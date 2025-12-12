@@ -1,0 +1,13 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "dev-toolbox",
+  "outputfilename": "dev-toolbox",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Vuong",
+    "email": "3168632+vuon9@users.noreply.github.com"
+  }
+}

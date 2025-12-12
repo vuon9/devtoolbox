@@ -1,0 +1,100 @@
+@use '@carbon/styles/scss/config' with ($use-flexbox-grid: true);
+@use '@carbon/styles/scss/themes';
+@use '@carbon/styles/scss/theme';
+@use '@carbon/styles';
+
+// Apply Carbon's background to body to avoid white flashes
+body {
+    background-color: var(--cds-background);
+    color: var(--cds-text-primary);
+    font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    transition: background-color 0.3s;
+}
+
+// Global variable mapping must happen where the Carbon Custom Properties exist.
+// Since we wrap the App in <Theme>, the tokens are available inside that wrapper.
+// We'll apply these mappings to .app-container which is the child of Theme.
+.app-container {
+    --bg-color: var(--cds-background);
+    --sidebar-bg: var(--cds-layer);
+    --surface-color: var(--cds-layer);
+    /* Adjusted to layer for better consistency */
+    --border-color: var(--cds-border-subtle);
+    --text-primary: var(--cds-text-primary);
+    --text-secondary: var(--cds-text-secondary);
+    --accent-color: var(--cds-primary);
+    --accent-hover: var(--cds-primary-hover);
+    --error-color: var(--cds-support-error);
+    --success-color: var(--cds-support-success);
+    --font-family: 'IBM Plex Sans', sans-serif;
+}
+
+// Map old utility classes to Carbon styles for transitioning
+.btn-primary {
+    // These should ideally be replaced by <Button> components, but for fallback:
+    background-color: var(--cds-primary);
+    color: var(--cds-text-on-primary);
+    border: none;
+    padding: 11px 16px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    background-color: var(--cds-primary-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--cds-border-strong);
+    color: var(--cds-text-primary);
+    padding: 10px 15px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-secondary:hover {
+    background-color: var(--cds-layer-hover);
+}
+
+// Ensure code editors look integrated
+.code-editor {
+    background-color: var(--cds-field);
+    color: var(--cds-text-primary);
+    border: none;
+    border-bottom: 1px solid var(--cds-border-strong);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.code-editor:focus {
+    outline: 2px solid var(--cds-focus);
+    outline-offset: -2px;
+}
+
+// Scrollbar styling to match theme
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cds-layer);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--cds-icon-secondary);
+    border-radius: 4px;
+}
