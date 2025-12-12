@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
+import { Button, RadioButtonGroup, RadioButton } from '@carbon/react';
+import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../components/ToolUI';
 
 export default function CsvJsonConverter() {
     const [input, setInput] = useState('');
@@ -8,7 +10,11 @@ export default function CsvJsonConverter() {
     const [error, setError] = useState('');
 
     const convert = () => {
-        if (!input.trim()) { setOutput(''); return; }
+        if (!input.trim()) {
+            setOutput('');
+            setError('');
+            return;
+        }
         setError('');
 
         if (mode === 'csv2json') {
@@ -18,9 +24,14 @@ export default function CsvJsonConverter() {
                 complete: (results) => {
                     if (results.errors.length > 0) {
                         setError('CSV Parse Error: ' + results.errors[0].message);
+                        setOutput('');
                     } else {
                         setOutput(JSON.stringify(results.data, null, 2));
                     }
+                },
+                error: (err) => {
+                    setError('CSV Parse Error: ' + err.message);
+                    setOutput('');
                 }
             });
         } else {
@@ -29,44 +40,44 @@ export default function CsvJsonConverter() {
                 const csv = Papa.unparse(json);
                 setOutput(csv);
             } catch (e) {
-                setError('Invalid JSON');
+                setError('Invalid JSON: ' + e.message);
+                setOutput('');
             }
         }
     };
 
     return (
         <div className="tool-container">
-            <div className="tool-header">
-                <h2 className="tool-title">CSV / JSON Converter</h2>
-                <p className="tool-desc">Convert between CSV and JSON formats.</p>
-            </div>
+            <ToolHeader title="CSV / JSON Converter" description="Convert between CSV and JSON formats." />
 
-            <div className="controls">
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <input type="radio" checked={mode === 'csv2json'} onChange={() => setMode('csv2json')} /> CSV to JSON
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <input type="radio" checked={mode === 'json2csv'} onChange={() => setMode('json2csv')} /> JSON to CSV
-                    </label>
-                </div>
-                <button className="btn-primary" onClick={convert}>Convert</button>
-            </div>
-            {error && <div style={{ color: 'var(--error-color)', marginBottom: '10px' }}>{error}</div>}
+            <ToolControls>
+                <RadioButtonGroup
+                    name="mode"
+                    legendText="Conversion Mode"
+                    value={mode}
+                    onChange={setMode}
+                    orientation="horizontal"
+                >
+                    <RadioButton labelText="CSV to JSON" value="csv2json" id="csv2json-radio" />
+                    <RadioButton labelText="JSON to CSV" value="json2csv" id="json2csv-radio" />
+                </RadioButtonGroup>
+                <Button onClick={convert}>Convert</Button>
+            </ToolControls>
 
-            <div className="split-pane">
-                <div className="pane">
-                    <div className="pane-header"><span className="pane-label">Input ({mode === 'csv2json' ? 'CSV' : 'JSON'})</span></div>
-                    <textarea className="code-editor" value={input} onChange={(e) => setInput(e.target.value)} />
-                </div>
-                <div className="pane">
-                    <div className="pane-header">
-                        <span className="pane-label">Output ({mode === 'csv2json' ? 'JSON' : 'CSV'})</span>
-                        <button className="btn-secondary" onClick={() => navigator.clipboard.writeText(output)}>Copy</button>
-                    </div>
-                    <textarea className="code-editor" readOnly value={output} />
-                </div>
-            </div>
+            {error && <div style={{ color: 'var(--cds-support-error)', marginBottom: '1rem' }}>{error}</div>}
+
+            <ToolSplitPane>
+                <ToolPane
+                    label={`Input (${mode === 'csv2json' ? 'CSV' : 'JSON'})`}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                />
+                <ToolPane
+                    label={`Output (${mode === 'csv2json' ? 'JSON' : 'CSV'})`}
+                    value={output}
+                    readOnly
+                />
+            </ToolSplitPane>
         </div>
     );
 }

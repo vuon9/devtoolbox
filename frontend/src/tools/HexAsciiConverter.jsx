@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextArea } from '@carbon/react';
+import { ToolHeader, ToolPane, ToolSplitPane } from '../components/ToolUI';
 
 export default function HexAsciiConverter() {
     const [hex, setHex] = useState('');
@@ -7,7 +7,7 @@ export default function HexAsciiConverter() {
 
     const fromHex = (val) => {
         setHex(val);
-        const clean = val.replace(/\s/g, '');
+        const clean = val.replace(/[^0-9a-fA-F]/g, '');
         let str = '';
         for (let i = 0; i < clean.length; i += 2) {
             str += String.fromCharCode(parseInt(clean.substr(i, 2), 16));
@@ -26,33 +26,22 @@ export default function HexAsciiConverter() {
 
     return (
         <div className="tool-container">
-            <div className="tool-header">
-                <h2 className="tool-title">Hex / ASCII Converter</h2>
-                <p className="tool-desc">Convert between Hexadecimal strings and ASCII text.</p>
-            </div>
+            <ToolHeader title="Hex / ASCII Converter" description="Convert between Hexadecimal strings and ASCII text." />
 
-            <div className="split-pane">
-                <div className="pane">
-                    <TextArea
-                        labelText="Hexadecimal"
-                        value={hex}
-                        onChange={(e) => fromHex(e.target.value)}
-                        placeholder="48 65 6c 6c 6f..."
-                        rows={15}
-                        style={{ height: '100%' }}
-                    />
-                </div>
-                <div className="pane">
-                    <TextArea
-                        labelText="ASCII"
-                        value={ascii}
-                        onChange={(e) => fromAscii(e.target.value)}
-                        placeholder="Hello..."
-                        rows={15}
-                        style={{ height: '100%' }}
-                    />
-                </div>
-            </div>
+            <ToolSplitPane>
+                <ToolPane
+                    label="Hexadecimal"
+                    value={hex}
+                    onChange={(e) => fromHex(e.target.value)}
+                    placeholder="48 65 6c 6c 6f..."
+                />
+                <ToolPane
+                    label="ASCII"
+                    value={ascii}
+                    onChange={(e) => fromAscii(e.target.value)}
+                    placeholder="Hello..."
+                />
+            </ToolSplitPane>
         </div>
     );
 }

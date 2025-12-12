@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import cronstrue from 'cronstrue';
+import { TextInput, Link } from '@carbon/react';
+import { ToolHeader } from '../components/ToolUI';
+
+const CronExample = ({ cron, text, setCron }) => (
+    <li style={{ marginBottom: '0.5rem' }}>
+        <Link onClick={() => setCron(cron)} style={{ cursor: 'pointer' }}>
+            <span style={{ fontFamily: 'monospace', color: 'var(--cds-text-primary)' }}>{cron.padEnd(18, ' ')}</span>
+            <span style={{ color: 'var(--cds-text-secondary)' }}>{text}</span>
+        </Link>
+    </li>
+);
 
 export default function CronJobParser() {
     const [cron, setCron] = useState('* * * * *');
@@ -24,43 +35,33 @@ export default function CronJobParser() {
 
     return (
         <div className="tool-container">
-            <div className="tool-header">
-                <h2 className="tool-title">Cron Job Parser</h2>
-                <p className="tool-desc">Describe cron expressions in human readable text.</p>
-            </div>
+            <ToolHeader title="Cron Job Parser" description="Translate cron expressions into human-readable text." />
 
-            <div className="pane" style={{ maxWidth: '800px' }}>
-                <div className="pane-header"><span className="pane-label">Cron Expression</span></div>
-                <input
-                    className="code-editor"
+            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                <TextInput
+                    id="cron-input"
+                    labelText="Cron Expression"
                     value={cron}
                     onChange={(e) => setCron(e.target.value)}
-                    style={{ fontSize: '1.5rem', fontFamily: 'monospace', height: 'auto', textAlign: 'center' }}
+                    invalid={!!error}
+                    invalidText={error}
+                    size="xl"
+                    style={{ fontFamily: 'monospace', textAlign: 'center' }}
                 />
 
-                <div style={{ marginTop: '30px', textAlign: 'center' }}>
-                    {error ? (
-                        <h3 style={{ color: 'var(--error-color)' }}>{error}</h3>
-                    ) : (
-                        <h3 style={{ color: 'var(--accent-color)', fontSize: '1.5rem', fontWeight: '400' }}>{desc}</h3>
-                    )}
+                <div style={{ marginTop: '2rem', textAlign: 'center', minHeight: '3rem' }}>
+                    <p style={{ fontSize: '1.25rem', color: 'var(--cds-text-primary)', fontWeight: '600' }}>
+                        {desc}
+                    </p>
                 </div>
 
-                <div style={{ marginTop: '40px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                    <p>Common Examples:</p>
+                <div style={{ marginTop: '3rem', color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>
+                    <h4 style={{ marginBottom: '1rem' }}>Common Examples</h4>
                     <ul style={{ listStyle: 'none', padding: 0 }}>
-                        <li style={{ marginBottom: '8px', cursor: 'pointer', display: 'flex', gap: '15px' }} onClick={() => setCron('*/5 * * * *')}>
-                            <span style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>*/5 * * * *</span>
-                            <span>Every 5 minutes</span>
-                        </li>
-                        <li style={{ marginBottom: '8px', cursor: 'pointer', display: 'flex', gap: '15px' }} onClick={() => setCron('0 0 * * *')}>
-                            <span style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>0 0 * * *</span>
-                            <span>At midnight</span>
-                        </li>
-                        <li style={{ marginBottom: '8px', cursor: 'pointer', display: 'flex', gap: '15px' }} onClick={() => setCron('0 9 * * 1')}>
-                            <span style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>0 9 * * 1</span>
-                            <span>At 09:00 on Monday</span>
-                        </li>
+                        <CronExample cron="*/5 * * * *" text="Every 5 minutes" setCron={setCron} />
+                        <CronExample cron="0 0 * * *" text="At midnight (00:00)" setCron={setCron} />
+                        <CronExample cron="0 9 * * 1" text="At 09:00 on Monday" setCron={setCron} />
+                        <CronExample cron="0 * * * *" text="Every hour at minute 0" setCron={setCron} />
                     </ul>
                 </div>
             </div>

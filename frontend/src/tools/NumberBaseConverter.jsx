@@ -1,83 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { TextInput } from '@carbon/react';
+import { ToolHeader } from '../components/ToolUI';
 
-export default function NumberBaseConverter() {
-    const [dec, setDec] = useState('');
-    const [hex, setHex] = useState('');
-    const [oct, setOct] = useState('');
-    const [bin, setBin] = useState('');
+const NumberBaseConverter = () => {
+    const [values, setValues] = useState({ dec: '', hex: '', oct: '', bin: '' });
+    const [error, setError] = useState('');
 
-    const updateFromDec = (val) => {
-        setDec(val);
-        if (val === '') { reset(); return; }
-        const num = parseInt(val, 10);
-        if (isNaN(num)) return;
-        setHex(num.toString(16).toUpperCase());
-        setOct(num.toString(8));
-        setBin(num.toString(2));
-    };
+    const reset = () => setValues({ dec: '', hex: '', oct: '', bin: '' });
 
-    const updateFromHex = (val) => {
-        setHex(val);
-        if (val === '') { reset(); return; }
-        const num = parseInt(val, 16);
-        if (isNaN(num)) return;
-        setDec(num.toString(10));
-        setOct(num.toString(8));
-        setBin(num.toString(2));
-    };
+    const handleConversion = useCallback((inputValue, fromBase) => {
+        if (inputValue.trim() === '') {
+            reset();
+            setError('');
+            return;
+        }
 
-    const updateFromOct = (val) => {
-        setOct(val);
-        if (val === '') { reset(); return; }
-        const num = parseInt(val, 8);
-        if (isNaN(num)) return;
-        setDec(num.toString(10));
-        setHex(num.toString(16).toUpperCase());
-        setBin(num.toString(2));
-    };
+        let num;
+        switch (fromBase) {
+            case 'dec': num = parseInt(inputValue, 10); break;
+            case 'hex': num = parseInt(inputValue, 16); break;
+            case 'oct': num = parseInt(inputValue, 8); break;
+            case 'bin': num = parseInt(inputValue, 2); break;
+            default: return;
+        }
 
-    const updateFromBin = (val) => {
-        setBin(val);
-        if (val === '') { reset(); return; }
-        const num = parseInt(val, 2);
-        if (isNaN(num)) return;
-        setDec(num.toString(10));
-        setHex(num.toString(16).toUpperCase());
-        setOct(num.toString(8));
-    };
-
-    const reset = () => {
-        setDec('');
-        setHex('');
-        setOct('');
-        setBin('');
-    };
+        if (isNaN(num) || num < 0) {
+            setError(`Invalid ${fromBase} input`);
+            const newValues = { ...values, [fromBase]: inputValue };
+            setValues(newValues);
+            return;
+        }
+        
+        setError('');
+        setValues({
+            dec: num.toString(10),
+            hex: num.toString(16).toUpperCase(),
+            oct: num.toString(8),
+            bin: num.toString(2),
+        });
+    }, []);
 
     return (
         <div className="tool-container">
-            <div className="tool-header">
-                <h2 className="tool-title">Number Base Converter</h2>
-                <p className="tool-desc">Convert numbers between Decimal, Hexadecimal, Octal, and Binary.</p>
-            </div>
-
-            <div className="pane" style={{ maxWidth: '600px', gap: '20px' }}>
-                <div>
-                    <div className="pane-header"><span className="pane-label">Decimal</span></div>
-                    <input className="code-editor" style={{ height: 'auto' }} value={dec} onChange={(e) => updateFromDec(e.target.value)} type="number" />
-                </div>
-                <div>
-                    <div className="pane-header"><span className="pane-label">Hexadecimal</span></div>
-                    <input className="code-editor" style={{ height: 'auto' }} value={hex} onChange={(e) => updateFromHex(e.target.value)} />
-                </div>
-                <div>
-                    <div className="pane-header"><span className="pane-label">Octal</span></div>
-                    <input className="code-editor" style={{ height: 'auto' }} value={oct} onChange={(e) => updateFromOct(e.target.value)} type="number" />
-                </div>
-                <div>
-                    <div className="pane-header"><span className="pane-label">Binary</span></div>
-                    <input className="code-editor" style={{ height: 'auto' }} value={bin} onChange={(e) => updateFromBin(e.target.value)} type="number" />
-                </div>
+            <ToolHeader title="Number Base Converter" description="Convert numbers between Decimal, Hexadecimal, Octal, and Binary." />
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '600px' }}>
+                <TextInput
+                    id="dec-input"
+                    labelText="Decimal"
+                    value={values.dec}
+                    onChange={(e) => handleConversion(e.target.value, 'dec')}
+                    invalid={error.includes('dec')}
+                    invalidText={error}
+                />
+                <TextInput
+                    id="hex-input"
+                    labelText="Hexadecimal"
+                    value={values.hex}
+                    onChange={(e) => handleConversion(e.target.value, 'hex')}
+                    invalid={error.includes('hex')}
+                    invalidText={error}
+                />
+                <TextInput
+                    id="oct-input"
+                    labelText="Octal"
+                    value={values.oct}
+                    onChange={(e) => handleConversion(e.target.value, 'oct')}
+                    invalid={error.includes('oct')}
+                    invalidText={error}
+                />
+                <TextInput
+                    id="bin-input"
+                    labelText="Binary"
+                    value={values.bin}
+                    onChange={(e) => handleConversion(e.target.value, 'bin')}
+                    invalid={error.includes('bin')}
+                    invalidText={error}
+                />
             </div>
         </div>
     );
-}
+};
+
+export default NumberBaseConverter;

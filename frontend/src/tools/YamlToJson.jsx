@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import yaml from 'js-yaml';
+import { RadioButtonGroup, RadioButton } from '@carbon/react';
+import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../components/ToolUI';
 
 export default function YamlToJson() {
     const [input, setInput] = useState('');
@@ -7,65 +9,63 @@ export default function YamlToJson() {
     const [mode, setMode] = useState('yaml2json'); // yaml2json | json2yaml
     const [error, setError] = useState('');
 
-    const convert = (val, currentMode) => {
-        if (!val.trim()) {
-            setOutput('');
-            setError('');
-            return;
-        }
-
-        try {
-            if (currentMode === 'yaml2json') {
-                const obj = yaml.load(val);
-                setOutput(JSON.stringify(obj, null, 2));
-            } else {
-                const obj = JSON.parse(val);
-                setOutput(yaml.dump(obj));
+    useEffect(() => {
+        const convert = () => {
+            if (!input.trim()) {
+                setOutput('');
+                setError('');
+                return;
             }
-            setError('');
-        } catch (e) {
-            setError(e.message);
-            setOutput('');
-        }
-    };
 
-    const handleInput = (val) => {
-        setInput(val);
-        convert(val, mode);
-    };
+            try {
+                if (mode === 'yaml2json') {
+                    const obj = yaml.load(input);
+                    setOutput(JSON.stringify(obj, null, 2));
+                } else {
+                    const obj = JSON.parse(input);
+                    setOutput(yaml.dump(obj));
+                }
+                setError('');
+            } catch (e) {
+                setError(e.message);
+                setOutput('');
+            }
+        };
+        convert();
+    }, [input, mode]);
 
     return (
         <div className="tool-container">
-            <div className="tool-header">
-                <h2 className="tool-title">YAML / JSON Converter</h2>
-                <p className="tool-desc">Convert between YAML and JSON formats.</p>
-            </div>
+            <ToolHeader title="YAML / JSON Converter" description="Convert between YAML and JSON formats." />
 
-            <div className="controls">
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <input type="radio" checked={mode === 'yaml2json'} onChange={() => { setMode('yaml2json'); convert(input, 'yaml2json'); }} /> YAML to JSON
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <input type="radio" checked={mode === 'json2yaml'} onChange={() => { setMode('json2yaml'); convert(input, 'json2yaml'); }} /> JSON to YAML
-                    </label>
-                </div>
-            </div>
-            {error && <div style={{ color: 'var(--error-color)', marginBottom: '10px' }}>{error}</div>}
+            <ToolControls>
+                <RadioButtonGroup
+                    name="mode"
+                    legendText="Conversion"
+                    value={mode}
+                    onChange={setMode}
+                    orientation="horizontal"
+                >
+                    <RadioButton labelText="YAML to JSON" value="yaml2json" id="yaml2json-radio" />
+                    <RadioButton labelText="JSON to YAML" value="json2yaml" id="json2yaml-radio" />
+                </RadioButtonGroup>
+            </ToolControls>
 
-            <div className="split-pane">
-                <div className="pane">
-                    <div className="pane-header"><span className="pane-label">{mode === 'yaml2json' ? 'YAML Input' : 'JSON Input'}</span></div>
-                    <textarea className="code-editor" value={input} onChange={(e) => handleInput(e.target.value)} />
-                </div>
-                <div className="pane">
-                    <div className="pane-header">
-                        <span className="pane-label">{mode === 'yaml2json' ? 'JSON Output' : 'YAML Output'}</span>
-                        <button className="btn-secondary" onClick={() => navigator.clipboard.writeText(output)}>Copy</button>
-                    </div>
-                    <textarea className="code-editor" readOnly value={output} />
-                </div>
-            </div>
+            {error && <div style={{ color: 'var(--cds-support-error)', marginBottom: '1rem' }}>{error}</div>}
+
+            <ToolSplitPane>
+                <ToolPane
+                    label={mode === 'yaml2json' ? 'YAML Input' : 'JSON Input'}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={mode === 'yaml2json' ? 'Enter YAML...' : 'Enter JSON...'}
+                />
+                <ToolPane
+                    label={mode === 'yaml2json' ? 'JSON Output' : 'YAML Output'}
+                    value={output}
+                    readOnly
+                />
+            </ToolSplitPane>
         </div>
     );
 }

@@ -1,56 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { RadioButtonGroup, RadioButton } from '@carbon/react';
+import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../components/ToolUI';
 
 export default function HtmlEntityConverter() {
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
     const [mode, setMode] = useState('encode');
+    const [error, setError] = useState('');
 
     const process = (val, currentMode) => {
         try {
+            let result;
             if (currentMode === 'encode') {
-                setOutput(val.replace(/[\u00A0-\u9999<>&]/g, function (i) {
-                    return '&#' + i.charCodeAt(0) + ';';
-                }));
+                result = (val || '').replace(/[\u00A0-\u9999<>&]/g, (i) => '&#' + i.charCodeAt(0) + ';');
             } else {
-                const doc = new DOMParser().parseFromString(val, "text/html");
-                setOutput(doc.documentElement.textContent);
+                const doc = new DOMParser().parseFromString(val || '', "text/html");
+                result = doc.documentElement.textContent;
             }
+            setOutput(result);
+            setError('');
         } catch (e) {
-            setOutput('Error processing');
+            setError('Error: ' + e.message);
+            setOutput('');
         }
     };
+    
+    useEffect(() => {
+        process(input, mode);
+    }, [input, mode]);
 
     return (
         <div className="tool-container">
-            <div className="tool-header">
-                <h2 className="tool-title">HTML Entity Converter</h2>
-                <p className="tool-desc">Encode or decode HTML entities.</p>
-            </div>
+            <ToolHeader title="HTML Entity Converter" description="Encode or decode HTML entities." />
 
-            <div className="controls">
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <input type="radio" checked={mode === 'encode'} onChange={() => { setMode('encode'); process(input, 'encode'); }} /> Encode
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <input type="radio" checked={mode === 'decode'} onChange={() => { setMode('decode'); process(input, 'decode'); }} /> Decode
-                    </label>
-                </div>
-            </div>
+            <ToolControls>
+                <RadioButtonGroup
+                    name="mode"
+                    legendText="Mode"
+                    value={mode}
+                    onChange={setMode}
+                    orientation="horizontal"
+                >
+                    <RadioButton labelText="Encode" value="encode" id="encode-radio" />
+                    <RadioButton labelText="Decode" value="decode" id="decode-radio" />
+                </RadioButtonGroup>
+            </ToolControls>
 
-            <div className="split-pane">
-                <div className="pane">
-                    <div className="pane-header"><span className="pane-label">Input</span></div>
-                    <textarea className="code-editor" value={input} onChange={(e) => { setInput(e.target.value); process(e.target.value, mode) }} />
-                </div>
-                <div className="pane">
-                    <div className="pane-header">
-                        <span className="pane-label">Output</span>
-                        <button className="btn-secondary" onClick={() => navigator.clipboard.writeText(output)}>Copy</button>
-                    </div>
-                    <textarea className="code-editor" readOnly value={output} />
-                </div>
-            </div>
+            {error && <div style={{ color: 'var(--cds-support-error)', marginBottom: '1rem' }}>{error}</div>}
+
+            <ToolSplitPane>
+                <ToolPane
+                    label="Input"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Paste text here..."
+                />
+                <ToolPane
+                    label="Output"
+                    value={output}
+                    readOnly
+                />
+            </ToolSplitPane>
         </div>
     );
 }

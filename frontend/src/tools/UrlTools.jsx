@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
 import UrlParser from './UrlParser';
 import UrlEncoder from './UrlEncoder';
+import { ToolHeader } from '../components/ToolUI';
 
 export default function UrlTools() {
     return (
         <div className="tool-container">
-            <div className="tool-header">
-                <h2 className="tool-title">URL Tools</h2>
-                <p className="tool-desc">Parse, Encode, and Decode URLs.</p>
-            </div>
+            <ToolHeader title="URL Tools" description="Parse, Encode, and Decode URLs." />
 
             <Tabs>
                 <TabList aria-label="URL Tools Tabs">

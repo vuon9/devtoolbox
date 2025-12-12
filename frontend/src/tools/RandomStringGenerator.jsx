@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Button, NumberInput, Checkbox } from '@carbon/react';
+import { Renew } from '@carbon/icons-react';
+import { ToolHeader, ToolControls, ToolPane } from '../components/ToolUI';
 
 export default function RandomStringGenerator() {
     const [length, setLength] = useState(32);
@@ -35,32 +38,37 @@ export default function RandomStringGenerator() {
         setResult(res);
     };
 
+    useEffect(() => {
+        generate();
+    }, [length, useUpper, useLower, useNumbers, useSymbols]);
+
     return (
         <div className="tool-container">
-            <div className="tool-header">
-                <h2 className="tool-title">Random String Generator</h2>
-                <p className="tool-desc">Generate random secure strings.</p>
-            </div>
+            <ToolHeader title="Random String Generator" description="Generate strong, random and secure strings." />
 
-            <div className="controls" style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <label>Length:</label>
-                    <input type="number" value={length} onChange={(e) => setLength(parseInt(e.target.value))} style={{ width: '60px' }} />
-                </div>
-                <label><input type="checkbox" checked={useUpper} onChange={(e) => setUseUpper(e.target.checked)} /> A-Z</label>
-                <label><input type="checkbox" checked={useLower} onChange={(e) => setUseLower(e.target.checked)} /> a-z</label>
-                <label><input type="checkbox" checked={useNumbers} onChange={(e) => setUseNumbers(e.target.checked)} /> 0-9</label>
-                <label><input type="checkbox" checked={useSymbols} onChange={(e) => setUseSymbols(e.target.checked)} /> !@#</label>
-                <button className="btn-primary" onClick={generate}>Generate</button>
-            </div>
+            <ToolControls>
+                <NumberInput
+                    id="length-input"
+                    label="Length"
+                    min={1}
+                    max={2048}
+                    value={length}
+                    onChange={(e) => setLength(e.target.value)}
+                />
+                <Checkbox labelText="A-Z" id="use-upper" checked={useUpper} onChange={(_, { checked }) => setUseUpper(checked)} />
+                <Checkbox labelText="a-z" id="use-lower" checked={useLower} onChange={(_, { checked }) => setUseLower(checked)} />
+                <Checkbox labelText="0-9" id="use-numbers" checked={useNumbers} onChange={(_, { checked }) => setUseNumbers(checked)} />
+                <Checkbox labelText="!@#$%" id="use-symbols" checked={useSymbols} onChange={(_, { checked }) => setUseSymbols(checked)} />
+                <Button onClick={generate} renderIcon={Renew}>Generate</Button>
+            </ToolControls>
 
-            <div className="pane" style={{ height: '200px' }}>
-                <div className="pane-header">
-                    <span className="pane-label">Result</span>
-                    {result && <button className="btn-secondary" onClick={() => navigator.clipboard.writeText(result)}>Copy</button>}
-                </div>
-                <textarea className="code-editor" readOnly value={result} style={{ fontSize: '1.2rem', textAlign: 'center', paddingTop: '60px' }} />
-            </div>
+            <ToolPane
+                label="Result"
+                value={result}
+                readOnly
+                placeholder="Generated string will appear here"
+                style={{ height: 'auto' }}
+            />
         </div>
     );
 }
