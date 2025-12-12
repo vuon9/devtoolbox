@@ -51,7 +51,7 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 marginBottom: '0.5rem',
-                minHeight: '24px'
+                minHeight: '30px'
             }}>
                 <label style={{
                     fontSize: '0.75rem',
@@ -63,17 +63,16 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
                 }}>
                     {label}
                 </label>
-                {(readOnly || onCopy) && (
-                    <Button
-                        hasIconOnly
-                        renderIcon={Copy}
-                        kind="ghost"
-                        size="sm"
-                        iconDescription="Copy to clipboard"
-                        tooltipPosition="left"
-                        onClick={handleCopy}
-                    />
-                )}
+                <Button
+                    hasIconOnly
+                    renderIcon={Copy}
+                    kind="ghost"
+                    size="sm"
+                    iconDescription="Copy to clipboard"
+                    tooltipPosition="left"
+                    onClick={handleCopy}
+                    disabled={!value}
+                />
             </div>
             <div style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column' }}>
                 <TextArea
@@ -81,14 +80,14 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
                     onChange={onChange}
                     readOnly={readOnly}
                     placeholder={placeholder}
-                    rows={10} // base rows, but flex will override
+                    rows={10}
                     style={{
                         height: '100%',
                         resize: 'none',
                         fontFamily: "'IBM Plex Mono', monospace",
-                        border: '1px solid var(--cds-border-strong)', // Enforce border
+                        border: '1px solid var(--cds-border-strong)',
                     }}
-                    labelText="" // We handle label externally
+                    labelText=""
                     {...props}
                 />
             </div>
@@ -96,11 +95,12 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
     );
 }
 
-export function ToolSplitPane({ children }) {
+export function ToolSplitPane({ children, columnCount = 2 }) {
+    const gridColumns = columnCount === 1 ? '1fr' : `repeat(${columnCount}, 1fr)`;
     return (
         <div className="split-pane" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: gridColumns,
             gap: '16px',
             flex: 1,
             minHeight: 0
