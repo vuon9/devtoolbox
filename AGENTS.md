@@ -3,6 +3,21 @@
 
 This project follows the **Carbon Design System** guidelines to ensure a consistent, accessible, and professional user interface. All new features and tools **MUST** adhere to these principles.
 
+---
+
+## ⚠️ IMPORTANT: Check Tool Status Before Modifying
+
+**Before editing any tool component, ALWAYS check [TOOL_STATUS.md](./TOOL_STATUS.md)** to see if it's currently being refactored or already completed.
+
+This prevents:
+- Accidentally modifying a tool already refactored with new patterns
+- Conflicting with ongoing refactoring work
+- Introducing outdated patterns into completed tools
+
+See [TOOL_STATUS.md](./TOOL_STATUS.md) for the current status of each tool.
+
+---
+
 ## 1. Design System & Theme
 -   **System**: [Carbon Design System](https://carbondesignsystem.com/) (`@carbon/react`).
 -   **Theme**: The application is wrapped in a Carbon `<Theme>` provider.
