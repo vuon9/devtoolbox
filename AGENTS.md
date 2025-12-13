@@ -62,3 +62,8 @@ Use the standardized components in `src/components/ToolUI.jsx` to enforce these 
 ## 4. Implementation Details
 -   **SCSS**: `src/index.scss` maps global variables.
 -   **Icons**: Use `@carbon/icons-react`.
+
+## 5. Testing Guidelines
+-   All Go tests MUST follow Go's recommended table-driven (table test) style: define a slice of named test cases with fields such as `name`, inputs, `want`, and `wantErr`, iterate over them with `for _, tc := range tests { ... }`, and run each case as a subtest using `t.Run(tc.name, func(t *testing.T) { ... })`.
+-   When using subtests with parallel execution, use `tc := tc` before `t.Run` and call `t.Parallel()` inside the subtest.
+-   Tests should use clear case names, deterministic setup/teardown, avoid global state, and prefer `reflect.DeepEqual` or the `cmp` package for comparisons to keep tests reliable and readable.
