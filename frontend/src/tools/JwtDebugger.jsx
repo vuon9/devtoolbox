@@ -1,6 +1,6 @@
 import React, { useReducer, useCallback } from 'react';
-import { Button, Select, SelectItem } from '@carbon/react';
-import { CheckmarkFilled, CloseFilled, MagicWand, Security, Code } from '@carbon/icons-react';
+import { Button, Select, SelectItem, Tabs, Tab, TabList } from '@carbon/react';
+import { CheckmarkFilled, CloseFilled, MagicWand, Security, Code, Search, Edit } from '@carbon/icons-react';
 import { ToolHeader, ToolControls, ToolLayout, ToolTextArea, ToolInputGroup, ToolCopyButton, LAYOUT_DIRECTIONS } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
 import ToolLayoutToggle from '../components/layout/ToolLayoutToggle';
@@ -151,34 +151,19 @@ export default function JwtDebugger() {
         </div>
     ) : null;
 
-    // Simple tab bar for mode switching (decode/encode)
+    // Enhanced tab bar for mode switching (decode/encode) using Carbon Tabs
     const ModeTabBar = ({ activeMode, onChange }) => (
-        <div style={{
-            display: 'flex',
-            gap: '1rem',
-            paddingBottom: '0.25rem',
-            height: '28px',
-            alignItems: 'center'
-        }}>
-            {['Decode', 'Encode'].map((tab, idx) => (
-                <button
-                    key={idx}
-                    onClick={() => onChange(idx)}
-                    style={{
-                        padding: '0.5rem 0',
-                        background: 'transparent',
-                        border: 'none',
-                        borderBottom: activeMode === idx ? '2px solid var(--cds-interactive-01)' : 'none',
-                        color: activeMode === idx ? 'var(--cds-text-primary)' : 'var(--cds-text-secondary)',
-                        fontSize: '0.875rem',
-                        fontWeight: 500,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                    }}
-                >
-                    {tab}
-                </button>
-            ))}
+        <div style={{ marginBottom: '-0.25rem' }}>
+            <Tabs selectedIndex={activeMode} onChange={({ selectedIndex }) => onChange(selectedIndex)}>
+                <TabList aria-label="JWT Debugger mode">
+                    <Tab renderIcon={Search}>
+                        Decode
+                    </Tab>
+                    <Tab renderIcon={Edit}>
+                        Encode
+                    </Tab>
+                </TabList>
+            </Tabs>
         </div>
     );
 

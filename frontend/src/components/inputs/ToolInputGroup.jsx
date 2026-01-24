@@ -129,8 +129,7 @@ export default function ToolInputGroup({
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                paddingBottom: '0.5rem',
-                borderBottom: '1px solid var(--cds-border-subtle)'
+                paddingBottom: '0.75rem'
             }}>
                 <h3 style={{
                     fontSize: '1.25rem',
