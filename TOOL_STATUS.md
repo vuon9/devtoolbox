@@ -13,7 +13,7 @@ This document tracks the refactoring and development status of each tool compone
 
 | Tool | Status | Notes | Last Updated |
 |------|--------|-------|--------------|
-| JwtDebugger | 🟢 Done | Uses new component abstraction system (ToolLayout, ToolTextArea, ToolInputGroup), toggleable layout, consistent styling, abstract button components, resizable textareas with constraints | Completed 2026-01-24 |
+| JwtDebugger | 🟢 Done | Uses component abstraction system (ToolLayout, ToolTextArea, ToolInputGroup), toggleable layout, consistent button styling with icons (MagicWand, Security, Code), enhanced tabs (custom mode tabs, improved JSON/Claims tabs), resizable textareas with constraints, proper error handling | Completed 2026-01-25 |
 | BackslashEscaper | 🔴 Not Started | Legacy implementation | - |
 | Base64Converter | 🔴 Not Started | Legacy implementation | - |
 | CodeFormatter | 🔴 Not Started | Legacy implementation | - |
