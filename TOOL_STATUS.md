@@ -13,7 +13,7 @@ This document tracks the refactoring and development status of each tool compone
 
 | Tool | Status | Notes | Last Updated |
 |------|--------|-------|--------------|
-| JwtDebugger | 🟢 Done | Refactored with useReducer, DRY components, Carbon Design System | 2025-12-13 |
+| JwtDebugger | 🟢 Done | Uses new component abstraction system (ToolLayout, ToolTextArea, ToolInputGroup), toggleable layout, consistent styling, abstract button components, resizable textareas with constraints | Completed 2026-01-24 |
 | BackslashEscaper | 🔴 Not Started | Legacy implementation | - |
 | Base64Converter | 🔴 Not Started | Legacy implementation | - |
 | CodeFormatter | 🔴 Not Started | Legacy implementation | - |

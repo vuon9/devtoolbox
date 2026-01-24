@@ -2,6 +2,10 @@ import React from 'react';
 import { TextArea, Button } from '@carbon/react';
 import { Copy } from '@carbon/icons-react';
 
+// Re-export new layout components
+export { ToolLayout, ToolLayoutToggle, ToolVerticalSplit, LAYOUT_DIRECTIONS, TOGGLE_POSITIONS } from './layout';
+export { ToolCopyButton, ToolTextArea, ToolInput, ToolInputGroup, ToolTabBar } from './inputs';
+
 export function ToolHeader({ title, description }) {
     return (
         <div className="tool-header">
@@ -50,7 +54,6 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '0.5rem',
                 minHeight: '30px'
             }}>
                 <label style={{

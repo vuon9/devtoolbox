@@ -70,7 +70,83 @@ Use the standardized components in `src/components/ToolUI.jsx` to enforce these 
 
 ---
 
-## 6. Development Setup
+## 6. Backend Architecture & Patterns
+
+This project follows clean architecture principles with domain‑driven design (DDD) inspiration. The backend is organized into layers with clear separation of concerns.
+
+### Package Structure
+
+- **`internal/`** – Domain‑specific packages (e.g., `internal/jwt/`). These are private to the application and not importable outside.
+- **`pkg/`** – Shared, reusable utilities (e.g., `pkg/encoding`, `pkg/validation`, `pkg/errors`). These are public and can be imported by other packages. (Previously organized under `pkg/shared/`; now flattened for simplicity.)
+- **`*.go` in root** – Wails binding structs (e.g., `jwt_service.go`). Each tool that needs backend logic should have its own service file.
+
+### Domain Package Structure (Example: `internal/jwt/`)
+
+```
+internal/jwt/
+├── errors.go      # Domain‑specific error types
+├── token.go       # Core domain models (Token, ValidationResult) with builder pattern
+├── parser.go      # Interface and implementation for parsing/verification
+├── service.go     # Service interface and implementation
+└── dto.go         # Data transfer objects matching frontend state
+```
+
+### Key Patterns
+
+1. **Interfaces First**: Define interfaces for major components (e.g., `Parser`, `JWTService`).
+2. **Builder Pattern**: Use fluent builders for complex objects (see `Token.WithHeader()`, `ValidationResult.WithMessage()`).
+3. **Error Mapping**: Convert library errors to domain errors using shared error types from `pkg/errors`.
+4. **State Compatibility**: Backend response structures must exactly match frontend state (see `DecodeResponse`, `VerifyResponse` in `dto.go`).
+5. **Wails Binding**: Create a separate service struct for each tool (e.g., `JWTService`) that implements `startup()` and exposes methods to the frontend.
+
+### Implementation Example (JWT Debugger)
+
+**Service Definition** (`jwt_service.go`):
+```go
+type JWTService struct {
+    ctx context.Context
+    svc jwt.JWTService
+}
+
+func (j *JWTService) Decode(token string) (jwt.DecodeResponse, error) {
+    result, err := j.svc.Decode(token)
+    if err != nil {
+        return jwt.DecodeResponse{Error: err.Error()}, nil
+    }
+    return jwt.FromToken(result), nil
+}
+```
+
+**Frontend Integration** (`JwtDebugger.jsx`):
+```js
+const response = await window.go.main.JWTService.Decode(state.token);
+```
+
+### Testing Backend Code
+
+All Go tests MUST follow the table‑driven style described in section 5. Example:
+
+```go
+func TestDecode(t *testing.T) {
+    tests := []struct {
+        name    string
+        token   string
+        wantErr bool
+    }{
+        {name: "valid token", token: "eyJ...", wantErr: false},
+        {name: "empty token", token: "", wantErr: true},
+    }
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            // test logic
+        })
+    }
+}
+```
+
+---
+
+## 7. Development Setup
 
 ### Prerequisites
 - **Node.js** (>= 18)
@@ -80,7 +156,7 @@ Use the standardized components in `src/components/ToolUI.jsx` to enforce these 
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/dev-toolbox.git
+git clone https://github.com/vuon9/dev-toolbox.git
 cd dev-toolbox
 
 # Install frontend dependencies
@@ -103,7 +179,7 @@ The application will open in a native window. All tools work offline; no externa
 
 ---
 
-## 7. Linting & Formatting
+## 8. Linting & Formatting
 
 ### Frontend
 - **ESLint**: Not currently configured. Consider adding `.eslintrc` and scripts.
@@ -136,7 +212,7 @@ npm run format
 
 ---
 
-## 8. Adding a New Tool
+## 9. Adding a New Tool
 
 Follow this step‑by‑step guide to add a new tool component:
 
@@ -173,7 +249,7 @@ Follow this step‑by‑step guide to add a new tool component:
 
 ---
 
-## 9. Refactoring a Tool
+## 10. Refactoring a Tool
 
 Refer to **[TOOL_STATUS.md](./TOOL_STATUS.md)** for the current status of each tool. **Always check this file before modifying any tool component.**
 
@@ -198,14 +274,14 @@ Refer to **[TOOL_STATUS.md](./TOOL_STATUS.md)** for the current status of each t
 
 ---
 
-## 10. Agent‑Specific Guidelines
+## 11. Agent‑Specific Guidelines
 
 These guidelines are intended for AI assistants (like opencode) working on this repository.
 
 ### Before Starting Work
 1. **Read `AGENTS.md`** – Understand the design principles and implementation rules.
 2. **Check `TOOL_STATUS.md`** – Never modify a tool that is already 🟢 Done or 🟡 In Progress unless explicitly instructed.
-3. **Examine existing code** – Look at recently refactored tools (e.g., `JwtDebugger.jsx`) to see the expected patterns.
+3. **Examine existing code** – Look at recently refactored tools (e.g., `JwtDebugger.jsx` and its Go backend in `internal/jwt/`) to see the expected patterns.
 
 ### While Implementing
 1. **Follow Carbon Design System** – Use `@carbon/react` components, Carbon tokens, and the provided `ToolUI` helpers.
@@ -216,7 +292,7 @@ These guidelines are intended for AI assistants (like opencode) working on this 
 6. **Code Quality** – Remove unused imports, variables, and debug logs before finishing.
 
 ### Before Finishing
-1. **Run linting & formatting** – Execute any available lint/format commands (see section 7).
+1. **Run linting & formatting** – Execute any available lint/format commands (see section 8).
 2. **Test the tool** – Verify functionality with `wails dev`.
 3. **Update `TOOL_STATUS.md`** – If you refactored a tool, update its status and add a completion note.
 4. **Commit changes** – Use descriptive commit messages that reference the tool name and changes made.

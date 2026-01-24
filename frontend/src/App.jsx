@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Sidebar } from './components/Sidebar';
 import { Theme, IconButton, OverflowMenu, OverflowMenuItem } from '@carbon/react';
@@ -34,8 +34,47 @@ import UrlTools from './tools/UrlTools';
 import DataConverter from './tools/DataConverter';
 import PhpJsonConverter from './tools/PhpJsonConverter';
 
+// Error boundary for catching React rendering errors
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null, errorInfo: null };
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error('ErrorBoundary caught an error:', error, errorInfo);
+        this.setState({
+            error: error,
+            errorInfo: errorInfo
+        });
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{ padding: '2rem', color: 'var(--cds-text-primary)', backgroundColor: 'var(--cds-layer)' }}>
+                    <h2>Something went wrong</h2>
+                    <p>The application encountered an error. Please try refreshing the page.</p>
+                    <details style={{ marginTop: '1rem', whiteSpace: 'pre-wrap' }}>
+                        <summary>Error details</summary>
+                        {this.state.error && this.state.error.toString()}
+                        <br />
+                        {this.state.errorInfo && this.state.errorInfo.componentStack}
+                    </details>
+                </div>
+            );
+        }
+
+        return this.props.children;
+    }
+}
 
 function App() {
+    console.log('App mounting');
     const [activeTool, setActiveTool] = useState('json');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [theme, setTheme] = useState('g100'); // 'white', 'g10', 'g90', 'g100'
@@ -109,7 +148,8 @@ function App() {
     };
 
     return (
-        <Theme theme={theme} style={{ height: '100%' }}>
+        <ErrorBoundary>
+            <Theme theme={theme} style={{ height: '100%' }}>
             <div className="app-container">
                 <Sidebar
                     activeTool={activeTool}
@@ -190,6 +230,7 @@ function App() {
                 )}
             </div>
         </Theme>
+        </ErrorBoundary>
     );
 }
 
