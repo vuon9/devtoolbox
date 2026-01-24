@@ -5,7 +5,7 @@ import { validateJson, formatJson, objectToKeyValueString } from '../../utils/in
 
 /**
  * Tabbed input group for patterns like JSON/Claims
- * 
+ *
  * @param {Object} props
  * @param {string} props.title - Group title
  * @param {string[]} props.tabs - Tab labels (e.g., ['JSON', 'Claims'])
@@ -33,7 +33,7 @@ export default function ToolInputGroup({
     // Determine content based on mode
     let content = null;
     let copyText = '';
-    
+
     // Base textarea styles with resizable constraints
     const textareaStyle = {
         flex: 1,
@@ -67,10 +67,10 @@ export default function ToolInputGroup({
         } else {
             // Claims tab - read-only display of parsed JSON
             const validation = validateJson(value || '');
-            const displayText = validation.isValid && validation.data 
+            const displayText = validation.isValid && validation.data
                 ? objectToKeyValueString(validation.data)
                 : '';
-            
+
             content = (
                 <textarea
                     value={displayText}
@@ -106,14 +106,14 @@ export default function ToolInputGroup({
             copyText = claimsText;
         }
     }
-    
+
     // Validation error for editable JSON
-    const validationError = editable && activeTab === 0 && value 
-        ? validateJson(value).error 
+    const validationError = editable && activeTab === 0 && value
+        ? validateJson(value).error
         : null;
-    
+
     return (
-        <div 
+        <div
             className="tool-input-group"
             style={{
                 display: 'flex',
@@ -129,7 +129,6 @@ export default function ToolInputGroup({
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                paddingBottom: '0.75rem'
             }}>
                 <h3 style={{
                     fontSize: '1.25rem',
@@ -140,29 +139,29 @@ export default function ToolInputGroup({
                     {title}
                 </h3>
                 {showCopyButton && (
-                    <ToolCopyButton 
+                    <ToolCopyButton
                         text={copyText}
                         disabled={!copyText}
                     />
                 )}
             </div>
-            
+
             {/* Tab bar */}
             <ToolTabBar
                 tabs={tabs}
                 activeTab={activeTab}
                 onChange={onTabChange}
             />
-            
+
             {/* Content area */}
-            <div style={{ 
-                flex: 1, 
-                minHeight: 0, 
-                display: 'flex', 
-                flexDirection: 'column' 
+            <div style={{
+                flex: 1,
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column'
             }}>
                 {content}
-                
+
                 {/* Validation error for editable JSON */}
                 {validationError && (
                     <div style={{

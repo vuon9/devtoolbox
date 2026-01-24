@@ -5,7 +5,7 @@ import { getMonospaceFontFamily, getDataFontSize, getTextareaResize } from '../.
 
 /**
  * Enhanced TextArea component with label, copy button, and configurable options
- * 
+ *
  * @param {Object} props
  * @param {string} props.label - Label text (displayed above textarea)
  * @param {string} props.value - Textarea value
@@ -41,17 +41,17 @@ export default function ToolTextArea({
     const effectiveFontFamily = monospace ? getMonospaceFontFamily() : fontFamily;
     const effectiveFontSize = fontSize || getDataFontSize();
     const resizeStyle = getTextareaResize(resizeHeight, resizeWidth);
-    
+
     // Copy button component
     const copyButton = showCopyButton && (
-        <ToolCopyButton 
+        <ToolCopyButton
             text={value}
             style={{ marginLeft: 'auto' }}
         />
     );
-    
+
     return (
-        <div 
+        <div
             className="tool-textarea-container"
             style={{
                 display: 'flex',
@@ -82,12 +82,12 @@ export default function ToolTextArea({
                 </label>
                 {copyButton}
             </div>
-            
+
             {/* Textarea container */}
-            <div style={{ 
-                flex: 1, 
-                position: 'relative', 
-                display: 'flex', 
+            <div style={{
+                flex: 1,
+                position: 'relative',
+                display: 'flex',
                 flexDirection: 'column',
                 minHeight: 0
             }}>
@@ -100,7 +100,7 @@ export default function ToolTextArea({
                     style={{
                         flex: 1,
                         height: rows ? undefined : '100%',
-                        minHeight: rows ? undefined : 0,
+                        minHeight: rows ? undefined : '40vh',
                         resize: resizeStyle,
                         fontFamily: effectiveFontFamily,
                         fontSize: effectiveFontSize,

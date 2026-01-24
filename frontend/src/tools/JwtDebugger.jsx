@@ -29,7 +29,7 @@ export default function JwtDebugger() {
         const decodeToken = async () => {
             try {
                 const response = await window.go.main.JWTService.Decode(state.token);
-                
+
                 dispatch(actions.setDecoded({
                     header: response.header,
                     payload: response.payload,
@@ -70,7 +70,7 @@ export default function JwtDebugger() {
         try {
             // Call Go backend for verification
             const response = await window.go.main.JWTService.Verify(state.token, state.secret, state.encoding);
-            
+
             dispatch(actions.setValidation(
                 response.error ? response.error : response.validationMessage,
                 response.isValid
@@ -99,7 +99,7 @@ export default function JwtDebugger() {
                 state.algorithm,
                 state.secret
             );
-            
+
             if (response.error) {
                 dispatch(actions.setEncodeResult('', response.error));
             } else {
@@ -222,7 +222,7 @@ export default function JwtDebugger() {
             }}>
                 <ToolHeader
                     title="JWT Debugger"
-                    description={state.mode === 'decode' 
+                    description={state.mode === 'decode'
                         ? "Paste a JWT below that you'd like to decode, validate, and verify."
                         : "Create a JWT by providing header and payload JSON, algorithm, and secret."
                     }
@@ -247,9 +247,9 @@ export default function JwtDebugger() {
                 alignItems: 'center',
                 marginBottom: '0.75rem'
             }}>
-                <ModeTabBar 
-                    activeMode={state.mode === 'decode' ? 0 : 1} 
-                    onChange={(tab) => dispatch(actions.setMode(tab === 0 ? 'decode' : 'encode'))} 
+                <ModeTabBar
+                    activeMode={state.mode === 'decode' ? 0 : 1}
+                    onChange={(tab) => dispatch(actions.setMode(tab === 0 ? 'decode' : 'encode'))}
                 />
                 {layout.showToggle && (
                     <ToolLayoutToggle
@@ -263,8 +263,8 @@ export default function JwtDebugger() {
 
             {/* Decode Mode */}
             {state.mode === 'decode' && (
-                 <>
-                     <ToolLayout
+                <>
+                    <ToolLayout
                         toolKey="jwt-debugger-decode"
                         direction={layout.direction}
                         onToggle={layout.toggleDirection}
@@ -287,7 +287,7 @@ export default function JwtDebugger() {
                                 showCopyButton={true}
                                 style={{ flex: 1 }}
                             />
-                            
+
                             {/* Status Messages */}
                             <ErrorMessage error={state.error} />
                             <SuccessMessage isValid={state.isValid} />
@@ -438,7 +438,7 @@ export default function JwtDebugger() {
             {/* Encode Mode */}
             {state.mode === 'encode' && (
                 <>
-                    <ToolLayout 
+                    <ToolLayout
                         toolKey="jwt-debugger-encode"
                         direction={layout.direction}
                         onToggle={layout.toggleDirection}
@@ -490,7 +490,7 @@ export default function JwtDebugger() {
                                 }}>
                                     Signing Configuration
                                 </h3>
-                                
+
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     <div>
                                         <label style={{
@@ -550,7 +550,7 @@ export default function JwtDebugger() {
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-start' }}>
                                     <Button
                                         kind="primary"
                                         size="md"
@@ -576,7 +576,7 @@ export default function JwtDebugger() {
                                 showCopyButton={true}
                                 style={{ flex: 1 }}
                             />
-                            
+
                             {/* Error Message */}
                             <ErrorMessage error={state.error} />
                         </div>
