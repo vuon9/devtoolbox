@@ -5,34 +5,34 @@ import { Theme, IconButton, OverflowMenu, OverflowMenuItem } from '@carbon/react
 import { Settings } from '@carbon/icons-react';
 
 // Tools Imports (Keeping all existing imports)
-import JsonFormatter from './tools/JsonFormatter';
-import Base64Converter from './tools/Base64Converter';
-import HashGenerator from './tools/HashGenerator';
-import UuidGenerator from './tools/UuidGenerator';
-import UnixTimeConverter from './tools/UnixTimeConverter';
-import JwtDebugger from './tools/JwtDebugger';
-import RegExpTester from './tools/RegExpTester';
-import HtmlEntityConverter from './tools/HtmlEntityConverter';
-import ColorConverter from './tools/ColorConverter';
-import BackslashEscaper from './tools/BackslashEscaper';
-import RandomStringGenerator from './tools/RandomStringGenerator';
-import HtmlPreview from './tools/HtmlPreview';
-import SqlFormatter from './tools/SqlFormatter';
-import StringCaseConverter from './tools/StringCaseConverter';
-import CronJobParser from './tools/CronJobParser';
-import TextDiffChecker from './tools/TextDiffChecker';
-import NumberBaseConverter from './tools/NumberBaseConverter';
-import CodeFormatter from './tools/CodeFormatter';
-import LoremIpsumGenerator from './tools/LoremIpsumGenerator';
-import QrCodeGenerator from './tools/QrCodeGenerator';
-import MarkdownPreview from './tools/MarkdownPreview';
-import LineSortDedupe from './tools/LineSortDedupe';
-import StringInspector from './tools/StringInspector';
-import HexAsciiConverter from './tools/HexAsciiConverter';
-import PhpSerializer from './tools/PhpSerializer';
-import UrlTools from './tools/UrlTools';
-import DataConverter from './tools/DataConverter';
-import PhpJsonConverter from './tools/PhpJsonConverter';
+import JsonFormatter from './pages/JsonFormatter';
+import Base64Converter from './pages/Base64Converter';
+import HashGenerator from './pages/HashGenerator';
+import UuidGenerator from './pages/UuidGenerator';
+import UnixTimeConverter from './pages/UnixTimeConverter';
+import JwtDebugger from './pages/JwtDebugger';
+import RegExpTester from './pages/RegExpTester';
+import HtmlEntityConverter from './pages/HtmlEntityConverter';
+import ColorConverter from './pages/ColorConverter';
+import BackslashEscaper from './pages/BackslashEscaper';
+import RandomStringGenerator from './pages/RandomStringGenerator';
+import HtmlPreview from './pages/HtmlPreview';
+import SqlFormatter from './pages/SqlFormatter';
+import StringCaseConverter from './pages/StringCaseConverter';
+import CronJobParser from './pages/CronJobParser';
+import TextDiffChecker from './pages/TextDiffChecker';
+import NumberBaseConverter from './pages/NumberBaseConverter';
+import CodeFormatter from './pages/CodeFormatter';
+import LoremIpsumGenerator from './pages/LoremIpsumGenerator';
+import QrCodeGenerator from './pages/QrCodeGenerator';
+import MarkdownPreview from './pages/MarkdownPreview';
+import LineSortDedupe from './pages/LineSortDedupe';
+import StringInspector from './pages/StringInspector';
+import HexAsciiConverter from './pages/HexAsciiConverter';
+import PhpSerializer from './pages/PhpSerializer';
+import UrlTools from './pages/UrlTools';
+import DataConverter from './pages/DataConverter';
+import PhpJsonConverter from './pages/PhpJsonConverter';
 
 // Error boundary for catching React rendering errors
 class ErrorBoundary extends React.Component {
