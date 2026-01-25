@@ -126,7 +126,6 @@ export default function JwtDebugger() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '0.75rem'
             }}>
                 <ModeTabBar
                     activeMode={state.mode === 'decode' ? 0 : 1}
