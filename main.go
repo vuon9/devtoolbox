@@ -16,10 +16,11 @@ func main() {
 	// Create instances of the app structures
 	app := NewApp()
 	jwtService := NewJWTService()
+	conversionService := NewConversionService()
 
 	// Start HTTP server for Web Mode (port 8081)
 	go func() {
-		server := NewServer(jwtService)
+		server := NewServer(jwtService, conversionService)
 		server.Start(8081)
 	}()
 
@@ -35,10 +36,12 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			app.startup(ctx)
 			jwtService.startup(ctx)
+			conversionService.startup(ctx)
 		},
 		Bind: []interface{}{
 			app,
 			jwtService,
+			conversionService,
 		},
 	})
 

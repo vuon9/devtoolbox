@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Select, SelectItem } from '@carbon/react';
 import { Code } from '@carbon/icons-react';
-import { ToolLayout, ToolTextArea, ToolInputGroup, ToolCopyButton } from '../../../components/ToolUI';
+import { ToolLayout, ToolTextArea, ToolInputGroup, ToolCopyButton, ToolInput } from '../../../components/ToolUI';
 import { actions } from '../jwtReducer';
 import { ErrorMessage } from './StatusMessages';
 
@@ -51,7 +51,6 @@ export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
                 <div style={{
                     padding: '1rem',
                     border: '1px solid var(--cds-border-subtle)',
-                    borderRadius: '4px',
                     backgroundColor: 'var(--cds-layer-accent)',
                     flex: '0 1 auto'
                 }}>
@@ -100,25 +99,14 @@ export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
                                 Secret (Optional - leave empty for unsigned)
                             </label>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <input
+                                <ToolInput
                                     type="password"
                                     value={state.secret}
                                     onChange={(e) => dispatch(actions.setSecret(e.target.value))}
                                     placeholder="Enter secret for signing..."
                                     style={{
                                         flex: 1,
-                                        padding: '0.5rem 0.75rem',
-                                        fontFamily: "'IBM Plex Mono', monospace",
-                                        fontSize: '0.875rem',
-                                        border: '1px solid var(--cds-border-strong)',
-                                        borderRadius: '4px',
-                                        backgroundColor: 'var(--cds-ui-01)',
-                                        color: 'var(--cds-text-primary)'
                                     }}
-                                />
-                                <ToolCopyButton
-                                    text={state.secret}
-                                    disabled={!state.secret}
                                 />
                             </div>
                         </div>

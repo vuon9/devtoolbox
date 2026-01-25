@@ -2,28 +2,27 @@ import React from 'react';
 
 /**
  * Enhanced tab bar component with improved styling
- * 
+ *
  * @param {Object} props
  * @param {string[]} props.tabs - Tab labels
  * @param {number} props.activeTab - Index of active tab
  * @param {Function} props.onChange - Callback when tab changes
  * @param {Object} [props.style={}] - Additional styles
  */
-export default function ToolTabBar({ 
-    tabs, 
-    activeTab, 
-    onChange, 
-    style = {} 
+export default function ToolTabBar({
+    tabs,
+    activeTab,
+    onChange,
+    style = {}
 }) {
     return (
-        <div 
+        <div
             className="tool-tab-bar"
             style={{
                 display: 'flex',
                 gap: '0.25rem',
                 padding: '0.25rem',
-                backgroundColor: 'var(--cds-layer-01)',
-                borderRadius: '8px',
+                backgroundColor: 'var(--cds-layer-02)',
                 ...style
             }}
         >
@@ -35,7 +34,6 @@ export default function ToolTabBar({
                         padding: '0.5rem 1rem',
                         background: activeTab === idx ? 'var(--cds-layer)' : 'transparent',
                         border: 'none',
-                        borderRadius: '6px',
                         color: activeTab === idx ? 'var(--cds-text-primary)' : 'var(--cds-text-secondary)',
                         fontSize: '0.875rem',
                         fontWeight: 500,

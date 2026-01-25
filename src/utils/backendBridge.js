@@ -54,5 +54,8 @@ export const Backend = {
         Decode: (token) => callBackend('JWTService', 'Decode', token),
         Encode: (header, payload, algo, secret) => callBackend('JWTService', 'Encode', header, payload, algo, secret),
         Verify: (token, secret, encoding) => callBackend('JWTService', 'Verify', token, secret, encoding)
+    },
+    ConversionService: {
+        Convert: (input, category, method, config) => callBackend('ConversionService', 'Convert', input, category, method, config)
     }
 };

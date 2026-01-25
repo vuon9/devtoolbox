@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Select, SelectItem } from '@carbon/react';
 import { Security } from '@carbon/icons-react';
-import { ToolCopyButton } from '../../../components/ToolUI';
+import { ToolCopyButton, ToolInput } from '../../../components/ToolUI';
 import { actions } from '../jwtReducer';
 
 export default function SignatureVerification({ state, dispatch, verifySignature }) {
@@ -9,7 +9,6 @@ export default function SignatureVerification({ state, dispatch, verifySignature
         <div style={{
             padding: '1rem',
             border: '1px solid var(--cds-border-subtle)',
-            borderRadius: '4px',
             backgroundColor: 'var(--cds-layer-accent)',
             flex: '0 1 auto'
         }}>
@@ -32,50 +31,34 @@ export default function SignatureVerification({ state, dispatch, verifySignature
             <div style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '0.5rem',
+                flexDirection: 'column',
+                gap: '1rem'
             }}>
-                <div style={{
-                    flex: '1 1 200px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    flexDirection: 'column',
-                    alignItems: 'stretch',
-                }}>
+                <div>
                     <label style={{
                         display: 'block',
                         fontSize: '0.75rem',
                         fontWeight: 400,
                         color: 'var(--cds-text-secondary)',
-                        textTransform: 'uppercase',
-                        marginBottom: '0.5rem'
+                        marginBottom: '0.5rem',
+                        textTransform: 'uppercase'
                     }}>
                         Secret
                     </label>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <input
+                    <div style={{ display: 'flex' }}>
+                        <ToolInput
                             type="password"
                             value={state.secret}
                             onChange={(e) => dispatch(actions.setSecret(e.target.value))}
                             placeholder="Enter secret..."
                             style={{
                                 flex: 1,
-                                padding: '0.5rem 0.75rem',
-                                fontFamily: "'IBM Plex Mono', monospace",
-                                fontSize: '0.875rem',
-                                border: '1px solid var(--cds-border-strong)',
-                                borderRadius: '4px',
-                                backgroundColor: 'var(--cds-ui-01)',
-                                color: 'var(--cds-text-primary)',
                                 width: '100%'
                             }}
                         />
-                        <ToolCopyButton
-                            text={state.secret}
-                            disabled={!state.secret}
-                        />
                     </div>
                 </div>
-                <div style={{ flex: '0 1 150px' }}>
+                <div>
                     <label style={{
                         display: 'block',
                         fontSize: '0.75rem',
@@ -100,12 +83,11 @@ export default function SignatureVerification({ state, dispatch, verifySignature
 
             {state.validationMessage && (
                 <div style={{
-                    padding: '0.75rem',
+                    paddingTop: '.5rem',
                     backgroundColor: 'var(--cds-ui-02)',
                     borderRadius: '4px',
                     fontSize: '0.875rem',
                     color: 'var(--cds-text-secondary)',
-                    marginBottom: '1rem'
                 }}>
                     {state.validationMessage}
                 </div>

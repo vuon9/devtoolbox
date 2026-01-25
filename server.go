@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 // Server represents the HTTP server for Web Mode
 type Server struct {
-	jwtService *JWTService
+	jwtService        *JWTService
+	conversionService *ConversionService
 }
 
 // NewServer creates a new Server instance
-func NewServer(jwtService *JWTService) *Server {
+func NewServer(jwtService *JWTService, conversionService *ConversionService) *Server {
 	return &Server{
-		jwtService: jwtService,
+		jwtService:        jwtService,
+		conversionService: conversionService,
 	}
 }
 
@@ -44,17 +47,66 @@ func (s *Server) handleAPI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Expected path: /api/Service/Method
-	var service, method string
-	fmt.Sscanf(r.URL.Path, "/api/%s/%s", &service, &method)
+	path := strings.TrimPrefix(r.URL.Path, "/api/")
+	parts := strings.Split(path, "/")
 
-	// Since we are doing a generic scan, we might get "JWTService/Decode" or similar
-	// Simple lookup for demo purposes
+	if len(parts) < 2 {
+		http.Error(w, "Invalid API path", http.StatusBadRequest)
+		return
+	}
+
+	service := parts[0]
+	method := parts[1]
+
 	if service == "JWTService" {
 		s.handleJWTService(method, w, r)
 		return
 	}
 
+	if service == "ConversionService" {
+		s.handleConversionService(method, w, r)
+		return
+	}
+
 	http.Error(w, fmt.Sprintf("Service not found: %s", service), http.StatusNotFound)
+}
+
+func (s *Server) handleConversionService(method string, w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		Args []interface{} `json:"args"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	var result interface{}
+	var err error
+
+	switch method {
+	case "Convert":
+		if len(payload.Args) < 4 {
+			http.Error(w, "Missing arguments", http.StatusBadRequest)
+			return
+		}
+		input := payload.Args[0].(string)
+		category := payload.Args[1].(string)
+		cmd := payload.Args[2].(string)
+		config := payload.Args[3].(map[string]interface{})
+		result, err = s.conversionService.Convert(input, category, cmd, config)
+	default:
+		http.Error(w, fmt.Sprintf("Method not found: %s", method), http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
 
 func (s *Server) handleJWTService(method string, w http.ResponseWriter, r *http.Request) {

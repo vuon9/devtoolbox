@@ -33,6 +33,7 @@ import PhpSerializer from './pages/PhpSerializer';
 import UrlTools from './pages/UrlTools';
 import DataConverter from './pages/DataConverter';
 import PhpJsonConverter from './pages/PhpJsonConverter';
+import AllInOneConverter from './pages/TextBasedConverter';
 
 // Error boundary for catching React rendering errors
 class ErrorBoundary extends React.Component {
@@ -143,6 +144,7 @@ function App() {
             case 'php-json': return <PhpJsonConverter />;
             case 'url-tools': return <UrlTools />;
             case 'data-converter': return <DataConverter />;
+            case 'text-based': return <AllInOneConverter />;
             default: return <div className="tool-container">Select a tool</div>;
         }
     };
@@ -150,86 +152,86 @@ function App() {
     return (
         <ErrorBoundary>
             <Theme theme={theme} style={{ height: '100%' }}>
-            <div className="app-container">
-                <Sidebar
-                    activeTool={activeTool}
-                    setActiveTool={setActiveTool}
-                    isVisible={isSidebarOpen}
-                />
+                <div className="app-container">
+                    <Sidebar
+                        activeTool={activeTool}
+                        setActiveTool={setActiveTool}
+                        isVisible={isSidebarOpen}
+                    />
 
-                <main className="main-content">
-                    {/* Top Bar Area for Toggle & Settings */}
-                    <div style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: '48px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0 16px',
-                        zIndex: 900,
-                        pointerEvents: 'none' /* Passthrough to tool interactions if no header bg */
-                    }}>
-                        <div style={{ pointerEvents: 'auto' }}>
-                            {!isSidebarOpen && (
-                                <IconButton
-                                    kind="ghost"
+                    <main className="main-content">
+                        {/* Top Bar Area for Toggle & Settings */}
+                        <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '48px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '0 16px',
+                            zIndex: 900,
+                            pointerEvents: 'none' /* Passthrough to tool interactions if no header bg */
+                        }}>
+                            <div style={{ pointerEvents: 'auto' }}>
+                                {!isSidebarOpen && (
+                                    <IconButton
+                                        kind="ghost"
+                                        size="sm"
+                                        onClick={toggleSidebar}
+                                        label="Toggle Sidebar"
+                                        align="bottom"
+                                        className="cds-icon-btn" // Ensuring Carbon class
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                                        </svg>
+                                    </IconButton>
+                                )}
+                            </div>
+
+                            <div style={{ pointerEvents: 'auto' }}>
+                                <OverflowMenu
+                                    renderIcon={Settings}
+                                    flipped
                                     size="sm"
-                                    onClick={toggleSidebar}
-                                    label="Toggle Sidebar"
-                                    align="bottom"
-                                    className="cds-icon-btn" // Ensuring Carbon class
+                                    ariaLabel="Settings"
+                                    iconDescription="Settings"
+                                    title="Theme Settings"
                                 >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                                    </svg>
-                                </IconButton>
-                            )}
+                                    <OverflowMenuItem itemText="System Theme" onClick={() => setThemeMode('system')} requireTitle />
+                                    <OverflowMenuItem itemText="Dark Theme" onClick={() => setThemeMode('dark')} requireTitle />
+                                    <OverflowMenuItem itemText="Light Theme" onClick={() => setThemeMode('light')} requireTitle />
+                                </OverflowMenu>
+                            </div>
                         </div>
 
-                        <div style={{ pointerEvents: 'auto' }}>
-                            <OverflowMenu
-                                renderIcon={Settings}
-                                flipped
+
+                        <div className="content-area" style={{ marginTop: '0px' }}>
+                            {renderTool()}
+                        </div>
+                    </main>
+
+                    {isSidebarOpen && (
+                        <div style={{ position: 'absolute', top: '10px', left: '215px', zIndex: 900 }}>
+                            <IconButton
+                                kind="ghost"
                                 size="sm"
-                                ariaLabel="Settings"
-                                iconDescription="Settings"
-                                title="Theme Settings"
+                                onClick={toggleSidebar}
+                                label="Close Sidebar"
+                                align="bottom"
                             >
-                                <OverflowMenuItem itemText="System Theme" onClick={() => setThemeMode('system')} requireTitle />
-                                <OverflowMenuItem itemText="Dark Theme" onClick={() => setThemeMode('dark')} requireTitle />
-                                <OverflowMenuItem itemText="Light Theme" onClick={() => setThemeMode('light')} requireTitle />
-                            </OverflowMenu>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M18 6L6 18M6 6l12 12"></path>
+                                </svg>
+                            </IconButton>
                         </div>
-                    </div>
-
-
-                    <div className="content-area" style={{ marginTop: '0px' }}>
-                        {renderTool()}
-                    </div>
-                </main>
-
-                {isSidebarOpen && (
-                    <div style={{ position: 'absolute', top: '10px', left: '215px', zIndex: 900 }}>
-                        <IconButton
-                            kind="ghost"
-                            size="sm"
-                            onClick={toggleSidebar}
-                            label="Close Sidebar"
-                            align="bottom"
-                        >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M18 6L6 18M6 6l12 12"></path>
-                            </svg>
-                        </IconButton>
-                    </div>
-                )}
-            </div>
-        </Theme>
+                    )}
+                </div>
+            </Theme>
         </ErrorBoundary>
     );
 }

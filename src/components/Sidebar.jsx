@@ -14,6 +14,7 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
     }, [pinned]);
 
     const tools = [
+        { id: 'text-based', name: 'Text Based Converter', icon: '🔄' },
         { id: 'unix-time', name: 'Unix Time Converter', icon: '🕒' },
         { id: 'json', name: 'JSON Format/Validate', icon: '{}' },
         { id: 'base64', name: 'Base64 Converter', icon: '64' },

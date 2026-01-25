@@ -1,11 +1,12 @@
-import React from 'react';
-import { TextInput } from '@carbon/react';
+import React, { useState } from 'react';
+import { TextInput, IconButton } from '@carbon/react';
+import { View, ViewOff } from '@carbon/icons-react';
 import ToolCopyButton from './ToolCopyButton';
 import { getMonospaceFontFamily, getDataFontSize } from '../../utils/inputUtils';
 
 /**
  * Enhanced input field with label and copy button
- * 
+ *
  * @param {Object} props
  * @param {string} props.label - Label text
  * @param {string} props.value - Input value
@@ -34,24 +35,41 @@ export default function ToolInput({
     inputProps = {},
     style = {}
 }) {
+    const [showPassword, setShowPassword] = useState(false);
     const effectiveFontFamily = monospace ? getMonospaceFontFamily() : fontFamily;
     const effectiveFontSize = fontSize || getDataFontSize();
-    
+
+    // Determine effective input type
+    const inputType = type === 'password' ? (showPassword ? 'text' : 'password') : type;
+
     // Copy button component
     const copyButton = showCopyButton && (
-        <ToolCopyButton 
+        <ToolCopyButton
             text={value}
             size="sm"
         />
     );
-    
+
+    // Toggle password visibility button
+    const passwordToggleButton = type === 'password' && (
+        <IconButton
+            kind="ghost"
+            size="sm"
+            onClick={() => setShowPassword(!showPassword)}
+            label={showPassword ? "Hide value" : "Show value"}
+            align="bottom"
+            className="password-toggle-button"
+        >
+            {showPassword ? <ViewOff /> : <View />}
+        </IconButton>
+    );
+
     return (
-        <div 
+        <div
             className="tool-input-container"
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.25rem',
                 ...style
             }}
         >
@@ -62,11 +80,10 @@ export default function ToolInput({
                 fontWeight: 400,
                 color: 'var(--cds-text-secondary)',
                 textTransform: 'uppercase',
-                marginBottom: '0.25rem'
             }}>
                 {label}
             </label>
-            
+
             {/* Input and copy button row */}
             <div style={{
                 display: 'flex',
@@ -77,7 +94,7 @@ export default function ToolInput({
                     <TextInput
                         value={value}
                         onChange={onChange}
-                        type={type}
+                        type={inputType}
                         placeholder={placeholder}
                         readOnly={readOnly}
                         style={{
@@ -90,6 +107,7 @@ export default function ToolInput({
                         {...inputProps}
                     />
                 </div>
+                {passwordToggleButton}
                 {copyButton}
             </div>
         </div>

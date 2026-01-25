@@ -4,7 +4,7 @@ import { ErrorMessage, SuccessMessage } from './StatusMessages';
 import SignatureVerification from './SignatureVerification';
 import { Button } from '@carbon/react';
 import { MagicWand } from '@carbon/icons-react';
-import { generateExampleToken, EXAMPLE_SECRET } from '../jwtUtils';
+import { EXAMPLE_SECRET } from '../jwtUtils';
 import { useCallback } from 'react';
 import { Backend } from '../../../utils/backendBridge';
 
