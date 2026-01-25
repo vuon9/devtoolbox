@@ -33,9 +33,14 @@ export default function SignatureVerification({ state, dispatch, verifySignature
                 display: 'flex',
                 flexWrap: 'wrap',
                 gap: '0.5rem',
-                marginBottom: '1rem'
             }}>
-                <div style={{ flex: '1 1 200px' }}>
+                <div style={{
+                    flex: '1 1 200px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                }}>
                     <label style={{
                         display: 'block',
                         fontSize: '0.75rem',

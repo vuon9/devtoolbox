@@ -1,13 +1,42 @@
-import React from 'react';
 import { ToolLayout, ToolTextArea, ToolInputGroup } from '../../../components/ToolUI';
 import { actions } from '../jwtReducer';
 import { ErrorMessage, SuccessMessage } from './StatusMessages';
 import SignatureVerification from './SignatureVerification';
+import { Button } from '@carbon/react';
+import { MagicWand } from '@carbon/icons-react';
+import { generateExampleToken, EXAMPLE_SECRET } from '../jwtUtils';
+import { useCallback } from 'react';
+import { Backend } from '../../../utils/backendBridge';
 
 export default function JwtDecode({ state, dispatch, layout, verifySignature }) {
     // Tab change handlers
     const handleHeaderTabChange = (tab) => dispatch(actions.setTab('header', tab));
     const handlePayloadTabChange = (tab) => dispatch(actions.setTab('payload', tab));
+
+    const handleGenerateExample = useCallback(async () => {
+        const header = { alg: 'HS256', typ: 'JWT' };
+        const payload = {
+            sub: '1234567890',
+            name: 'John Doe',
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) + 3600
+        };
+
+        try {
+            const response = await Backend.JWTService.Encode(
+                JSON.stringify(header),
+                JSON.stringify(payload),
+                'HS256',
+                EXAMPLE_SECRET
+            );
+
+            if (response.token) {
+                dispatch(actions.generateExample(response.token, EXAMPLE_SECRET));
+            }
+        } catch (err) {
+            console.error("Failed to generate sample token", err);
+        }
+    }, []);
 
     return (
         <ToolLayout
@@ -33,6 +62,18 @@ export default function JwtDecode({ state, dispatch, layout, verifySignature }) 
                     showCopyButton={true}
                     style={{ flex: 1 }}
                 />
+
+                <div style={{ marginTop: '.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button
+                        kind="secondary"
+                        size="md"
+                        renderIcon={MagicWand}
+                        onClick={handleGenerateExample}
+                        style={{ flexShrink: 0, justifyContent: 'flex-end' }}
+                    >
+                        Sample
+                    </Button>
+                </div>
 
                 {/* Status Messages */}
                 <ErrorMessage error={state.error} />

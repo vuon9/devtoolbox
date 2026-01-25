@@ -5,27 +5,13 @@ export const EXAMPLE_SECRET = 'example-secret';
 /**
  * Generate an example JWT token for demonstration
  */
+/**
+ * Generate an example JWT token for demonstration
+ * Note: Actual signing is now performed via the Backend bridge in components
+ */
 export const generateExampleToken = () => {
-    const header = { alg: 'HS256', typ: 'JWT' };
-    const payload = { 
-        sub: '1234567890', 
-        name: 'John Doe', 
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
-    };
-    
-    // Base64URL encode
-    const encode = (obj) => {
-        const json = JSON.stringify(obj);
-        const base64 = btoa(unescape(encodeURIComponent(json)));
-        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    };
-    
-    const encodedHeader = encode(header);
-    const encodedPayload = encode(payload);
-    const signature = 'example-signature'; // Not a real signature, just for display
-    
-    return `${encodedHeader}.${encodedPayload}.${signature}`;
+    // This is a static placeholder; components should use Backend.JWTService.Encode for dynamic tokens
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 };
 
 /**
@@ -42,14 +28,14 @@ export const formatValidationMessage = (isValid, message) => {
 export const parseTokenParts = (token) => {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
-    
+
     try {
         const decode = (str) => {
             const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
             const json = decodeURIComponent(escape(atob(base64)));
             return JSON.parse(json);
         };
-        
+
         return {
             header: decode(parts[0]),
             payload: decode(parts[1]),

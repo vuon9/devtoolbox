@@ -100,7 +100,7 @@ export default function ToolTextArea({
                     style={{
                         flex: 1,
                         height: rows ? undefined : '100%',
-                        minHeight: rows ? undefined : '40vh',
+                        minHeight: rows ? undefined : '0',
                         resize: resizeStyle,
                         fontFamily: effectiveFontFamily,
                         fontSize: effectiveFontSize,
@@ -109,6 +109,7 @@ export default function ToolTextArea({
                         color: 'var(--cds-text-primary)',
                     }}
                     labelText=""
+                    className="tool-textarea-flex-fix"
                     {...textAreaProps}
                 />
             </div>

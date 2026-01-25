@@ -1,14 +1,12 @@
 import React, { useReducer, useCallback } from 'react';
-import { Button } from '@carbon/react';
-import { MagicWand } from '@carbon/icons-react';
 import { ToolHeader } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
 import ToolLayoutToggle from '../../components/layout/ToolLayoutToggle';
 import { jwtReducer, initialState, actions } from './jwtReducer';
-import { generateExampleToken, EXAMPLE_SECRET } from './jwtUtils';
 import ModeTabBar from './components/ModeTabBar';
 import JwtDecode from './components/JwtDecode';
 import JwtEncode from './components/JwtEncode';
+import { Backend } from '../../utils/backendBridge';
 
 export default function JwtDebugger() {
     const [state, dispatch] = useReducer(jwtReducer, initialState);
@@ -31,7 +29,7 @@ export default function JwtDebugger() {
         // Call Go backend for decoding
         const decodeToken = async () => {
             try {
-                const response = await window.go.main.JWTService.Decode(state.token);
+                const response = await Backend.JWTService.Decode(state.token);
 
                 dispatch(actions.setDecoded({
                     header: response.header,
@@ -68,7 +66,7 @@ export default function JwtDebugger() {
 
         try {
             // Call Go backend for verification
-            const response = await window.go.main.JWTService.Verify(state.token, state.secret, state.encoding);
+            const response = await Backend.JWTService.Verify(state.token, state.secret, state.encoding);
 
             dispatch(actions.setValidation(
                 response.error ? response.error : response.validationMessage,
@@ -79,11 +77,6 @@ export default function JwtDebugger() {
         }
     }, [state.token, state.secret, state.encoding]);
 
-    const handleGenerateExample = useCallback(() => {
-        const token = generateExampleToken();
-        dispatch(actions.generateExample(token, EXAMPLE_SECRET));
-    }, []);
-
     const encodeJWT = useCallback(async () => {
         // Basic validation
         if (!state.headerInput.trim() && !state.payloadInput.trim()) {
@@ -92,7 +85,7 @@ export default function JwtDebugger() {
         }
 
         try {
-            const response = await window.go.main.JWTService.Encode(
+            const response = await Backend.JWTService.Encode(
                 state.headerInput,
                 state.payloadInput,
                 state.algorithm,
@@ -126,17 +119,6 @@ export default function JwtDebugger() {
                         : "Create a JWT by providing header and payload JSON, algorithm, and secret."
                     }
                 />
-                {state.mode === 'decode' && (
-                    <Button
-                        kind="secondary"
-                        size="md"
-                        renderIcon={MagicWand}
-                        onClick={handleGenerateExample}
-                        style={{ flexShrink: 0, marginRight: '2rem' }}
-                    >
-                        Generate Example
-                    </Button>
-                )}
             </div>
 
             {/* Row with mode tabs and layout toggle */}

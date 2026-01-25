@@ -30,6 +30,30 @@ body {
     --font-family: 'IBM Plex Sans', sans-serif;
 }
 
+// Force Carbon TextArea to fill height (Definitive Fix)
+// Applies to the Carbon wrapper components when our custom class is present
+// .tool-textarea-container .cds--form-item:has(.tool-textarea-flex-fix),
+// .tool-textarea-container .cds--text-area__wrapper:has(.tool-textarea-flex-fix) {
+//     flex: 1 1 0% !important;
+//     display: flex !important;
+//     flex-direction: column !important;
+//     height: 100% !important;
+//     min-height: 0 !important;
+// }
+
+.cds--text-area__wrapper {
+    flex: 1;
+}
+
+// // Ensure the textarea itself fills the wrapper
+// .tool-textarea-flex-fix.cds--text-area {
+//     height: 100% !important;
+//     flex: 1 1 0% !important;
+//     min-height: 0 !important;
+//     resize: none !important;
+//     /* Let container handle size, preventing conflict */
+// }
+
 // Map old utility classes to Carbon styles for transitioning
 .btn-primary {
     // These should ideally be replaced by <Button> components, but for fallback:

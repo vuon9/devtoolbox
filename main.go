@@ -9,13 +9,19 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:frontend/dist
+//go:embed all:dist
 var assets embed.FS
 
 func main() {
 	// Create instances of the app structures
 	app := NewApp()
 	jwtService := NewJWTService()
+
+	// Start HTTP server for Web Mode (port 8081)
+	go func() {
+		server := NewServer(jwtService)
+		server.Start(8081)
+	}()
 
 	// Create application with options
 	err := wails.Run(&options.App{
