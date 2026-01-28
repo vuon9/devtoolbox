@@ -160,9 +160,7 @@ git clone https://github.com/vuon9/dev-toolbox.git
 cd dev-toolbox
 
 # Install frontend dependencies
-cd frontend
-npm install
-cd ..
+bun install
 ```
 
 ### Running the Application

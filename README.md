@@ -51,11 +51,9 @@ git clone https://github.com/your-org/dev-toolbox.git
 cd dev-toolbox
 
 # Install frontend dependencies
-cd frontend
-npm install
+bun install
 
 # Build & run the desktop app (Wails)
-cd ..
 wails dev   # development mode with hot‑reload
 # or
 wails build # production binary
@@ -103,7 +101,7 @@ dev-toolbox/
 
 ## Contributing
 - Fork the repo and create a feature branch.
-- Run `npm run lint` and `npm run format` before committing.
+- Run `bun run lint` and `bun run format` before committing.
 - Ensure any new UI respects the Carbon design system and the rules in `AGENTS.md`.
 - Open a pull request with a clear description of the added functionality.
 
