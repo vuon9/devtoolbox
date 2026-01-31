@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Button } from '@carbon/react';
-import { Add, Close } from '@carbon/icons-react';
+import { Tag, Button, TooltipIcon } from '@carbon/react';
+import { Add, Close, Checkmark } from '@carbon/icons-react';
 
 // Default common tags - at least 5 as requested
 const DEFAULT_COMMON_TAGS = [
@@ -117,50 +117,70 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
                                 display: 'flex',
                                 alignItems: 'center',
                                 flexShrink: 0,
+                                position: 'relative',
                             }}
                         >
                             <Tag
-                                type={isActive ? 'blue' : 'gray'}
+                                type={isActive ? 'blue' : isCustom ? 'green' : 'gray'}
                                 size="sm"
                                 onClick={() => handleTagClick(tag)}
                                 style={{
                                     cursor: 'pointer',
                                     userSelect: 'none',
+                                    paddingRight: isCustom ? '24px' : '8px',
                                 }}
-                                filter={isCustom}
                             >
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                     {tag.label}
-                                    {isCustom && (
-                                        <Close
-                                            size={12}
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={(e) => handleRemoveTag(e, tag.id)}
-                                        />
-                                    )}
                                 </span>
                             </Tag>
+                            {isCustom && (
+                                <div
+                                    onClick={(e) => handleRemoveTag(e, tag.id)}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '4px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: '16px',
+                                        height: '16px',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'var(--cds-background-hover)',
+                                        opacity: 0.7,
+                                        transition: 'opacity 0.2s',
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                                    onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+                                    title="Remove from quick select"
+                                >
+                                    <Close size={12} />
+                                </div>
+                            )}
                         </div>
                     );
                 })}
             </div>
 
-            {/* Add current button */}
-            {!isCurrentInTags && (
-                <Button
-                    kind="ghost"
-                    size="sm"
-                    renderIcon={Add}
-                    iconDescription="Add current to quick select"
-                    onClick={handleAddCurrent}
-                    style={{
-                        flexShrink: 0,
-                        padding: '0 8px',
-                    }}
-                >
-                    Add
-                </Button>
-            )}
+            {/* Add current button - always visible */}
+            <Button
+                kind={isCurrentInTags ? "ghost" : "tertiary"}
+                size="sm"
+                renderIcon={isCurrentInTags ? Checkmark : Add}
+                iconDescription={isCurrentInTags ? "Already in quick select" : "Add to quick select"}
+                onClick={handleAddCurrent}
+                disabled={isCurrentInTags}
+                style={{
+                    flexShrink: 0,
+                    padding: '0 8px',
+                    opacity: isCurrentInTags ? 0.5 : 1,
+                }}
+            >
+                {isCurrentInTags ? 'Added' : 'Add'}
+            </Button>
         </div>
     );
 }
