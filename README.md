@@ -1,5 +1,10 @@
 # Developer Toolbox
 
+[![Tests & Build](https://github.com/vuon9/dev-toolbox/actions/workflows/tests.yml/badge.svg)](https://github.com/vuon9/dev-toolbox/actions/workflows/tests.yml)
+[![Wails Build](https://github.com/vuon9/dev-toolbox/actions/workflows/build.yml/badge.svg)](https://github.com/vuon9/dev-toolbox/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev)
+
 A modern, all-in-one desktop application for developers featuring 40+ utilities for encoding, encryption, hashing, and data format conversions.
 
 ![Developer Toolbox Screenshot](screenshot.png)
