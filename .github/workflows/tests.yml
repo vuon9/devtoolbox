@@ -68,7 +68,7 @@ jobs:
           lcov-file: ./coverage.lcov
           github-token: ${{ secrets.GITHUB_TOKEN }}
           title: "Go Test Coverage Report"
-          hide-branch-coverage: false
+          delete-old-comments: true
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
