@@ -7,6 +7,8 @@ import { Backend } from '../../utils/backendBridge';
 import ConversionControls from './components/ConversionControls';
 import ConfigurationPane from './components/ConfigurationPane';
 import MultiHashOutput from './components/MultiHashOutput';
+import CommonTags from './components/CommonTags';
+import ImageOutput, { isBase64Image } from './components/ImageOutput';
 import { CONVERTER_MAP } from './constants';
 
 export default function TextBasedConverter() {
@@ -104,11 +106,23 @@ export default function TextBasedConverter() {
     // Determine if Key/IV pane should be shown
     const showConfig = category === 'Encrypt - Decrypt' || method === 'HMAC';
 
+    // Check if output is a base64 image
+    const isImageOutput = !isAllHashes && isBase64Image(output);
+
     return (
         <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
             <ToolHeader
                 title="Text Based Converter"
                 description="Universal converter for various data formats and string transformations."
+            />
+
+            <CommonTags
+                currentCategory={category}
+                currentMethod={method}
+                onTagSelect={(cat, meth) => {
+                    setCategory(cat);
+                    setMethod(meth);
+                }}
             />
 
             <ConversionControls
@@ -177,6 +191,16 @@ export default function TextBasedConverter() {
                                 error={error}
                             />
                         </div>
+                    </div>
+                ) : isImageOutput ? (
+                    <div className="pane" style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
+                        minHeight: 0,
+                        flex: 1
+                    }}>
+                        <ImageOutput value={output} />
                     </div>
                 ) : (
                     <ToolPane
