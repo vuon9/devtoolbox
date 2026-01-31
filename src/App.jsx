@@ -4,23 +4,15 @@ import { Sidebar } from './components/Sidebar';
 import { Theme, IconButton, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 
-// Tools Imports (Keeping all existing imports)
-import JsonFormatter from './pages/JsonFormatter';
+// Tools Imports
 import UnixTimeConverter from './pages/UnixTimeConverter';
 import JwtDebugger from './pages/JwtDebugger';
 import RegExpTester from './pages/RegExpTester';
-
-import SqlFormatter from './pages/SqlFormatter';
-import StringCaseConverter from './pages/StringCaseConverter';
 import CronJobParser from './pages/CronJobParser';
 import TextDiffChecker from './pages/TextDiffChecker';
-import NumberBaseConverter from './pages/NumberBaseConverter';
-import LineSortDedupe from './pages/LineSortDedupe';
-import StringInspector from './pages/StringInspector';
-import PhpSerializer from './pages/PhpSerializer';
-import UrlTools from './pages/UrlTools';
-import PhpJsonConverter from './pages/PhpJsonConverter';
-import AllInOneConverter from './pages/TextBasedConverter';
+import NumberConverter from './pages/NumberConverter';
+import TextConverter from './pages/TextConverter';
+import StringUtilities from './pages/StringUtilities';
 import BarcodeGenerator from './pages/BarcodeGenerator';
 import DataGenerator from './pages/DataGenerator';
 import CodeFormatter from './pages/CodeFormatter';
@@ -66,7 +58,7 @@ class ErrorBoundary extends React.Component {
 
 function App() {
     console.log('App mounting');
-    const [activeTool, setActiveTool] = useState('json');
+    const [activeTool, setActiveTool] = useState('text-converter');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [theme, setTheme] = useState('g100'); // 'white', 'g10', 'g90', 'g100'
     const [themeMode, setThemeMode] = useState('dark'); // 'system', 'light', 'dark'
@@ -106,27 +98,17 @@ function App() {
 
     const renderTool = () => {
         switch (activeTool) {
-            // New tools
+            case 'text-converter': return <TextConverter />;
+            case 'string-utilities': return <StringUtilities />;
+            case 'unix-time': return <UnixTimeConverter />;
             case 'jwt': return <JwtDebugger />;
-            case 'text-based': return <AllInOneConverter />;
             case 'barcode': return <BarcodeGenerator />;
             case 'data-generator': return <DataGenerator />;
             case 'code-formatter': return <CodeFormatter />;
-
-            case 'json': return <JsonFormatter />;
-            case 'unix-time': return <UnixTimeConverter />;
             case 'regexp': return <RegExpTester />;
-
-            case 'sql': return <SqlFormatter />;
-            case 'case': return <StringCaseConverter />;
             case 'cron': return <CronJobParser />;
             case 'diff': return <TextDiffChecker />;
-            case 'number-base': return <NumberBaseConverter />;
-            case 'sort': return <LineSortDedupe />;
-            case 'inspector': return <StringInspector />;
-            case 'php-ser': return <PhpSerializer />;
-            case 'php-json': return <PhpJsonConverter />;
-            case 'url-tools': return <UrlTools />;
+            case 'number-converter': return <NumberConverter />;
             default: return <div className="tool-container">Select a tool</div>;
         }
     };
