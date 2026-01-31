@@ -25,8 +25,8 @@ export default function ConversionControls({
     const modeLabels = category === 'Encrypt - Decrypt'
         ? { left: 'Encrypt', right: 'Decrypt' }
         : category === 'Escape'
-        ? { left: 'Escape', right: 'Unescape' }
-        : { left: 'Encode', right: 'Decode' };
+            ? { left: 'Escape', right: 'Unescape' }
+            : { left: 'Encode', right: 'Decode' };
 
     return (
         <div style={{
@@ -66,7 +66,7 @@ export default function ConversionControls({
                 </div>
 
                 {/* Convert Button - Always visible, disabled when auto-run is on */}
-                <div style={{ paddingBottom: '4px' }}>
+                <div>
                     <Button
                         kind="primary"
                         size="md"
@@ -79,7 +79,7 @@ export default function ConversionControls({
                 </div>
 
                 {/* Quick Action + Button */}
-                <div style={{ paddingBottom: '4px' }}>
+                <div>
                     <Button
                         kind={isCurrentInQuickActions ? "ghost" : "tertiary"}
                         size="md"
@@ -95,14 +95,14 @@ export default function ConversionControls({
                 </div>
 
                 {/* Auto-run Toggle */}
-                <div style={{ paddingBottom: '12px', minWidth: '120px' }}>
+                <div style={{ paddingBottom: '6px', minWidth: '120px' }}>
                     <Toggle
                         id="auto-run-toggle"
                         labelA="Manual"
                         labelB="Auto-run"
                         toggled={autoRun}
                         onToggle={setAutoRun}
-                        size="sm"
+                        size="md"
                     />
                 </div>
 

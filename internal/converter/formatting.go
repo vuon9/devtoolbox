@@ -169,6 +169,9 @@ func (c *formattingConverter) Convert(req ConversionRequest) (string, error) {
 			return cronToText(input)
 		}
 		return textToCron(input)
+
+	case strings.Contains(method, "color"):
+		return convertColor(req.Input)
 	}
 
 	return "", fmt.Errorf("formatting method %s not supported", req.Method)
@@ -1009,4 +1012,314 @@ func textToCron(input string) (string, error) {
 	}
 
 	return fmt.Sprintf("%s %s * * %s", minute, hour, weekday), nil
+}
+
+// Color conversion functions
+func convertColor(input string) (string, error) {
+	input = strings.TrimSpace(input)
+
+	var r, g, b int
+	var err error
+
+	// Try to detect format and parse
+	if strings.HasPrefix(input, "#") {
+		// HEX format
+		r, g, b, err = parseHex(input)
+	} else if strings.HasPrefix(input, "rgb") {
+		// RGB format: rgb(255, 128, 0)
+		r, g, b, err = parseRGB(input)
+	} else if strings.HasPrefix(input, "hsl") {
+		// HSL format: hsl(120, 50%, 50%)
+		r, g, b, err = parseHSL(input)
+	} else if strings.HasPrefix(input, "hsv") || strings.HasPrefix(input, "hsb") {
+		// HSV/HSB format: hsv(120, 50%, 50%)
+		r, g, b, err = parseHSV(input)
+	} else {
+		// Try comma-separated RGB
+		r, g, b, err = parseCommaRGB(input)
+	}
+
+	if err != nil {
+		return "", fmt.Errorf("invalid color format: %w", err)
+	}
+
+	// Generate all output formats
+	var result strings.Builder
+	result.WriteString(fmt.Sprintf("HEX: %s\n", rgbToHex(r, g, b)))
+	result.WriteString(fmt.Sprintf("RGB: rgb(%d, %d, %d)\n", r, g, b))
+
+	h, s, l := rgbToHSL(r, g, b)
+	result.WriteString(fmt.Sprintf("HSL: hsl(%d, %d%%, %d%%)\n", h, s, l))
+
+	h2, s2, v := rgbToHSV(r, g, b)
+	result.WriteString(fmt.Sprintf("HSV: hsv(%d, %d%%, %d%%)", h2, s2, v))
+
+	return result.String(), nil
+}
+
+func parseHex(input string) (int, int, int, error) {
+	input = strings.TrimPrefix(input, "#")
+
+	// Handle shorthand: #RGB -> #RRGGBB
+	if len(input) == 3 {
+		input = string(input[0]) + string(input[0]) + string(input[1]) + string(input[1]) + string(input[2]) + string(input[2])
+	}
+
+	if len(input) != 6 {
+		return 0, 0, 0, fmt.Errorf("invalid hex length")
+	}
+
+	val, err := strconv.ParseInt(input, 16, 64)
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	r := int((val >> 16) & 0xFF)
+	g := int((val >> 8) & 0xFF)
+	b := int(val & 0xFF)
+
+	return r, g, b, nil
+}
+
+func rgbToHex(r, g, b int) string {
+	return fmt.Sprintf("#%02X%02X%02X", r, g, b)
+}
+
+func parseRGB(input string) (int, int, int, error) {
+	// Extract numbers from rgb(255, 128, 0)
+	re := regexp.MustCompile(`rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)`)
+	matches := re.FindStringSubmatch(input)
+	if len(matches) != 4 {
+		return 0, 0, 0, fmt.Errorf("invalid RGB format")
+	}
+
+	r, _ := strconv.Atoi(matches[1])
+	g, _ := strconv.Atoi(matches[2])
+	b, _ := strconv.Atoi(matches[3])
+
+	return clamp(r, 0, 255), clamp(g, 0, 255), clamp(b, 0, 255), nil
+}
+
+func parseCommaRGB(input string) (int, int, int, error) {
+	// Try format: 255, 128, 0
+	parts := strings.Split(input, ",")
+	if len(parts) != 3 {
+		return 0, 0, 0, fmt.Errorf("invalid comma-separated RGB")
+	}
+
+	r, err1 := strconv.Atoi(strings.TrimSpace(parts[0]))
+	g, err2 := strconv.Atoi(strings.TrimSpace(parts[1]))
+	b, err3 := strconv.Atoi(strings.TrimSpace(parts[2]))
+
+	if err1 != nil || err2 != nil || err3 != nil {
+		return 0, 0, 0, fmt.Errorf("invalid RGB values")
+	}
+
+	return clamp(r, 0, 255), clamp(g, 0, 255), clamp(b, 0, 255), nil
+}
+
+func parseHSL(input string) (int, int, int, error) {
+	// Extract numbers from hsl(120, 50%, 50%)
+	re := regexp.MustCompile(`hsl\s*\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)`)
+	matches := re.FindStringSubmatch(input)
+	if len(matches) != 4 {
+		return 0, 0, 0, fmt.Errorf("invalid HSL format")
+	}
+
+	h, _ := strconv.Atoi(matches[1])
+	s, _ := strconv.Atoi(matches[2])
+	l, _ := strconv.Atoi(matches[3])
+
+	return hslToRGB(h, s, l)
+}
+
+func rgbToHSL(r, g, b int) (int, int, int) {
+	rf := float64(r) / 255.0
+	gf := float64(g) / 255.0
+	bf := float64(b) / 255.0
+
+	max := max(rf, max(gf, bf))
+	min := min(rf, min(gf, bf))
+	l := (max + min) / 2
+
+	var s, h float64
+
+	if max == min {
+		s, h = 0, 0
+	} else {
+		d := max - min
+		if l > 0.5 {
+			s = d / (2 - max - min)
+		} else {
+			s = d / (max + min)
+		}
+
+		switch max {
+		case rf:
+			h = (gf - bf) / d
+			if gf < bf {
+				h += 6
+			}
+		case gf:
+			h = (bf-rf)/d + 2
+		case bf:
+			h = (rf-gf)/d + 4
+		}
+		h /= 6
+	}
+
+	return int(h * 360), int(s * 100), int(l * 100)
+}
+
+func hslToRGB(h, s, l int) (int, int, int, error) {
+	hf := float64(h) / 360.0
+	sf := float64(s) / 100.0
+	lf := float64(l) / 100.0
+
+	var r, g, b float64
+
+	if sf == 0 {
+		r, g, b = lf, lf, lf
+	} else {
+		var q float64
+		if lf < 0.5 {
+			q = lf * (1 + sf)
+		} else {
+			q = lf + sf - lf*sf
+		}
+		p := 2*lf - q
+
+		r = hueToRGB(p, q, hf+1.0/3.0)
+		g = hueToRGB(p, q, hf)
+		b = hueToRGB(p, q, hf-1.0/3.0)
+	}
+
+	return int(r * 255), int(g * 255), int(b * 255), nil
+}
+
+func hueToRGB(p, q, t float64) float64 {
+	if t < 0 {
+		t += 1
+	}
+	if t > 1 {
+		t -= 1
+	}
+	if t < 1.0/6.0 {
+		return p + (q-p)*6*t
+	}
+	if t < 1.0/2.0 {
+		return q
+	}
+	if t < 2.0/3.0 {
+		return p + (q-p)*(2.0/3.0-t)*6
+	}
+	return p
+}
+
+func parseHSV(input string) (int, int, int, error) {
+	// Extract numbers from hsv(120, 50%, 50%)
+	re := regexp.MustCompile(`(?:hsv|hsb)\s*\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)`)
+	matches := re.FindStringSubmatch(input)
+	if len(matches) != 4 {
+		return 0, 0, 0, fmt.Errorf("invalid HSV format")
+	}
+
+	h, _ := strconv.Atoi(matches[1])
+	s, _ := strconv.Atoi(matches[2])
+	v, _ := strconv.Atoi(matches[3])
+
+	return hsvToRGB(h, s, v)
+}
+
+func rgbToHSV(r, g, b int) (int, int, int) {
+	rf := float64(r) / 255.0
+	gf := float64(g) / 255.0
+	bf := float64(b) / 255.0
+
+	max := max(rf, max(gf, bf))
+	min := min(rf, min(gf, bf))
+	v := max
+
+	d := max - min
+	var s float64
+	if max == 0 {
+		s = 0
+	} else {
+		s = d / max
+	}
+
+	var h float64
+	if max == min {
+		h = 0
+	} else {
+		switch max {
+		case rf:
+			h = (gf - bf) / d
+			if gf < bf {
+				h += 6
+			}
+		case gf:
+			h = (bf-rf)/d + 2
+		case bf:
+			h = (rf-gf)/d + 4
+		}
+		h /= 6
+	}
+
+	return int(h * 360), int(s * 100), int(v * 100)
+}
+
+func hsvToRGB(h, s, v int) (int, int, int, error) {
+	hf := float64(h) / 360.0
+	sf := float64(s) / 100.0
+	vf := float64(v) / 100.0
+
+	i := int(hf * 6)
+	f := hf*6 - float64(i)
+	p := vf * (1 - sf)
+	q := vf * (1 - f*sf)
+	t := vf * (1 - (1-f)*sf)
+
+	var r, g, b float64
+
+	switch i % 6 {
+	case 0:
+		r, g, b = vf, t, p
+	case 1:
+		r, g, b = q, vf, p
+	case 2:
+		r, g, b = p, vf, t
+	case 3:
+		r, g, b = p, q, vf
+	case 4:
+		r, g, b = t, p, vf
+	case 5:
+		r, g, b = vf, p, q
+	}
+
+	return int(r * 255), int(g * 255), int(b * 255), nil
+}
+
+func clamp(v, min, max int) int {
+	if v < min {
+		return min
+	}
+	if v > max {
+		return max
+	}
+	return v
+}
+
+func max(a, b float64) float64 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a, b float64) float64 {
+	if a < b {
+		return a
+	}
+	return b
 }

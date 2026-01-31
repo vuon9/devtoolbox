@@ -16,7 +16,7 @@ This document tracks the refactoring and development status of each tool compone
 | Tool | Status | Notes | Last Updated |
 |------|--------|-------|--------------|
 | JwtDebugger | 🟢 Done | Uses component abstraction system (ToolLayout, ToolTextArea, ToolInputGroup), toggleable layout, consistent button styling with icons (MagicWand, Security, Code), enhanced tabs (custom mode tabs, improved JSON/Claims tabs), resizable textareas with constraints, proper error handling | Completed 2026-01-25 |
-| **TextBasedConverter** | 🟢 Done | Unified tool with 40+ algorithms (encrypt, encode, hash, convert). Features: Common Tags (Quick Select), Base64 Image Preview, All Hashes view, Smart ConfigurationPane. Backend: hierarchical structure with comprehensive tests. Phase 2: 2 default tags, custom tags with localStorage, image output support | Completed 2026-01-31 |
+| **TextBasedConverter** | 🟢 Done | Unified tool with 45+ algorithms across 5 categories (encrypt, encode, escape, hash, convert). Features: Common Tags (Quick Select), Base64 Image Preview, All Hashes view, Smart ConfigurationPane, 5 Escape methods. Backend: hierarchical structure with 83 comprehensive tests. Phase 2 & 3 complete | Completed 2026-01-31 |
 | BackslashEscaper | 🔴 Not Started | Legacy implementation | - |
 | CodeFormatter | 🔴 Not Started | Legacy implementation | - |
 | ColorConverter | 🔴 Not Started | Legacy implementation | - |
@@ -39,66 +39,6 @@ This document tracks the refactoring and development status of each tool compone
 | UrlParser | 🔴 Not Started | Legacy implementation | - |
 | UrlTools | 🔴 Not Started | Legacy implementation | - |
 | UuidGenerator | 🔴 Not Started | Legacy implementation | - |
-
----
-
-## Last tool tasks
-
-### Text-based Converter - Implementation Status
-
-#### ✅ **COMPLETED**
-
-**Encryption (8 algorithms):**
-- ✅ AES, AES-GCM, DES, Triple DES, ChaCha20, Salsa20, XOR, RC4
-
-**Encoding (12 algorithms):**
-- ✅ Base16 (Hex), Base32, Base58, Base64, Base64URL, URL, HTML Entities, Binary, Morse Code, ROT13, ROT47, Quoted-Printable
-
-**Conversion (11 formats):**
-- ✅ JSON ↔ YAML, JSON ↔ XML, JSON ↔ CSV / TSV, YAML ↔ TOML, Markdown ↔ HTML, CSV ↔ TSV, Key-Value ↔ Query String, Number Bases, Case Swapping, Properties ↔ JSON, INI ↔ JSON
-
-**Hashing (19 algorithms + All view):**
-- ✅ MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-3 (Keccak), BLAKE2b, BLAKE3, RIPEMD-160, bcrypt, scrypt, Argon2, HMAC, CRC32, Adler-32, MurmurHash3, xxHash, FNV-1a
-- ✅ "All" hash view with grid display of all algorithms
-
-**UI Features (Phase 2):**
-- ✅ Common Tags (Quick Select) - 2 default tags (URL Encode, All Hashes)
-- ✅ Custom tags with add/remove functionality
-- ✅ Custom tags persist in localStorage
-- ✅ Quick Action + button in main controls row
-- ✅ Base64 Image Preview with copy/download buttons
-- ✅ Auto-detection of base64 image data
-- ✅ "All" hash view with grid display of all algorithms
-- ✅ Smart ConfigurationPane for key/IV inputs
-
-**Infrastructure:**
-- ✅ Comprehensive unit tests (56 test cases)
-- ✅ GitHub Actions CI/CD for Go tests
-- ✅ Removed deprecated tools from codebase
-
----
-
-#### ⏳ **PENDING IMPLEMENTATION**
-
-The following algorithms are listed in CONVERTER_MAP but **not yet implemented** in the backend:
-
-**Encryption (7 algorithms):**
-- ⏳ Rabbit, RC4Drop, Blowfish, Twofish, RSA, Fernet, BIP38
-
-**Encoding (5 algorithms):**
-- ⏳ Base85, Punnycode, JWT Decode, Bencoded, Protobuf
-
-**Conversion (5 formats):**
-- ⏳ Unix Timestamp ↔ ISO 8601 (exists but needs improvement)
-- ⏳ Color Codes (exists but needs improvement)
-- ⏳ SQL Insert ↔ JSON Array
-- ⏳ CURL Command ↔ Fetch
-- ⏳ Cron Expression ↔ Text
-
-**UI Improvements:**
-- ⏳ Add copy buttons to ConfigurationPane for sample values
-- ⏳ Consider adding "Generate Random Key" button for encryption
-- ⏳ Full browser testing with real Wails app (not test server)
 
 ---
 
