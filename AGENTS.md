@@ -336,6 +336,67 @@ Follow this step‑by‑step guide to add a new tool component:
 
 ---
 
+## 9b. Consolidating/Merging Tools (Unified Tools Pattern)
+
+When creating a unified tool that replaces multiple existing tools (e.g., `CodeFormatter` replacing `JsonFormatter`, `SqlFormatter`, etc.), follow these additional steps:
+
+### Implementation Steps
+
+1. **Create Unified Tool First**
+   - Build the new unified tool following the standard tool creation process
+   - Ensure it covers ALL features of the tools it replaces
+   - Test thoroughly before removing old tools
+
+2. **Update All Registrations**
+   - Add route in `App.jsx` for the new unified tool
+   - Add entry in `Sidebar.jsx` for navigation
+   - Register backend service in `main.go` and `server.go`
+
+3. **Documentation Updates**
+   - Update `README.md` to reflect the consolidated tool (remove entries for replaced tools, add unified tool entry)
+   - Update `TOOL_STATUS.md`:
+     - Mark new unified tool as 🟢 Done
+     - Optionally add notes about which tools it replaces
+   - Consider adding a note in AGENTS.md about this consolidation pattern
+
+4. **Testing the Migration**
+   - Verify all functionality from old tools works in the unified tool
+   - Test sidebar navigation and routing
+   - Ensure state persistence works correctly
+
+### Tool Removal Process (After Migration is Complete)
+
+Once the unified tool is fully functional and tested:
+
+1. **Remove Old Tool Components**
+   - Delete old component files from `src/pages/`
+   - Remove imports from `App.jsx`
+   - Remove entries from `Sidebar.jsx`
+   - Clean up any unused backend services
+
+2. **Update TOOL_STATUS.md**
+   - Remove entries for deprecated tools, OR
+   - Mark them as "Replaced by [UnifiedTool]" with strikethrough
+
+3. **Clean Up Backend (if applicable)**
+   - Remove unused service files from root directory
+   - Remove unused internal packages if no longer needed
+   - Update `main.go` to remove old service bindings
+
+### Example: CodeFormatter Consolidation
+
+**Replaced Tools:**
+- `JsonFormatter` → Now part of CodeFormatter with jq filter support
+- `SqlFormatter` → Now part of CodeFormatter with SQL formatting
+- (Future: XML tools, CSS tools, etc.)
+
+**Migration Notes:**
+- CodeFormatter adds new capabilities (jq filters, XPath, CSS selectors) not in original tools
+- State persistence moved to unified storage key
+- Backend service supports 6+ format types with extensible architecture
+
+---
+
 ## 10. Refactoring a Tool
 
 Refer to **[TOOL_STATUS.md](./TOOL_STATUS.md)** for the current status of each tool. **Always check this file before modifying any tool component.**
@@ -381,8 +442,12 @@ These guidelines are intended for AI assistants (like opencode) working on this 
 ### Before Finishing
 1. **Run linting & formatting** – Execute any available lint/format commands (see section 8).
 2. **Test the tool** – Verify functionality with `wails dev`.
-3. **Update `TOOL_STATUS.md`** – If you refactored a tool, update its status and add a completion note.
-4. **Update `README.md`** - If features have been changed, modify features list and its details.
+3. **Update `TOOL_STATUS.md`** – Update the tool's status and add completion notes (mark as 🟢 Done when complete).
+4. **Update `README.md`** – **Whenever TOOL_STATUS.md is updated, review README.md to ensure consistency**: 
+   - Add new tools to the feature table
+   - Remove deprecated tools
+   - Update descriptions if features changed
+   - Keep the tool count/feature list in sync
 5. **Commit changes** – Use descriptive commit messages that reference the tool name and changes made.
 
 ### Important Notes
@@ -392,4 +457,4 @@ These guidelines are intended for AI assistants (like opencode) working on this 
 
 ---
 
-*Last updated: 2026‑01‑24*
+*Last updated: 2026‑01‑31*

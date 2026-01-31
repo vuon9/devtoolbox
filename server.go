@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"dev-toolbox/internal/codeformatter"
 	"dev-toolbox/internal/datagenerator"
 )
 
@@ -16,15 +17,17 @@ type Server struct {
 	conversionService    *ConversionService
 	barcodeService       *BarcodeService
 	dataGeneratorService *DataGeneratorService
+	codeFormatterService *CodeFormatterService
 }
 
 // NewServer creates a new Server instance
-func NewServer(jwtService *JWTService, conversionService *ConversionService, barcodeService *BarcodeService, dataGeneratorService *DataGeneratorService) *Server {
+func NewServer(jwtService *JWTService, conversionService *ConversionService, barcodeService *BarcodeService, dataGeneratorService *DataGeneratorService, codeFormatterService *CodeFormatterService) *Server {
 	return &Server{
 		jwtService:           jwtService,
 		conversionService:    conversionService,
 		barcodeService:       barcodeService,
 		dataGeneratorService: dataGeneratorService,
+		codeFormatterService: codeFormatterService,
 	}
 }
 
@@ -81,6 +84,11 @@ func (s *Server) handleAPI(w http.ResponseWriter, r *http.Request) {
 
 	if service == "DataGeneratorService" {
 		s.handleDataGeneratorService(method, w, r)
+		return
+	}
+
+	if service == "CodeFormatterService" {
+		s.handleCodeFormatterService(method, w, r)
 		return
 	}
 
@@ -312,6 +320,55 @@ func (s *Server) handleDataGeneratorService(method string, w http.ResponseWriter
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
+}
+
+func (s *Server) handleCodeFormatterService(method string, w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		Args []interface{} `json:"args"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	var result interface{}
+
+	switch method {
+	case "Format":
+		if len(payload.Args) < 1 {
+			http.Error(w, "Missing arguments", http.StatusBadRequest)
+			return
+		}
+		reqData, ok := payload.Args[0].(map[string]interface{})
+		if !ok {
+			http.Error(w, "Invalid request format", http.StatusBadRequest)
+			return
+		}
+
+		req := codeformatter.FormatRequest{
+			Input:      getStringFromMap(reqData, "input"),
+			FormatType: getStringFromMap(reqData, "formatType"),
+			Filter:     getStringFromMap(reqData, "filter"),
+			Minify:     getBoolFromMap(reqData, "minify"),
+		}
+		result = s.codeFormatterService.Format(req)
+	default:
+		http.Error(w, fmt.Sprintf("Method not found: %s", method), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+}
+
+func getBoolFromMap(m map[string]interface{}, key string) bool {
+	if val, ok := m[key]; ok {
+		if b, ok := val.(bool); ok {
+			return b
+		}
+	}
+	return false
 }
 
 func corsMiddleware(next http.Handler) http.Handler {

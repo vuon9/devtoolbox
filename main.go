@@ -19,10 +19,11 @@ func main() {
 	conversionService := NewConversionService()
 	barcodeService := NewBarcodeService()
 	dataGeneratorService := NewDataGeneratorService()
+	codeFormatterService := NewCodeFormatterService()
 
 	// Start HTTP server for Web Mode (port 8081)
 	go func() {
-		server := NewServer(jwtService, conversionService, barcodeService, dataGeneratorService)
+		server := NewServer(jwtService, conversionService, barcodeService, dataGeneratorService, codeFormatterService)
 		server.Start(8081)
 	}()
 
@@ -41,6 +42,7 @@ func main() {
 			conversionService.startup(ctx)
 			barcodeService.startup(ctx)
 			dataGeneratorService.startup(ctx)
+			codeFormatterService.startup(ctx)
 		},
 		Bind: []interface{}{
 			app,
@@ -48,6 +50,7 @@ func main() {
 			conversionService,
 			barcodeService,
 			dataGeneratorService,
+			codeFormatterService,
 		},
 	})
 
