@@ -64,9 +64,99 @@ Use the standardized components in `src/components/ToolUI.jsx` to enforce these 
 -   **Icons**: Use `@carbon/icons-react`.
 
 ## 5. Testing Guidelines
--   All Go tests MUST follow Go's recommended table-driven (table test) style: define a slice of named test cases with fields such as `name`, inputs, `want`, and `wantErr`, iterate over them with `for _, tc := range tests { ... }`, and run each case as a subtest using `t.Run(tc.name, func(t *testing.T) { ... })`.
--   When using subtests with parallel execution, use `tc := tc` before `t.Run` and call `t.Parallel()` inside the subtest.
--   Tests should use clear case names, deterministic setup/teardown, avoid global state, and prefer `reflect.DeepEqual` or the `cmp` package for comparisons to keep tests reliable and readable.
+
+### Table-Driven Test Style (Mandatory)
+
+All Go tests **MUST** follow Go's recommended table-driven (table test) style. This provides clear structure, easy addition of new test cases, and consistent test organization.
+
+#### Required Structure:
+```go
+func TestConverter(t *testing.T) {
+    tests := []struct {
+        name      string  // Descriptive test case name
+        input     string  // Input data
+        method    string  // Method being tested
+        subMode   string  // Mode (Encode/Decode, Encrypt/Decrypt, etc.)
+        expected  string  // Expected output
+        expectErr bool    // Whether an error is expected
+    }{
+        {"Base64 Encode hello", "hello", "base64", "Encode", "aGVsbG8=", false},
+        {"Base64 Decode aGVsbG8=", "aGVsbG8=", "base64", "Decode", "hello", false},
+        {"Hex Encode", "hello", "hex", "Encode", "68656c6c6f", false},
+        // Add more cases...
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            req := ConversionRequest{
+                Input:  tt.input,
+                Method: tt.method,
+                Config: map[string]interface{}{"subMode": tt.subMode},
+            }
+            result, err := conv.Convert(req)
+            
+            if tt.expectErr {
+                if err == nil {
+                    t.Errorf("Expected error but got none")
+                }
+                return
+            }
+            
+            if err != nil {
+                t.Errorf("Unexpected error: %v", err)
+                return
+            }
+            
+            if result != tt.expected {
+                t.Errorf("Expected '%s', got '%s'", tt.expected, result)
+            }
+        })
+    }
+}
+```
+
+#### Key Requirements:
+- **Name field**: Every test case must have a descriptive `name` field
+- **Slice of structs**: Use `[]struct{...}` to define all test cases
+- **Iterate with range**: Use `for _, tc := range tests`
+- **Subtests with t.Run**: Always use `t.Run(tc.name, func(t *testing.T) {...})`
+- **Parallel execution**: When needed, use `tc := tc` capture and `t.Parallel()`
+
+### What NOT to Do:
+❌ **Individual t.Run() calls** - Don't write separate `t.Run()` calls for each test case:
+```go
+// BAD - Don't do this
+t.Run("Test 1", func(t *testing.T) { ... })
+t.Run("Test 2", func(t *testing.T) { ... })
+t.Run("Test 3", func(t *testing.T) { ... })
+```
+
+✅ **Do this instead**:
+```go
+// GOOD - Table-driven
+for _, tc := range tests {
+    t.Run(tc.name, func(t *testing.T) { ... })
+}
+```
+
+### Best Practices:
+- **Clear case names**: Use descriptive names like `"AES Encrypt - simple text"` not `"test1"`
+- **Deterministic setup**: Avoid global state, setup everything in the test function
+- **Test both directions**: For bidirectional operations (encode/decode), test both ways
+- **Edge cases**: Include empty strings, special characters, unicode, long text
+- **Error cases**: Test invalid inputs and expect errors
+
+### Running Tests:
+```bash
+# Run all tests
+go test ./internal/converter/...
+
+# Run with verbose output
+go test ./internal/converter/... -v
+
+# Run specific test
+go test ./internal/converter/... -run TestEncodingConverter
+```
 
 ---
 
@@ -159,10 +249,8 @@ func TestDecode(t *testing.T) {
 git clone https://github.com/vuon9/dev-toolbox.git
 cd dev-toolbox
 
-# Install frontend dependencies
-cd frontend
-npm install
-cd ..
+# Install frontend dependencies (using Bun)
+bun install
 ```
 
 ### Running the Application
@@ -185,7 +273,7 @@ The application will open in a native window. All tools work offline; no externa
 - **ESLint**: Not currently configured. Consider adding `.eslintrc` and scripts.
 - **Prettier**: Not currently configured. Consider adding `.prettierrc`.
 
-**Recommended**: Add linting and formatting scripts to `frontend/package.json`:
+**Recommended**: Add linting and formatting scripts to `package.json`:
 ```json
 "scripts": {
   "lint": "eslint src --ext .js,.jsx",
@@ -195,9 +283,8 @@ The application will open in a native window. All tools work offline; no externa
 
 Run these commands before committing:
 ```bash
-cd frontend
-npm run lint
-npm run format
+bun run lint
+bun run format
 ```
 
 ### Go
