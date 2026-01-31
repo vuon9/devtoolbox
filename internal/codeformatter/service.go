@@ -269,55 +269,124 @@ func extractXMLAttributes(xmlStr, elementName, attrName string) (string, error) 
 
 // formatXMLPretty formats XML with indentation
 func formatXMLPretty(xmlStr string) (string, error) {
-	var buf bytes.Buffer
-	encoder := json.NewEncoder(&buf)
-	encoder.SetIndent("", "  ")
+	// Use a simple but robust approach: tokenize and rebuild
+	type token struct {
+		typ   string // "decl", "open", "close", "selfclose", "text", "comment"
+		value string
+		name  string // for tags
+	}
 
-	// Simple pretty printing - parse and re-serialize
-	// In production, use proper XML indentation
-	var result strings.Builder
-	indent := 0
-	inTag := false
+	var tokens []token
+	i := 0
+	for i < len(xmlStr) {
+		if xmlStr[i] == '<' {
+			// Find end of tag
+			end := i + 1
+			for end < len(xmlStr) && xmlStr[end] != '>' {
+				end++
+			}
+			if end >= len(xmlStr) {
+				break
+			}
+			tagContent := xmlStr[i+1 : end]
+			fullTag := xmlStr[i : end+1]
 
-	for i := 0; i < len(xmlStr); i++ {
-		ch := xmlStr[i]
-
-		switch ch {
-		case '<':
-			if i+1 < len(xmlStr) && xmlStr[i+1] == '/' {
-				// Closing tag
-				indent--
-				if result.Len() > 0 && result.String()[result.Len()-1] == '\n' {
-					result.WriteString(strings.Repeat("  ", indent))
+			if strings.HasPrefix(tagContent, "?") {
+				tokens = append(tokens, token{typ: "decl", value: fullTag})
+			} else if strings.HasPrefix(tagContent, "!--") {
+				tokens = append(tokens, token{typ: "comment", value: fullTag})
+			} else if strings.HasPrefix(tagContent, "/") {
+				name := strings.TrimSpace(tagContent[1:])
+				tokens = append(tokens, token{typ: "close", value: fullTag, name: name})
+			} else if strings.HasSuffix(tagContent, "/") {
+				name := strings.TrimSpace(strings.TrimSuffix(tagContent, "/"))
+				if idx := strings.IndexAny(name, " \t"); idx != -1 {
+					name = name[:idx]
 				}
+				tokens = append(tokens, token{typ: "selfclose", value: fullTag, name: name})
+			} else {
+				name := strings.TrimSpace(tagContent)
+				if idx := strings.IndexAny(name, " \t"); idx != -1 {
+					name = name[:idx]
+				}
+				tokens = append(tokens, token{typ: "open", value: fullTag, name: name})
 			}
-			result.WriteByte(ch)
-			inTag = true
-		case '>':
-			result.WriteByte(ch)
-			inTag = false
-			if i+1 < len(xmlStr) && xmlStr[i+1] != '<' && xmlStr[i+1] != ' ' && xmlStr[i+1] != '\t' && xmlStr[i+1] != '\n' {
-				// Content follows
-			} else if i+1 < len(xmlStr) && xmlStr[i+1] == '<' && xmlStr[i+2] != '/' {
-				// Opening tag follows
-				indent++
-				result.WriteByte('\n')
-				result.WriteString(strings.Repeat("  ", indent))
-			} else if i+1 < len(xmlStr) && xmlStr[i+1] == '<' && xmlStr[i+2] == '/' {
-				// Closing tag follows
-				result.WriteByte('\n')
-				result.WriteString(strings.Repeat("  ", indent))
+			i = end + 1
+		} else {
+			// Text content
+			start := i
+			for i < len(xmlStr) && xmlStr[i] != '<' {
+				i++
 			}
-		case '\n', '\t':
-			if !inTag {
-				// Skip whitespace outside tags
+			text := strings.TrimSpace(xmlStr[start:i])
+			if text != "" {
+				tokens = append(tokens, token{typ: "text", value: text})
 			}
-		default:
-			result.WriteByte(ch)
 		}
 	}
 
-	return result.String(), nil
+	// Rebuild with proper indentation
+	var result strings.Builder
+	indent := 0
+	for j, tok := range tokens {
+		switch tok.typ {
+		case "decl":
+			result.WriteString(tok.value)
+			result.WriteByte('\n')
+		case "comment":
+			result.WriteString(strings.Repeat("  ", indent))
+			result.WriteString(tok.value)
+			result.WriteByte('\n')
+		case "open":
+			// Check if this is an inline element (text follows and then close)
+			isInline := false
+			if j+2 < len(tokens) && tokens[j+1].typ == "text" && tokens[j+2].typ == "close" && tokens[j+2].name == tok.name {
+				isInline = true
+			}
+
+			if !isInline && result.Len() > 0 && !strings.HasSuffix(result.String(), "\n") {
+				result.WriteByte('\n')
+			}
+			if !isInline {
+				result.WriteString(strings.Repeat("  ", indent))
+			}
+			result.WriteString(tok.value)
+			if !isInline {
+				indent++
+			}
+		case "close":
+			// Check if previous was inline (open + text + close sequence)
+			wasInline := j >= 2 && tokens[j-2].typ == "open" && tokens[j-2].name == tok.name && tokens[j-1].typ == "text"
+
+			if !wasInline {
+				indent--
+				if indent < 0 {
+					indent = 0
+				}
+				if result.Len() > 0 && !strings.HasSuffix(result.String(), "\n") {
+					result.WriteByte('\n')
+				}
+				result.WriteString(strings.Repeat("  ", indent))
+			}
+			result.WriteString(tok.value)
+			if j < len(tokens)-1 {
+				result.WriteByte('\n')
+			}
+		case "selfclose":
+			if result.Len() > 0 && !strings.HasSuffix(result.String(), "\n") {
+				result.WriteByte('\n')
+			}
+			result.WriteString(strings.Repeat("  ", indent))
+			result.WriteString(tok.value)
+			if j < len(tokens)-1 {
+				result.WriteByte('\n')
+			}
+		case "text":
+			result.WriteString(tok.value)
+		}
+	}
+
+	return strings.TrimSpace(result.String()), nil
 }
 
 // minifyXML removes whitespace from XML

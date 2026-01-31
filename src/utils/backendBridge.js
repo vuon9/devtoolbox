@@ -17,9 +17,9 @@ const API_BASE_URL = 'http://localhost:8081';
 async function callBackend(service, method, ...args) {
     if (isWails()) {
         // Direct Wails binding call
-        // Assumes window.go[service][method] exists
+        // Wails generates bindings under window.go.wails (not window.go.main)
         try {
-            return await window.go.main[service][method](...args);
+            return await window.go.wails[service][method](...args);
         } catch (err) {
             console.error(`Wails call failed: ${service}.${method}`, err);
             throw err;
@@ -69,5 +69,8 @@ export const Backend = {
         Generate: (req) => callBackend('DataGeneratorService', 'Generate', req),
         GetPresets: () => callBackend('DataGeneratorService', 'GetPresets'),
         ValidateTemplate: (template) => callBackend('DataGeneratorService', 'ValidateTemplate', template)
+    },
+    CodeFormatterService: {
+        Format: (req) => callBackend('CodeFormatterService', 'Format', req)
     }
 };
