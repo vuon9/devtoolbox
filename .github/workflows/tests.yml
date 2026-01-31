@@ -34,7 +34,8 @@ jobs:
   go-tests:
     name: Go Tests
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      pull-requests: write
 
     steps:
       - name: Checkout
