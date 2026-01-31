@@ -6,31 +6,8 @@ import useLayoutToggle from '../../hooks/useLayoutToggle';
 import { Backend } from '../../utils/backendBridge';
 import ConversionControls from './components/ConversionControls';
 import ConfigurationPane from './components/ConfigurationPane';
-
-export const CONVERTER_MAP = {
-    'Encrypt - Decrypt': [
-        'AES', 'DES', 'Triple DES', 'Rabbit', 'RC4', 'RC4Drop',
-        'ChaCha20', 'Salsa20', 'Blowfish', 'Twofish', 'RSA',
-        'Fernet', 'BIP38', 'XOR'
-    ],
-    'Encode - Decode': [
-        'Base16 (Hex)', 'Base32', 'Base58', 'Base64', 'Base64URL',
-        'Base85', 'URL', 'HTML Entities', 'Binary', 'Morse Code',
-        'Punnycode', 'JWT Decode', 'Bencoded', 'Protobuf'
-    ],
-    'Convert': [
-        'JSON ↔ YAML', 'JSON ↔ XML', 'JSON ↔ CSV / TSV', 'YAML ↔ TOML',
-        'Markdown ↔ HTML', 'Unix Timestamp ↔ ISO 8601', 'Color Codes',
-        'Number Bases', 'Case Swapping', 'SQL Insert ↔ JSON Array',
-        'CURL Command ↔ Fetch', 'Cron Expression ↔ Text'
-    ],
-    'Hash': [
-        'MD5', 'SHA-1', 'SHA-224', 'SHA-256', 'SHA-384', 'SHA-512',
-        'SHA-3 (Keccak)', 'BLAKE2b', 'BLAKE3', 'RIPEMD-160',
-        'bcrypt', 'scrypt', 'Argon2', 'HMAC', 'CRC32', 'Adler-32',
-        'MurmurHash3'
-    ],
-};
+import MultiHashOutput from './components/MultiHashOutput';
+import { CONVERTER_MAP } from './constants';
 
 export default function TextBasedConverter() {
     // Persistent state initialization
@@ -63,6 +40,9 @@ export default function TextBasedConverter() {
         persist: true
     });
 
+    // Check if showing all hashes
+    const isAllHashes = category === 'Hash' && method === 'All';
+
     // Submode default logic
     useEffect(() => {
         if (category === 'Encrypt - Decrypt' && !['Encrypt', 'Decrypt'].includes(subMode)) {
@@ -82,6 +62,13 @@ export default function TextBasedConverter() {
 
     const performConversion = useCallback(async (text, cat, meth, sub, cfg) => {
         if (!text && cat !== 'Hash') {
+            setOutput('');
+            setError('');
+            return;
+        }
+
+        // For All Hashes, we compute even with empty input (show empty results)
+        if (!text && cat === 'Hash' && meth === 'All') {
             setOutput('');
             setError('');
             return;
@@ -115,7 +102,7 @@ export default function TextBasedConverter() {
     const updateConfig = (newCfg) => setConfig(prev => ({ ...prev, ...newCfg }));
 
     // Determine if Key/IV pane should be shown
-    const showConfig = category === 'Encrypt - Decrypt';
+    const showConfig = category === 'Encrypt - Decrypt' || method === 'HMAC';
 
     return (
         <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
@@ -135,6 +122,7 @@ export default function TextBasedConverter() {
                 autoRun={config.autoRun}
                 setAutoRun={(val) => updateConfig({ autoRun: val })}
                 onConvert={handleConvert}
+                isAllHashes={isAllHashes}
             />
 
             {showConfig && (
@@ -153,15 +141,53 @@ export default function TextBasedConverter() {
                     placeholder="Enter text here..."
                 />
 
-
-                <ToolPane
-                    label="Output"
-                    value={output}
-                    readOnly
-                    placeholder="Result will appear here..."
-                    invalid={!!error}
-                    invalidText={error}
-                />
+                {isAllHashes ? (
+                    <div className="pane" style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
+                        minHeight: 0,
+                        flex: 1
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            minHeight: '30px'
+                        }}>
+                            <label style={{
+                                fontSize: '0.75rem',
+                                fontWeight: 400,
+                                lineHeight: 1.5,
+                                letterSpacing: '0.32px',
+                                color: 'var(--cds-text-secondary)',
+                                textTransform: 'uppercase'
+                            }}>
+                                Output
+                            </label>
+                        </div>
+                        <div style={{
+                            flex: 1,
+                            overflowY: 'auto',
+                            padding: '0.75rem',
+                            backgroundColor: 'var(--cds-layer)',
+                        }}>
+                            <MultiHashOutput
+                                value={output}
+                                error={error}
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    <ToolPane
+                        label="Output"
+                        value={output}
+                        readOnly
+                        placeholder="Result will appear here..."
+                        invalid={!!error}
+                        invalidText={error}
+                    />
+                )}
             </ToolSplitPane>
         </div>
     );

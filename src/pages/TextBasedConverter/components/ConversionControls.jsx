@@ -1,7 +1,7 @@
 import { Button, Dropdown, Toggle, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { ToolLayoutToggle } from '../../../components/ToolUI';
 import { ArrowsHorizontal, Play } from '@carbon/icons-react';
-import { CONVERTER_MAP } from '../index';
+import { CONVERTER_MAP } from '../constants';
 
 export default function ConversionControls({
     category,
@@ -14,6 +14,7 @@ export default function ConversionControls({
     autoRun,
     setAutoRun,
     onConvert,
+    isAllHashes = false,
 }) {
     const categories = Object.keys(CONVERTER_MAP);
     const methods = CONVERTER_MAP[category] || [];
@@ -49,7 +50,7 @@ export default function ConversionControls({
                     />
                 </div>
 
-                <div style={{ width: '220px' }}>
+                <div style={{ width: '280px' }}>
                     <Dropdown
                         id="method-select"
                         titleText="Algorithm / Method"

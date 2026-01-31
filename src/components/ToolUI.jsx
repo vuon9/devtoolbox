@@ -3,7 +3,8 @@ import { TextArea, Button } from '@carbon/react';
 import { Copy } from '@carbon/icons-react';
 
 // Re-export new layout components
-export { ToolLayout, ToolLayoutToggle, ToolVerticalSplit, LAYOUT_DIRECTIONS, TOGGLE_POSITIONS } from './layout';
+export { ToolLayout, ToolLayoutToggle, ToolVerticalSplit } from './layout';
+export { LAYOUT_DIRECTIONS, TOGGLE_POSITIONS } from './layout/constants';
 export { ToolCopyButton, ToolTextArea, ToolInput, ToolInputGroup, ToolTabBar } from './inputs';
 
 export function ToolHeader({ title, description }) {
@@ -47,7 +48,7 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
-            minHeight: 0,
+            minHeight: '50vh',
             flex: 1
         }}>
             <div style={{
@@ -79,6 +80,7 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
             </div>
             <div style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column' }}>
                 <TextArea
+                    id="tool-textarea"
                     value={value}
                     onChange={onChange}
                     readOnly={readOnly}
@@ -90,7 +92,8 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
                         fontFamily: "'IBM Plex Mono', monospace",
                         border: '1px solid var(--cds-border-strong)',
                     }}
-                    labelText=""
+                    labelText={label || 'Text Area'}
+                    hideLabel
                     {...props}
                 />
             </div>

@@ -106,7 +106,7 @@ func (c *encodingConverter) Convert(req ConversionRequest) (string, error) {
 		json.Unmarshal(payload, &p)
 
 		res := map[string]interface{}{
-			"header": h,
+			"header":  h,
 			"payload": p,
 		}
 		out, _ := json.MarshalIndent(res, "", "  ")
@@ -130,9 +130,134 @@ func (c *encodingConverter) Convert(req ConversionRequest) (string, error) {
 			res = append(res, byte(b))
 		}
 		return string(res), nil
+
+	case method == "rot13":
+		// ROT13 is symmetric - encode and decode are the same
+		return rot13(req.Input), nil
+
+	case method == "rot47":
+		// ROT47 is also symmetric
+		return rot47(req.Input), nil
+
+	case strings.Contains(method, "quoted-printable"):
+		if isEncode {
+			return encodeQuotedPrintable(req.Input), nil
+		}
+		return decodeQuotedPrintable(req.Input)
 	}
 
 	return "", fmt.Errorf("encoding method %s not supported", req.Method)
+}
+
+// ROT13 implementation
+func rot13(input string) string {
+	var result strings.Builder
+	for _, r := range input {
+		switch {
+		case r >= 'a' && r <= 'z':
+			result.WriteRune('a' + (r-'a'+13)%26)
+		case r >= 'A' && r <= 'Z':
+			result.WriteRune('A' + (r-'A'+13)%26)
+		default:
+			result.WriteRune(r)
+		}
+	}
+	return result.String()
+}
+
+// ROT47 implementation - shifts characters in the range 33-126
+func rot47(input string) string {
+	var result strings.Builder
+	for _, r := range input {
+		if r >= 33 && r <= 126 {
+			result.WriteRune(33 + (r-33+47)%94)
+		} else {
+			result.WriteRune(r)
+		}
+	}
+	return result.String()
+}
+
+// Quoted-Printable encoding
+func encodeQuotedPrintable(input string) string {
+	var result strings.Builder
+	lineLength := 0
+	for i := 0; i < len(input); i++ {
+		b := input[i]
+		// Characters that can be represented as-is
+		if (b >= 33 && b <= 60) || (b >= 62 && b <= 126) {
+			if lineLength >= 75 {
+				result.WriteString("=\n")
+				lineLength = 0
+			}
+			result.WriteByte(b)
+			lineLength++
+		} else if b == ' ' || b == '\t' {
+			// Check if space/tab is at end of line
+			if i+1 < len(input) && (input[i+1] == '\n' || input[i+1] == '\r') {
+				if lineLength+3 > 75 {
+					result.WriteString("=\n")
+					lineLength = 0
+				}
+				result.WriteString(fmt.Sprintf("=%02X", b))
+				lineLength += 3
+			} else {
+				if lineLength >= 75 {
+					result.WriteString("=\n")
+					lineLength = 0
+				}
+				result.WriteByte(b)
+				lineLength++
+			}
+		} else {
+			// Encode other characters
+			if lineLength+3 > 75 {
+				result.WriteString("=\n")
+				lineLength = 0
+			}
+			result.WriteString(fmt.Sprintf("=%02X", b))
+			lineLength += 3
+		}
+	}
+	return result.String()
+}
+
+// Quoted-Printable decoding
+func decodeQuotedPrintable(input string) (string, error) {
+	var result strings.Builder
+	for i := 0; i < len(input); i++ {
+		if input[i] == '=' {
+			if i+1 < len(input) {
+				// Check for soft line break
+				if input[i+1] == '\n' || input[i+1] == '\r' {
+					// Soft line break - skip the = and newline
+					if i+2 < len(input) && input[i+1] == '\r' && input[i+2] == '\n' {
+						i += 2
+					} else {
+						i++
+					}
+					continue
+				}
+				// Decode hex value
+				if i+2 < len(input) {
+					hexVal := input[i+1 : i+3]
+					val, err := strconv.ParseInt(hexVal, 16, 8)
+					if err != nil {
+						return "", fmt.Errorf("invalid quoted-printable sequence at position %d", i)
+					}
+					result.WriteByte(byte(val))
+					i += 2
+				} else {
+					return "", fmt.Errorf("incomplete quoted-printable sequence at position %d", i)
+				}
+			} else {
+				return "", fmt.Errorf("invalid quoted-printable sequence at position %d", i)
+			}
+		} else {
+			result.WriteByte(input[i])
+		}
+	}
+	return result.String(), nil
 }
 
 // Reuse Morse logic from previous implementation

@@ -1,6 +1,7 @@
 import React from 'react';
 import { IconButton } from '@carbon/react';
 import { SplitScreen, VerticalView } from '@carbon/icons-react';
+import { TOGGLE_POSITIONS } from './constants';
 
 /**
  * Layout toggle button for switching between horizontal and vertical layouts
@@ -64,10 +65,3 @@ export default function ToolLayoutToggle({
         </div>
     );
 }
-
-// Export position constants for easy reference
-export const TOGGLE_POSITIONS = {
-    TOP_RIGHT: 'top-right',
-    CONTROLS: 'controls',
-    FLOATING: 'floating'
-};
