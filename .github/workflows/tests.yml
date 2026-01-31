@@ -1,19 +1,9 @@
 name: Go Tests
 
 on:
-  push:
-    branches:
-      - main
-      - master
-      - 'feat/**'
-    paths:
-      - '**.go'
-      - 'go.mod'
-      - 'go.sum'
   pull_request:
     branches:
       - main
-      - master
     paths:
       - '**.go'
       - 'go.mod'
@@ -23,7 +13,7 @@ jobs:
   test:
     name: Run Go Tests
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
