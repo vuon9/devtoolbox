@@ -76,6 +76,13 @@ export default function TextBasedConverter() {
             return;
         }
 
+        // If input is a data URI (base64 image), display it directly
+        if (text && text.trim().startsWith('data:image/')) {
+            setOutput(text.trim());
+            setError('');
+            return;
+        }
+
         try {
             // Include subMode in backend request
             const backendConfig = { ...cfg, subMode: sub };
