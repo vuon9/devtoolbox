@@ -7,9 +7,6 @@ export const CONVERTER_MAP = {
         'ChaCha20', 'Salsa20', 'Blowfish', 'Twofish', 'RSA',
         'Fernet', 'BIP38', 'XOR'
     ],
-    'Escape': [
-        'String Literal', 'Unicode/Hex', 'HTML/XML', 'URL', 'Regex'
-    ],
     'Encode - Decode': [
         'Base16 (Hex)', 'Base32', 'Base58', 'Base64', 'Base64URL',
         'Base85', 'URL', 'HTML Entities', 'Binary', 'Morse Code',
@@ -17,10 +14,7 @@ export const CONVERTER_MAP = {
         'ROT13', 'ROT47', 'Quoted-Printable'
     ],
     'Escape': [
-        'JSON String', 'JavaScript String', 'Python String', 'Go String',
-        'C/C++ String', 'Java String', 'Ruby String', 'PHP String',
-        'SQL String', 'Regex', 'HTML Attribute', 'XML',
-        'Command Line', 'Single Quote', 'Double Quote', 'Backslash'
+        'String Literal', 'Unicode/Hex', 'HTML/XML', 'URL', 'Regex'
     ],
     'Convert': [
         'JSON ↔ YAML', 'JSON ↔ XML', 'JSON ↔ CSV / TSV', 'YAML ↔ TOML',
