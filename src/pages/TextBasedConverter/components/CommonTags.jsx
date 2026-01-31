@@ -146,18 +146,26 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        width: '16px',
-                                        height: '16px',
+                                        width: '18px',
+                                        height: '18px',
                                         borderRadius: '50%',
-                                        backgroundColor: 'var(--cds-background-hover)',
-                                        opacity: 0.7,
-                                        transition: 'opacity 0.2s',
+                                        backgroundColor: 'var(--cds-background-inverse-hover, #393939)',
+                                        color: 'var(--cds-text-inverse, #ffffff)',
+                                        opacity: 0.6,
+                                        transition: 'all 0.2s',
+                                        zIndex: 10,
                                     }}
-                                    onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                                    onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.opacity = '1';
+                                        e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.opacity = '0.6';
+                                        e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                                    }}
                                     title="Remove from quick select"
                                 >
-                                    <Close size={12} />
+                                    <Close size={14} />
                                 </div>
                             )}
                         </div>
