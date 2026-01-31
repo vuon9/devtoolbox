@@ -120,6 +120,9 @@ jobs:
           if [ "${{ matrix.os }}" = "macos-latest" ]; then
             # macOS: create DMG using create-dmg
             brew install create-dmg
+            # Clean up any existing files
+            rm -f release/dev-toolbox-${{ matrix.build }}.dmg
+            rm -f /tmp/rw.*.dev-toolbox-${{ matrix.build }}.dmg
             create-dmg \
               --volname "Dev-Toolbox" \
               --window-pos 200 120 \
@@ -130,31 +133,6 @@ jobs:
               "build/bin/dev-toolbox.app"
           elif [ "${{ matrix.os }}" = "windows-latest" ]; then
             # Windows: Wails already outputs .exe, just copy it
-            cp build/bin/dev-toolbox.exe release/dev-toolbox-${{ matrix.build }}.exe
-          else
-            # Linux: create AppImage or tar.gz
-            tar -czf "release/dev-toolbox-${{ matrix.build }}.tar.gz" -C build/bin dev-toolbox
-          fi
-        shell: bash
-
-      # Package and upload build artifacts
-      - name: Package Artifacts
-        run: |
-          mkdir -p release
-          if [ "${{ matrix.os }}" = "macos-latest" ]; then
-            # macOS: create DMG using create-dmg
-            brew install create-dmg
-            create-dmg \
-              --volname "Dev-Toolbox" \
-              --window-pos 200 120 \
-              --window-size 800 400 \
-              --icon-size 100 \
-              --app-drop-link 600 185 \
-              "release/dev-toolbox-${{ matrix.build }}.dmg" \
-              "build/bin/dev-toolbox.app"
-          elif [ "${{ matrix.os }}" = "windows-latest" ]; then
-            # Windows: rename binary with .exe extension
-            mv build/bin/dev-toolbox build/bin/dev-toolbox.exe
             cp build/bin/dev-toolbox.exe release/dev-toolbox-${{ matrix.build }}.exe
           else
             # Linux: create AppImage or tar.gz
