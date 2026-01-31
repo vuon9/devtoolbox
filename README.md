@@ -38,10 +38,9 @@ The central hub with 45+ algorithms across 5 categories:
 | **JWT Debugger** | Decode and verify JWT tokens with header/payload inspection |
 | **Barcode / QR Code Generator** | Create QR codes and 1D barcodes (EAN-13, EAN-8, Code 128, Code 39) with preview and download |
 | **Data Generator** | Generate mock data with templates using Faker library (UUID, ULID, Random String, Lorem Ipsum, User Profiles, API responses, SQL inserts, and more) |
-| **JSON Formatter** | Pretty-print or minify JSON with syntax validation |
+| **Code Formatter** | Format and minify JSON, XML, HTML, SQL, CSS, and JavaScript with advanced filtering support (jq for JSON, XPath for XML, CSS selectors for HTML) |
 | **RegExp Tester** | Test regular expressions with real-time matching |
 | **Unix Time Converter** | Convert between Unix timestamps and human-readable dates |
-| **SQL Formatter** | Format SQL queries with proper indentation |
 | **String Case Converter** | Convert between camelCase, snake_case, PascalCase, etc. |
 | **Cron Job Parser** | Parse and explain cron expressions |
 | **Text Diff Checker** | Compare two text blocks and highlight differences |

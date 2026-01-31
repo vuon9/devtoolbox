@@ -21,6 +21,7 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
         { id: 'url-tools', name: 'URL Tools', icon: '🔗' },
         { id: 'barcode', name: 'Barcode / QR Code', icon: '▣' },
         { id: 'data-generator', name: 'Data Generator', icon: '📊' },
+        { id: 'code-formatter', name: 'Code Formatter', icon: '📝' },
         { id: 'sql', name: 'SQL Formatter', icon: '🗄️' },
         { id: 'case', name: 'String Case', icon: 'aA' },
         { id: 'cron', name: 'Cron Job Parser', icon: '⏳' },

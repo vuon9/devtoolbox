@@ -23,6 +23,7 @@ import PhpJsonConverter from './pages/PhpJsonConverter';
 import AllInOneConverter from './pages/TextBasedConverter';
 import BarcodeGenerator from './pages/BarcodeGenerator';
 import DataGenerator from './pages/DataGenerator';
+import CodeFormatter from './pages/CodeFormatter';
 
 // Error boundary for catching React rendering errors
 class ErrorBoundary extends React.Component {
@@ -110,6 +111,7 @@ function App() {
             case 'text-based': return <AllInOneConverter />;
             case 'barcode': return <BarcodeGenerator />;
             case 'data-generator': return <DataGenerator />;
+            case 'code-formatter': return <CodeFormatter />;
 
             case 'json': return <JsonFormatter />;
             case 'unix-time': return <UnixTimeConverter />;
