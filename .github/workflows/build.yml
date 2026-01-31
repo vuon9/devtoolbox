@@ -62,7 +62,12 @@ jobs:
 
       - name: Build Application
         run: |
-          wails build -platform ${{ matrix.platform }}
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            wails build -platform ${{ matrix.platform }} -tags webkit2_41
+          else
+            wails build -platform ${{ matrix.platform }}
+          fi
+        shell: bash
 
       # Optional: Upload build artifacts
       - name: Upload Artifacts
