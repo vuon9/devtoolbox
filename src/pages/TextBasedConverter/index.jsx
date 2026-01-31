@@ -7,17 +7,33 @@ import { Backend } from '../../utils/backendBridge';
 import ConversionControls from './components/ConversionControls';
 import ConfigurationPane from './components/ConfigurationPane';
 import MultiHashOutput from './components/MultiHashOutput';
+import CommonTags from './components/CommonTags';
+import ImageOutput, { isBase64Image } from './components/ImageOutput';
 import { CONVERTER_MAP } from './constants';
+
+const DEFAULT_COMMON_TAGS = [
+    { id: 'url', category: 'Encode - Decode', method: 'URL', label: 'URL Encode' },
+    { id: 'all-hashes', category: 'Hash', method: 'All', label: 'All Hashes' },
+];
 
 export default function TextBasedConverter() {
     // Persistent state initialization
     const [category, setCategory] = useState(() => localStorage.getItem('tbc-category') || 'Encode - Decode');
     const [method, setMethod] = useState(() => localStorage.getItem('tbc-method') || 'Base64');
-    const [subMode, setSubMode] = useState(() => localStorage.getItem('tbc-submode') || ''); // "Encrypt"/"Decrypt" or "Encode"/"Decode"
+    const [subMode, setSubMode] = useState(() => localStorage.getItem('tbc-submode') || '');
 
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
     const [error, setError] = useState('');
+
+    // Custom tags state with localStorage persistence
+    const [customTags, setCustomTags] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('tbc-custom-tags')) || [];
+        } catch {
+            return [];
+        }
+    });
 
     // Config state
     const [config, setConfig] = useState(() => {
@@ -59,6 +75,32 @@ export default function TextBasedConverter() {
     useEffect(() => localStorage.setItem('tbc-method', method), [method]);
     useEffect(() => localStorage.setItem('tbc-submode', subMode), [subMode]);
     useEffect(() => localStorage.setItem('tbc-config', JSON.stringify(config)), [config]);
+    useEffect(() => localStorage.setItem('tbc-custom-tags', JSON.stringify(customTags)), [customTags]);
+
+    // Check if current selection is in quick actions
+    const isCurrentInQuickActions = useCallback(() => {
+        const isInDefault = DEFAULT_COMMON_TAGS.some(
+            tag => tag.category === category && tag.method === method
+        );
+        const isInCustom = customTags.some(
+            tag => tag.category === category && tag.method === method
+        );
+        return isInDefault || isInCustom;
+    }, [category, method, customTags]);
+
+    // Add current selection to quick actions
+    const addCurrentToQuickActions = useCallback(() => {
+        if (isCurrentInQuickActions()) return;
+        
+        const newTag = {
+            id: `${category}-${method}`.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+            category,
+            method,
+            label: `${category} - ${method}`
+        };
+        
+        setCustomTags(prev => [...prev, newTag]);
+    }, [category, method, isCurrentInQuickActions]);
 
     const performConversion = useCallback(async (text, cat, meth, sub, cfg) => {
         if (!text && cat !== 'Hash') {
@@ -70,6 +112,13 @@ export default function TextBasedConverter() {
         // For All Hashes, we compute even with empty input (show empty results)
         if (!text && cat === 'Hash' && meth === 'All') {
             setOutput('');
+            setError('');
+            return;
+        }
+
+        // If input is a data URI (base64 image), display it directly
+        if (text && text.trim().startsWith('data:image/')) {
+            setOutput(text.trim());
             setError('');
             return;
         }
@@ -104,11 +153,24 @@ export default function TextBasedConverter() {
     // Determine if Key/IV pane should be shown
     const showConfig = category === 'Encrypt - Decrypt' || method === 'HMAC';
 
+    // Check if output is a base64 image
+    const isImageOutput = !isAllHashes && isBase64Image(output);
+
     return (
         <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
             <ToolHeader
                 title="Text Based Converter"
                 description="Universal converter for various data formats and string transformations."
+            />
+
+            <CommonTags
+                currentCategory={category}
+                currentMethod={method}
+                onTagSelect={(cat, meth) => {
+                    setCategory(cat);
+                    setMethod(meth);
+                }}
+                customTags={customTags}
             />
 
             <ConversionControls
@@ -123,6 +185,8 @@ export default function TextBasedConverter() {
                 setAutoRun={(val) => updateConfig({ autoRun: val })}
                 onConvert={handleConvert}
                 isAllHashes={isAllHashes}
+                onAddQuickAction={addCurrentToQuickActions}
+                isCurrentInQuickActions={isCurrentInQuickActions()}
             />
 
             {showConfig && (
@@ -177,6 +241,16 @@ export default function TextBasedConverter() {
                                 error={error}
                             />
                         </div>
+                    </div>
+                ) : isImageOutput ? (
+                    <div className="pane" style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
+                        minHeight: 0,
+                        flex: 1
+                    }}>
+                        <ImageOutput value={output} />
                     </div>
                 ) : (
                     <ToolPane
