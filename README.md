@@ -17,7 +17,7 @@ The central hub with 45+ algorithms across 5 categories:
 | **🔐 Encrypt / Decrypt** | AES, AES-GCM, DES, Triple DES, ChaCha20, Salsa20, XOR, RC4 |
 | **🔀 Encode / Decode** | Base64, Base64URL, Base32, Base58, Base16 (Hex), URL, HTML Entities, Binary, Morse Code, ROT13, ROT47, Quoted-Printable |
 | **✂️ Escape / Unescape** | String Literal, Unicode/Hex, HTML/XML, URL, Regex |
-| **🔄 Convert** | JSON ↔ YAML, JSON ↔ XML, JSON ↔ CSV, YAML ↔ TOML, Markdown ↔ HTML, CSV ↔ TSV, Properties ↔ JSON, INI ↔ JSON, Key-Value ↔ Query String, Number Bases, Case Swapping |
+| **🔄 Convert** | JSON ↔ YAML, JSON ↔ XML, JSON ↔ CSV, YAML ↔ TOML, CSV ↔ TSV, Properties ↔ JSON, INI ↔ JSON, Key-Value ↔ Query String, Number Bases, Case Swapping, Color Codes |
 | **#️⃣ Hash** | MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-3, BLAKE2b, BLAKE3, RIPEMD-160, bcrypt, scrypt, Argon2, HMAC, CRC32, Adler-32, MurmurHash3, xxHash, FNV-1a |
 
 **Special Features:**
@@ -33,13 +33,11 @@ The central hub with 45+ algorithms across 5 categories:
 | Tool | Description |
 |------|-------------|
 | **JWT Debugger** | Decode and verify JWT tokens with header/payload inspection |
+| **Barcode / QR Code Generator** | Create QR codes and 1D barcodes (EAN-13, EAN-8, Code 128, Code 39) with preview and download |
 | **UUID / ULID Generator** | Generate random UUID v4 or ULID values |
-| **QR Code Generator** | Create QR codes from text/URLs with preview and download |
 | **JSON Formatter** | Pretty-print or minify JSON with syntax validation |
-| **Code Formatter** | Beautify HTML, CSS, JavaScript, XML |
 | **RegExp Tester** | Test regular expressions with real-time matching |
 | **Unix Time Converter** | Convert between Unix timestamps and human-readable dates |
-| **Color Converter** | Convert between HEX, RGB, HSL, and other color formats |
 | **SQL Formatter** | Format SQL queries with proper indentation |
 | **String Case Converter** | Convert between camelCase, snake_case, PascalCase, etc. |
 | **Cron Job Parser** | Parse and explain cron expressions |
@@ -48,9 +46,6 @@ The central hub with 45+ algorithms across 5 categories:
 | **String Inspector** | Count characters, words, lines, bytes, and sentences |
 | **Lorem Ipsum Generator** | Generate placeholder text |
 | **Random String Generator** | Generate random alphanumeric strings with custom length |
-| **HTML Preview** | Preview HTML rendering in real-time |
-| **Markdown Preview** | Render Markdown with live preview |
-| **Backslash Escaper** | Escape/unescape backslash characters |
 | **PHP Serializer** | PHP serialization/unserialization |
 | **URL Tools** | Parse URLs, extract components |
 
