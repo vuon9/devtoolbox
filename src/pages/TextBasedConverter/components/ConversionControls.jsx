@@ -1,6 +1,6 @@
 import { Button, Dropdown, Toggle, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { ToolLayoutToggle } from '../../../components/ToolUI';
-import { ArrowsHorizontal, Play } from '@carbon/icons-react';
+import { ArrowsHorizontal, Play, Add, Checkmark } from '@carbon/icons-react';
 import { CONVERTER_MAP } from '../constants';
 
 export default function ConversionControls({
@@ -15,6 +15,8 @@ export default function ConversionControls({
     setAutoRun,
     onConvert,
     isAllHashes = false,
+    onAddQuickAction,
+    isCurrentInQuickActions = false,
 }) {
     const categories = Object.keys(CONVERTER_MAP);
     const methods = CONVERTER_MAP[category] || [];
@@ -71,6 +73,22 @@ export default function ConversionControls({
                         disabled={autoRun}
                     >
                         Convert
+                    </Button>
+                </div>
+
+                {/* Quick Action + Button */}
+                <div style={{ paddingBottom: '4px' }}>
+                    <Button
+                        kind={isCurrentInQuickActions ? "ghost" : "tertiary"}
+                        size="md"
+                        renderIcon={isCurrentInQuickActions ? Checkmark : Add}
+                        onClick={onAddQuickAction}
+                        disabled={isCurrentInQuickActions}
+                        style={{
+                            opacity: isCurrentInQuickActions ? 0.5 : 1,
+                        }}
+                    >
+                        {isCurrentInQuickActions ? 'Added' : 'Quick Action'}
                     </Button>
                 </div>
 

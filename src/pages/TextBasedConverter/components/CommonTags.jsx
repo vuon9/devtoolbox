@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Button, TooltipIcon } from '@carbon/react';
+import { Tag, Button } from '@carbon/react';
 import { Add, Close, Checkmark } from '@carbon/icons-react';
 
-// Default common tags - at least 5 as requested
+// Default common tags - only 2 as requested
 const DEFAULT_COMMON_TAGS = [
-    { id: 'json-yaml', category: 'Convert', method: 'JSON ↔ YAML', label: 'JSON ↔ YAML' },
-    { id: 'base64', category: 'Encode - Decode', method: 'Base64', label: 'Base64' },
-    { id: 'md5', category: 'Hash', method: 'MD5', label: 'MD5' },
-    { id: 'sha256', category: 'Hash', method: 'SHA-256', label: 'SHA-256' },
-    { id: 'json-xml', category: 'Convert', method: 'JSON ↔ XML', label: 'JSON ↔ XML' },
     { id: 'url', category: 'Encode - Decode', method: 'URL', label: 'URL Encode' },
-    { id: 'html', category: 'Encode - Decode', method: 'HTML Entities', label: 'HTML Entities' },
-    { id: 'csv-tsv', category: 'Convert', method: 'CSV ↔ TSV', label: 'CSV ↔ TSV' },
-    { id: 'jwt', category: 'Encode - Decode', method: 'JWT Decode', label: 'JWT Decode' },
     { id: 'all-hashes', category: 'Hash', method: 'All', label: 'All Hashes' },
 ];
 
@@ -34,26 +26,8 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
     // Combine default and custom tags
     const allTags = [...DEFAULT_COMMON_TAGS, ...customTags];
 
-    // Check if current selection is already in tags
-    const isCurrentInTags = allTags.some(
-        tag => tag.category === currentCategory && tag.method === currentMethod
-    );
-
     const handleTagClick = (tag) => {
         onTagSelect(tag.category, tag.method);
-    };
-
-    const handleAddCurrent = () => {
-        if (isCurrentInTags) return;
-
-        const newTag = {
-            id: `custom-${Date.now()}`,
-            category: currentCategory,
-            method: currentMethod,
-            label: `${currentCategory} > ${currentMethod}`,
-        };
-
-        setCustomTags([...customTags, newTag]);
     };
 
     const handleRemoveTag = (e, tagId) => {
@@ -122,7 +96,7 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
                         >
                             <Tag
                                 type={isActive ? 'blue' : isCustom ? 'green' : 'gray'}
-                                size="sm"
+                                size="md"
                                 onClick={() => handleTagClick(tag)}
                                 style={{
                                     cursor: 'pointer',
@@ -130,9 +104,7 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
                                     paddingRight: isCustom ? '24px' : '8px',
                                 }}
                             >
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    {tag.label}
-                                </span>
+                                {tag.label}
                             </Tag>
                             {isCustom && (
                                 <div
@@ -172,23 +144,6 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
                     );
                 })}
             </div>
-
-            {/* Add current button - always visible */}
-            <Button
-                kind={isCurrentInTags ? "ghost" : "tertiary"}
-                size="sm"
-                renderIcon={isCurrentInTags ? Checkmark : Add}
-                iconDescription={isCurrentInTags ? "Already in quick select" : "Add to quick select"}
-                onClick={handleAddCurrent}
-                disabled={isCurrentInTags}
-                style={{
-                    flexShrink: 0,
-                    padding: '0 8px',
-                    opacity: isCurrentInTags ? 0.5 : 1,
-                }}
-            >
-                {isCurrentInTags ? 'Added' : 'Add'}
-            </Button>
         </div>
     );
 }
