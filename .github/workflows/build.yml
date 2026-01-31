@@ -62,8 +62,78 @@ jobs:
         run: |
           if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
             wails build -platform ${{ matrix.platform }} -tags webkit2_41
+          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+            # macOS: Build with code signing if certificates are available
+            if [ -n "$MACOS_CERTIFICATE" ] && [ -n "$MACOS_CERTIFICATE_PASSWORD" ]; then
+              echo "Building with code signing..."
+              wails build -platform ${{ matrix.platform }} -sign -signIdentity "Developer ID Application"
+            else
+              echo "Building without code signing (no certificates found)..."
+              wails build -platform ${{ matrix.platform }}
+            fi
           else
             wails build -platform ${{ matrix.platform }}
+          fi
+        shell: bash
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+
+      # Import macOS certificates for signing (optional - only if secrets are configured)
+      - name: Import macOS Certificates
+        if: matrix.os == 'macos-latest' && github.event_name != 'pull_request' && env.HAS_CERTS == 'true'
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
+          p12-password: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          keychain: build
+          keychain-password: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        env:
+          HAS_CERTS: ${{ secrets.MACOS_CERTIFICATE != '' && secrets.MACOS_CERTIFICATE_PASSWORD != '' }}
+
+      # Notarize macOS app (optional - only if secrets are configured)
+      - name: Notarize macOS App
+        if: matrix.os == 'macos-latest' && github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/v') && env.HAS_NOTARIZE_SECRETS == 'true'
+        run: |
+          # Create a zip for notarization
+          ditto -c -k --keepParent "build/bin/dev-toolbox.app" "build/bin/dev-toolbox.zip"
+          
+          # Submit for notarization
+          xcrun notarytool submit "build/bin/dev-toolbox.zip" \
+            --apple-id "${{ secrets.APPLE_ID }}" \
+            --password "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" \
+            --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --wait
+          
+          # Staple the notarization ticket
+          xcrun stapler staple "build/bin/dev-toolbox.app"
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          HAS_NOTARIZE_SECRETS: ${{ secrets.APPLE_ID != '' && secrets.APPLE_APP_SPECIFIC_PASSWORD != '' && secrets.APPLE_TEAM_ID != '' }}
+
+      # Package and upload build artifacts
+      - name: Package Artifacts
+        run: |
+          mkdir -p release
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then
+            # macOS: create DMG using create-dmg
+            brew install create-dmg
+            create-dmg \
+              --volname "Dev-Toolbox" \
+              --window-pos 200 120 \
+              --window-size 800 400 \
+              --icon-size 100 \
+              --app-drop-link 600 185 \
+              "release/dev-toolbox-${{ matrix.build }}.dmg" \
+              "build/bin/dev-toolbox.app"
+          elif [ "${{ matrix.os }}" = "windows-latest" ]; then
+            # Windows: Wails already outputs .exe, just copy it
+            cp build/bin/dev-toolbox.exe release/dev-toolbox-${{ matrix.build }}.exe
+          else
+            # Linux: create AppImage or tar.gz
+            tar -czf "release/dev-toolbox-${{ matrix.build }}.tar.gz" -C build/bin dev-toolbox
           fi
         shell: bash
 

@@ -79,6 +79,42 @@ wails build
 wails dev
 ```
 
+## Installation
+
+Download the latest release for your platform from the [Releases](https://github.com/vuon9/dev-toolbox/releases) page.
+
+### macOS
+
+⚠️ **Note:** The macOS build is not signed with an Apple Developer certificate (requires $99/year). You may see a security warning when opening the app.
+
+**To bypass the security warning:**
+
+1. Download the `dev-toolbox-macos.dmg` file
+2. Open the DMG and drag the app to your Applications folder
+3. **First time only:** Open Terminal and run:
+   ```bash
+   xattr -cr /Applications/dev-toolbox.app
+   ```
+   Or alternatively:
+   - Go to **System Settings** → **Privacy & Security**
+   - Scroll down to the "Security" section
+   - Click **"Open Anyway"** next to the message about "dev-toolbox"
+   - Click **"Open"** in the dialog that appears
+
+4. The app will now open normally
+
+### Windows
+
+1. Download `dev-toolbox-windows.exe`
+2. Run the executable
+3. If Windows Defender shows a warning, click **"More info"** → **"Run anyway"**
+
+### Linux
+
+1. Download `dev-toolbox-linux.tar.gz`
+2. Extract: `tar -xzf dev-toolbox-linux.tar.gz`
+3. Run: `./dev-toolbox`
+
 ## Key Features
 
 ✅ **Works Offline** - All tools run locally, no internet connection required  
