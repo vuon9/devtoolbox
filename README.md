@@ -5,22 +5,25 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev)
 
-A modern, all-in-one desktop application for developers featuring 40+ utilities for encoding, encryption, hashing, and data format conversions.
+A modern, all-in-one desktop application for developers featuring 45+ utilities for encoding, encryption, hashing, escaping, and data format conversions.
 
 ## Features
 
 ### **Text Based Converter** (Unified Tool)
-The central hub with 40+ algorithms across 4 categories:
+The central hub with 45+ algorithms across 5 categories:
 
 | Category | Algorithms |
 |----------|------------|
 | **🔐 Encrypt / Decrypt** | AES, AES-GCM, DES, Triple DES, ChaCha20, Salsa20, XOR, RC4 |
 | **🔀 Encode / Decode** | Base64, Base64URL, Base32, Base58, Base16 (Hex), URL, HTML Entities, Binary, Morse Code, ROT13, ROT47, Quoted-Printable |
+| **✂️ Escape / Unescape** | String Literal, Unicode/Hex, HTML/XML, URL, Regex |
 | **🔄 Convert** | JSON ↔ YAML, JSON ↔ XML, JSON ↔ CSV, YAML ↔ TOML, Markdown ↔ HTML, CSV ↔ TSV, Properties ↔ JSON, INI ↔ JSON, Key-Value ↔ Query String, Number Bases, Case Swapping |
 | **#️⃣ Hash** | MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-3, BLAKE2b, BLAKE3, RIPEMD-160, bcrypt, scrypt, Argon2, HMAC, CRC32, Adler-32, MurmurHash3, xxHash, FNV-1a |
 
 **Special Features:**
 - **"All Hashes" view** - Compute all 19 hash algorithms at once with copy buttons for each
+- **Quick Action Tags** - Save frequently used conversions for instant access
+- **Base64 Image Preview** - Automatically displays base64 images in output pane
 - **Smart key/IV detection** - Automatically shows configuration pane when needed
 - **Auto-run mode** - Results update instantly as you type
 - **Horizontal/Vertical layout toggle** - Customize the workspace layout
