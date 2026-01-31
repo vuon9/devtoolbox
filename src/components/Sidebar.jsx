@@ -14,23 +14,17 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
     }, [pinned]);
 
     const tools = [
-        { id: 'text-based', name: 'Text Based Converter', icon: '🔄' },
+        { id: 'text-converter', name: 'Text Converter', icon: '🔄' },
+        { id: 'string-utilities', name: 'String Utilities', icon: '🧵' },
+        { id: 'number-converter', name: 'Number Converter', icon: '🔢' },
         { id: 'unix-time', name: 'Unix Time Converter', icon: '🕒' },
-        { id: 'json', name: 'JSON Format/Validate', icon: '{}' },
         { id: 'jwt', name: 'JWT Debugger', icon: '🛡️' },
-        { id: 'url-tools', name: 'URL Tools', icon: '🔗' },
         { id: 'barcode', name: 'Barcode / QR Code', icon: '▣' },
         { id: 'data-generator', name: 'Data Generator', icon: '📊' },
         { id: 'code-formatter', name: 'Code Formatter', icon: '📝' },
-        { id: 'sql', name: 'SQL Formatter', icon: '🗄️' },
-        { id: 'case', name: 'String Case', icon: 'aA' },
         { id: 'cron', name: 'Cron Job Parser', icon: '⏳' },
-        { id: 'php-ser', name: 'PHP Serializer', icon: '📦' },
-        { id: 'number-base', name: 'Number Base Converter', icon: '01' },
         { id: 'regexp', name: 'RegExp Tester', icon: '.*' },
         { id: 'diff', name: 'Text Diff Checker', icon: '⚖️' },
-        { id: 'sort', name: 'Line Sort/Dedupe', icon: '☰' },
-        { id: 'inspector', name: 'String Inspector', icon: '🔍' },
     ];
 
     const togglePin = (e, id) => {

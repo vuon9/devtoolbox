@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Checkbox, Button } from '@carbon/react';
-import { DataEnrichment } from '@carbon/icons-react';
-import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../components/ToolUI';
+import { Checkbox } from '@carbon/react';
+import { ToolControls, ToolPane, ToolSplitPane } from '../../../components/ToolUI';
 
-export default function LineSortDedupe() {
-    const [input, setInput] = useState('');
+export default function SortDedupePane({ input, setInput, layout }) {
     const [output, setOutput] = useState('');
     const [options, setOptions] = useState({
         sort: true,
@@ -16,6 +14,11 @@ export default function LineSortDedupe() {
 
     useEffect(() => {
         const process = () => {
+            if (!input) {
+                setOutput('');
+                return;
+            }
+
             let lines = input.split('\n');
 
             if (options.trim) {
@@ -43,11 +46,8 @@ export default function LineSortDedupe() {
         process();
     }, [input, options]);
 
-
     return (
-        <div className="tool-container">
-            <ToolHeader title="Line Sort / Dedupe" description="Sort, deduplicate, and clean up lists of text." />
-
+        <>
             <ToolControls>
                 <Checkbox
                     labelText="Sort"
@@ -81,19 +81,20 @@ export default function LineSortDedupe() {
                 />
             </ToolControls>
 
-            <ToolSplitPane>
+            <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
                 <ToolPane
-                    label="Input List"
+                    label="Input"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Enter lines..."
+                    placeholder="Enter lines to process..."
                 />
                 <ToolPane
-                    label="Cleaned Output"
+                    label="Processed Output"
                     value={output}
                     readOnly
+                    placeholder="Processed result will appear here..."
                 />
             </ToolSplitPane>
-        </div>
+        </>
     );
 }
