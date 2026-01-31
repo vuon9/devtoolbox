@@ -1,4 +1,4 @@
-package main
+package wails
 
 import (
 	"context"
@@ -19,8 +19,8 @@ func NewDataGeneratorService() *DataGeneratorService {
 	}
 }
 
-// startup is called when the service starts
-func (d *DataGeneratorService) startup(ctx context.Context) {
+// Startup is called when the service starts
+func (d *DataGeneratorService) Startup(ctx context.Context) {
 	d.ctx = ctx
 }
 

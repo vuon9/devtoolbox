@@ -1,3 +1,40 @@
+export namespace codeformatter {
+	
+	export class FormatRequest {
+	    input: string;
+	    formatType: string;
+	    filter?: string;
+	    minify: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new FormatRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.input = source["input"];
+	        this.formatType = source["formatType"];
+	        this.filter = source["filter"];
+	        this.minify = source["minify"];
+	    }
+	}
+	export class FormatResponse {
+	    output: string;
+	    error?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FormatResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.output = source["output"];
+	        this.error = source["error"];
+	    }
+	}
+
+}
+
 export namespace datagenerator {
 	
 	export class GenerateRequest {

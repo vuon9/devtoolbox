@@ -1,4 +1,4 @@
-package main
+package wails
 
 import (
 	"context"
@@ -21,8 +21,8 @@ func NewJWTService() *JWTService {
 	}
 }
 
-// startup is called when the app starts (Wails lifecycle)
-func (j *JWTService) startup(ctx context.Context) {
+// Startup is called when the app starts (Wails lifecycle)
+func (j *JWTService) Startup(ctx context.Context) {
 	j.ctx = ctx
 }
 

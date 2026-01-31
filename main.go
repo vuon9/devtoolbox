@@ -4,7 +4,9 @@ import (
 	"context"
 	"embed"
 
-	"github.com/wailsapp/wails/v2"
+	"dev-toolbox/internal/wails"
+
+	wails_runtime "github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
@@ -15,11 +17,11 @@ var assets embed.FS
 func main() {
 	// Create instances of the app structures
 	app := NewApp()
-	jwtService := NewJWTService()
-	conversionService := NewConversionService()
-	barcodeService := NewBarcodeService()
-	dataGeneratorService := NewDataGeneratorService()
-	codeFormatterService := NewCodeFormatterService()
+	jwtService := wails.NewJWTService()
+	conversionService := wails.NewConversionService()
+	barcodeService := wails.NewBarcodeService()
+	dataGeneratorService := wails.NewDataGeneratorService()
+	codeFormatterService := wails.NewCodeFormatterService()
 
 	// Start HTTP server for Web Mode (port 8081)
 	go func() {
@@ -28,7 +30,7 @@ func main() {
 	}()
 
 	// Create application with options
-	err := wails.Run(&options.App{
+	err := wails_runtime.Run(&options.App{
 		Title:  "dev-toolbox",
 		Width:  1024,
 		Height: 768,
@@ -38,11 +40,11 @@ func main() {
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup: func(ctx context.Context) {
 			app.startup(ctx)
-			jwtService.startup(ctx)
-			conversionService.startup(ctx)
-			barcodeService.startup(ctx)
-			dataGeneratorService.startup(ctx)
-			codeFormatterService.startup(ctx)
+			jwtService.Startup(ctx)
+			conversionService.Startup(ctx)
+			barcodeService.Startup(ctx)
+			dataGeneratorService.Startup(ctx)
+			codeFormatterService.Startup(ctx)
 		},
 		Bind: []interface{}{
 			app,

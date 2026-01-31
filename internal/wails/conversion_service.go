@@ -1,4 +1,4 @@
-package main
+package wails
 
 import (
 	"context"
@@ -16,7 +16,7 @@ func NewConversionService() *ConversionService {
 	}
 }
 
-func (s *ConversionService) startup(ctx context.Context) {
+func (s *ConversionService) Startup(ctx context.Context) {
 	s.ctx = ctx
 }
 

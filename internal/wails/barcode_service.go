@@ -1,4 +1,4 @@
-package main
+package wails
 
 import (
 	"bytes"
@@ -22,7 +22,7 @@ func NewBarcodeService() *BarcodeService {
 	return &BarcodeService{}
 }
 
-func (s *BarcodeService) startup(ctx context.Context) {
+func (s *BarcodeService) Startup(ctx context.Context) {
 	s.ctx = ctx
 }
 

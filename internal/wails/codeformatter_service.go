@@ -1,4 +1,4 @@
-package main
+package wails
 
 import (
 	"context"
@@ -18,8 +18,8 @@ func NewCodeFormatterService() *CodeFormatterService {
 	}
 }
 
-// startup is called when the app starts (Wails lifecycle)
-func (c *CodeFormatterService) startup(ctx context.Context) {
+// Startup is called when the app starts (Wails lifecycle)
+func (c *CodeFormatterService) Startup(ctx context.Context) {
 	c.ctx = ctx
 }
 
