@@ -109,16 +109,17 @@ func TestJWTService_Verify(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := svc.Verify(tt.token, tt.secret, tt.encoding)
 
+			if err != nil {
+				t.Fatalf("Verify returned error: %v", err)
+			}
+
 			if tt.shouldErr {
-				if err == nil {
-					t.Errorf("Expected error, got nil")
+				if result.Valid {
+					t.Errorf("Expected invalid token, got valid")
 				}
 			} else {
-				if err != nil {
-					t.Errorf("Unexpected error: %v", err)
-				}
 				if !result.Valid {
-					t.Errorf("Expected valid token")
+					t.Errorf("Expected valid token, got invalid: %s", result.Message)
 				}
 			}
 		})
@@ -189,8 +190,8 @@ func TestJWTService_EdgeCases(t *testing.T) {
 		header := map[string]interface{}{"alg": "HS256", "typ": "JWT"}
 		payload := map[string]interface{}{
 			"user": map[string]interface{}{
-				"id":   123,
-				"name": "Test User",
+				"id":    123,
+				"name":  "Test User",
 				"roles": []string{"admin", "user"},
 			},
 			"metadata": map[string]interface{}{

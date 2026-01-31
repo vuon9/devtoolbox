@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Button, Select, SelectItem, TextInput } from '@carbon/react';
-import { Code, TrashCan, MagicWand } from '@carbon/icons-react';
+import { Button, Select, SelectItem, TextInput, IconButton } from '@carbon/react';
+import { Code, TrashCan, Close } from '@carbon/icons-react';
 import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../../components/ToolUI';
 import { Backend } from '../../utils/backendBridge';
 
@@ -34,6 +34,7 @@ export default function CodeFormatter() {
     const [formatType, setFormatType] = useState(persisted?.formatType || 'json');
     const [input, setInput] = useState(persisted?.input || '');
     const [output, setOutput] = useState('');
+    const [formattedOutput, setFormattedOutput] = useState(''); // Store formatted output for filter source
     const [filter, setFilter] = useState(persisted?.filter || '');
     const [error, setError] = useState(null);
     const [isMinified, setIsMinified] = useState(false);
@@ -52,6 +53,7 @@ export default function CodeFormatter() {
     const format = useCallback(async () => {
         if (!input.trim()) {
             setOutput('');
+            setFormattedOutput('');
             setError(null);
             return;
         }
@@ -60,14 +62,16 @@ export default function CodeFormatter() {
             const result = await Backend.CodeFormatterService.Format({
                 input,
                 formatType,
-                filter: filter.trim() || undefined,
+                filter: undefined,
                 minify: false
             });
 
             if (result.error) {
                 setError(result.error);
                 setOutput('');
+                setFormattedOutput('');
             } else {
+                setFormattedOutput(result.output);
                 setOutput(result.output);
                 setError(null);
                 setIsMinified(false);
@@ -75,12 +79,14 @@ export default function CodeFormatter() {
         } catch (err) {
             setError(err.message);
             setOutput('');
+            setFormattedOutput('');
         }
-    }, [input, formatType, filter]);
+    }, [input, formatType]);
 
     const minify = useCallback(async () => {
         if (!input.trim()) {
             setOutput('');
+            setFormattedOutput('');
             setError(null);
             return;
         }
@@ -89,14 +95,16 @@ export default function CodeFormatter() {
             const result = await Backend.CodeFormatterService.Format({
                 input,
                 formatType,
-                filter: filter.trim() || undefined,
+                filter: undefined,
                 minify: true
             });
 
             if (result.error) {
                 setError(result.error);
                 setOutput('');
+                setFormattedOutput('');
             } else {
+                setFormattedOutput(result.output);
                 setOutput(result.output);
                 setError(null);
                 setIsMinified(true);
@@ -104,26 +112,72 @@ export default function CodeFormatter() {
         } catch (err) {
             setError(err.message);
             setOutput('');
+            setFormattedOutput('');
         }
-    }, [input, formatType, filter]);
+    }, [input, formatType]);
+
+    // Apply filter to formatted output (not the already-filtered output)
+    const applyFilter = useCallback(async () => {
+        if (!formattedOutput.trim() || !filter.trim()) {
+            // If filter is cleared, restore formatted output
+            if (!filter.trim()) {
+                setOutput(formattedOutput);
+            }
+            return;
+        }
+
+        try {
+            const result = await Backend.CodeFormatterService.Format({
+                input: formattedOutput, // Always use formatted output as source
+                formatType,
+                filter: filter.trim(),
+                minify: false
+            });
+
+            if (result.error) {
+                setError(result.error);
+            } else {
+                setOutput(result.output);
+                setError(null);
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    }, [formattedOutput, formatType, filter]);
+
+    const clearFilter = useCallback(() => {
+        setFilter('');
+        setError(null);
+    }, []);
 
     const clear = useCallback(() => {
         setInput('');
         setOutput('');
+        setFormattedOutput('');
         setFilter('');
         setError(null);
         setIsMinified(false);
     }, []);
 
-    // Auto-format on input change (debounced)
+    // Auto-format on input change (debounced) - only for formatting, not filter
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (input.trim() && !error) {
+            if (input.trim()) {
                 format();
             }
         }, 500);
         return () => clearTimeout(timer);
     }, [input, formatType]);
+
+    // Auto-apply filter when filter changes (debounced)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (formattedOutput.trim() && currentFormatter?.supportsFilter) {
+                applyFilter();
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [filter, formattedOutput]);
 
     return (
         <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
@@ -146,16 +200,6 @@ export default function CodeFormatter() {
                         ))}
                     </Select>
 
-                    {currentFormatter?.supportsFilter && (
-                        <TextInput
-                            id="filter-input"
-                            labelText="Filter (optional)"
-                            placeholder={currentFormatter.filterPlaceholder}
-                            value={filter}
-                            onChange={(e) => setFilter(e.target.value)}
-                            style={{ minWidth: '300px' }}
-                        />
-                    )}
                     <Button onClick={format} renderIcon={Code} size='md'>
                         Format
                     </Button>
@@ -184,12 +228,39 @@ export default function CodeFormatter() {
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={`Paste ${currentFormatter?.name || 'code'} here...`}
                 />
-                <ToolPane
-                    label={isMinified ? 'Output (Minified)' : 'Output (Formatted)'}
-                    value={output}
-                    readOnly
-                    placeholder={`Formatted ${currentFormatter?.name || 'code'} will appear here...`}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '0.5rem' }}>
+                    <ToolPane
+                        label={isMinified ? 'Output (Minified)' : 'Output (Formatted)'}
+                        value={output}
+                        readOnly
+                        placeholder={`Formatted ${currentFormatter?.name || 'code'} will appear here...`}
+                    />
+                    {currentFormatter?.supportsFilter && (
+                        <div style={{
+                            display: 'flex',
+                            gap: '0.5rem',
+                            alignItems: 'flex-end',
+                            alignContent: 'flex-end'
+                        }}>
+                            <TextInput
+                                id="filter-input"
+                                labelText="Filter"
+                                placeholder={currentFormatter.filterPlaceholder}
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                style={{ flex: 1 }}
+                            />
+                            <IconButton
+                                label="Clear filter"
+                                onClick={clearFilter}
+                                disabled={!filter}
+                                size="md"
+                            >
+                                <Close />
+                            </IconButton>
+                        </div>
+                    )}
+                </div>
             </ToolSplitPane>
         </div>
     );

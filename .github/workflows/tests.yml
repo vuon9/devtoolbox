@@ -51,10 +51,10 @@ jobs:
         run: go mod download
 
       - name: Run Go Tests
-        run: go test ./internal/converter/... -v -race
+        run: go test ./internal/... -v -race
 
       - name: Run Tests with Coverage
-        run: go test ./internal/converter/... -coverprofile=coverage.out
+        run: go test ./internal/... -coverprofile=coverage.out
 
       - name: Generate Coverage Report
         run: |

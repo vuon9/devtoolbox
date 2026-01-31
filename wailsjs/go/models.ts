@@ -244,7 +244,7 @@ export namespace jwt {
 
 }
 
-export namespace main {
+export namespace wails {
 	
 	export class GenerateBarcodeRequest {
 	    content: string;
