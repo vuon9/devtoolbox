@@ -7,7 +7,6 @@ This document tracks the refactoring and development status of each tool compone
 - 🟢 **Done** - Tool fully refactored, uses Carbon Design System, follows all guidelines
 - 🟡 **In Progress** - Tool is being refactored, use caution before modifying
 - 🔴 **Not Started** - Tool uses legacy patterns, needs full refactoring
-- ⚫ **Deprecated** - Tool functionality replaced by another tool, can be removed
 
 ---
 
@@ -17,18 +16,13 @@ This document tracks the refactoring and development status of each tool compone
 |------|--------|-------|--------------|
 | JwtDebugger | 🟢 Done | Uses component abstraction system (ToolLayout, ToolTextArea, ToolInputGroup), toggleable layout, consistent button styling with icons (MagicWand, Security, Code), enhanced tabs (custom mode tabs, improved JSON/Claims tabs), resizable textareas with constraints, proper error handling | Completed 2026-01-25 |
 | **TextBasedConverter** | 🟢 Done | Unified tool with 45+ algorithms across 5 categories (encrypt, encode, escape, hash, convert). Features: Common Tags (Quick Select), Base64 Image Preview, All Hashes view, Smart ConfigurationPane, 5 Escape methods. Backend: hierarchical structure with 83 comprehensive tests. Phase 2 & 3 complete | Completed 2026-01-31 |
-| BackslashEscaper | 🔴 Not Started | Legacy implementation | - |
-| CodeFormatter | 🔴 Not Started | Legacy implementation | - |
-| ColorConverter | 🔴 Not Started | Legacy implementation | - |
+| BarcodeGenerator | 🟢 Done | Multi-standard barcode generator (QR, EAN-13, EAN-8, Code128, Code39). Features: configurable size, error correction levels for QR, client-side validation, download button. | Completed 2026-01-31 |
 | CronJobParser | 🔴 Not Started | Legacy implementation | - |
-| HtmlPreview | 🔴 Not Started | Legacy implementation | - |
 | JsonFormatter | 🔴 Not Started | Legacy implementation | - |
 | LineSortDedupe | 🔴 Not Started | Legacy implementation | - |
 | LoremIpsumGenerator | 🔴 Not Started | Legacy implementation | - |
-| MarkdownPreview | 🔴 Not Started | Legacy implementation | - |
 | PhpJsonConverter | 🔴 Not Started | Legacy implementation | - |
 | PhpSerializer | 🔴 Not Started | Legacy implementation | - |
-| QrCodeGenerator | 🔴 Not Started | Legacy implementation | - |
 | RandomStringGenerator | 🔴 Not Started | Legacy implementation | - |
 | RegExpTester | 🔴 Not Started | Legacy implementation | - |
 | SqlFormatter | 🔴 Not Started | Legacy implementation | - |
