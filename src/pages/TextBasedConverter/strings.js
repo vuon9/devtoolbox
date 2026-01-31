@@ -30,13 +30,14 @@ export const DEFAULTS = {
 // Default Quick Action Tags
 export const DEFAULT_COMMON_TAGS = [
     { id: 'url', category: 'Encode - Decode', method: 'URL', label: 'URL Encode' },
+    { id: 'base64', category: 'Encode - Decode', method: 'Base64', label: 'Base64' },
     { id: 'all-hashes', category: 'Hash', method: 'All', label: 'All Hashes' },
 ];
 
 // Labels
 export const LABELS = {
-    QUICK_SELECT: 'Quick Select:',
-    INPUT: (category, subMode, method) => `${category} (${subMode || method}) - Input`,
+    QUICK_ACTION: 'Quick Action:',
+    INPUT: (category, subMode, method) => `Input - ${category} (${subMode || method})`,
     OUTPUT: 'Output',
     IMAGE_PREVIEW: 'Image Preview'
 };

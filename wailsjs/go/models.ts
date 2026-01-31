@@ -53,3 +53,42 @@ export namespace jwt {
 
 }
 
+export namespace main {
+	
+	export class GenerateBarcodeRequest {
+	    content: string;
+	    standard: string;
+	    size: number;
+	    level: string;
+	    format: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new GenerateBarcodeRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.content = source["content"];
+	        this.standard = source["standard"];
+	        this.size = source["size"];
+	        this.level = source["level"];
+	        this.format = source["format"];
+	    }
+	}
+	export class GenerateBarcodeResponse {
+	    dataUrl: string;
+	    error: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new GenerateBarcodeResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.dataUrl = source["dataUrl"];
+	        this.error = source["error"];
+	    }
+	}
+
+}
+

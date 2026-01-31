@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import logo from '../assets/images/logo-universal.png';
 
 export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar }) {
@@ -19,24 +19,19 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
         { id: 'json', name: 'JSON Format/Validate', icon: '{}' },
         { id: 'jwt', name: 'JWT Debugger', icon: '🛡️' },
         { id: 'url-tools', name: 'URL Tools', icon: '🔗' },
-        { id: 'color', name: 'Color Converter', icon: '🎨' },
-        { id: 'escape', name: 'Backslash Escape', icon: '\\' },
+        { id: 'barcode', name: 'Barcode / QR Code', icon: '▣' },
         { id: 'uuid', name: 'UUID/ULID Generator', icon: '🆔' },
         { id: 'sql', name: 'SQL Formatter', icon: '🗄️' },
         { id: 'case', name: 'String Case', icon: 'aA' },
         { id: 'cron', name: 'Cron Job Parser', icon: '⏳' },
         { id: 'php-ser', name: 'PHP Serializer', icon: '📦' },
         { id: 'number-base', name: 'Number Base Converter', icon: '01' },
-        { id: 'code-fmt', name: 'Code Beautify/Minify', icon: '📝' },
         { id: 'regexp', name: 'RegExp Tester', icon: '.*' },
         { id: 'diff', name: 'Text Diff Checker', icon: '⚖️' },
         { id: 'sort', name: 'Line Sort/Dedupe', icon: '☰' },
         { id: 'inspector', name: 'String Inspector', icon: '🔍' },
         { id: 'lorem', name: 'Lorem Ipsum Generator', icon: '¶' },
         { id: 'random', name: 'Random String', icon: '🎲' },
-        { id: 'html-preview', name: 'HTML Preview', icon: '👁️' },
-        { id: 'markdown', name: 'Markdown Preview', icon: 'M↓' },
-        { id: 'qr', name: 'QR Code Generator', icon: '📱' },
     ];
 
     const togglePin = (e, id) => {

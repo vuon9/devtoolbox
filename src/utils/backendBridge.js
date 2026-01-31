@@ -57,5 +57,12 @@ export const Backend = {
     },
     ConversionService: {
         Convert: (input, category, method, config) => callBackend('ConversionService', 'Convert', input, category, method, config)
+    },
+    BarcodeService: {
+        GenerateBarcode: (req) => callBackend('BarcodeService', 'GenerateBarcode', req),
+        GetQRErrorLevels: () => callBackend('BarcodeService', 'GetQRErrorLevels'),
+        GetBarcodeSizes: () => callBackend('BarcodeService', 'GetBarcodeSizes'),
+        GetBarcodeStandards: () => callBackend('BarcodeService', 'GetBarcodeStandards'),
+        ValidateContent: (content, standard) => callBackend('BarcodeService', 'ValidateContent', content, standard)
     }
 };

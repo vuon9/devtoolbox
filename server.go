@@ -12,13 +12,15 @@ import (
 type Server struct {
 	jwtService        *JWTService
 	conversionService *ConversionService
+	barcodeService    *BarcodeService
 }
 
 // NewServer creates a new Server instance
-func NewServer(jwtService *JWTService, conversionService *ConversionService) *Server {
+func NewServer(jwtService *JWTService, conversionService *ConversionService, barcodeService *BarcodeService) *Server {
 	return &Server{
 		jwtService:        jwtService,
 		conversionService: conversionService,
+		barcodeService:    barcodeService,
 	}
 }
 
@@ -65,6 +67,11 @@ func (s *Server) handleAPI(w http.ResponseWriter, r *http.Request) {
 
 	if service == "ConversionService" {
 		s.handleConversionService(method, w, r)
+		return
+	}
+
+	if service == "BarcodeService" {
+		s.handleBarcodeService(method, w, r)
 		return
 	}
 
@@ -161,6 +168,90 @@ func (s *Server) handleJWTService(method string, w http.ResponseWriter, r *http.
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
+}
+
+func (s *Server) handleBarcodeService(method string, w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		Args []interface{} `json:"args"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	var result interface{}
+	var err error
+
+	switch method {
+	case "GenerateQR":
+		if len(payload.Args) < 1 {
+			http.Error(w, "Missing arguments", http.StatusBadRequest)
+			return
+		}
+		// Parse the request from the first argument
+		reqData, ok := payload.Args[0].(map[string]interface{})
+		if !ok {
+			http.Error(w, "Invalid request format", http.StatusBadRequest)
+			return
+		}
+
+		req := GenerateBarcodeRequest{
+			Content:  getStringFromMap(reqData, "content"),
+			Standard: getStringFromMap(reqData, "standard"),
+			Size:     getIntFromMap(reqData, "size"),
+			Level:    getStringFromMap(reqData, "level"),
+			Format:   getStringFromMap(reqData, "format"),
+		}
+		result = s.barcodeService.GenerateBarcode(req)
+	case "GetQRErrorLevels":
+		result = s.barcodeService.GetQRErrorLevels()
+	case "GetBarcodeSizes":
+		result = s.barcodeService.GetBarcodeSizes()
+	case "GetBarcodeStandards":
+		result = s.barcodeService.GetBarcodeStandards()
+	case "ValidateContent":
+		if len(payload.Args) < 2 {
+			http.Error(w, "Missing arguments", http.StatusBadRequest)
+			return
+		}
+		content := payload.Args[0].(string)
+		standard := payload.Args[1].(string)
+		result = s.barcodeService.ValidateContent(content, standard)
+	default:
+		http.Error(w, fmt.Sprintf("Method not found: %s", method), http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
+}
+
+// Helper functions for type conversion
+func getStringFromMap(m map[string]interface{}, key string) string {
+	if val, ok := m[key]; ok {
+		if str, ok := val.(string); ok {
+			return str
+		}
+	}
+	return ""
+}
+
+func getIntFromMap(m map[string]interface{}, key string) int {
+	if val, ok := m[key]; ok {
+		switch v := val.(type) {
+		case int:
+			return v
+		case float64:
+			return int(v)
+		}
+	}
+	return 0
 }
 
 func corsMiddleware(next http.Handler) http.Handler {

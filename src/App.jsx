@@ -10,25 +10,21 @@ import UuidGenerator from './pages/UuidGenerator';
 import UnixTimeConverter from './pages/UnixTimeConverter';
 import JwtDebugger from './pages/JwtDebugger';
 import RegExpTester from './pages/RegExpTester';
-import ColorConverter from './pages/ColorConverter';
-import BackslashEscaper from './pages/BackslashEscaper';
+
 import RandomStringGenerator from './pages/RandomStringGenerator';
-import HtmlPreview from './pages/HtmlPreview';
 import SqlFormatter from './pages/SqlFormatter';
 import StringCaseConverter from './pages/StringCaseConverter';
 import CronJobParser from './pages/CronJobParser';
 import TextDiffChecker from './pages/TextDiffChecker';
 import NumberBaseConverter from './pages/NumberBaseConverter';
-import CodeFormatter from './pages/CodeFormatter';
 import LoremIpsumGenerator from './pages/LoremIpsumGenerator';
-import QrCodeGenerator from './pages/QrCodeGenerator';
-import MarkdownPreview from './pages/MarkdownPreview';
 import LineSortDedupe from './pages/LineSortDedupe';
 import StringInspector from './pages/StringInspector';
 import PhpSerializer from './pages/PhpSerializer';
 import UrlTools from './pages/UrlTools';
 import PhpJsonConverter from './pages/PhpJsonConverter';
 import AllInOneConverter from './pages/TextBasedConverter';
+import BarcodeGenerator from './pages/BarcodeGenerator';
 
 // Error boundary for catching React rendering errors
 class ErrorBoundary extends React.Component {
@@ -111,30 +107,28 @@ function App() {
 
     const renderTool = () => {
         switch (activeTool) {
+            // New tools
+            case 'jwt': return <JwtDebugger />;
+            case 'text-based': return <AllInOneConverter />;
+            case 'barcode': return <BarcodeGenerator />;
+
             case 'json': return <JsonFormatter />;
             case 'uuid': return <UuidGenerator />;
             case 'unix-time': return <UnixTimeConverter />;
-            case 'jwt': return <JwtDebugger />;
             case 'regexp': return <RegExpTester />;
-            case 'color': return <ColorConverter />;
-            case 'escape': return <BackslashEscaper />;
+
             case 'random': return <RandomStringGenerator />;
-            case 'html-preview': return <HtmlPreview />;
             case 'sql': return <SqlFormatter />;
             case 'case': return <StringCaseConverter />;
             case 'cron': return <CronJobParser />;
             case 'diff': return <TextDiffChecker />;
             case 'number-base': return <NumberBaseConverter />;
-            case 'code-fmt': return <CodeFormatter />;
             case 'lorem': return <LoremIpsumGenerator />;
-            case 'qr': return <QrCodeGenerator />;
-            case 'markdown': return <MarkdownPreview />;
             case 'sort': return <LineSortDedupe />;
             case 'inspector': return <StringInspector />;
             case 'php-ser': return <PhpSerializer />;
             case 'php-json': return <PhpJsonConverter />;
             case 'url-tools': return <UrlTools />;
-            case 'text-based': return <AllInOneConverter />;
             default: return <div className="tool-container">Select a tool</div>;
         }
     };

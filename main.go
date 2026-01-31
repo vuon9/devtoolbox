@@ -17,10 +17,11 @@ func main() {
 	app := NewApp()
 	jwtService := NewJWTService()
 	conversionService := NewConversionService()
+	barcodeService := NewBarcodeService()
 
 	// Start HTTP server for Web Mode (port 8081)
 	go func() {
-		server := NewServer(jwtService, conversionService)
+		server := NewServer(jwtService, conversionService, barcodeService)
 		server.Start(8081)
 	}()
 
@@ -37,11 +38,13 @@ func main() {
 			app.startup(ctx)
 			jwtService.startup(ctx)
 			conversionService.startup(ctx)
+			barcodeService.startup(ctx)
 		},
 		Bind: []interface{}{
 			app,
 			jwtService,
 			conversionService,
+			barcodeService,
 		},
 	})
 

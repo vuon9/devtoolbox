@@ -22,7 +22,7 @@ export const CONVERTER_MAP = {
         'Number Bases', 'Case Swapping', 'SQL Insert ↔ JSON Array',
         'CURL Command ↔ Fetch', 'Cron Expression ↔ Text',
         'CSV ↔ TSV', 'Key-Value ↔ Query String',
-        'Properties ↔ JSON', 'INI ↔ JSON'
+        'Properties ↔ JSON', 'INI ↔ JSON', 'QR Code'
     ],
     'Hash': [
         'All',

@@ -3,10 +3,12 @@ module dev-toolbox
 go 1.24.0
 
 require (
+	github.com/boombuler/barcode v1.1.0
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
 	github.com/pelletier/go-toml/v2 v2.2.4
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/wailsapp/wails/v2 v2.11.0
 	golang.org/x/crypto v0.47.0
 	golang.org/x/net v0.49.0

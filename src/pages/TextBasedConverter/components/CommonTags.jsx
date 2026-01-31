@@ -50,7 +50,7 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
                     whiteSpace: 'nowrap',
                 }}
             >
-                {LABELS.QUICK_SELECT}
+                {LABELS.QUICK_ACTION}
             </span>
 
             {/* Scrollable tags container */}
