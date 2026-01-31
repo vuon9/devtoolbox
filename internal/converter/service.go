@@ -22,6 +22,7 @@ type converterService struct {
 	encryption ConverterService
 	hashing    ConverterService
 	formatting ConverterService
+	escape     ConverterService
 }
 
 func NewConverterService() ConverterService {
@@ -30,6 +31,7 @@ func NewConverterService() ConverterService {
 		encryption: NewEncryptionConverter(),
 		hashing:    NewHashingConverter(),
 		formatting: NewFormattingConverter(),
+		escape:     NewEscapeConverter(),
 	}
 }
 
@@ -52,6 +54,9 @@ func (s *converterService) Convert(req ConversionRequest) (string, error) {
 	}
 	if strings.Contains(category, "convert") {
 		return s.formatting.Convert(req)
+	}
+	if strings.Contains(category, "escape") {
+		return s.escape.Convert(req)
 	}
 
 	return "", fmt.Errorf("category %s not supported", req.Category)
