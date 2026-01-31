@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Tag, Button } from '@carbon/react';
 import { Add, Close, Checkmark } from '@carbon/icons-react';
-
-// Default common tags - only 2 as requested
-const DEFAULT_COMMON_TAGS = [
-    { id: 'url', category: 'Encode - Decode', method: 'URL', label: 'URL Encode' },
-    { id: 'all-hashes', category: 'Hash', method: 'All', label: 'All Hashes' },
-];
+import { STORAGE_KEYS, DEFAULT_COMMON_TAGS, LABELS, BUTTONS } from '../strings';
 
 export default function CommonTags({ currentCategory, currentMethod, onTagSelect }) {
     const [customTags, setCustomTags] = useState(() => {
         try {
-            return JSON.parse(localStorage.getItem('tbc-custom-tags')) || [];
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_TAGS)) || [];
         } catch {
             return [];
         }
@@ -20,7 +15,7 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
 
     // Save custom tags to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem('tbc-custom-tags', JSON.stringify(customTags));
+        localStorage.setItem(STORAGE_KEYS.CUSTOM_TAGS, JSON.stringify(customTags));
     }, [customTags]);
 
     // Combine default and custom tags
@@ -55,7 +50,7 @@ export default function CommonTags({ currentCategory, currentMethod, onTagSelect
                     whiteSpace: 'nowrap',
                 }}
             >
-                Quick Select:
+                {LABELS.QUICK_SELECT}
             </span>
 
             {/* Scrollable tags container */}

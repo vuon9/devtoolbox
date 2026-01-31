@@ -21,9 +21,11 @@ export default function ConversionControls({
     const categories = Object.keys(CONVERTER_MAP);
     const methods = CONVERTER_MAP[category] || [];
 
-    const showModeToggle = ['Encrypt - Decrypt', 'Encode - Decode'].includes(category);
+    const showModeToggle = ['Encrypt - Decrypt', 'Encode - Decode', 'Escape'].includes(category);
     const modeLabels = category === 'Encrypt - Decrypt'
         ? { left: 'Encrypt', right: 'Decrypt' }
+        : category === 'Escape'
+        ? { left: 'Escape', right: 'Unescape' }
         : { left: 'Encode', right: 'Decode' };
 
     return (

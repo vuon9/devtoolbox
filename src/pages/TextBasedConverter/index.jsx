@@ -10,17 +10,22 @@ import MultiHashOutput from './components/MultiHashOutput';
 import CommonTags from './components/CommonTags';
 import ImageOutput, { isBase64Image } from './components/ImageOutput';
 import { CONVERTER_MAP } from './constants';
-
-const DEFAULT_COMMON_TAGS = [
-    { id: 'url', category: 'Encode - Decode', method: 'URL', label: 'URL Encode' },
-    { id: 'all-hashes', category: 'Hash', method: 'All', label: 'All Hashes' },
-];
+import {
+    TOOL_TITLE,
+    TOOL_DESCRIPTION,
+    STORAGE_KEYS,
+    DEFAULTS,
+    DEFAULT_COMMON_TAGS,
+    LABELS,
+    PLACEHOLDERS,
+    LAYOUT
+} from './strings';
 
 export default function TextBasedConverter() {
     // Persistent state initialization
-    const [category, setCategory] = useState(() => localStorage.getItem('tbc-category') || 'Encode - Decode');
-    const [method, setMethod] = useState(() => localStorage.getItem('tbc-method') || 'Base64');
-    const [subMode, setSubMode] = useState(() => localStorage.getItem('tbc-submode') || '');
+    const [category, setCategory] = useState(() => localStorage.getItem(STORAGE_KEYS.CATEGORY) || DEFAULTS.CATEGORY);
+    const [method, setMethod] = useState(() => localStorage.getItem(STORAGE_KEYS.METHOD) || DEFAULTS.METHOD);
+    const [subMode, setSubMode] = useState(() => localStorage.getItem(STORAGE_KEYS.SUBMODE) || DEFAULTS.SUBMODE);
 
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
@@ -29,7 +34,7 @@ export default function TextBasedConverter() {
     // Custom tags state with localStorage persistence
     const [customTags, setCustomTags] = useState(() => {
         try {
-            return JSON.parse(localStorage.getItem('tbc-custom-tags')) || [];
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_TAGS)) || [];
         } catch {
             return [];
         }
@@ -38,20 +43,15 @@ export default function TextBasedConverter() {
     // Config state
     const [config, setConfig] = useState(() => {
         try {
-            return JSON.parse(localStorage.getItem('tbc-config')) || {
-                key: '',
-                iv: '',
-                autoRun: true,
-                caseSensitive: false
-            };
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.CONFIG)) || DEFAULTS.CONFIG;
         } catch {
-            return { key: '', iv: '', autoRun: true, caseSensitive: false };
+            return DEFAULTS.CONFIG;
         }
     });
 
     const layout = useLayoutToggle({
-        toolKey: 'text-based-converter-layout',
-        defaultDirection: 'horizontal',
+        toolKey: LAYOUT.TOOL_KEY,
+        defaultDirection: LAYOUT.DEFAULT_DIRECTION,
         showToggle: true,
         persist: true
     });
@@ -65,17 +65,19 @@ export default function TextBasedConverter() {
             setSubMode('Encrypt');
         } else if (category === 'Encode - Decode' && !['Encode', 'Decode'].includes(subMode)) {
             setSubMode('Encode');
+        } else if (category === 'Escape' && !['Escape', 'Unescape'].includes(subMode)) {
+            setSubMode('Escape');
         } else if (category === 'Hash' || category === 'Convert') {
             setSubMode('');
         }
     }, [category]);
 
     // Persistence effects
-    useEffect(() => localStorage.setItem('tbc-category', category), [category]);
-    useEffect(() => localStorage.setItem('tbc-method', method), [method]);
-    useEffect(() => localStorage.setItem('tbc-submode', subMode), [subMode]);
-    useEffect(() => localStorage.setItem('tbc-config', JSON.stringify(config)), [config]);
-    useEffect(() => localStorage.setItem('tbc-custom-tags', JSON.stringify(customTags)), [customTags]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.CATEGORY, category), [category]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.METHOD, method), [method]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.SUBMODE, subMode), [subMode]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify(config)), [config]);
+    useEffect(() => localStorage.setItem(STORAGE_KEYS.CUSTOM_TAGS, JSON.stringify(customTags)), [customTags]);
 
     // Check if current selection is in quick actions
     const isCurrentInQuickActions = useCallback(() => {
@@ -159,8 +161,8 @@ export default function TextBasedConverter() {
     return (
         <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
             <ToolHeader
-                title="Text Based Converter"
-                description="Universal converter for various data formats and string transformations."
+                title={TOOL_TITLE}
+                description={TOOL_DESCRIPTION}
             />
 
             <CommonTags
@@ -199,10 +201,10 @@ export default function TextBasedConverter() {
 
             <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
                 <ToolPane
-                    label={`${category} (${subMode || method}) - Input`}
+                    label={LABELS.INPUT(category, subMode, method)}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Enter text here..."
+                    placeholder={PLACEHOLDERS.INPUT}
                 />
 
                 {isAllHashes ? (
@@ -227,7 +229,7 @@ export default function TextBasedConverter() {
                                 color: 'var(--cds-text-secondary)',
                                 textTransform: 'uppercase'
                             }}>
-                                Output
+                                {LABELS.OUTPUT}
                             </label>
                         </div>
                         <div style={{
@@ -254,10 +256,10 @@ export default function TextBasedConverter() {
                     </div>
                 ) : (
                     <ToolPane
-                        label="Output"
+                        label={LABELS.OUTPUT}
                         value={output}
                         readOnly
-                        placeholder="Result will appear here..."
+                        placeholder={PLACEHOLDERS.OUTPUT}
                         invalid={!!error}
                         invalidText={error}
                     />

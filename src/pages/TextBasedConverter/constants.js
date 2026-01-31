@@ -13,6 +13,9 @@ export const CONVERTER_MAP = {
         'Punnycode', 'JWT Decode', 'Bencoded', 'Protobuf',
         'ROT13', 'ROT47', 'Quoted-Printable'
     ],
+    'Escape': [
+        'String Literal', 'Unicode/Hex', 'HTML/XML', 'URL', 'Regex'
+    ],
     'Convert': [
         'JSON ↔ YAML', 'JSON ↔ XML', 'JSON ↔ CSV / TSV', 'YAML ↔ TOML',
         'Markdown ↔ HTML', 'Unix Timestamp ↔ ISO 8601', 'Color Codes',

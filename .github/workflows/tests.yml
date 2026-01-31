@@ -1,4 +1,4 @@
-name: Tests & Build Verification
+name: Continuous Integration
 
 on:
   pull_request:
@@ -34,6 +34,8 @@ jobs:
   go-tests:
     name: Go Tests
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -54,11 +56,27 @@ jobs:
       - name: Run Tests with Coverage
         run: go test ./internal/converter/... -coverprofile=coverage.out
 
+      - name: Generate Coverage Report
+        run: |
+          go install github.com/jandelgado/gcov2lcov@latest
+          gcov2lcov -infile=coverage.out -outfile=coverage.lcov
+
+      - name: Post Coverage Report to PR
+        if: github.event_name == 'pull_request'
+        uses: romeovs/lcov-reporter-action@v0.4.0
+        with:
+          lcov-file: ./coverage.lcov
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Go Test Coverage Report"
+          hide-branch-coverage: false
+
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage.out
+          path: |
+            coverage.out
+            coverage.lcov
 
   frontend-build:
     name: Frontend Build (Bun)
