@@ -7,8 +7,6 @@
 
 A modern, all-in-one desktop application for developers featuring 40+ utilities for encoding, encryption, hashing, and data format conversions.
 
-![Developer Toolbox Screenshot](screenshot.png)
-
 ## Features
 
 ### **Text Based Converter** (Unified Tool)
