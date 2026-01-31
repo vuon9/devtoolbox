@@ -6,13 +6,10 @@ import { Settings } from '@carbon/icons-react';
 
 // Tools Imports (Keeping all existing imports)
 import JsonFormatter from './pages/JsonFormatter';
-import Base64Converter from './pages/Base64Converter';
-import HashGenerator from './pages/HashGenerator';
 import UuidGenerator from './pages/UuidGenerator';
 import UnixTimeConverter from './pages/UnixTimeConverter';
 import JwtDebugger from './pages/JwtDebugger';
 import RegExpTester from './pages/RegExpTester';
-import HtmlEntityConverter from './pages/HtmlEntityConverter';
 import ColorConverter from './pages/ColorConverter';
 import BackslashEscaper from './pages/BackslashEscaper';
 import RandomStringGenerator from './pages/RandomStringGenerator';
@@ -28,10 +25,8 @@ import QrCodeGenerator from './pages/QrCodeGenerator';
 import MarkdownPreview from './pages/MarkdownPreview';
 import LineSortDedupe from './pages/LineSortDedupe';
 import StringInspector from './pages/StringInspector';
-import HexAsciiConverter from './pages/HexAsciiConverter';
 import PhpSerializer from './pages/PhpSerializer';
 import UrlTools from './pages/UrlTools';
-import DataConverter from './pages/DataConverter';
 import PhpJsonConverter from './pages/PhpJsonConverter';
 import AllInOneConverter from './pages/TextBasedConverter';
 
@@ -117,13 +112,10 @@ function App() {
     const renderTool = () => {
         switch (activeTool) {
             case 'json': return <JsonFormatter />;
-            case 'base64': return <Base64Converter />;
-            case 'hash': return <HashGenerator />;
             case 'uuid': return <UuidGenerator />;
             case 'unix-time': return <UnixTimeConverter />;
             case 'jwt': return <JwtDebugger />;
             case 'regexp': return <RegExpTester />;
-            case 'html-entity': return <HtmlEntityConverter />;
             case 'color': return <ColorConverter />;
             case 'escape': return <BackslashEscaper />;
             case 'random': return <RandomStringGenerator />;
@@ -139,11 +131,9 @@ function App() {
             case 'markdown': return <MarkdownPreview />;
             case 'sort': return <LineSortDedupe />;
             case 'inspector': return <StringInspector />;
-            case 'hex-ascii': return <HexAsciiConverter />;
             case 'php-ser': return <PhpSerializer />;
             case 'php-json': return <PhpJsonConverter />;
             case 'url-tools': return <UrlTools />;
-            case 'data-converter': return <DataConverter />;
             case 'text-based': return <AllInOneConverter />;
             default: return <div className="tool-container">Select a tool</div>;
         }

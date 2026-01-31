@@ -1,0 +1,50 @@
+name: Go Tests
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - 'feat/**'
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+
+jobs:
+  test:
+    name: Run Go Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.0'
+          check-latest: true
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Run Tests
+        run: go test ./internal/converter/... -v -race
+
+      - name: Run Tests with Coverage
+        run: go test ./internal/converter/... -coverprofile=coverage.out
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.out

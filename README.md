@@ -1,118 +1,105 @@
 # Developer Toolbox
 
-## Overview
+A modern, all-in-one desktop application for developers featuring 40+ utilities for encoding, encryption, hashing, and data format conversions.
 
-The **Developer Toolbox** is a modern, lightweight web‑based utility suite for developers. It bundles a collection of everyday tools—JSON/YAML/CSV conversion, Base64 encoding/decoding, UUID/ULID generation, QR code creation, JWT debugging, code formatting, Lorem Ipsum generation, and many more—into a single, cohesive UI.
-
-All UI components are built with the **Carbon Design System** (`@carbon/react`) to ensure a consistent, accessible, and premium look across the entire application. The app supports dark, light, and system‑preferred themes and includes a theme‑switcher in the top‑right corner.
-
-> **Why this toolbox?**
-> - No need to install a dozen separate CLI tools.
-> - Works offline in a desktop‑like environment powered by **Wails** (Go + Vite + React).
-> - Extensible: new tools can be added by simply creating a React component that follows the UI conventions.
-
----
+![Developer Toolbox Screenshot](screenshot.png)
 
 ## Features
 
-| Category | Tool | Description |
-|----------|------|-------------|
-| **Data Conversion** | **Data Converter** | Convert between JSON, YAML, CSV, and PHP array formats. |
-| | **CSV ↔ JSON** | Convert CSV files to JSON and vice‑versa. |
-| **Encoding / Decoding** | **Base64 Converter** | Encode/decode text and images to/from Base64. |
-| | **URL Tools** | Parse URLs, encode/decode components. |
-| **Generators** | **UUID / ULID Generator** | Generate random UUID v4 or ULID values. |
-| | **Lorem Ipsum Generator** | Produce placeholder paragraphs, sentences, or words. |
-| | **QR Code Generator** | Generate QR codes from arbitrary text/URLs with preview and download. |
-| **Debuggers** | **JWT Debugger** | Decode JWT header and payload, view errors. |
-| **Formatters** | **Code Formatter** | Beautify HTML, CSS, JavaScript, XML. |
-| | **JSON Formatter** | Pretty‑print or minify JSON. |
-| | **Hex / ASCII Converter** | Convert between hexadecimal strings and ASCII text. |
-| **Utilities** | **String Inspector** | Show character, word, line, byte, and sentence counts. |
-| | **Line Sort / Dedupe** | Sort, deduplicate, trim, reverse lists of lines. |
-| | **Hash Generator** | Compute MD5, SHA‑1, SHA‑256, SHA‑512 hashes. |
-| | **Random String Generator** | Generate random alphanumeric strings. |
-| | **Uuid Generator** | Generate UUIDs and ULIDs. |
-| | **...** | Additional tools can be found in the sidebar.
+### **Text Based Converter** (Unified Tool)
+The central hub with 40+ algorithms across 4 categories:
 
----
+| Category | Algorithms |
+|----------|------------|
+| **🔐 Encrypt / Decrypt** | AES, AES-GCM, DES, Triple DES, ChaCha20, Salsa20, XOR, RC4 |
+| **🔀 Encode / Decode** | Base64, Base64URL, Base32, Base58, Base16 (Hex), URL, HTML Entities, Binary, Morse Code, ROT13, ROT47, Quoted-Printable |
+| **🔄 Convert** | JSON ↔ YAML, JSON ↔ XML, JSON ↔ CSV, YAML ↔ TOML, Markdown ↔ HTML, CSV ↔ TSV, Properties ↔ JSON, INI ↔ JSON, Key-Value ↔ Query String, Number Bases, Case Swapping |
+| **#️⃣ Hash** | MD5, SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-3, BLAKE2b, BLAKE3, RIPEMD-160, bcrypt, scrypt, Argon2, HMAC, CRC32, Adler-32, MurmurHash3, xxHash, FNV-1a |
 
-## Installation & Running
+**Special Features:**
+- **"All Hashes" view** - Compute all 19 hash algorithms at once with copy buttons for each
+- **Smart key/IV detection** - Automatically shows configuration pane when needed
+- **Auto-run mode** - Results update instantly as you type
+- **Horizontal/Vertical layout toggle** - Customize the workspace layout
 
-### Prerequisites
-- **Node.js** (>= 18)
-- **Go** (>= 1.22)
-- **Wails** CLI (`go install github.com/wailsapp/wails/v2/cmd/wails@latest`)
+### **Other Tools**
 
-### Steps
+| Tool | Description |
+|------|-------------|
+| **JWT Debugger** | Decode and verify JWT tokens with header/payload inspection |
+| **UUID / ULID Generator** | Generate random UUID v4 or ULID values |
+| **QR Code Generator** | Create QR codes from text/URLs with preview and download |
+| **JSON Formatter** | Pretty-print or minify JSON with syntax validation |
+| **Code Formatter** | Beautify HTML, CSS, JavaScript, XML |
+| **RegExp Tester** | Test regular expressions with real-time matching |
+| **Unix Time Converter** | Convert between Unix timestamps and human-readable dates |
+| **Color Converter** | Convert between HEX, RGB, HSL, and other color formats |
+| **SQL Formatter** | Format SQL queries with proper indentation |
+| **String Case Converter** | Convert between camelCase, snake_case, PascalCase, etc. |
+| **Cron Job Parser** | Parse and explain cron expressions |
+| **Text Diff Checker** | Compare two text blocks and highlight differences |
+| **Line Sort / Dedupe** | Sort lines, remove duplicates, trim whitespace |
+| **String Inspector** | Count characters, words, lines, bytes, and sentences |
+| **Lorem Ipsum Generator** | Generate placeholder text |
+| **Random String Generator** | Generate random alphanumeric strings with custom length |
+| **HTML Preview** | Preview HTML rendering in real-time |
+| **Markdown Preview** | Render Markdown with live preview |
+| **Backslash Escaper** | Escape/unescape backslash characters |
+| **PHP Serializer** | PHP serialization/unserialization |
+| **URL Tools** | Parse URLs, extract components |
+
+## Installation
+
+### Download Pre-built Binaries
+Download the latest release for your platform from the [Releases](https://github.com/your-org/dev-toolbox/releases) page.
+
+**Supported Platforms:**
+- Windows (x64)
+- macOS (Intel & Apple Silicon)
+- Linux (x64)
+
+### Build from Source
+
+**Prerequisites:**
+- Node.js (>= 18)
+- Go (>= 1.22)
+- Wails CLI: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+
+**Build Steps:**
 ```bash
 # Clone the repository
 git clone https://github.com/your-org/dev-toolbox.git
 cd dev-toolbox
 
-# Install frontend dependencies
-cd frontend
-npm install
+# Install dependencies and build
+wails build
 
-# Build & run the desktop app (Wails)
-cd ..
-wails dev   # development mode with hot‑reload
-# or
-wails build # production binary
+# Or run in development mode
+wails dev
 ```
 
-The app will open in a native window. The UI works offline; no external API calls are required.
+## Key Features
 
----
+✅ **Works Offline** - All tools run locally, no internet connection required  
+✅ **Dark/Light Themes** - Switch between themes or use system preference  
+✅ **Pin Tools** - Pin frequently used tools to the top of the sidebar  
+✅ **Keyboard Shortcuts** - `Cmd/Ctrl + B` to toggle sidebar  
+✅ **Copy to Clipboard** - One-click copy buttons on all output fields  
+✅ **Auto-run** - See results instantly as you type (can be disabled)  
+✅ **Responsive Layout** - Horizontal or vertical split panes  
 
-## Project Structure
-```
-dev-toolbox/
-├─ frontend/                # React + Vite source
-│   ├─ src/
-│   │   ├─ components/      # Shared UI helpers (ToolUI, Sidebar, etc.)
-│   │   ├─ tools/           # Individual tool components
-│   │   ├─ App.jsx           # Root component, Theme provider, routing
-│   │   └─ index.scss        # Global Carbon style overrides
-│   └─ vite.config.js       # Vite config with Sass deprecation suppression
-├─ backend/ (Go)            # Wails bridge, main entry point
-│   ├─ main.go
-│   └─ app.go
-└─ AGENTS.md                # Design principles & UI guidelines (auto‑generated)
-```
+## UI Design
 
----
-
-## UI / Design Guidelines (see `AGENTS.md`)
-- **All components must use Carbon React components** (Button, TextArea, Select, Tabs, etc.).
-- **TextAreas** for both input and output share the same style: monospace font, identical height, visible border, and a copy‑to‑clipboard button that is always shown next to the label.
-- **Buttons** placed on the same line have a 1 rem gap and are grouped in a dedicated `ToolControls` area.
-- **Labels** use Carbon’s label style (uppercase, small, secondary text color).
-- **Theme switching** is available via the Settings overflow menu (System / Dark / Light).
-- **Copy button** is positioned beside the pane label and never hidden.
-
----
-
-## Adding a New Tool
-1. Create a new component under `src/tools/`.
-2. Wrap the UI with the shared helpers from `src/components/ToolUI.jsx` (`ToolHeader`, `ToolControls`, `ToolPane`, `ToolSplitPane`).
-3. Export the component and add a route entry in `src/App.jsx`.
-4. Follow the UI rules in `AGENTS.md` to keep the look consistent.
-
----
-
-## Contributing
-- Fork the repo and create a feature branch.
-- Run `npm run lint` and `npm run format` before committing.
-- Ensure any new UI respects the Carbon design system and the rules in `AGENTS.md`.
-- Open a pull request with a clear description of the added functionality.
-
----
+Built with **Carbon Design System** for a consistent, professional look:
+- Clean, modern interface
+- Accessible components
+- Consistent spacing and typography
+- Monospace fonts for code/data
 
 ## License
 
-MIT License – feel free to use, modify, and distribute.
+MIT License - free to use, modify, and distribute.
 
 ---
 
-*Built with ❤️ and 🤖.*
+*Built with ❤️ using Go, React, and Wails.*
