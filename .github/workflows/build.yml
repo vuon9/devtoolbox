@@ -83,8 +83,7 @@ jobs:
               "release/dev-toolbox-${{ matrix.build }}.dmg" \
               "build/bin/dev-toolbox.app"
           elif [ "${{ matrix.os }}" = "windows-latest" ]; then
-            # Windows: rename binary with .exe extension
-            mv build/bin/dev-toolbox build/bin/dev-toolbox.exe
+            # Windows: Wails already outputs .exe, just copy it
             cp build/bin/dev-toolbox.exe release/dev-toolbox-${{ matrix.build }}.exe
           else
             # Linux: create AppImage or tar.gz
