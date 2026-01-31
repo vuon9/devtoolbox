@@ -326,3 +326,112 @@ func containsHelper(s, substr string) bool {
 	}
 	return false
 }
+
+func TestColorConverter(t *testing.T) {
+	conv := NewFormattingConverter()
+
+	tests := []struct {
+		name           string
+		input          string
+		method         string
+		expectedSubstr []string
+		expectErr      bool
+	}{
+		{
+			name:           "HEX to all formats",
+			input:          "#FF5733",
+			method:         "color codes",
+			expectedSubstr: []string{"HEX: #FF5733", "RGB: rgb(255, 87, 51)", "HSL:", "HSV:"},
+			expectErr:      false,
+		},
+		{
+			name:           "Short HEX format",
+			input:          "#F53",
+			method:         "color codes",
+			expectedSubstr: []string{"HEX: #FF5533", "RGB:"},
+			expectErr:      false,
+		},
+		{
+			name:           "RGB format",
+			input:          "rgb(255, 87, 51)",
+			method:         "color codes",
+			expectedSubstr: []string{"HEX: #FF5733", "RGB: rgb(255, 87, 51)"},
+			expectErr:      false,
+		},
+		{
+			name:           "Comma-separated RGB",
+			input:          "255, 87, 51",
+			method:         "color codes",
+			expectedSubstr: []string{"HEX: #FF5733"},
+			expectErr:      false,
+		},
+		{
+			name:           "HSL format",
+			input:          "hsl(9, 100%, 60%)",
+			method:         "color codes",
+			expectedSubstr: []string{"HEX:", "RGB:", "HSL:"},
+			expectErr:      false,
+		},
+		{
+			name:           "HSV format",
+			input:          "hsv(9, 80%, 100%)",
+			method:         "color codes",
+			expectedSubstr: []string{"HEX:", "RGB:", "HSV: hsv(9, 80%, 100%)"},
+			expectErr:      false,
+		},
+		{
+			name:           "White color",
+			input:          "#FFFFFF",
+			method:         "color codes",
+			expectedSubstr: []string{"HEX: #FFFFFF", "RGB: rgb(255, 255, 255)"},
+			expectErr:      false,
+		},
+		{
+			name:           "Black color",
+			input:          "#000000",
+			method:         "color codes",
+			expectedSubstr: []string{"HEX: #000000", "RGB: rgb(0, 0, 0)"},
+			expectErr:      false,
+		},
+		{
+			name:           "Invalid format",
+			input:          "not-a-color",
+			method:         "color codes",
+			expectedSubstr: []string{},
+			expectErr:      true,
+		},
+		{
+			name:           "Empty input",
+			input:          "",
+			method:         "color codes",
+			expectedSubstr: []string{},
+			expectErr:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := ConversionRequest{
+				Input:  tt.input,
+				Method: tt.method,
+				Config: map[string]interface{}{},
+			}
+			result, err := conv.Convert(req)
+			if tt.expectErr {
+				if err == nil {
+					t.Errorf("Expected error but got none, result: %s", result)
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+				return
+			}
+			for _, substr := range tt.expectedSubstr {
+				if !strings.Contains(result, substr) {
+					t.Errorf("Expected output to contain '%s', got:\n%s", substr, result)
+				}
+			}
+		})
+	}
+}
