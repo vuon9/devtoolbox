@@ -30,6 +30,8 @@ jobs:
             platform: darwin/amd64
 
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
