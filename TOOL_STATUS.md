@@ -17,13 +17,12 @@ This document tracks the refactoring and development status of each tool compone
 | JwtDebugger | 🟢 Done | Uses component abstraction system (ToolLayout, ToolTextArea, ToolInputGroup), toggleable layout, consistent button styling with icons (MagicWand, Security, Code), enhanced tabs (custom mode tabs, improved JSON/Claims tabs), resizable textareas with constraints, proper error handling | Completed 2026-01-25 |
 | **TextBasedConverter** | 🟢 Done | Unified tool with 45+ algorithms across 5 categories (encrypt, encode, escape, hash, convert). Features: Common Tags (Quick Select), Base64 Image Preview, All Hashes view, Smart ConfigurationPane, 5 Escape methods. Backend: hierarchical structure with 83 comprehensive tests. Phase 2 & 3 complete | Completed 2026-01-31 |
 | BarcodeGenerator | 🟢 Done | Multi-standard barcode generator (QR, EAN-13, EAN-8, Code128, Code39). Features: configurable size, error correction levels for QR, client-side validation, download button. | Completed 2026-01-31 |
+| **DataGenerator** | 🟢 Done | Template-based mock data generator with Faker integration. Features: 10 built-in presets (UUID, ULID, Random String, Lorem Ipsum, User Profile, E-commerce Product, API Response, SQL Insert, Log Entries, Credit Card), batch generation (10-1000 records), multiple output formats (JSON, XML, CSV, YAML), comprehensive help documentation with 4 tabs (Quick Start, Syntax, Faker Reference, Examples). Backend: Go templates + gofakeit library with 80+ faker functions. Replaces: RandomStringGenerator, UuidGenerator, LoremIpsumGenerator | Completed 2026-01-31 |
 | CronJobParser | 🔴 Not Started | Legacy implementation | - |
 | JsonFormatter | 🔴 Not Started | Legacy implementation | - |
 | LineSortDedupe | 🔴 Not Started | Legacy implementation | - |
-| LoremIpsumGenerator | 🔴 Not Started | Legacy implementation | - |
 | PhpJsonConverter | 🔴 Not Started | Legacy implementation | - |
 | PhpSerializer | 🔴 Not Started | Legacy implementation | - |
-| RandomStringGenerator | 🔴 Not Started | Legacy implementation | - |
 | RegExpTester | 🔴 Not Started | Legacy implementation | - |
 | SqlFormatter | 🔴 Not Started | Legacy implementation | - |
 | StringCaseConverter | 🔴 Not Started | Legacy implementation | - |
@@ -32,7 +31,6 @@ This document tracks the refactoring and development status of each tool compone
 | UnixTimeConverter | 🔴 Not Started | Legacy implementation | - |
 | UrlParser | 🔴 Not Started | Legacy implementation | - |
 | UrlTools | 🔴 Not Started | Legacy implementation | - |
-| UuidGenerator | 🔴 Not Started | Legacy implementation | - |
 
 ---
 

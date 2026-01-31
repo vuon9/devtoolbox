@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/boombuler/barcode v1.1.0
+	github.com/brianvoe/gofakeit/v7 v7.14.0
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a

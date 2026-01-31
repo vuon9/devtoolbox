@@ -6,18 +6,15 @@ import { Settings } from '@carbon/icons-react';
 
 // Tools Imports (Keeping all existing imports)
 import JsonFormatter from './pages/JsonFormatter';
-import UuidGenerator from './pages/UuidGenerator';
 import UnixTimeConverter from './pages/UnixTimeConverter';
 import JwtDebugger from './pages/JwtDebugger';
 import RegExpTester from './pages/RegExpTester';
 
-import RandomStringGenerator from './pages/RandomStringGenerator';
 import SqlFormatter from './pages/SqlFormatter';
 import StringCaseConverter from './pages/StringCaseConverter';
 import CronJobParser from './pages/CronJobParser';
 import TextDiffChecker from './pages/TextDiffChecker';
 import NumberBaseConverter from './pages/NumberBaseConverter';
-import LoremIpsumGenerator from './pages/LoremIpsumGenerator';
 import LineSortDedupe from './pages/LineSortDedupe';
 import StringInspector from './pages/StringInspector';
 import PhpSerializer from './pages/PhpSerializer';
@@ -25,6 +22,7 @@ import UrlTools from './pages/UrlTools';
 import PhpJsonConverter from './pages/PhpJsonConverter';
 import AllInOneConverter from './pages/TextBasedConverter';
 import BarcodeGenerator from './pages/BarcodeGenerator';
+import DataGenerator from './pages/DataGenerator';
 
 // Error boundary for catching React rendering errors
 class ErrorBoundary extends React.Component {
@@ -111,19 +109,17 @@ function App() {
             case 'jwt': return <JwtDebugger />;
             case 'text-based': return <AllInOneConverter />;
             case 'barcode': return <BarcodeGenerator />;
+            case 'data-generator': return <DataGenerator />;
 
             case 'json': return <JsonFormatter />;
-            case 'uuid': return <UuidGenerator />;
             case 'unix-time': return <UnixTimeConverter />;
             case 'regexp': return <RegExpTester />;
 
-            case 'random': return <RandomStringGenerator />;
             case 'sql': return <SqlFormatter />;
             case 'case': return <StringCaseConverter />;
             case 'cron': return <CronJobParser />;
             case 'diff': return <TextDiffChecker />;
             case 'number-base': return <NumberBaseConverter />;
-            case 'lorem': return <LoremIpsumGenerator />;
             case 'sort': return <LineSortDedupe />;
             case 'inspector': return <StringInspector />;
             case 'php-ser': return <PhpSerializer />;

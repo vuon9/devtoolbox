@@ -6,21 +6,25 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"dev-toolbox/internal/datagenerator"
 )
 
 // Server represents the HTTP server for Web Mode
 type Server struct {
-	jwtService        *JWTService
-	conversionService *ConversionService
-	barcodeService    *BarcodeService
+	jwtService           *JWTService
+	conversionService    *ConversionService
+	barcodeService       *BarcodeService
+	dataGeneratorService *DataGeneratorService
 }
 
 // NewServer creates a new Server instance
-func NewServer(jwtService *JWTService, conversionService *ConversionService, barcodeService *BarcodeService) *Server {
+func NewServer(jwtService *JWTService, conversionService *ConversionService, barcodeService *BarcodeService, dataGeneratorService *DataGeneratorService) *Server {
 	return &Server{
-		jwtService:        jwtService,
-		conversionService: conversionService,
-		barcodeService:    barcodeService,
+		jwtService:           jwtService,
+		conversionService:    conversionService,
+		barcodeService:       barcodeService,
+		dataGeneratorService: dataGeneratorService,
 	}
 }
 
@@ -72,6 +76,11 @@ func (s *Server) handleAPI(w http.ResponseWriter, r *http.Request) {
 
 	if service == "BarcodeService" {
 		s.handleBarcodeService(method, w, r)
+		return
+	}
+
+	if service == "DataGeneratorService" {
+		s.handleDataGeneratorService(method, w, r)
 		return
 	}
 
@@ -252,6 +261,57 @@ func getIntFromMap(m map[string]interface{}, key string) int {
 		}
 	}
 	return 0
+}
+
+func (s *Server) handleDataGeneratorService(method string, w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		Args []interface{} `json:"args"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	var result interface{}
+
+	switch method {
+	case "Generate":
+		if len(payload.Args) < 1 {
+			http.Error(w, "Missing arguments", http.StatusBadRequest)
+			return
+		}
+		reqData, ok := payload.Args[0].(map[string]interface{})
+		if !ok {
+			http.Error(w, "Invalid request format", http.StatusBadRequest)
+			return
+		}
+
+		req := datagenerator.GenerateRequest{
+			Template:     getStringFromMap(reqData, "template"),
+			BatchCount:   getIntFromMap(reqData, "batchCount"),
+			OutputFormat: getStringFromMap(reqData, "outputFormat"),
+		}
+		if vars, ok := reqData["variables"].(map[string]interface{}); ok {
+			req.Variables = vars
+		}
+		result = s.dataGeneratorService.Generate(req)
+	case "GetPresets":
+		result = s.dataGeneratorService.GetPresets()
+	case "ValidateTemplate":
+		if len(payload.Args) < 1 {
+			http.Error(w, "Missing arguments", http.StatusBadRequest)
+			return
+		}
+		template := payload.Args[0].(string)
+		result = s.dataGeneratorService.ValidateTemplate(template)
+	default:
+		http.Error(w, fmt.Sprintf("Method not found: %s", method), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
 
 func corsMiddleware(next http.Handler) http.Handler {

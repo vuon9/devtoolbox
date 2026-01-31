@@ -37,7 +37,7 @@ The central hub with 45+ algorithms across 5 categories:
 |------|-------------|
 | **JWT Debugger** | Decode and verify JWT tokens with header/payload inspection |
 | **Barcode / QR Code Generator** | Create QR codes and 1D barcodes (EAN-13, EAN-8, Code 128, Code 39) with preview and download |
-| **UUID / ULID Generator** | Generate random UUID v4 or ULID values |
+| **Data Generator** | Generate mock data with templates using Faker library (UUID, ULID, Random String, Lorem Ipsum, User Profiles, API responses, SQL inserts, and more) |
 | **JSON Formatter** | Pretty-print or minify JSON with syntax validation |
 | **RegExp Tester** | Test regular expressions with real-time matching |
 | **Unix Time Converter** | Convert between Unix timestamps and human-readable dates |
@@ -47,8 +47,6 @@ The central hub with 45+ algorithms across 5 categories:
 | **Text Diff Checker** | Compare two text blocks and highlight differences |
 | **Line Sort / Dedupe** | Sort lines, remove duplicates, trim whitespace |
 | **String Inspector** | Count characters, words, lines, bytes, and sentences |
-| **Lorem Ipsum Generator** | Generate placeholder text |
-| **Random String Generator** | Generate random alphanumeric strings with custom length |
 | **PHP Serializer** | PHP serialization/unserialization |
 | **URL Tools** | Parse URLs, extract components |
 

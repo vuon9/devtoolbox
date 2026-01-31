@@ -20,7 +20,7 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
         { id: 'jwt', name: 'JWT Debugger', icon: '🛡️' },
         { id: 'url-tools', name: 'URL Tools', icon: '🔗' },
         { id: 'barcode', name: 'Barcode / QR Code', icon: '▣' },
-        { id: 'uuid', name: 'UUID/ULID Generator', icon: '🆔' },
+        { id: 'data-generator', name: 'Data Generator', icon: '📊' },
         { id: 'sql', name: 'SQL Formatter', icon: '🗄️' },
         { id: 'case', name: 'String Case', icon: 'aA' },
         { id: 'cron', name: 'Cron Job Parser', icon: '⏳' },
@@ -30,8 +30,6 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
         { id: 'diff', name: 'Text Diff Checker', icon: '⚖️' },
         { id: 'sort', name: 'Line Sort/Dedupe', icon: '☰' },
         { id: 'inspector', name: 'String Inspector', icon: '🔍' },
-        { id: 'lorem', name: 'Lorem Ipsum Generator', icon: '¶' },
-        { id: 'random', name: 'Random String', icon: '🎲' },
     ];
 
     const togglePin = (e, id) => {

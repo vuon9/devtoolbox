@@ -64,5 +64,10 @@ export const Backend = {
         GetBarcodeSizes: () => callBackend('BarcodeService', 'GetBarcodeSizes'),
         GetBarcodeStandards: () => callBackend('BarcodeService', 'GetBarcodeStandards'),
         ValidateContent: (content, standard) => callBackend('BarcodeService', 'ValidateContent', content, standard)
+    },
+    DataGeneratorService: {
+        Generate: (req) => callBackend('DataGeneratorService', 'Generate', req),
+        GetPresets: () => callBackend('DataGeneratorService', 'GetPresets'),
+        ValidateTemplate: (template) => callBackend('DataGeneratorService', 'ValidateTemplate', template)
     }
 };

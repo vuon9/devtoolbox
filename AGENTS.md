@@ -94,19 +94,19 @@ func TestConverter(t *testing.T) {
                 Config: map[string]interface{}{"subMode": tt.subMode},
             }
             result, err := conv.Convert(req)
-            
+
             if tt.expectErr {
                 if err == nil {
                     t.Errorf("Expected error but got none")
                 }
                 return
             }
-            
+
             if err != nil {
                 t.Errorf("Unexpected error: %v", err)
                 return
             }
-            
+
             if result != tt.expected {
                 t.Errorf("Expected '%s', got '%s'", tt.expected, result)
             }
@@ -382,7 +382,8 @@ These guidelines are intended for AI assistants (like opencode) working on this 
 1. **Run linting & formatting** – Execute any available lint/format commands (see section 8).
 2. **Test the tool** – Verify functionality with `wails dev`.
 3. **Update `TOOL_STATUS.md`** – If you refactored a tool, update its status and add a completion note.
-4. **Commit changes** – Use descriptive commit messages that reference the tool name and changes made.
+4. **Update `README.md`** - If features have been changed, modify features list and its details.
+5. **Commit changes** – Use descriptive commit messages that reference the tool name and changes made.
 
 ### Important Notes
 - **Never commit secrets** – Avoid committing `.env`, credentials, or any sensitive data.
