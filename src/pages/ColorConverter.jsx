@@ -241,6 +241,7 @@ function colorReducer(state, action) {
 export default function ColorConverter() {
     const [state, dispatch] = useReducer(colorReducer, initialState);
     const [hexInput, setHexInput] = useState(initialState.hex);
+    const [isHexValid, setIsHexValid] = useState(true);
     const [rgbInputs, setRgbInputs] = useState(initialState.rgb);
     const [hslInputs, setHslInputs] = useState(initialState.hsl);
     const [eyedropperSupported, setEyedropperSupported] = useState(false);
@@ -289,9 +290,22 @@ export default function ColorConverter() {
         setHexInput(value);
         const rgb = hexToRgb(value);
         if (rgb) {
+            setIsHexValid(true);
             updateFromRgb(rgb.r, rgb.g, rgb.b, rgb.a);
+        } else {
+            setIsHexValid(false);
         }
     }, [updateFromRgb]);
+
+    // Handle hex input blur - validate and reset if invalid
+    const handleHexBlur = useCallback(() => {
+        const rgb = hexToRgb(hexInput);
+        if (!rgb) {
+            // Reset to current valid color
+            setHexInput(state.hex);
+            setIsHexValid(true);
+        }
+    }, [hexInput, state.hex]);
 
     // Handle RGB input changes
     const handleRgbChange = useCallback((key, value) => {
@@ -408,45 +422,33 @@ export default function ColorConverter() {
 
             <ToolControls style={{ flexWrap: 'nowrap' }}>
                 {/* Color Preview & Picker */}
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'nowrap' }}>
-                    <div style={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '8px',
-                        backgroundColor: state.hex,
-                        border: '2px solid var(--cds-border-strong)',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}>
-                        <input
-                            type="color"
-                            value={state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex}
-                            onChange={handleColorPickerChange}
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                opacity: 0,
-                                cursor: 'pointer'
-                            }}
-                        />
-                    </div>
-                    
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {eyedropperSupported && (
-                            <Button
-                                size="sm"
-                                kind="primary"
-                                renderIcon={Eyewash}
-                                onClick={openEyeDropper}
-                                disabled={isPicking}
-                            >
-                                {isPicking ? 'Picking...' : 'Pick Color'}
-                            </Button>
-                        )}
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '8px',
+                            backgroundColor: state.hex,
+                            border: '2px solid var(--cds-border-strong)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            <input
+                                type="color"
+                                value={state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex}
+                                onChange={handleColorPickerChange}
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    opacity: 0,
+                                    cursor: 'pointer'
+                                }}
+                            />
+                        </div>
                         <Button
                             size="sm"
                             kind="secondary"
@@ -456,6 +458,18 @@ export default function ColorConverter() {
                             Random
                         </Button>
                     </div>
+                    
+                    {eyedropperSupported && (
+                        <Button
+                            size="sm"
+                            kind="primary"
+                            renderIcon={Eyedropper}
+                            onClick={openEyeDropper}
+                            disabled={isPicking}
+                        >
+                            {isPicking ? 'Picking...' : 'Pick Color'}
+                        </Button>
+                    )}
                 </div>
 
                 {/* Input Controls */}
@@ -467,15 +481,18 @@ export default function ColorConverter() {
                             id="hex-input"
                             value={hexInput}
                             onChange={(e) => handleHexChange(e.target.value)}
+                            onBlur={handleHexBlur}
                             placeholder="#3DD6F5"
                             style={{ fontFamily: "'IBM Plex Mono', monospace" }}
                             size="sm"
+                            invalid={!isHexValid}
+                            invalidText="Invalid hex color"
                         />
                     </div>
 
                     {/* RGB Inputs */}
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '70px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>R</label>
                             <TextInput
                                 id="rgb-r"
@@ -487,7 +504,7 @@ export default function ColorConverter() {
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '70px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>G</label>
                             <TextInput
                                 id="rgb-g"
@@ -499,7 +516,7 @@ export default function ColorConverter() {
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '70px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>B</label>
                             <TextInput
                                 id="rgb-b"
@@ -511,7 +528,7 @@ export default function ColorConverter() {
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '70px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>A</label>
                             <TextInput
                                 id="rgb-a"
@@ -528,7 +545,7 @@ export default function ColorConverter() {
 
                     {/* HSL Inputs */}
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '70px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>H</label>
                             <TextInput
                                 id="hsl-h"
@@ -540,7 +557,7 @@ export default function ColorConverter() {
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '70px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>S%</label>
                             <TextInput
                                 id="hsl-s"
@@ -552,7 +569,7 @@ export default function ColorConverter() {
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '70px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>L%</label>
                             <TextInput
                                 id="hsl-l"
@@ -577,13 +594,78 @@ export default function ColorConverter() {
                 </div>
             </ToolControls>
 
-            {/* Format Tags */}
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-                <Tag type="gray">RGB: {state.rgb.r}, {state.rgb.g}, {state.rgb.b}</Tag>
-                <Tag type="gray">HEX: {state.hex}</Tag>
-                <Tag type="gray">HSL: {state.hsl.h}°, {state.hsl.s}%, {state.hsl.l}%</Tag>
-                <Tag type="gray">HSV: {state.hsv.h}°, {state.hsv.s}%, {state.hsv.v}%</Tag>
-                <Tag type="gray">CMYK: {state.cmyk.c}%, {state.cmyk.m}%, {state.cmyk.y}%, {state.cmyk.k}%</Tag>
+            {/* Format Values */}
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>RGB:</span>
+                    <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
+                        {state.rgb.r}, {state.rgb.g}, {state.rgb.b}
+                    </code>
+                    <Button
+                        hasIconOnly
+                        renderIcon={Copy}
+                        kind="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(`${state.rgb.r}, ${state.rgb.g}, ${state.rgb.b}`)}
+                        iconDescription="Copy RGB"
+                    />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HEX:</span>
+                    <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
+                        {state.hex}
+                    </code>
+                    <Button
+                        hasIconOnly
+                        renderIcon={Copy}
+                        kind="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(state.hex)}
+                        iconDescription="Copy HEX"
+                    />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HSL:</span>
+                    <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
+                        {state.hsl.h}°, {state.hsl.s}%, {state.hsl.l}%
+                    </code>
+                    <Button
+                        hasIconOnly
+                        renderIcon={Copy}
+                        kind="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(`${state.hsl.h}°, ${state.hsl.s}%, ${state.hsl.l}%`)}
+                        iconDescription="Copy HSL"
+                    />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HSV:</span>
+                    <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
+                        {state.hsv.h}°, {state.hsv.s}%, {state.hsv.v}%
+                    </code>
+                    <Button
+                        hasIconOnly
+                        renderIcon={Copy}
+                        kind="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(`${state.hsv.h}°, ${state.hsv.s}%, ${state.hsv.v}%`)}
+                        iconDescription="Copy HSV"
+                    />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>CMYK:</span>
+                    <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
+                        {state.cmyk.c}%, {state.cmyk.m}%, {state.cmyk.y}%, {state.cmyk.k}%
+                    </code>
+                    <Button
+                        hasIconOnly
+                        renderIcon={Copy}
+                        kind="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(`${state.cmyk.c}%, ${state.cmyk.m}%, ${state.cmyk.y}%, ${state.cmyk.k}%`)}
+                        iconDescription="Copy CMYK"
+                    />
+                </div>
             </div>
 
             {/* Main Content Area */}
@@ -700,7 +782,9 @@ export default function ColorConverter() {
                                                             margin: 0,
                                                             whiteSpace: 'pre-wrap',
                                                             wordBreak: 'break-all',
-                                                            color: 'var(--cds-text-primary)'
+                                                            color: 'var(--cds-text-primary)',
+                                                            maxHeight: '200px',
+                                                            overflow: 'auto'
                                                         }}>
                                                             {snippet.code}
                                                         </pre>
