@@ -595,8 +595,16 @@ export default function ColorConverter() {
             </ToolControls>
 
             {/* Format Values */}
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem', alignItems: 'center' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.75rem',
+                    backgroundColor: 'var(--cds-layer)',
+                    border: '1px solid var(--cds-border-subtle)',
+                    borderRadius: '4px'
+                }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>RGB:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
                         {state.rgb.r}, {state.rgb.g}, {state.rgb.b}
@@ -610,7 +618,15 @@ export default function ColorConverter() {
                         iconDescription="Copy RGB"
                     />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.75rem',
+                    backgroundColor: 'var(--cds-layer)',
+                    border: '1px solid var(--cds-border-subtle)',
+                    borderRadius: '4px'
+                }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HEX:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
                         {state.hex}
@@ -624,7 +640,15 @@ export default function ColorConverter() {
                         iconDescription="Copy HEX"
                     />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.75rem',
+                    backgroundColor: 'var(--cds-layer)',
+                    border: '1px solid var(--cds-border-subtle)',
+                    borderRadius: '4px'
+                }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HSL:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
                         {state.hsl.h}°, {state.hsl.s}%, {state.hsl.l}%
@@ -638,7 +662,15 @@ export default function ColorConverter() {
                         iconDescription="Copy HSL"
                     />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.75rem',
+                    backgroundColor: 'var(--cds-layer)',
+                    border: '1px solid var(--cds-border-subtle)',
+                    borderRadius: '4px'
+                }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HSV:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
                         {state.hsv.h}°, {state.hsv.s}%, {state.hsv.v}%
@@ -652,7 +684,15 @@ export default function ColorConverter() {
                         iconDescription="Copy HSV"
                     />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.75rem',
+                    backgroundColor: 'var(--cds-layer)',
+                    border: '1px solid var(--cds-border-subtle)',
+                    borderRadius: '4px'
+                }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>CMYK:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
                         {state.cmyk.c}%, {state.cmyk.m}%, {state.cmyk.y}%, {state.cmyk.k}%
@@ -755,7 +795,7 @@ export default function ColorConverter() {
                                 <Tab key={tab.id}>{tab.label}</Tab>
                             ))}
                         </TabList>
-                        <TabPanels style={{ flex: 1, overflow: 'auto' }}>
+                        <TabPanels style={{ flex: 1, overflow: 'auto', maxHeight: '400px' }}>
                             {languageTabs.map(tab => (
                                 <TabPanel key={tab.id} style={{ padding: '1rem 0' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
