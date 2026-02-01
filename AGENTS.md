@@ -32,6 +32,41 @@ Every tool must follow this hierarchy:
 2.  **Controls**: A distinct row/area for options (selects, inputs) and primary actions (buttons).
 3.  **Workspace**: The main area, usually split 50/50 between Input and Output panes.
 
+### Layout Toggle (Horizontal/Vertical)
+All tools with split-pane layouts **MUST** include a layout toggle button to allow users to switch between horizontal and vertical arrangements.
+
+**Implementation Pattern:**
+```jsx
+import useLayoutToggle from '../hooks/useLayoutToggle';
+import { ToolLayoutToggle } from '../components/ToolUI';
+
+// In component:
+const layout = useLayoutToggle({
+    toolKey: 'unique-tool-key-layout',
+    defaultDirection: 'horizontal',
+    showToggle: true,
+    persist: true
+});
+
+// In ToolControls:
+<div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+    <ToolLayoutToggle
+        direction={layout.direction}
+        onToggle={layout.toggleDirection}
+        position="controls"
+    />
+</div>
+
+// On ToolSplitPane:
+<ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
+```
+
+**Requirements:**
+- Place the toggle button at the end of the `ToolControls` area using `marginLeft: 'auto'`
+- Use a unique `toolKey` for each tool to ensure independent persistence
+- Always set `persist: true` to remember user's preference
+- Update `ToolSplitPane` to dynamically adjust `columnCount` based on layout direction
+
 ### Component Specifics
 
 #### Buttons
@@ -239,7 +274,7 @@ func TestDecode(t *testing.T) {
 ## 7. Development Setup
 
 ### Prerequisites
-- **Node.js** (>= 18)
+- **Bun** (>= 1.0) - Required for frontend dependencies
 - **Go** (>= 1.22)
 - **Wails CLI** (`go install github.com/wailsapp/wails/v2/cmd/wails@latest`)
 
@@ -249,7 +284,7 @@ func TestDecode(t *testing.T) {
 git clone https://github.com/vuon9/dev-toolbox.git
 cd dev-toolbox
 
-# Install frontend dependencies (using Bun)
+# Install dependencies (using Bun)
 bun install
 ```
 
@@ -304,7 +339,7 @@ bun run format
 Follow this step‑by‑step guide to add a new tool component:
 
 1. **Create Component File**
-   - Create a new `.jsx` file in `frontend/src/tools/` (e.g., `MyNewTool.jsx`).
+   - Create a new `.jsx` file in `src/pages/` (e.g., `MyNewTool.jsx`).
    - Use the existing tool components as reference (e.g., `JwtDebugger.jsx`).
 
 2. **Implement the Tool**
@@ -316,15 +351,19 @@ Follow this step‑by‑step guide to add a new tool component:
    - Ensure input/output panes are symmetrical, have monospace fonts, and include copy buttons.
 
 3. **Add Route**
-   - Open `frontend/src/App.jsx`.
+   - Open `src/App.jsx`.
    - Import your new component.
-   - Add a route entry in the `routes` array:
+   - Add the component to the `renderTool()` switch statement:
      ```jsx
-     { path: '/my-new-tool', element: <MyNewTool /> }
+     case 'my-new-tool': return <MyNewTool />;
      ```
 
-4. **Update Sidebar** (Optional)
-   - If the tool should appear in the sidebar, add an entry in `frontend/src/App.jsx` within the `sidebarItems` array.
+4. **Update Sidebar**
+   - Open `src/components/Sidebar.jsx`.
+   - Add an entry to the `tools` array:
+     ```jsx
+     { id: 'my-new-tool', name: 'My New Tool', icon: '🛠️' }
+     ```
 
 5. **Test the Tool**
    - Run `wails dev` to verify the tool works correctly.
@@ -443,11 +482,12 @@ These guidelines are intended for AI assistants (like opencode) working on this 
 1. **Run linting & formatting** – Execute any available lint/format commands (see section 8).
 2. **Test the tool** – Verify functionality with `wails dev`.
 3. **Update `TOOL_STATUS.md`** – Update the tool's status and add completion notes (mark as 🟢 Done when complete).
-4. **Update `README.md`** – **Whenever TOOL_STATUS.md is updated, review README.md to ensure consistency**: 
+4. **Update `README.md`** – **REQUIRED: Whenever TOOL_STATUS.md is updated, README.md MUST also be updated to ensure consistency**: 
    - Add new tools to the feature table
    - Remove deprecated tools
    - Update descriptions if features changed
    - Keep the tool count/feature list in sync
+   - **This is mandatory** - never update TOOL_STATUS.md without checking/updating README.md
 5. **Commit changes** – Use descriptive commit messages that reference the tool name and changes made.
 
 ### Important Notes

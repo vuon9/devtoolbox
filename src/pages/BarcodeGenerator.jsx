@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Button, Dropdown, InlineLoading } from '@carbon/react';
 import { Renew, Download } from '@carbon/icons-react';
-import { ToolHeader, ToolPane, ToolSplitPane } from '../components/ToolUI';
+import { ToolHeader, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../components/ToolUI';
+import useLayoutToggle from '../hooks/useLayoutToggle';
 import { Backend } from '../utils/backendBridge';
 
 const BARCODE_STANDARDS = [
@@ -118,6 +119,13 @@ export default function BarcodeGenerator() {
   const [qrImage, setQrImage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const layout = useLayoutToggle({
+    toolKey: 'barcode-generator-layout',
+    defaultDirection: 'horizontal',
+    showToggle: true,
+    persist: true
+  });
 
   // Track what was last generated to prevent duplicate generation
   const lastGeneratedParams = useRef({ content: '', standard: 'QR', size: 256, level: 'M' });
@@ -288,9 +296,17 @@ export default function BarcodeGenerator() {
         >
           Generate
         </Button>
+
+        <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+          <ToolLayoutToggle
+            direction={layout.direction}
+            onToggle={layout.toggleDirection}
+            position="controls"
+          />
+        </div>
       </div>
 
-      <ToolSplitPane columnCount={2}>
+      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
         {/* Input Pane */}
         <ToolPane
           label="Content"
