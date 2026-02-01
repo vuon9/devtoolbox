@@ -39,6 +39,7 @@ The central hub with 45+ algorithms across 5 categories:
 | **Barcode / QR Code Generator** | Create QR codes and 1D barcodes (EAN-13, EAN-8, Code 128, Code 39) with preview and download |
 | **Data Generator** | Generate mock data with templates using Faker library (UUID, ULID, Random String, Lorem Ipsum, User Profiles, API responses, SQL inserts, and more) |
 | **Code Formatter** | Format and minify JSON, XML, HTML, SQL, CSS, and JavaScript with advanced filtering support (jq for JSON, XPath for XML, CSS selectors for HTML) |
+| **Color Converter** | Pick colors with eyedropper and generate code snippets for 11+ programming languages (CSS, Swift, .NET, Java, Android, Obj-C, Flutter, Unity, React Native, OpenGL, SVG) |
 | **RegExp Tester** | Test regular expressions with real-time matching |
 | **Unix Time Converter** | Convert between Unix timestamps and human-readable dates |
 | **String Utilities** | Sort/Dedupe lines, Case conversion (camelCase, snake_case, etc.), String Inspector |
