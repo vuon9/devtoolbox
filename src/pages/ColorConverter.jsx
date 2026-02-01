@@ -470,7 +470,7 @@ export default function ColorConverter() {
                         }}>
                             <input
                                 type="color"
-                                value={state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex}
+                                value={state.hex.startsWith('#') && state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex}
                                 onChange={handleColorPickerChange}
                                 style={{
                                     position: 'absolute',
