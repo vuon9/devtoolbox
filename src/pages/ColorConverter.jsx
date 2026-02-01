@@ -291,13 +291,13 @@ export default function ColorConverter() {
         if (historyTimeoutRef.current) {
             clearTimeout(historyTimeoutRef.current);
         }
-        // Set new timeout to add to history after 500ms of no changes
+        // Set new timeout to add to history after 100ms of no changes
         historyTimeoutRef.current = setTimeout(() => {
             dispatch({
                 type: 'ADD_TO_HISTORY',
                 payload: { hex, rgb }
             });
-        }, 500);
+        }, 100);
     }, []);
 
     // Update all color formats from RGB
@@ -747,13 +747,12 @@ export default function ColorConverter() {
             }}>
                 {/* Color History */}
                 {state.history.length > 0 && (
-                    <div style={{ 
+                    <div style={{
                         width: layout.direction === 'horizontal' ? '200px' : '100%',
                         minWidth: layout.direction === 'horizontal' ? '200px' : 'auto',
-                        display: 'flex', 
+                        display: 'flex',
                         flexDirection: 'column',
                         border: '1px solid var(--cds-border-strong)',
-                        borderRadius: '4px',
                         overflow: 'hidden'
                     }}>
                         <div style={{
@@ -764,7 +763,7 @@ export default function ColorConverter() {
                             justifyContent: 'space-between',
                             alignItems: 'center'
                         }}>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>History</span>
+                            <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>History</span>
                             <Button
                                 hasIconOnly
                                 renderIcon={TrashCan}
@@ -826,7 +825,7 @@ export default function ColorConverter() {
                         </TabList>
                         <TabPanels style={{ flex: 1, overflow: 'auto', maxHeight: '400px' }}>
                             {languageTabs.map(tab => (
-                                <TabPanel key={tab.id} style={{ padding: '1rem 0', height: '200px', overflow: 'auto' }}>
+                                <TabPanel key={tab.id} style={{ padding: '1rem 0', height: '350px', overflow: 'auto' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                         {(codeSnippets[tab.id] || []).map((snippet, idx) => (
                                             <Tile key={idx} style={{ padding: '1rem' }}>
