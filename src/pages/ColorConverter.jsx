@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useReducer, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useReducer, useMemo, useRef } from 'react';
 import { Button, TextInput, Tile, Tabs, TabList, Tab, TabPanels, TabPanel, Tag } from '@carbon/react';
 import { Eyedropper, Copy, ColorPalette, TrashCan } from '@carbon/icons-react';
 import { ToolHeader, ToolControls, ToolSplitPane, ToolLayoutToggle } from '../components/ToolUI';
@@ -222,10 +222,16 @@ function colorReducer(state, action) {
         case 'SET_COLOR':
             return {
                 ...state,
-                ...action.payload,
-                history: state.history.some(h => h.hex === action.payload.hex)
-                    ? state.history
-                    : [{ hex: action.payload.hex, rgb: action.payload.rgb }, ...state.history].slice(0, 10)
+                ...action.payload
+            };
+        case 'ADD_TO_HISTORY':
+            const newEntry = action.payload;
+            if (state.history.some(h => h.hex === newEntry.hex)) {
+                return state;
+            }
+            return {
+                ...state,
+                history: [newEntry, ...state.history].slice(0, 10)
             };
         case 'SET_SELECTED_TAB':
             return { ...state, selectedTab: action.payload };
@@ -246,6 +252,7 @@ export default function ColorConverter() {
     const [hslInputs, setHslInputs] = useState(initialState.hsl);
     const [eyedropperSupported, setEyedropperSupported] = useState(false);
     const [isPicking, setIsPicking] = useState(false);
+    const historyTimeoutRef = useRef(null);
 
     // Layout toggle support
     const layout = useLayoutToggle({
@@ -260,6 +267,15 @@ export default function ColorConverter() {
         setEyedropperSupported('EyeDropper' in window);
     }, []);
 
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (historyTimeoutRef.current) {
+                clearTimeout(historyTimeoutRef.current);
+            }
+        };
+    }, []);
+
     // Generate code snippets when color changes
     const codeSnippets = useMemo(() => 
         generateCodeSnippets(
@@ -268,6 +284,21 @@ export default function ColorConverter() {
         ),
         [state.rgb, state.hsl, state.hsv]
     );
+
+    // Debounced history recording
+    const debouncedAddToHistory = useCallback((hex, rgb) => {
+        // Clear existing timeout
+        if (historyTimeoutRef.current) {
+            clearTimeout(historyTimeoutRef.current);
+        }
+        // Set new timeout to add to history after 500ms of no changes
+        historyTimeoutRef.current = setTimeout(() => {
+            dispatch({
+                type: 'ADD_TO_HISTORY',
+                payload: { hex, rgb }
+            });
+        }, 500);
+    }, []);
 
     // Update all color formats from RGB
     const updateFromRgb = useCallback((r, g, b, a = 1) => {
@@ -283,7 +314,10 @@ export default function ColorConverter() {
         setHexInput(hex);
         setRgbInputs({ r, g, b, a });
         setHslInputs(hsl);
-    }, []);
+        
+        // Debounce history recording
+        debouncedAddToHistory(hex, { r, g, b, a });
+    }, [debouncedAddToHistory]);
 
     // Handle hex input change
     const handleHexChange = useCallback((value) => {
