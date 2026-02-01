@@ -776,7 +776,7 @@ export default function ColorConverter() {
                             />
                         </div>
                         <div style={{ 
-                            flex: 1, 
+                            height: '350px',
                             overflowY: 'auto',
                             padding: '0.5rem'
                         }}>
