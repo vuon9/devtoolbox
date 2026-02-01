@@ -1,4 +1,4 @@
-# Developer Toolbox
+# DevToolbox
 
 [![Tests & Build](https://github.com/vuon9/dev-toolbox/actions/workflows/tests.yml/badge.svg)](https://github.com/vuon9/dev-toolbox/actions/workflows/tests.yml)
 [![Wails Build](https://github.com/vuon9/dev-toolbox/actions/workflows/build.yml/badge.svg)](https://github.com/vuon9/dev-toolbox/actions/workflows/build.yml)
