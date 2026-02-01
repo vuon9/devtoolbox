@@ -602,8 +602,7 @@ export default function ColorConverter() {
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
-                    border: '1px solid var(--cds-border-subtle)',
-                    borderRadius: '4px'
+                    border: '1px solid var(--cds-border-subtle)'
                 }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>RGB:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
@@ -624,8 +623,7 @@ export default function ColorConverter() {
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
-                    border: '1px solid var(--cds-border-subtle)',
-                    borderRadius: '4px'
+                    border: '1px solid var(--cds-border-subtle)'
                 }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HEX:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
@@ -646,8 +644,7 @@ export default function ColorConverter() {
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
-                    border: '1px solid var(--cds-border-subtle)',
-                    borderRadius: '4px'
+                    border: '1px solid var(--cds-border-subtle)'
                 }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HSL:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
@@ -668,8 +665,7 @@ export default function ColorConverter() {
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
-                    border: '1px solid var(--cds-border-subtle)',
-                    borderRadius: '4px'
+                    border: '1px solid var(--cds-border-subtle)'
                 }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HSV:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
@@ -690,8 +686,7 @@ export default function ColorConverter() {
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
-                    border: '1px solid var(--cds-border-subtle)',
-                    borderRadius: '4px'
+                    border: '1px solid var(--cds-border-subtle)'
                 }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>CMYK:</span>
                     <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.875rem' }}>
@@ -797,7 +792,7 @@ export default function ColorConverter() {
                         </TabList>
                         <TabPanels style={{ flex: 1, overflow: 'auto', maxHeight: '400px' }}>
                             {languageTabs.map(tab => (
-                                <TabPanel key={tab.id} style={{ padding: '1rem 0' }}>
+                                <TabPanel key={tab.id} style={{ padding: '1rem 0', height: '200px', overflow: 'auto' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                         {(codeSnippets[tab.id] || []).map((snippet, idx) => (
                                             <Tile key={idx} style={{ padding: '1rem' }}>
