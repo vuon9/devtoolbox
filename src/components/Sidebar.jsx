@@ -22,6 +22,7 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
         { id: 'barcode', name: 'Barcode / QR Code', icon: '▣' },
         { id: 'data-generator', name: 'Data Generator', icon: '📊' },
         { id: 'code-formatter', name: 'Code Formatter', icon: '📝' },
+        { id: 'color-converter', name: 'Color Converter', icon: '🎨' },
         { id: 'cron', name: 'Cron Job Parser', icon: '⏳' },
         { id: 'regexp', name: 'RegExp Tester', icon: '.*' },
         { id: 'diff', name: 'Text Diff Checker', icon: '⚖️' },

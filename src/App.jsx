@@ -16,6 +16,7 @@ import StringUtilities from './pages/StringUtilities';
 import BarcodeGenerator from './pages/BarcodeGenerator';
 import DataGenerator from './pages/DataGenerator';
 import CodeFormatter from './pages/CodeFormatter';
+import ColorConverter from './pages/ColorConverter';
 
 // Error boundary for catching React rendering errors
 class ErrorBoundary extends React.Component {
@@ -105,6 +106,7 @@ function App() {
             case 'barcode': return <BarcodeGenerator />;
             case 'data-generator': return <DataGenerator />;
             case 'code-formatter': return <CodeFormatter />;
+            case 'color-converter': return <ColorConverter />;
             case 'regexp': return <RegExpTester />;
             case 'cron': return <CronJobParser />;
             case 'diff': return <TextDiffChecker />;
