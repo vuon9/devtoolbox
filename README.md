@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev)
 
-A modern, all-in-one desktop application for developers featuring 45+ utilities for encoding, encryption, hashing, escaping, and data format conversions.
+Essential software development tools for everyday tasks.
 
 <img width="1564" height="934" alt="image" src="https://github.com/user-attachments/assets/d3082042-b657-409d-8179-9941269db8d4" />
 
