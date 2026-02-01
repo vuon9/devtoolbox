@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { InlineNotification } from '@carbon/react';
-import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../../components/ToolUI';
+import { ToolHeader, ToolControls, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../../components/ToolUI';
+import useLayoutToggle from '../../hooks/useLayoutToggle';
 import { Backend } from '../../utils/backendBridge';
 import { initialState, reducer } from './constants';
 import GeneratorControls from './components/GeneratorControls';
@@ -9,6 +10,13 @@ import HelpModal from './components/HelpModal';
 
 export default function DataGenerator() {
     const [state, dispatch] = React.useReducer(reducer, initialState);
+
+    const layout = useLayoutToggle({
+        toolKey: 'data-generator-layout',
+        defaultDirection: 'horizontal',
+        showToggle: true,
+        persist: true
+    });
 
     // Load presets on mount
     useEffect(() => {
@@ -131,6 +139,13 @@ export default function DataGenerator() {
                     onPresetChange={handlePresetChange}
                     onGenerate={handleGenerate}
                 />
+                <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+                    <ToolLayoutToggle
+                        direction={layout.direction}
+                        onToggle={layout.toggleDirection}
+                        position="controls"
+                    />
+                </div>
             </ToolControls>
 
             <VariableControls
@@ -139,7 +154,7 @@ export default function DataGenerator() {
                 onChange={handleVariableChange}
             />
 
-            <ToolSplitPane>
+            <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
                 <ToolPane
                     label="Template"
                     value={state.template}

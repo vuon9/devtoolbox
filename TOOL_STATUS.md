@@ -26,59 +26,6 @@ This document tracks the refactoring and development status of each tool compone
 | **TextDiffChecker** | 🟡 In Progress | Refactored with enhanced features. Features: Diff mode switcher (Lines/Words/Chars), auto-compare on input change, Clear button, improved diff view with color coding, layout toggle. | Updated 2026-01-31 |
 | **UnixTimeConverter** | 🟡 In Progress | Refactored with new features. Features: Relative time display (e.g., "2 hours ago"), split-pane layout (ISO 8601 / Local), "Now" button with icon, layout toggle, auto-initialization with current time. | Updated 2026-01-31 |
 
-### Removed Tools (Consolidated)
-
-| Tool | Replacement | Reason |
-|------|-------------|--------|
-| JsonFormatter | CodeFormatter | Unified formatting tool |
-| SqlFormatter | CodeFormatter | Unified formatting tool |
-| UrlTools | TextConverter | URL encode/decode functionality |
-| UrlParser | TextConverter | URL parsing functionality |
-| UrlEncoder | TextConverter | URL encoding functionality |
-| PhpSerializer | - | Removed - low usage |
-| PhpJsonConverter | - | Removed - low usage |
-| LineSortDedupe | StringUtilities | Consolidated into StringUtilities |
-| StringCaseConverter | StringUtilities | Consolidated into StringUtilities |
-| StringInspector | StringUtilities | Consolidated into StringUtilities |
-| NumberBaseConverter | NumberConverter | Renamed and refactored |
-| TextBasedConverter | TextConverter | Renamed for clarity |
-
----
-
-## Final Tool Count: 11 Tools
-
-1. **Text Converter** - Encoding, encryption, hashing, escaping
-2. **String Utilities** - Sort/Dedupe, Case conversion, Inspector
-3. **Number Converter** - Decimal, Hex, Octal, Binary conversions
-4. **Unix Time Converter** - Timestamp conversions with relative time
-5. **JWT Debugger** - JWT encode/decode/verify
-6. **RegExp Tester** - Regular expression testing
-7. **Cron Job Parser** - Cron expression parsing
-8. **Text Diff Checker** - Text comparison
-9. **Code Formatter** - JSON, XML, HTML, SQL, CSS, JS formatting
-10. **Barcode Generator** - QR codes and barcodes
-11. **Data Generator** - Mock data generation
-
----
-
-## Refactoring Checklist
-
-When refactoring a tool, ensure:
-
-- [x] Uses **Carbon Design System** components (`@carbon/react`)
-- [x] All colors use `var(--cds-*)` tokens, no hardcoded hex values
-- [x] Implements **useReducer** for state management (not multiple useState hooks)
-- [x] Uses **useCallback** for memoized functions
-- [x] Follows **DRY principle** - no duplicated components/logic
-- [x] Has proper **ToolHeader** with title and description
-- [x] Input/Output panes are symmetrical and use **Carbon TextArea**
-- [x] All buttons properly spaced (gap: 1rem)
-- [x] Copy buttons present on all output/data panes
-- [x] Monospace font for data (`'IBM Plex Mono', monospace`)
-- [x] Proper flex layout for responsive sizing
-- [x] No unused imports or variables
-- [x] Code compiles without errors or warnings
-
 ---
 
 ## How to Update This File
