@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useReducer } from 'react';
 import { Button, TextInput, Tile, Tabs, TabList, Tab, TabPanels, TabPanel, Tag } from '@carbon/react';
-import { Eyewash, Copy, ColorPalette, Undo, TrashCan } from '@carbon/icons-react';
+import { Eyewash, Copy, ColorPalette, TrashCan } from '@carbon/icons-react';
 import { ToolHeader, ToolControls } from '../components/ToolUI';
 
 // Color utility functions
@@ -401,9 +401,9 @@ export default function ColorConverter() {
                 description="Pick colors and generate code snippets for multiple programming languages." 
             />
 
-            <ToolControls style={{ flexWrap: 'nowrap' }}>
+            <ToolControls>
                 {/* Color Preview & Picker */}
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'nowrap' }}>
                     <div style={{
                         width: '80px',
                         height: '80px',
