@@ -7,8 +7,7 @@
 
 A modern, all-in-one desktop application for developers featuring 45+ utilities for encoding, encryption, hashing, escaping, and data format conversions.
 
-<img width="1462" height="894" alt="image" src="https://github.com/user-attachments/assets/fd82c884-203d-44e0-a29d-a9f769eba33a" />
-
+<img width="1564" height="934" alt="image" src="https://github.com/user-attachments/assets/d3082042-b657-409d-8179-9941269db8d4" />
 
 ## Features
 
