@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Button, Select, SelectItem, TextInput, IconButton } from '@carbon/react';
 import { Code, TrashCan, Close } from '@carbon/icons-react';
-import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../../components/ToolUI';
+import { ToolHeader, ToolControls, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../../components/ToolUI';
+import useLayoutToggle from '../../hooks/useLayoutToggle';
 import { Backend } from '../../utils/backendBridge';
 
 const FORMATTERS = [
@@ -38,6 +39,13 @@ export default function CodeFormatter() {
     const [filter, setFilter] = useState(persisted?.filter || '');
     const [error, setError] = useState(null);
     const [isMinified, setIsMinified] = useState(false);
+
+    const layout = useLayoutToggle({
+        toolKey: 'code-formatter-layout',
+        defaultDirection: 'horizontal',
+        showToggle: true,
+        persist: true
+    });
 
     // Persist state
     useEffect(() => {
@@ -206,6 +214,14 @@ export default function CodeFormatter() {
                     <Button onClick={minify} kind="secondary" size='md'>
                         Minify
                     </Button>
+
+                    <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+                        <ToolLayoutToggle
+                            direction={layout.direction}
+                            onToggle={layout.toggleDirection}
+                            position="controls"
+                        />
+                    </div>
                 </div>
             </ToolControls>
 
@@ -221,7 +237,7 @@ export default function CodeFormatter() {
                 </div>
             )}
 
-            <ToolSplitPane>
+            <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
                 <ToolPane
                     label="Input"
                     value={input}

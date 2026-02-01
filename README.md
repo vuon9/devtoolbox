@@ -41,13 +41,10 @@ The central hub with 45+ algorithms across 5 categories:
 | **Code Formatter** | Format and minify JSON, XML, HTML, SQL, CSS, and JavaScript with advanced filtering support (jq for JSON, XPath for XML, CSS selectors for HTML) |
 | **RegExp Tester** | Test regular expressions with real-time matching |
 | **Unix Time Converter** | Convert between Unix timestamps and human-readable dates |
-| **String Case Converter** | Convert between camelCase, snake_case, PascalCase, etc. |
+| **String Utilities** | Sort/Dedupe lines, Case conversion (camelCase, snake_case, etc.), String Inspector |
 | **Cron Job Parser** | Parse and explain cron expressions |
 | **Text Diff Checker** | Compare two text blocks and highlight differences |
-| **Line Sort / Dedupe** | Sort lines, remove duplicates, trim whitespace |
-| **String Inspector** | Count characters, words, lines, bytes, and sentences |
-| **PHP Serializer** | PHP serialization/unserialization |
-| **URL Tools** | Parse URLs, extract components |
+| **Number Converter** | Convert between Decimal, Hex, Octal, and Binary |
 
 ## Installation
 
@@ -62,7 +59,7 @@ Download the latest release for your platform from the [Releases](https://github
 ### Build from Source
 
 **Prerequisites:**
-- Node.js (>= 18)
+- Bun (>= 1.0) - Required for frontend dependencies
 - Go (>= 1.22)
 - Wails CLI: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
 
