@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useReducer, useMemo, useRef } from 'react';
-import { Button, TextInput, Tile, Tabs, TabList, Tab, TabPanels, TabPanel, Tag } from '@carbon/react';
+import { Button, TextInput, Tile, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { Eyedropper, Copy, ColorPalette, TrashCan } from '@carbon/icons-react';
-import { ToolHeader, ToolControls, ToolSplitPane, ToolLayoutToggle } from '../components/ToolUI';
+import { ToolHeader, ToolControls, ToolLayoutToggle } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
 
 // Color utility functions
@@ -343,10 +343,12 @@ export default function ColorConverter() {
 
     // Handle RGB input changes
     const handleRgbChange = useCallback((key, value) => {
-        const numValue = parseInt(value, 10) || 0;
+        const numValue = key === 'a'
+            ? parseFloat(value) || 0  // Preserve decimal for alpha
+            : parseInt(value, 10) || 0;
         const newRgb = { ...rgbInputs, [key]: numValue };
         setRgbInputs(newRgb);
-        
+
         if (key === 'a') {
             updateFromRgb(newRgb.r, newRgb.g, newRgb.b, numValue);
         } else {
