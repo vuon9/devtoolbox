@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback, useReducer } from 'react';
+import React, { useState, useEffect, useCallback, useReducer, useMemo } from 'react';
 import { Button, TextInput, Tile, Tabs, TabList, Tab, TabPanels, TabPanel, Tag } from '@carbon/react';
-import { Eyewash, Copy, ColorPalette, TrashCan } from '@carbon/icons-react';
-import { ToolHeader, ToolControls } from '../components/ToolUI';
+import { Eyedropper, Copy, ColorPalette, TrashCan } from '@carbon/icons-react';
+import { ToolHeader, ToolControls, ToolSplitPane, ToolLayoutToggle } from '../components/ToolUI';
+import useLayoutToggle from '../hooks/useLayoutToggle';
 
 // Color utility functions
 const hexToRgb = (hex) => {
@@ -211,7 +212,6 @@ const initialState = {
     hsl: { h: 191, s: 90, l: 60 },
     hsv: { h: 191, s: 75, v: 96 },
     cmyk: { c: 75, m: 13, y: 0, k: 4 },
-    inputMode: 'hex',
     history: [],
     selectedTab: 0
 };
@@ -227,8 +227,6 @@ function colorReducer(state, action) {
                     ? state.history
                     : [{ hex: action.payload.hex, rgb: action.payload.rgb }, ...state.history].slice(0, 10)
             };
-        case 'SET_INPUT_MODE':
-            return { ...state, inputMode: action.payload };
         case 'SET_SELECTED_TAB':
             return { ...state, selectedTab: action.payload };
         case 'CLEAR_HISTORY':
@@ -245,23 +243,30 @@ export default function ColorConverter() {
     const [hexInput, setHexInput] = useState(initialState.hex);
     const [rgbInputs, setRgbInputs] = useState(initialState.rgb);
     const [hslInputs, setHslInputs] = useState(initialState.hsl);
-    const [codeSnippets, setCodeSnippets] = useState({});
     const [eyedropperSupported, setEyedropperSupported] = useState(false);
     const [isPicking, setIsPicking] = useState(false);
+
+    // Layout toggle support
+    const layout = useLayoutToggle({
+        toolKey: 'color-converter-layout',
+        defaultDirection: 'horizontal',
+        showToggle: true,
+        persist: true
+    });
 
     // Check for EyeDropper API support
     useEffect(() => {
         setEyedropperSupported('EyeDropper' in window);
     }, []);
 
-    // Update code snippets when color changes
-    useEffect(() => {
-        const snippets = generateCodeSnippets(
+    // Generate code snippets when color changes
+    const codeSnippets = useMemo(() => 
+        generateCodeSnippets(
             state.rgb.r, state.rgb.g, state.rgb.b, state.rgb.a,
             state.hsl, state.hsv
-        );
-        setCodeSnippets(snippets);
-    }, [state.rgb, state.hsl, state.hsv]);
+        ),
+        [state.rgb, state.hsl, state.hsv]
+    );
 
     // Update all color formats from RGB
     const updateFromRgb = useCallback((r, g, b, a = 1) => {
@@ -401,7 +406,7 @@ export default function ColorConverter() {
                 description="Pick colors and generate code snippets for multiple programming languages." 
             />
 
-            <ToolControls>
+            <ToolControls style={{ flexWrap: 'nowrap' }}>
                 {/* Color Preview & Picker */}
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'nowrap' }}>
                     <div style={{
@@ -561,6 +566,15 @@ export default function ColorConverter() {
                         </div>
                     </div>
                 </div>
+                
+                {/* Layout Toggle */}
+                <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+                    <ToolLayoutToggle
+                        direction={layout.direction}
+                        onToggle={layout.toggleDirection}
+                        position="controls"
+                    />
+                </div>
             </ToolControls>
 
             {/* Format Tags */}
@@ -573,11 +587,18 @@ export default function ColorConverter() {
             </div>
 
             {/* Main Content Area */}
-            <div style={{ display: 'flex', gap: '1rem', flex: 1, minHeight: 0 }}>
+            <div style={{ 
+                display: 'flex', 
+                gap: '1rem', 
+                flex: 1, 
+                minHeight: 0,
+                flexDirection: layout.direction === 'horizontal' ? 'row' : 'column'
+            }}>
                 {/* Color History */}
                 {state.history.length > 0 && (
                     <div style={{ 
-                        width: '200px', 
+                        width: layout.direction === 'horizontal' ? '200px' : '100%',
+                        minWidth: layout.direction === 'horizontal' ? '200px' : 'auto',
                         display: 'flex', 
                         flexDirection: 'column',
                         border: '1px solid var(--cds-border-strong)',
