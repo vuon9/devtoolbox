@@ -400,7 +400,7 @@ export default function ColorConverter() {
     ];
 
     return (
-        <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflow: 'hidden' }}>
             <ToolHeader 
                 title="Color Converter" 
                 description="Pick colors and generate code snippets for multiple programming languages." 
