@@ -3,25 +3,28 @@ package wails
 import (
 	"context"
 
-	"dev-toolbox/internal/datagenerator"
+	"devtoolbox/internal/datagenerator"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 // DataGeneratorService provides data generation functionality via Wails
 type DataGeneratorService struct {
-	ctx context.Context
+	app *application.App
 	svc datagenerator.DataGeneratorService
 }
 
 // NewDataGeneratorService creates a new DataGeneratorService
-func NewDataGeneratorService() *DataGeneratorService {
+func NewDataGeneratorService(app *application.App) *DataGeneratorService {
 	return &DataGeneratorService{
 		svc: datagenerator.NewDataGeneratorService(),
+		app: app,
 	}
 }
 
 // Startup is called when the service starts
-func (d *DataGeneratorService) Startup(ctx context.Context) {
-	d.ctx = ctx
+func (d *DataGeneratorService) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
+	return nil
 }
 
 // Generate generates data based on the provided request

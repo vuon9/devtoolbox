@@ -2,28 +2,30 @@ package wails
 
 import (
 	"context"
-	"dev-toolbox/internal/jwt"
 	"encoding/json"
+
+	"devtoolbox/internal/jwt"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 // JWTService is the Wails binding struct for JWT operations
 type JWTService struct {
-	ctx context.Context
 	svc jwt.JWTService
+	app *application.App
 }
 
 // NewJWTService creates a new JWTService instance
-func NewJWTService() *JWTService {
-	parser := jwt.NewParser()
-	svc := jwt.NewJWTService(parser)
+func NewJWTService(app *application.App) *JWTService {
 	return &JWTService{
-		svc: svc,
+		svc: jwt.NewJWTService(jwt.NewParser()),
+		app: app,
 	}
 }
 
-// Startup is called when the app starts (Wails lifecycle)
-func (j *JWTService) Startup(ctx context.Context) {
-	j.ctx = ctx
+// ServiceStartup is called when the app starts (Wails lifecycle)
+func (j *JWTService) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
+	return nil
 }
 
 // Decode decodes a JWT token

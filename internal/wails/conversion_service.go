@@ -2,22 +2,26 @@ package wails
 
 import (
 	"context"
-	"dev-toolbox/internal/converter"
+
+	"devtoolbox/internal/converter"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 type ConversionService struct {
-	ctx context.Context
+	app *application.App
 	svc converter.ConverterService
 }
 
-func NewConversionService() *ConversionService {
+func NewConversionService(app *application.App) *ConversionService {
 	return &ConversionService{
 		svc: converter.NewConverterService(),
+		app: app,
 	}
 }
 
-func (s *ConversionService) Startup(ctx context.Context) {
-	s.ctx = ctx
+func (s *ConversionService) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
+	return nil
 }
 
 func (s *ConversionService) Convert(input, category, method string, config map[string]interface{}) (string, error) {

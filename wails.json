@@ -1,14 +1,10 @@
 {
-  "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "dev-toolbox",
-  "outputfilename": "dev-toolbox",
-  "frontend:install": "bun install",
-  "frontend:build": "bun run build",
-  "frontend:dev:watcher": "bun run dev",
-  "frontend:dev:serverUrl": "auto",
-  "frontend:dir": ".",
-  "author": {
-    "name": "Vuong",
-    "email": "3168632+vuon9@users.noreply.github.com"
+  "name": "DevToolbox",
+  "frontend": {
+    "dir": "./frontend",
+    "install": "bun install",
+    "build": "bun run build",
+    "dev": "bun run dev",
+    "devServerUrl": "http://localhost:5173"
   }
 }

@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	sharedErrors "dev-toolbox/pkg/errors"
+	sharedErrors "devtoolbox/pkg/errors"
 )
 
 // JWTError represents a JWT-specific error

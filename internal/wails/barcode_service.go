@@ -12,18 +12,21 @@ import (
 	"github.com/boombuler/barcode/code39"
 	"github.com/boombuler/barcode/ean"
 	"github.com/skip2/go-qrcode"
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 type BarcodeService struct {
-	ctx context.Context
+	app *application.App
 }
 
-func NewBarcodeService() *BarcodeService {
-	return &BarcodeService{}
+func NewBarcodeService(app *application.App) *BarcodeService {
+	return &BarcodeService{
+		app: app,
+	}
 }
 
-func (s *BarcodeService) Startup(ctx context.Context) {
-	s.ctx = ctx
+func (s *BarcodeService) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
+	return nil
 }
 
 // GenerateBarcodeRequest represents the request to generate a barcode

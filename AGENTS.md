@@ -281,8 +281,8 @@ func TestDecode(t *testing.T) {
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/vuon9/dev-toolbox.git
-cd dev-toolbox
+git clone https://github.com/vuon9/devtoolbox.git
+cd devtoolbox
 
 # Install dependencies (using Bun)
 bun install
@@ -482,7 +482,7 @@ These guidelines are intended for AI assistants (like opencode) working on this 
 1. **Run linting & formatting** – Execute any available lint/format commands (see section 8).
 2. **Test the tool** – Verify functionality with `wails dev`.
 3. **Update `TOOL_STATUS.md`** – Update the tool's status and add completion notes (mark as 🟢 Done when complete).
-4. **Update `README.md`** – **REQUIRED: Whenever TOOL_STATUS.md is updated, README.md MUST also be updated to ensure consistency**: 
+4. **Update `README.md`** – **REQUIRED: Whenever TOOL_STATUS.md is updated, README.md MUST also be updated to ensure consistency**:
    - Add new tools to the feature table
    - Remove deprecated tools
    - Update descriptions if features changed

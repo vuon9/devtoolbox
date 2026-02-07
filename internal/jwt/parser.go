@@ -1,9 +1,10 @@
 package jwt
 
 import (
-	"dev-toolbox/pkg/encoding"
-	"dev-toolbox/pkg/validation"
 	"strings"
+
+	"devtoolbox/pkg/encoding"
+	"devtoolbox/pkg/validation"
 
 	"github.com/golang-jwt/jwt/v5"
 )
