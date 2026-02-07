@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button } from '@carbon/react';
-import { ArrowsHorizontal } from '@carbon/icons-react';
 import { ToolHeader, ToolPane, ToolSplitPane } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
-import { Backend } from '../../utils/backendBridge';
 import ConversionControls from './components/ConversionControls';
 import ConfigurationPane from './components/ConfigurationPane';
 import MultiHashOutput from './components/MultiHashOutput';
@@ -20,6 +17,7 @@ import {
     PLACEHOLDERS,
     LAYOUT
 } from './strings';
+import { ConversionService } from '../../../bindings/devtoolbox/internal/wails';
 
 export default function TextBasedConverter() {
     // Persistent state initialization
@@ -93,14 +91,14 @@ export default function TextBasedConverter() {
     // Add current selection to quick actions
     const addCurrentToQuickActions = useCallback(() => {
         if (isCurrentInQuickActions()) return;
-        
+
         const newTag = {
             id: `${category}-${method}`.toLowerCase().replace(/[^a-z0-9]/g, '-'),
             category,
             method,
             label: `${category} - ${method}`
         };
-        
+
         setCustomTags(prev => [...prev, newTag]);
     }, [category, method, isCurrentInQuickActions]);
 
@@ -128,7 +126,7 @@ export default function TextBasedConverter() {
         try {
             // Include subMode in backend request
             const backendConfig = { ...cfg, subMode: sub };
-            const result = await Backend.ConversionService.Convert(text, cat, meth, backendConfig);
+            const result = await ConversionService.Convert(text, cat, meth, backendConfig);
             setOutput(result);
             setError('');
         } catch (err) {

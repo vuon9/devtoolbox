@@ -6,7 +6,7 @@ import { Button } from '@carbon/react';
 import { MagicWand } from '@carbon/icons-react';
 import { EXAMPLE_SECRET } from '../jwtUtils';
 import React, { useCallback } from 'react';
-import { Backend } from '../../../utils/backendBridge';
+import { JWTService } from '../../../../bindings/devtoolbox/internal/wails';
 
 export default function JwtDecode({ state, dispatch, layout, verifySignature }) {
     // Tab change handlers
@@ -23,7 +23,7 @@ export default function JwtDecode({ state, dispatch, layout, verifySignature }) 
         };
 
         try {
-            const response = await Backend.JWTService.Encode(
+            const response = await JWTService.Encode(
                 JSON.stringify(header),
                 JSON.stringify(payload),
                 'HS256',

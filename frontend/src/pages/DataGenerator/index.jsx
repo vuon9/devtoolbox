@@ -2,11 +2,11 @@ import React, { useEffect, useCallback } from 'react';
 import { InlineNotification } from '@carbon/react';
 import { ToolHeader, ToolControls, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
-import { Backend } from '../../utils/backendBridge';
 import { initialState, reducer } from './constants';
 import GeneratorControls from './components/GeneratorControls';
 import VariableControls from './components/VariableControls';
 import HelpModal from './components/HelpModal';
+import { DataGeneratorService } from '../../../bindings/devtoolbox/internal/wails';
 
 export default function DataGenerator() {
     const [state, dispatch] = React.useReducer(reducer, initialState);
@@ -22,24 +22,24 @@ export default function DataGenerator() {
     useEffect(() => {
         const loadPresets = async () => {
             try {
-                const response = await Backend.DataGeneratorService.GetPresets();
+                const response = await DataGeneratorService.GetPresets();
                 console.log('GetPresets response:', response);
-                
+
                 const presets = response.presets || response;
-                
+
                 if (presets && Array.isArray(presets) && presets.length > 0) {
                     dispatch({ type: 'SET_PRESETS', payload: presets });
-                    
+
                     const defaultVars = {};
                     if (presets[0].variables && Array.isArray(presets[0].variables)) {
                         presets[0].variables.forEach(v => {
                             defaultVars[v.name] = v.default;
                         });
                     }
-                    
-                    dispatch({ 
-                        type: 'SELECT_PRESET', 
-                        payload: { 
+
+                    dispatch({
+                        type: 'SELECT_PRESET',
+                        payload: {
                             id: presets[0].id,
                             template: presets[0].template,
                             defaultVars
@@ -64,9 +64,9 @@ export default function DataGenerator() {
             preset.variables.forEach(v => {
                 defaultVars[v.name] = v.default;
             });
-            dispatch({ 
-                type: 'SELECT_PRESET', 
-                payload: { 
+            dispatch({
+                type: 'SELECT_PRESET',
+                payload: {
                     id: preset.id,
                     template: preset.template,
                     defaultVars
@@ -94,7 +94,7 @@ export default function DataGenerator() {
                 separator: state.separator === 'custom' ? state.customSeparator : state.separator
             };
 
-            const response = await Backend.DataGeneratorService.Generate(request);
+            const response = await DataGeneratorService.Generate(request);
 
             if (response.error) {
                 dispatch({ type: 'SET_ERROR', payload: response.error });
@@ -116,8 +116,8 @@ export default function DataGenerator() {
 
     return (
         <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
-            <ToolHeader 
-                title="Data Generator" 
+            <ToolHeader
+                title="Data Generator"
                 description="Generate mock data with templates using Faker library"
             />
 

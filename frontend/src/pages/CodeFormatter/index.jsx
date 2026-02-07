@@ -3,7 +3,7 @@ import { Button, Select, SelectItem, TextInput, IconButton } from '@carbon/react
 import { Code, TrashCan, Close } from '@carbon/icons-react';
 import { ToolHeader, ToolControls, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
-import { Backend } from '../../utils/backendBridge';
+import { CodeFormatterService } from '../../../bindings/devtoolbox/internal/wails';
 
 const FORMATTERS = [
     { id: 'json', name: 'JSON', supportsFilter: true, filterPlaceholder: '.users[] | select(.age > 18) | .name' },
@@ -67,7 +67,7 @@ export default function CodeFormatter() {
         }
 
         try {
-            const result = await Backend.CodeFormatterService.Format({
+            const result = await CodeFormatterService.Format({
                 input,
                 formatType,
                 filter: undefined,
@@ -100,7 +100,7 @@ export default function CodeFormatter() {
         }
 
         try {
-            const result = await Backend.CodeFormatterService.Format({
+            const result = await CodeFormatterService.Format({
                 input,
                 formatType,
                 filter: undefined,
@@ -135,7 +135,7 @@ export default function CodeFormatter() {
         }
 
         try {
-            const result = await Backend.CodeFormatterService.Format({
+            const result = await CodeFormatterService.Format({
                 input: formattedOutput, // Always use formatted output as source
                 formatType,
                 filter: filter.trim(),

@@ -6,7 +6,7 @@ import { jwtReducer, initialState, actions } from './jwtReducer';
 import ModeTabBar from './components/ModeTabBar';
 import JwtDecode from './components/JwtDecode';
 import JwtEncode from './components/JwtEncode';
-import { Backend } from '../../utils/backendBridge';
+import { JWTService } from '../../../bindings/devtoolbox/internal/wails';
 
 export default function JwtDebugger() {
     const [state, dispatch] = useReducer(jwtReducer, initialState);
@@ -29,7 +29,7 @@ export default function JwtDebugger() {
         // Call Go backend for decoding
         const decodeToken = async () => {
             try {
-                const response = await Backend.JWTService.Decode(state.token);
+                const response = await JWTService.Decode(state.token);
 
                 dispatch(actions.setDecoded({
                     header: response.header,
@@ -66,7 +66,7 @@ export default function JwtDebugger() {
 
         try {
             // Call Go backend for verification
-            const response = await Backend.JWTService.Verify(state.token, state.secret, state.encoding);
+            const response = await JWTService.Verify(state.token, state.secret, state.encoding);
 
             dispatch(actions.setValidation(
                 response.error ? response.error : response.validationMessage,
@@ -85,7 +85,7 @@ export default function JwtDebugger() {
         }
 
         try {
-            const response = await Backend.JWTService.Encode(
+            const response = await JWTService.Encode(
                 state.headerInput,
                 state.payloadInput,
                 state.algorithm,

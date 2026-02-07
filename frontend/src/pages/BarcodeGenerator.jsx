@@ -3,7 +3,7 @@ import { Button, Dropdown, InlineLoading } from '@carbon/react';
 import { Renew, Download } from '@carbon/icons-react';
 import { ToolHeader, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
-import { Backend } from '../utils/backendBridge';
+import { BarcodeService } from '../../bindings/devtoolbox/internal/wails';
 
 const BARCODE_STANDARDS = [
   { value: 'QR', label: 'QR Code (2D)' },
@@ -157,7 +157,7 @@ export default function BarcodeGenerator() {
     setError('');
 
     try {
-      const response = await Backend.BarcodeService.GenerateBarcode({
+      const response = await BarcodeService.GenerateBarcode({
         content: content.trim(),
         standard,
         size,
