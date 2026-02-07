@@ -1,4 +1,4 @@
-name: pr-review
+name: PR Review
 
 on:
   pull_request:
@@ -6,6 +6,8 @@ on:
 
 jobs:
   review:
+    if: |
+      github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
       id-token: write

@@ -1,8 +1,11 @@
 build/bin
 frontend/node_modules
 frontend/dist
+.task
 devtoolbox
 vendor
 bin
 runtime-debug.js
 runtime.js
+.task/*
+/package.json

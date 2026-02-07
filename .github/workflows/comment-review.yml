@@ -1,4 +1,4 @@
-name: comment-review
+name: Comment Review
 
 on:
   issue_comment:
@@ -7,7 +7,7 @@ on:
     types: [created]
 
 jobs:
-  opencode:
+  comment_review:
     if: |
       contains(github.event.comment.body, ' /oc') ||
       startsWith(github.event.comment.body, '/oc') ||
