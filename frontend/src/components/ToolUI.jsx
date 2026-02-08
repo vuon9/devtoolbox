@@ -20,7 +20,6 @@ export function ToolControls({ children, style = {} }) {
     return (
         <div className="controls" style={{
             display: 'flex',
-            alignItems: 'flex-end',
             gap: '1rem',
             flexWrap: 'wrap',
             marginBottom: '1rem',

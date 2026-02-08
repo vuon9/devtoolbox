@@ -1,11 +1,11 @@
 import React from 'react';
-import { IconButton } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { SplitScreen, VerticalView } from '@carbon/icons-react';
 import { TOGGLE_POSITIONS } from './constants';
 
 /**
  * Layout toggle button for switching between horizontal and vertical layouts
- * 
+ *
  * @param {Object} props
  * @param {'horizontal'|'vertical'} props.direction - Current layout direction
  * @param {Function} props.onToggle - Callback when toggle is clicked
@@ -13,15 +13,15 @@ import { TOGGLE_POSITIONS } from './constants';
  * @param {boolean} [props.disabled=false] - Whether toggle is disabled
  * @param {Object} [props.style={}] - Additional styles
  */
-export default function ToolLayoutToggle({ 
-    direction, 
-    onToggle, 
+export default function ToolLayoutToggle({
+    direction,
+    onToggle,
     position = 'top-right',
     disabled = false,
     style = {}
 }) {
     const isHorizontal = direction === 'horizontal';
-    
+
     // Position styling based on position prop
     const positionStyles = {
         'top-right': {
@@ -43,25 +43,24 @@ export default function ToolLayoutToggle({
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }
     };
-    
+
     const containerStyle = {
         ...positionStyles[position] || positionStyles['top-right'],
         ...style
     };
-    
+
     return (
         <div style={containerStyle}>
-            <IconButton
+            <Button
                 kind="ghost"
                 size="sm"
-                label={isHorizontal ? "Switch to vertical layout" : "Switch to horizontal layout"}
+                renderIcon={isHorizontal ? VerticalView : SplitScreen}
                 iconDescription={isHorizontal ? "Vertical layout" : "Horizontal layout"}
-                align="bottom"
+                hasIconOnly
                 disabled={disabled}
                 onClick={onToggle}
-            >
-                {isHorizontal ? <VerticalView size={16} /> : <SplitScreen size={16} />}
-            </IconButton>
+                title={isHorizontal ? "Switch to vertical layout" : "Switch to horizontal layout"}
+            />
         </div>
     );
 }

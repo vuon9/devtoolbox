@@ -455,62 +455,64 @@ export default function ColorConverter() {
     ];
 
     return (
-        <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflow: 'hidden' }}>
+        <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
             <ToolHeader
                 title="Color Converter"
                 description="Pick colors and generate code snippets for multiple programming languages."
             />
 
-            <ToolControls style={{ flexWrap: 'nowrap' }}>
+            <ToolControls style={{ flexWrap: 'wrap', overflow: 'visible' }}>
                 {/* Color Preview & Picker */}
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <div style={{
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '8px',
-                            backgroundColor: state.hex,
-                            border: '2px solid var(--cds-border-strong)',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                            position: 'relative',
-                            overflow: 'hidden'
-                        }}>
-                            <input
-                                type="color"
-                                value={state.hex.startsWith('#') && state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex}
-                                onChange={handleColorPickerChange}
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    opacity: 0,
-                                    cursor: 'pointer'
-                                }}
-                            />
-                        </div>
+                    <div style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '8px',
+                        backgroundColor: state.hex,
+                        border: '2px solid var(--cds-border-strong)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}>
+                        <input
+                            type="color"
+                            value={state.hex.startsWith('#') && state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex}
+                            onChange={handleColorPickerChange}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                opacity: 0,
+                                cursor: 'pointer'
+                            }}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'stretch' }}>
                         <Button
                             size="sm"
                             kind="secondary"
                             renderIcon={ColorPalette}
                             onClick={generateRandomColor}
+                            style={{ minWidth: '150px' }}
                         >
                             Random
                         </Button>
-                    </div>
 
-                    {eyedropperSupported && (
-                        <Button
-                            size="sm"
-                            kind="primary"
-                            renderIcon={Eyedropper}
-                            onClick={openEyeDropper}
-                            disabled={isPicking}
-                        >
-                            {isPicking ? 'Picking...' : 'Pick Color'}
-                        </Button>
-                    )}
+                        {eyedropperSupported && (
+                            <Button
+                                size="sm"
+                                kind="primary"
+                                renderIcon={Eyedropper}
+                                onClick={openEyeDropper}
+                                disabled={isPicking}
+                                style={{ minWidth: '150px' }}
+                            >
+                                {isPicking ? 'Picking...' : 'Pick Color'}
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Input Controls */}
@@ -520,6 +522,8 @@ export default function ColorConverter() {
                         <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>HEX</label>
                         <TextInput
                             id="hex-input"
+                            labelText=""
+                            hideLabel={true}
                             value={hexInput}
                             onChange={(e) => handleHexChange(e.target.value)}
                             onBlur={handleHexBlur}
@@ -533,48 +537,48 @@ export default function ColorConverter() {
 
                     {/* RGB Inputs */}
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>R</label>
                             <NumberInput
                                 id="rgb-r"
-                                min="0"
-                                max="255"
+                                min={0}
+                                max={255}
                                 value={rgbInputs.r}
-                                onChange={(e) => handleRgbChange('r', e.target.value)}
+                                onChange={(e, { value }) => handleRgbChange('r', value)}
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>G</label>
                             <NumberInput
                                 id="rgb-g"
-                                min="0"
-                                max="255"
+                                min={0}
+                                max={255}
                                 value={rgbInputs.g}
-                                onChange={(e) => handleRgbChange('g', e.target.value)}
+                                onChange={(e, { value }) => handleRgbChange('g', value)}
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>B</label>
                             <NumberInput
                                 id="rgb-b"
-                                min="0"
-                                max="255"
+                                min={0}
+                                max={255}
                                 value={rgbInputs.b}
-                                onChange={(e) => handleRgbChange('b', e.target.value)}
+                                onChange={(e, { value }) => handleRgbChange('b', value)}
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>A</label>
                             <NumberInput
                                 id="rgb-a"
-                                min="0"
-                                max="1"
-                                step="0.1"
+                                min={0}
+                                max={1}
+                                step={0.1}
                                 value={rgbInputs.a}
-                                onChange={(e) => handleRgbChange('a', e.target.value)}
+                                onChange={(e, { value }) => handleRgbChange('a', value)}
                                 size="sm"
                             />
                         </div>
@@ -582,51 +586,53 @@ export default function ColorConverter() {
 
                     {/* HSL Inputs */}
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>H</label>
                             <NumberInput
                                 id="hsl-h"
-                                min="0"
-                                max="360"
+                                min={0}
+                                max={360}
                                 value={hslInputs.h}
-                                onChange={(e) => handleHslChange('h', e.target.value)}
+                                onChange={(e, { value }) => handleHslChange('h', value)}
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>S%</label>
                             <NumberInput
                                 id="hsl-s"
-                                min="0"
-                                max="100"
+                                min={0}
+                                max={100}
                                 value={hslInputs.s}
-                                onChange={(e) => handleHslChange('s', e.target.value)}
+                                onChange={(e, { value }) => handleHslChange('s', value)}
                                 size="sm"
                             />
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>L%</label>
                             <NumberInput
                                 id="hsl-l"
-                                min="0"
-                                max="100"
+                                min={0}
+                                max={100}
                                 value={hslInputs.l}
-                                onChange={(e) => handleHslChange('l', e.target.value)}
+                                onChange={(e, { value }) => handleHslChange('l', value)}
                                 size="sm"
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Layout Toggle */}
-                <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
-                    <ToolLayoutToggle
-                        direction={layout.direction}
-                        onToggle={layout.toggleDirection}
-                        position="controls"
-                    />
-                </div>
             </ToolControls>
+
+            {/* Layout Toggle - Moved outside ToolControls */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                <ToolLayoutToggle
+                    direction={layout.direction}
+                    onToggle={layout.toggleDirection}
+                    position="top-right"
+                    style={{ position: 'relative' }}
+                />
+            </div>
 
             {/* Format Values */}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem', alignItems: 'center' }}>
@@ -745,40 +751,120 @@ export default function ColorConverter() {
                 minHeight: 0,
                 flexDirection: layout.direction === 'horizontal' ? 'row' : 'column'
             }}>
-                {/* Color History */}
-                {state.history.length > 0 && (
+                {/* Code Snippets - 70% */}
+                <div style={{
+                    flex: layout.direction === 'horizontal' ? '0 0 70%' : '1',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: 0
+                }}>
+                    <Tabs
+                        selectedIndex={state.selectedTab}
+                        onChange={({ selectedIndex }) => dispatch({ type: 'SET_SELECTED_TAB', payload: selectedIndex })}
+                    >
+                        <TabList aria-label="Language tabs" contained style={{ overflowX: 'auto' }}>
+                            {languageTabs.map(tab => (
+                                <Tab key={tab.id}>{tab.label}</Tab>
+                            ))}
+                        </TabList>
+                        <TabPanels style={{ flex: 1, overflow: 'auto', maxHeight: '400px' }}>
+                            {languageTabs.map(tab => (
+                                <TabPanel key={tab.id} style={{ padding: '1rem 0', height: '350px', overflow: 'auto' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                        {(codeSnippets[tab.id] || []).map((snippet, idx) => (
+                                            <Tile key={idx} style={{
+                                                padding: '1rem',
+                                                backgroundColor: idx % 2 === 0 ? 'var(--cds-layer)' : 'var(--cds-layer-hover)'
+                                            }}>
+                                                <div style={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'flex-start',
+                                                    gap: '1rem',
+                                                    overflow: 'hidden'
+                                                }}>
+                                                    <Button
+                                                        hasIconOnly
+                                                        renderIcon={Copy}
+                                                        kind="ghost"
+                                                        size="sm"
+                                                        onClick={() => copyToClipboard(snippet.code)}
+                                                        iconDescription="Copy"
+                                                    />
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{
+                                                            fontSize: '0.75rem',
+                                                            color: 'var(--cds-text-secondary)',
+                                                            marginBottom: '0.5rem',
+                                                            textTransform: 'uppercase'
+                                                        }}>
+                                                            {snippet.name}
+                                                        </div>
+                                                        <pre style={{
+                                                            fontFamily: "'IBM Plex Mono', monospace",
+                                                            fontSize: '0.875rem',
+                                                            margin: 0,
+                                                            whiteSpace: 'pre-wrap',
+                                                            wordBreak: 'break-all',
+                                                            color: 'var(--cds-text-primary)',
+                                                            maxHeight: '200px',
+                                                            overflow: 'auto'
+                                                        }}>
+                                                            {snippet.code}
+                                                        </pre>
+                                                    </div>
+                                                </div>
+                                            </Tile>
+                                        ))}
+                                    </div>
+                                </TabPanel>
+                            ))}
+                        </TabPanels>
+                    </Tabs>
+                </div>
+
+                {/* Color History - 30% */}
+                <div style={{
+                    flex: layout.direction === 'horizontal' ? '0 0 29%' : '1',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    border: '.5px solid var(--cds-border-strong)',
+                    overflow: 'hidden'
+                }}>
                     <div style={{
-                        width: layout.direction === 'horizontal' ? '200px' : '100%',
-                        minWidth: layout.direction === 'horizontal' ? '200px' : 'auto',
+                        padding: '0.75rem',
+                        backgroundColor: 'var(--cds-layer)',
+                        borderBottom: '.5px solid var(--cds-border-strong)',
                         display: 'flex',
-                        flexDirection: 'column',
-                        border: '1px solid var(--cds-border-strong)',
-                        overflow: 'hidden'
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                     }}>
-                        <div style={{
-                            padding: '0.75rem',
-                            backgroundColor: 'var(--cds-layer)',
-                            borderBottom: '1px solid var(--cds-border-strong)',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}>
-                            <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>History</span>
-                            <Button
-                                hasIconOnly
-                                renderIcon={TrashCan}
-                                kind="ghost"
-                                size="sm"
-                                onClick={() => dispatch({ type: 'CLEAR_HISTORY' })}
-                                iconDescription="Clear history"
-                            />
-                        </div>
-                        <div style={{
-                            height: '350px',
-                            overflowY: 'auto',
-                            padding: '0.5rem'
-                        }}>
-                            {state.history.map((item, idx) => (
+                        <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>History</span>
+                        <Button
+                            hasIconOnly
+                            renderIcon={TrashCan}
+                            kind="ghost"
+                            size="sm"
+                            onClick={() => dispatch({ type: 'CLEAR_HISTORY' })}
+                            iconDescription="Clear history"
+                        />
+                    </div>
+                    <div style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        padding: '0.5rem'
+                    }}>
+                        {state.history.length === 0 ? (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '2rem 1rem',
+                                color: 'var(--cds-text-secondary)',
+                                fontSize: '0.875rem'
+                            }}>
+                                No colors in history
+                            </div>
+                        ) : (
+                            state.history.map((item, idx) => (
                                 <div
                                     key={idx}
                                     onClick={() => loadFromHistory(item)}
@@ -807,72 +893,9 @@ export default function ColorConverter() {
                                         {item.hex}
                                     </span>
                                 </div>
-                            ))}
-                        </div>
+                            ))
+                        )}
                     </div>
-                )}
-
-                {/* Code Snippets */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                    <Tabs
-                        selectedIndex={state.selectedTab}
-                        onChange={({ selectedIndex }) => dispatch({ type: 'SET_SELECTED_TAB', payload: selectedIndex })}
-                    >
-                        <TabList aria-label="Language tabs" contained style={{ overflowX: 'auto' }}>
-                            {languageTabs.map(tab => (
-                                <Tab key={tab.id}>{tab.label}</Tab>
-                            ))}
-                        </TabList>
-                        <TabPanels style={{ flex: 1, overflow: 'auto', maxHeight: '400px' }}>
-                            {languageTabs.map(tab => (
-                                <TabPanel key={tab.id} style={{ padding: '1rem 0', height: '350px', overflow: 'auto' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                        {(codeSnippets[tab.id] || []).map((snippet, idx) => (
-                                            <Tile key={idx} style={{ padding: '1rem' }}>
-                                                <div style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'flex-start',
-                                                    gap: '1rem'
-                                                }}>
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{
-                                                            fontSize: '0.75rem',
-                                                            color: 'var(--cds-text-secondary)',
-                                                            marginBottom: '0.5rem',
-                                                            textTransform: 'uppercase'
-                                                        }}>
-                                                            {snippet.name}
-                                                        </div>
-                                                        <pre style={{
-                                                            fontFamily: "'IBM Plex Mono', monospace",
-                                                            fontSize: '0.875rem',
-                                                            margin: 0,
-                                                            whiteSpace: 'pre-wrap',
-                                                            wordBreak: 'break-all',
-                                                            color: 'var(--cds-text-primary)',
-                                                            maxHeight: '200px',
-                                                            overflow: 'auto'
-                                                        }}>
-                                                            {snippet.code}
-                                                        </pre>
-                                                    </div>
-                                                    <Button
-                                                        hasIconOnly
-                                                        renderIcon={Copy}
-                                                        kind="ghost"
-                                                        size="sm"
-                                                        onClick={() => copyToClipboard(snippet.code)}
-                                                        iconDescription="Copy"
-                                                    />
-                                                </div>
-                                            </Tile>
-                                        ))}
-                                    </div>
-                                </TabPanel>
-                            ))}
-                        </TabPanels>
-                    </Tabs>
                 </div>
             </div>
         </div>

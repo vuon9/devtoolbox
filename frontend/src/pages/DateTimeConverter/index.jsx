@@ -221,7 +221,7 @@ export default function DateTimeConverter() {
     };
 
     return (
-        <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflow: 'auto' }}>
+        <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
             <ToolHeader
                 title="DateTime Converter"
                 description="Convert between timestamps and date formats. Supports Unix timestamps, ISO dates, and various formats."
