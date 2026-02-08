@@ -1,14 +1,10 @@
 name: Release
 
 on:
+  # Run on version tags (releases)
   push:
     tags:
       - "v*"
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   # Allow manual trigger
   workflow_dispatch:
 
