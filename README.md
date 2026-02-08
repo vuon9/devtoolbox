@@ -1,7 +1,7 @@
 # DevToolbox
 
-[![Tests & Build](https://github.com/vuon9/devtoolbox/actions/workflows/tests.yml/badge.svg)](https://github.com/vuon9/devtoolbox/actions/workflows/tests.yml)
-[![Wails Build](https://github.com/vuon9/devtoolbox/actions/workflows/build.yml/badge.svg)](https://github.com/vuon9/devtoolbox/actions/workflows/build.yml)
+[![Tests & Build](https://github.com/vuon9/devtoolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/vuon9/devtoolbox/actions/workflows/ci.yml)
+[![Wails Build](https://github.com/vuon9/devtoolbox/actions/workflows/release.yml/badge.svg)](https://github.com/vuon9/devtoolbox/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev)
 
