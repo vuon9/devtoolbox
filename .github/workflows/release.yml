@@ -59,21 +59,23 @@ jobs:
       - name: Install Wails CLI
         run: |
           go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+          GOPATH=$(go env GOPATH)
+          # Create 'wails' alias for 'wails3' for future compatibility
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            mv $(go env GOPATH)/bin/wails3.exe $(go env GOPATH)/bin/wails.exe
-            echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+            cp "$GOPATH/bin/wails3.exe" "$GOPATH/bin/wails.exe"
+            echo "$GOPATH/bin" >> $GITHUB_PATH
           elif [ "${{ matrix.os }}" = "macos-latest" ]; then
-            mv $(go env GOPATH)/bin/wails3 $(go env GOPATH)/bin/wails
-            echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+            ln -sf "$GOPATH/bin/wails3" "$GOPATH/bin/wails"
+            echo "$GOPATH/bin" >> $GITHUB_PATH
           else
-            sudo cp $(go env GOPATH)/bin/wails3 /usr/local/bin/wails
+            sudo ln -sf "$GOPATH/bin/wails3" /usr/local/bin/wails
           fi
         shell: bash
 
       - name: Build Application
         run: |
           if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-            wails build -platform ${{ matrix.platform }} -tags webkit2_41
+            wails build -platform ${{ matrix.platform }}
           elif [ "${{ matrix.os }}" = "macos-latest" ]; then
             # macOS: Build with code signing if certificates are available
             if [ -n "$MACOS_CERTIFICATE" ] && [ -n "$MACOS_CERTIFICATE_PASSWORD" ]; then
