@@ -1,15 +1,11 @@
 name: Release
 
 on:
-  # Only run on version tags (releases)
   push:
     tags:
       - "v*"
-  # TEMPORARY: Run on PR for testing build fixes
-  pull_request:
     branches:
       - main
-  # Allow manual trigger
   workflow_dispatch:
 
 env:
@@ -104,30 +100,6 @@ jobs:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
 
-      - name: Debug Build Output
-        run: |
-          echo "=== Current directory ==="
-          pwd
-          echo ""
-          echo "=== All files in current directory ==="
-          ls -la
-          echo ""
-          echo "=== Contents of bin/ directory ==="
-          ls -la bin/ 2>/dev/null || echo "bin/ directory not found"
-          echo ""
-          echo "=== Contents of build/bin/ directory ==="
-          ls -la build/bin/ 2>/dev/null || echo "build/bin/ directory not found"
-          echo ""
-          echo "=== Find all executables ==="
-          find . -type f \( -name "*.exe" -o -name "devtoolbox*" -o -perm /111 \) 2>/dev/null | head -20
-          echo ""
-          echo "=== Find all .app bundles ==="
-          find . -type d -name "*.app" 2>/dev/null | head -10
-          echo ""
-          echo "=== Find all bin directories ==="
-          find . -type d -name "bin" 2>/dev/null
-        shell: bash
-
       # Import macOS certificates for signing (optional - only if secrets are configured)
       - name: Import macOS Certificates
         if: matrix.os == 'macos-latest' && github.event_name != 'pull_request' && env.HAS_CERTS == 'true'
@@ -148,14 +120,14 @@ jobs:
           if [ -d "bin/$BINARY_NAME.app" ]; then
             # Create a zip for notarization
             ditto -c -k --keepParent "bin/$BINARY_NAME.app" "bin/devtoolbox.zip"
-            
+
             # Submit for notarization
             xcrun notarytool submit "bin/devtoolbox.zip" \
               --apple-id "${{ secrets.APPLE_ID }}" \
               --password "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" \
               --team-id "${{ secrets.APPLE_TEAM_ID }}" \
               --wait
-            
+
             # Staple the notarization ticket
             xcrun stapler staple "bin/$BINARY_NAME.app"
           else
@@ -171,17 +143,17 @@ jobs:
       - name: Package Artifacts
         run: |
           mkdir -p release
-          
+
           # Discover the actual binary name (DevToolbox, devtoolbox, etc.)
           BINARY_NAME=$(ls bin/ | grep -i "devtoolbox" | head -1)
           echo "Found binary: $BINARY_NAME"
-          
+
           if [ -z "$BINARY_NAME" ]; then
             echo "ERROR: Could not find devtoolbox binary in bin/"
             ls -la bin/
             exit 1
           fi
-          
+
           # Check if it's an .app bundle (macOS) or just a binary
           if [ -d "bin/$BINARY_NAME.app" ]; then
             # macOS with .app bundle
@@ -202,7 +174,7 @@ jobs:
             # Linux or macOS binary (no .app): create tar.gz
             tar -czf "release/DevToolbox.tar.gz" -C bin "$BINARY_NAME"
           fi
-          
+
           echo "=== Release contents ==="
           ls -la release/
         shell: bash
