@@ -1,4 +1,11 @@
 build/bin
-node_modules
-dist
-dev-toolbox
+frontend/node_modules
+frontend/dist
+.task
+devtoolbox
+vendor
+bin
+runtime-debug.js
+runtime.js
+.task/*
+/package.json

@@ -1,34 +1,46 @@
 package main
 
 import (
+	"devtoolbox/internal/barcode"
+	"devtoolbox/internal/codeformatter"
+	"devtoolbox/internal/datagenerator"
+	"devtoolbox/internal/datetimeconverter"
+	"devtoolbox/service"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
-
-	"dev-toolbox/internal/codeformatter"
-	"dev-toolbox/internal/datagenerator"
-	"dev-toolbox/internal/wails"
 )
+
+// TODO: Think of a way to expose this by Gin, so i can test it via Http client
 
 // Server represents the HTTP server for Web Mode
 type Server struct {
-	jwtService           *wails.JWTService
-	conversionService    *wails.ConversionService
-	barcodeService       *wails.BarcodeService
-	dataGeneratorService *wails.DataGeneratorService
-	codeFormatterService *wails.CodeFormatterService
+	jwtService           *service.JWTService
+	conversionService    *service.ConversionService
+	barcodeService       *service.BarcodeService
+	dataGeneratorService *service.DataGeneratorService
+	codeFormatterService *service.CodeFormatterService
+	dateTimeService      *service.DateTimeService
 }
 
 // NewServer creates a new Server instance
-func NewServer(jwtService *wails.JWTService, conversionService *wails.ConversionService, barcodeService *wails.BarcodeService, dataGeneratorService *wails.DataGeneratorService, codeFormatterService *wails.CodeFormatterService) *Server {
+func NewServer(
+	jwtService *service.JWTService,
+	conversionService *service.ConversionService,
+	barcodeService *service.BarcodeService,
+	dataGeneratorService *service.DataGeneratorService,
+	codeFormatterService *service.CodeFormatterService,
+	dateTimeService *service.DateTimeService,
+) *Server {
 	return &Server{
 		jwtService:           jwtService,
 		conversionService:    conversionService,
 		barcodeService:       barcodeService,
 		dataGeneratorService: dataGeneratorService,
 		codeFormatterService: codeFormatterService,
+		dateTimeService:      dateTimeService,
 	}
 }
 
@@ -90,6 +102,11 @@ func (s *Server) handleAPI(w http.ResponseWriter, r *http.Request) {
 
 	if service == "CodeFormatterService" {
 		s.handleCodeFormatterService(method, w, r)
+		return
+	}
+
+	if service == "DateTimeService" {
+		s.handleDateTimeService(method, w, r)
 		return
 	}
 
@@ -214,7 +231,7 @@ func (s *Server) handleBarcodeService(method string, w http.ResponseWriter, r *h
 			return
 		}
 
-		req := wails.GenerateBarcodeRequest{
+		req := barcode.GenerateBarcodeRequest{
 			Content:  getStringFromMap(reqData, "content"),
 			Standard: getStringFromMap(reqData, "standard"),
 			Size:     getIntFromMap(reqData, "size"),
@@ -370,6 +387,73 @@ func getBoolFromMap(m map[string]interface{}, key string) bool {
 		}
 	}
 	return false
+}
+
+func (s *Server) handleDateTimeService(method string, w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		Args []interface{} `json:"args"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	var result interface{}
+	var err error
+
+	switch method {
+	case "Convert":
+		if len(payload.Args) < 1 {
+			http.Error(w, "Missing arguments", http.StatusBadRequest)
+			return
+		}
+		reqData, ok := payload.Args[0].(map[string]interface{})
+		if !ok {
+			http.Error(w, "Invalid request format", http.StatusBadRequest)
+			return
+		}
+
+		req := datetimeconverter.ConvertRequest{
+			Input:        getStringFromMap(reqData, "input"),
+			Precision:    getStringFromMap(reqData, "precision"),
+			Timezone:     getStringFromMap(reqData, "timezone"),
+			OutputFormat: getStringFromMap(reqData, "outputFormat"),
+			CustomFormat: getStringFromMap(reqData, "customFormat"),
+		}
+		result, err = s.dateTimeService.Convert(req)
+	case "GetPresets":
+		result, err = s.dateTimeService.GetPresets()
+	case "CalculateDelta":
+		if len(payload.Args) < 1 {
+			http.Error(w, "Missing arguments", http.StatusBadRequest)
+			return
+		}
+		reqData, ok := payload.Args[0].(map[string]interface{})
+		if !ok {
+			http.Error(w, "Invalid request format", http.StatusBadRequest)
+			return
+		}
+
+		req := datetimeconverter.DeltaRequest{
+			DateA: getStringFromMap(reqData, "dateA"),
+			DateB: getStringFromMap(reqData, "dateB"),
+		}
+		result, err = s.dateTimeService.CalculateDelta(req)
+	case "GetAvailableTimezones":
+		result, err = s.dateTimeService.GetAvailableTimezones()
+	default:
+		http.Error(w, fmt.Sprintf("Method not found: %s", method), http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }
 
 func corsMiddleware(next http.Handler) http.Handler {

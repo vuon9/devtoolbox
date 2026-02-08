@@ -1,7 +1,7 @@
 # DevToolbox
 
-[![Tests & Build](https://github.com/vuon9/dev-toolbox/actions/workflows/tests.yml/badge.svg)](https://github.com/vuon9/dev-toolbox/actions/workflows/tests.yml)
-[![Wails Build](https://github.com/vuon9/dev-toolbox/actions/workflows/build.yml/badge.svg)](https://github.com/vuon9/dev-toolbox/actions/workflows/build.yml)
+[![Tests & Build](https://github.com/vuon9/devtoolbox/actions/workflows/tests.yml/badge.svg)](https://github.com/vuon9/devtoolbox/actions/workflows/tests.yml)
+[![Wails Build](https://github.com/vuon9/devtoolbox/actions/workflows/build.yml/badge.svg)](https://github.com/vuon9/devtoolbox/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev)
 
@@ -49,7 +49,7 @@ The central hub with 45+ algorithms across 5 categories:
 ## Installation
 
 ### Download Pre-built Binaries
-Download the latest release for your platform from the [Releases](https://github.com/your-org/dev-toolbox/releases) page.
+Download the latest release for your platform from the [Releases](https://github.com/vuon9/devtoolbox/releases) page.
 
 **Supported Platforms:**
 - Windows (x64)
@@ -66,8 +66,8 @@ Download the latest release for your platform from the [Releases](https://github
 **Build Steps:**
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/dev-toolbox.git
-cd dev-toolbox
+git clone https://github.com/your-org/devtoolbox.git
+cd devtoolbox
 
 # Install dependencies and build
 wails build
@@ -78,7 +78,7 @@ wails dev
 
 ## Installation
 
-Download the latest release for your platform from the [Releases](https://github.com/vuon9/dev-toolbox/releases) page.
+Download the latest release for your platform from the [Releases](https://github.com/vuon9/devtoolbox/releases) page.
 
 ### macOS
 
@@ -86,41 +86,41 @@ Download the latest release for your platform from the [Releases](https://github
 
 **To bypass the security warning:**
 
-1. Download the `dev-toolbox-macos.dmg` file
+1. Download the `devtoolbox-macos.dmg` file
 2. Open the DMG and drag the app to your Applications folder
 3. **First time only:** Open Terminal and run:
    ```bash
-   xattr -cr /Applications/dev-toolbox.app
+   xattr -cr /Applications/devtoolbox.app
    ```
    Or alternatively:
    - Go to **System Settings** → **Privacy & Security**
    - Scroll down to the "Security" section
-   - Click **"Open Anyway"** next to the message about "dev-toolbox"
+   - Click **"Open Anyway"** next to the message about "devtoolbox"
    - Click **"Open"** in the dialog that appears
 
 4. The app will now open normally
 
 ### Windows
 
-1. Download `dev-toolbox-windows.exe`
+1. Download `devtoolbox-windows.exe`
 2. Run the executable
 3. If Windows Defender shows a warning, click **"More info"** → **"Run anyway"**
 
 ### Linux
 
-1. Download `dev-toolbox-linux.tar.gz`
-2. Extract: `tar -xzf dev-toolbox-linux.tar.gz`
-3. Run: `./dev-toolbox`
+1. Download `devtoolbox-linux.tar.gz`
+2. Extract: `tar -xzf devtoolbox-linux.tar.gz`
+3. Run: `./devtoolbox`
 
 ## Key Features
 
-✅ **Works Offline** - All tools run locally, no internet connection required  
-✅ **Dark/Light Themes** - Switch between themes or use system preference  
-✅ **Pin Tools** - Pin frequently used tools to the top of the sidebar  
-✅ **Keyboard Shortcuts** - `Cmd/Ctrl + B` to toggle sidebar  
-✅ **Copy to Clipboard** - One-click copy buttons on all output fields  
-✅ **Auto-run** - See results instantly as you type (can be disabled)  
-✅ **Responsive Layout** - Horizontal or vertical split panes  
+✅ **Works Offline** - All tools run locally, no internet connection required
+✅ **Dark/Light Themes** - Switch between themes or use system preference
+✅ **Pin Tools** - Pin frequently used tools to the top of the sidebar
+✅ **Keyboard Shortcuts** - `Cmd/Ctrl + B` to toggle sidebar
+✅ **Copy to Clipboard** - One-click copy buttons on all output fields
+✅ **Auto-run** - See results instantly as you type (can be disabled)
+✅ **Responsive Layout** - Horizontal or vertical split panes
 
 ## UI Design
 
