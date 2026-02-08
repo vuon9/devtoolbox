@@ -1,4 +1,4 @@
-name: Release Build
+name: Release
 
 on:
   # Only run on version tags (releases)
@@ -49,14 +49,14 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install Wails
-        run: go install github.com/wailsapp/wails/v3/cmd/wails@latest
-
-      - name: Install Linux dependencies
+      - name: Install dependencies
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+          chmod +x $(go env GOPATH)/bin/wails3
+          sudo cp $(go env GOPATH)/bin/wails3 /usr/local/bin/wails
 
       - name: Build Application
         run: |
