@@ -5,6 +5,10 @@ on:
   push:
     tags:
       - "v*"
+  # TEMPORARY: Run on PR for testing build fixes
+  pull_request:
+    branches:
+      - main
   # Allow manual trigger
   workflow_dispatch:
 
