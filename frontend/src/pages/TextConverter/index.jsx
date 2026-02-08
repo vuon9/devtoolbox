@@ -17,7 +17,7 @@ import {
     PLACEHOLDERS,
     LAYOUT
 } from './strings';
-import { ConversionService } from '../../../bindings/devtoolbox/internal/wails';
+import { ConversionService } from '../../../bindings/devtoolbox/service';
 
 export default function TextBasedConverter() {
     // Persistent state initialization

@@ -1,10 +1,11 @@
 package main
 
 import (
+	"devtoolbox/internal/barcode"
 	"devtoolbox/internal/codeformatter"
 	"devtoolbox/internal/datagenerator"
 	"devtoolbox/internal/datetimeconverter"
-	"devtoolbox/internal/wails"
+	"devtoolbox/service"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -16,16 +17,23 @@ import (
 
 // Server represents the HTTP server for Web Mode
 type Server struct {
-	jwtService           *wails.JWTService
-	conversionService    *wails.ConversionService
-	barcodeService       *wails.BarcodeService
-	dataGeneratorService *wails.DataGeneratorService
-	codeFormatterService *wails.CodeFormatterService
-	dateTimeService      *wails.DateTimeService
+	jwtService           *service.JWTService
+	conversionService    *service.ConversionService
+	barcodeService       *service.BarcodeService
+	dataGeneratorService *service.DataGeneratorService
+	codeFormatterService *service.CodeFormatterService
+	dateTimeService      *service.DateTimeService
 }
 
 // NewServer creates a new Server instance
-func NewServer(jwtService *wails.JWTService, conversionService *wails.ConversionService, barcodeService *wails.BarcodeService, dataGeneratorService *wails.DataGeneratorService, codeFormatterService *wails.CodeFormatterService, dateTimeService *wails.DateTimeService) *Server {
+func NewServer(
+	jwtService *service.JWTService,
+	conversionService *service.ConversionService,
+	barcodeService *service.BarcodeService,
+	dataGeneratorService *service.DataGeneratorService,
+	codeFormatterService *service.CodeFormatterService,
+	dateTimeService *service.DateTimeService,
+) *Server {
 	return &Server{
 		jwtService:           jwtService,
 		conversionService:    conversionService,
@@ -223,7 +231,7 @@ func (s *Server) handleBarcodeService(method string, w http.ResponseWriter, r *h
 			return
 		}
 
-		req := wails.GenerateBarcodeRequest{
+		req := barcode.GenerateBarcodeRequest{
 			Content:  getStringFromMap(reqData, "content"),
 			Standard: getStringFromMap(reqData, "standard"),
 			Size:     getIntFromMap(reqData, "size"),

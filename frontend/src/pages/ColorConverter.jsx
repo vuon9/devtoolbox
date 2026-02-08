@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useReducer, useMemo, useRef } from 'react';
-import { Button, TextInput, Tile, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
+import { Button, TextInput, Tile, Tabs, TabList, Tab, TabPanels, TabPanel, NumberInput } from '@carbon/react';
 import { Eyedropper, Copy, ColorPalette, TrashCan } from '@carbon/icons-react';
 import { ToolHeader, ToolControls, ToolLayoutToggle } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
@@ -7,14 +7,14 @@ import useLayoutToggle from '../hooks/useLayoutToggle';
 // Color utility functions
 const hexToRgb = (hex) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})?$/i.exec(hex) ||
-                   /^#?([a-f\d])([a-f\d])([a-f\d])$/i.exec(hex);
+        /^#?([a-f\d])([a-f\d])([a-f\d])$/i.exec(hex);
     if (!result) return null;
-    
+
     const r = parseInt(result[1].length === 1 ? result[1] + result[1] : result[1], 16);
     const g = parseInt(result[2].length === 1 ? result[2] + result[2] : result[2], 16);
     const b = parseInt(result[3].length === 1 ? result[3] + result[3] : result[3], 16);
     const a = result[4] ? parseInt(result[4].length === 1 ? result[4] + result[4] : result[4], 16) / 255 : 1;
-    
+
     return { r, g, b, a };
 };
 
@@ -31,11 +31,11 @@ const rgbToHsl = (r, g, b) => {
     r /= 255;
     g /= 255;
     b /= 255;
-    
+
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
     let h, s, l = (max + min) / 2;
-    
+
     if (max === min) {
         h = s = 0;
     } else {
@@ -48,7 +48,7 @@ const rgbToHsl = (r, g, b) => {
         }
         h /= 6;
     }
-    
+
     return {
         h: Math.round(h * 360),
         s: Math.round(s * 100),
@@ -60,14 +60,14 @@ const rgbToHsv = (r, g, b) => {
     r /= 255;
     g /= 255;
     b /= 255;
-    
+
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
     let h, s, v = max;
-    
+
     const d = max - min;
     s = max === 0 ? 0 : d / max;
-    
+
     if (max === min) {
         h = 0;
     } else {
@@ -78,7 +78,7 @@ const rgbToHsv = (r, g, b) => {
         }
         h /= 6;
     }
-    
+
     return {
         h: Math.round(h * 360),
         s: Math.round(s * 100),
@@ -90,12 +90,12 @@ const rgbToCmyk = (r, g, b) => {
     r /= 255;
     g /= 255;
     b /= 255;
-    
+
     const k = 1 - Math.max(r, g, b);
     const c = k === 1 ? 0 : (1 - r - k) / (1 - k);
     const m = k === 1 ? 0 : (1 - g - k) / (1 - k);
     const y = k === 1 ? 0 : (1 - b - k) / (1 - k);
-    
+
     return {
         c: Math.round(c * 100),
         m: Math.round(m * 100),
@@ -113,7 +113,7 @@ const generateCodeSnippets = (r, g, b, a, hsl, hsv) => {
     const hue = hsl.h;
     const sat = hsv.s;
     const bright = hsv.v;
-    
+
     return {
         css: [
             { name: 'RGB', code: `rgb(${r} ${g} ${b})` },
@@ -124,25 +124,29 @@ const generateCodeSnippets = (r, g, b, a, hsl, hsv) => {
             { name: 'CSS Variable', code: `--color-primary: ${rgbToHex(r, g, b, a)};` }
         ],
         swift: [
-            { name: 'NSColor RGB', code: `NSColor(
+            {
+                name: 'NSColor RGB', code: `NSColor(
     calibratedRed: ${rf},
     green: ${gf},
     blue: ${bf},
     alpha: ${af}
 )` },
-            { name: 'NSColor HSB', code: `NSColor(
+            {
+                name: 'NSColor HSB', code: `NSColor(
     calibratedHue: ${hue / 360},
     saturation: ${(sat / 100).toFixed(3)},
     brightness: ${(bright / 100).toFixed(3)},
     alpha: ${af}
 )` },
-            { name: 'UIColor RGB', code: `UIColor(
+            {
+                name: 'UIColor RGB', code: `UIColor(
     red: ${rf},
     green: ${gf},
     blue: ${bf},
     alpha: ${af}
 )` },
-            { name: 'UIColor HSB', code: `UIColor(
+            {
+                name: 'UIColor HSB', code: `UIColor(
     hue: ${hue / 360},
     saturation: ${(sat / 100).toFixed(3)},
     brightness: ${(bright / 100).toFixed(3)},
@@ -189,7 +193,8 @@ const generateCodeSnippets = (r, g, b, a, hsl, hsv) => {
             { name: 'Hex String', code: `ColorUtility.TryParseHtmlString("${rgbToHex(r, g, b)}", out Color color)` }
         ],
         reactnative: [
-            { name: 'StyleSheet', code: `const styles = StyleSheet.create({
+            {
+                name: 'StyleSheet', code: `const styles = StyleSheet.create({
     container: {
         backgroundColor: '${rgbToHex(r, g, b)}',
     },
@@ -277,7 +282,7 @@ export default function ColorConverter() {
     }, []);
 
     // Generate code snippets when color changes
-    const codeSnippets = useMemo(() => 
+    const codeSnippets = useMemo(() =>
         generateCodeSnippets(
             state.rgb.r, state.rgb.g, state.rgb.b, state.rgb.a,
             state.hsl, state.hsv
@@ -306,7 +311,7 @@ export default function ColorConverter() {
         const hsl = rgbToHsl(r, g, b);
         const hsv = rgbToHsv(r, g, b);
         const cmyk = rgbToCmyk(r, g, b);
-        
+
         dispatch({
             type: 'SET_COLOR',
             payload: { hex, rgb: { r, g, b, a }, hsl, hsv, cmyk }
@@ -314,7 +319,7 @@ export default function ColorConverter() {
         setHexInput(hex);
         setRgbInputs({ r, g, b, a });
         setHslInputs(hsl);
-        
+
         // Debounce history recording
         debouncedAddToHistory(hex, { r, g, b, a });
     }, [debouncedAddToHistory]);
@@ -361,33 +366,33 @@ export default function ColorConverter() {
         const numValue = parseInt(value, 10) || 0;
         const newHsl = { ...hslInputs, [key]: numValue };
         setHslInputs(newHsl);
-        
+
         // Convert HSL to RGB
         const h = newHsl.h / 360;
         const s = newHsl.s / 100;
         const l = newHsl.l / 100;
-        
+
         let r, g, b;
-        
+
         if (s === 0) {
             r = g = b = l;
         } else {
             const hue2rgb = (p, q, t) => {
                 if (t < 0) t += 1;
                 if (t > 1) t -= 1;
-                if (t < 1/6) return p + (q - p) * 6 * t;
-                if (t < 1/2) return q;
-                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                if (t < 1 / 6) return p + (q - p) * 6 * t;
+                if (t < 1 / 2) return q;
+                if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
                 return p;
             };
-            
+
             const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
             const p = 2 * l - q;
-            r = hue2rgb(p, q, h + 1/3);
+            r = hue2rgb(p, q, h + 1 / 3);
             g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1/3);
+            b = hue2rgb(p, q, h - 1 / 3);
         }
-        
+
         updateFromRgb(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), state.rgb.a);
     }, [hslInputs, state.rgb.a, updateFromRgb]);
 
@@ -399,7 +404,7 @@ export default function ColorConverter() {
     // EyeDropper functionality
     const openEyeDropper = useCallback(async () => {
         if (!eyedropperSupported) return;
-        
+
         setIsPicking(true);
         try {
             const eyeDropper = new window.EyeDropper();
@@ -451,9 +456,9 @@ export default function ColorConverter() {
 
     return (
         <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflow: 'hidden' }}>
-            <ToolHeader 
-                title="Color Converter" 
-                description="Pick colors and generate code snippets for multiple programming languages." 
+            <ToolHeader
+                title="Color Converter"
+                description="Pick colors and generate code snippets for multiple programming languages."
             />
 
             <ToolControls style={{ flexWrap: 'nowrap' }}>
@@ -494,7 +499,7 @@ export default function ColorConverter() {
                             Random
                         </Button>
                     </div>
-                    
+
                     {eyedropperSupported && (
                         <Button
                             size="sm"
@@ -530,9 +535,8 @@ export default function ColorConverter() {
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>R</label>
-                            <TextInput
+                            <NumberInput
                                 id="rgb-r"
-                                type="number"
                                 min="0"
                                 max="255"
                                 value={rgbInputs.r}
@@ -542,9 +546,8 @@ export default function ColorConverter() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>G</label>
-                            <TextInput
+                            <NumberInput
                                 id="rgb-g"
-                                type="number"
                                 min="0"
                                 max="255"
                                 value={rgbInputs.g}
@@ -554,9 +557,8 @@ export default function ColorConverter() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>B</label>
-                            <TextInput
+                            <NumberInput
                                 id="rgb-b"
-                                type="number"
                                 min="0"
                                 max="255"
                                 value={rgbInputs.b}
@@ -566,9 +568,8 @@ export default function ColorConverter() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>A</label>
-                            <TextInput
+                            <NumberInput
                                 id="rgb-a"
-                                type="number"
                                 min="0"
                                 max="1"
                                 step="0.1"
@@ -583,9 +584,8 @@ export default function ColorConverter() {
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>H</label>
-                            <TextInput
+                            <NumberInput
                                 id="hsl-h"
-                                type="number"
                                 min="0"
                                 max="360"
                                 value={hslInputs.h}
@@ -595,9 +595,8 @@ export default function ColorConverter() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>S%</label>
-                            <TextInput
+                            <NumberInput
                                 id="hsl-s"
-                                type="number"
                                 min="0"
                                 max="100"
                                 value={hslInputs.s}
@@ -607,9 +606,8 @@ export default function ColorConverter() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100px' }}>
                             <label style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>L%</label>
-                            <TextInput
+                            <NumberInput
                                 id="hsl-l"
-                                type="number"
                                 min="0"
                                 max="100"
                                 value={hslInputs.l}
@@ -619,7 +617,7 @@ export default function ColorConverter() {
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Layout Toggle */}
                 <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
                     <ToolLayoutToggle
@@ -632,9 +630,9 @@ export default function ColorConverter() {
 
             {/* Format Values */}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem', alignItems: 'center' }}>
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
@@ -653,9 +651,9 @@ export default function ColorConverter() {
                         iconDescription="Copy RGB"
                     />
                 </div>
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
@@ -674,9 +672,9 @@ export default function ColorConverter() {
                         iconDescription="Copy HEX"
                     />
                 </div>
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
@@ -695,9 +693,9 @@ export default function ColorConverter() {
                         iconDescription="Copy HSL"
                     />
                 </div>
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
@@ -716,9 +714,9 @@ export default function ColorConverter() {
                         iconDescription="Copy HSV"
                     />
                 </div>
-                <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
                     backgroundColor: 'var(--cds-layer)',
@@ -740,10 +738,10 @@ export default function ColorConverter() {
             </div>
 
             {/* Main Content Area */}
-            <div style={{ 
-                display: 'flex', 
-                gap: '1rem', 
-                flex: 1, 
+            <div style={{
+                display: 'flex',
+                gap: '1rem',
+                flex: 1,
                 minHeight: 0,
                 flexDirection: layout.direction === 'horizontal' ? 'row' : 'column'
             }}>
@@ -775,7 +773,7 @@ export default function ColorConverter() {
                                 iconDescription="Clear history"
                             />
                         </div>
-                        <div style={{ 
+                        <div style={{
                             height: '350px',
                             overflowY: 'auto',
                             padding: '0.5rem'
@@ -802,7 +800,7 @@ export default function ColorConverter() {
                                         backgroundColor: item.hex,
                                         border: '1px solid var(--cds-border-strong)'
                                     }} />
-                                    <span style={{ 
+                                    <span style={{
                                         fontFamily: "'IBM Plex Mono', monospace",
                                         fontSize: '0.75rem'
                                     }}>
@@ -816,7 +814,7 @@ export default function ColorConverter() {
 
                 {/* Code Snippets */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                    <Tabs 
+                    <Tabs
                         selectedIndex={state.selectedTab}
                         onChange={({ selectedIndex }) => dispatch({ type: 'SET_SELECTED_TAB', payload: selectedIndex })}
                     >

@@ -1,10 +1,9 @@
-package wails
+package service
 
 import (
 	"context"
-	"encoding/json"
-
 	"devtoolbox/internal/jwt"
+	"encoding/json"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )

@@ -1,13 +1,12 @@
 package main
 
 import (
+	"devtoolbox/service"
 	"embed"
 	"log"
 	"net/http"
 	"strings"
 	"time"
-
-	inw "devtoolbox/internal/wails"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -59,12 +58,12 @@ func main() {
 	})
 
 	// Register app services
-	app.RegisterService(application.NewService(inw.NewJWTService(app)))
-	app.RegisterService(application.NewService(inw.NewDateTimeService(app)))
-	app.RegisterService(application.NewService(inw.NewConversionService(app)))
-	app.RegisterService(application.NewService(inw.NewBarcodeService(app)))
-	app.RegisterService(application.NewService(inw.NewDataGeneratorService(app)))
-	app.RegisterService(application.NewService(inw.NewCodeFormatterService(app)))
+	app.RegisterService(application.NewService(service.NewJWTService(app)))
+	app.RegisterService(application.NewService(service.NewDateTimeService(app)))
+	app.RegisterService(application.NewService(service.NewConversionService(app)))
+	app.RegisterService(application.NewService(service.NewBarcodeService(app)))
+	app.RegisterService(application.NewService(service.NewDataGeneratorService(app)))
+	app.RegisterService(application.NewService(service.NewCodeFormatterService(app)))
 
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:  "DevToolbox",

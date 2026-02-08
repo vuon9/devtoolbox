@@ -3,7 +3,7 @@ import { Button, Select, SelectItem, TextInput, IconButton } from '@carbon/react
 import { Code, TrashCan, Close } from '@carbon/icons-react';
 import { ToolHeader, ToolControls, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
-import { CodeFormatterService } from '../../../bindings/devtoolbox/internal/wails';
+import { CodeFormatterService } from '../../../bindings/devtoolbox/service';
 
 const FORMATTERS = [
     { id: 'json', name: 'JSON', supportsFilter: true, filterPlaceholder: '.users[] | select(.age > 18) | .name' },

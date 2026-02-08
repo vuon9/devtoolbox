@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react';
 import { ToolLayout, ToolTextArea, ToolInputGroup } from '../../../components/ToolUI';
 import { actions } from '../jwtReducer';
 import { ErrorMessage, SuccessMessage } from './StatusMessages';
@@ -5,8 +6,7 @@ import SignatureVerification from './SignatureVerification';
 import { Button } from '@carbon/react';
 import { MagicWand } from '@carbon/icons-react';
 import { EXAMPLE_SECRET } from '../jwtUtils';
-import React, { useCallback } from 'react';
-import { JWTService } from '../../../../bindings/devtoolbox/internal/wails';
+import { JWTService } from '../../../../bindings/devtoolbox/service';
 
 export default function JwtDecode({ state, dispatch, layout, verifySignature }) {
     // Tab change handlers

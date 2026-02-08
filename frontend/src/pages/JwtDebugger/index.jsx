@@ -6,7 +6,7 @@ import { jwtReducer, initialState, actions } from './jwtReducer';
 import ModeTabBar from './components/ModeTabBar';
 import JwtDecode from './components/JwtDecode';
 import JwtEncode from './components/JwtEncode';
-import { JWTService } from '../../../bindings/devtoolbox/internal/wails';
+import { JWTService } from '../../../bindings/devtoolbox/service';
 
 export default function JwtDebugger() {
     const [state, dispatch] = useReducer(jwtReducer, initialState);

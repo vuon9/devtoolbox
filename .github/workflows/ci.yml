@@ -14,10 +14,23 @@ on:
       - "**.tsx"
       - "package.json"
       - "bun.lockb"
+  push:
+    branches:
+      - main
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - "**.js"
+      - "**.jsx"
+      - "**.ts"
+      - "**.tsx"
+      - "package.json"
+      - "bun.lockb"
 
 jobs:
-  tests:
-    name: Tests
+  go-tests:
+    name: Go Tests
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -33,21 +46,20 @@ jobs:
           go-version: "1.25.0"
           check-latest: true
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+      # - name: Install dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
 
       - name: Install gocover-cobertura
-        run: go install ://github.com
+        run: go get github.com/boumenot/gocover-cobertura
 
       - name: Run Go Tests
         env:
           GOTOOLCHAIN: local
-        run: go test ./internal/... -v -race -coverprofile=coverage.out
-
-      - name: Convert go coverage to Cobertura format
-        run: gocover-cobertura < coverage.txt > coverage.xml
+        run: |
+          go test ./internal/... -v -race -coverprofile=coverage.out
+          gocover-cobertura < coverage.out > coverage.xml
 
       - name: Code Coverage Report
         if: github.event_name == 'pull_request'
@@ -70,8 +82,8 @@ jobs:
           recreate: true
           path: ./coverage.md
 
-  build:
-    name: Build
+  app-build:
+    name: App Build
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

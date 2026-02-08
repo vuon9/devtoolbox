@@ -1,8 +1,7 @@
-package wails
+package barcode
 
 import (
 	"bytes"
-	"context"
 	"encoding/base64"
 	"fmt"
 	"image/png"
@@ -12,21 +11,12 @@ import (
 	"github.com/boombuler/barcode/code39"
 	"github.com/boombuler/barcode/ean"
 	"github.com/skip2/go-qrcode"
-	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-type BarcodeService struct {
-	app *application.App
-}
+type BarcodeService struct{}
 
-func NewBarcodeService(app *application.App) *BarcodeService {
-	return &BarcodeService{
-		app: app,
-	}
-}
-
-func (s *BarcodeService) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
-	return nil
+func NewBarcodeService() BarcodeService {
+	return BarcodeService{}
 }
 
 // GenerateBarcodeRequest represents the request to generate a barcode
@@ -92,21 +82,28 @@ func (s *BarcodeService) GenerateBarcode(req GenerateBarcodeRequest) GenerateBar
 	// For 1D barcodes, we maintain aspect ratio
 	if standard != "QR" {
 		bounds := img.Bounds()
-		width := bounds.Dx()
-		height := bounds.Dy()
+		origWidth := bounds.Dx()
+		origHeight := bounds.Dy()
 
-		// Scale width to size, maintain aspect ratio for height
-		scaleFactor := float64(size) / float64(width)
-		newHeight := int(float64(height) * scaleFactor)
+		// Calculate target dimensions while maintaining aspect ratio
+		scaleFactor := float64(size) / float64(origWidth)
+		targetWidth := size
+		targetHeight := int(float64(origHeight) * scaleFactor)
 
-		// Ensure minimum height for visibility
-		if newHeight < 100 {
-			newHeight = 100
+		// Ensure minimum dimensions for visibility and library requirements
+		if targetWidth < 259 {
+			targetWidth = 259
+		}
+		if targetHeight < 100 {
+			targetHeight = 100
 		}
 
-		img, err = barcode.Scale(img, size, newHeight)
-		if err != nil {
-			return GenerateBarcodeResponse{Error: fmt.Sprintf("Failed to scale barcode: %v", err)}
+		// Only scale if the target is different from original
+		if targetWidth != origWidth || targetHeight != origHeight {
+			img, err = barcode.Scale(img, targetWidth, targetHeight)
+			if err != nil {
+				return GenerateBarcodeResponse{Error: fmt.Sprintf("Failed to scale barcode: %v", err)}
+			}
 		}
 	}
 
@@ -190,14 +187,27 @@ func (s *BarcodeService) GetBarcodeSizes() []map[string]interface{} {
 }
 
 // calculateEANChecksum calculates the EAN checksum digit
+// For EAN-13: weights alternate starting with 1 (1,3,1,3...)
+// For EAN-8: weights alternate starting with 3 (3,1,3,1...)
 func calculateEANChecksum(code string) int {
 	sum := 0
+	isEAN8 := len(code) == 7
 	for i, c := range code {
 		digit := int(c - '0')
-		if i%2 == 0 {
-			sum += digit * 1
+		if isEAN8 {
+			// EAN-8: weights start with 3 at position 0
+			if i%2 == 0 {
+				sum += digit * 3
+			} else {
+				sum += digit * 1
+			}
 		} else {
-			sum += digit * 3
+			// EAN-13: weights start with 1 at position 0
+			if i%2 == 0 {
+				sum += digit * 1
+			} else {
+				sum += digit * 3
+			}
 		}
 	}
 	checksum := (10 - (sum % 10)) % 10

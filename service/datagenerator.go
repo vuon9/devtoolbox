@@ -1,8 +1,7 @@
-package wails
+package service
 
 import (
 	"context"
-
 	"devtoolbox/internal/datagenerator"
 
 	"github.com/wailsapp/wails/v3/pkg/application"

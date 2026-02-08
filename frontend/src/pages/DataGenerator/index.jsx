@@ -6,7 +6,7 @@ import { initialState, reducer } from './constants';
 import GeneratorControls from './components/GeneratorControls';
 import VariableControls from './components/VariableControls';
 import HelpModal from './components/HelpModal';
-import { DataGeneratorService } from '../../../bindings/devtoolbox/internal/wails';
+import { DataGeneratorService } from '../../../bindings/devtoolbox/service';
 
 export default function DataGenerator() {
     const [state, dispatch] = React.useReducer(reducer, initialState);

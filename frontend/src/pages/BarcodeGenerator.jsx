@@ -3,7 +3,7 @@ import { Button, Dropdown, InlineLoading } from '@carbon/react';
 import { Renew, Download } from '@carbon/icons-react';
 import { ToolHeader, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
-import { BarcodeService } from '../../bindings/devtoolbox/internal/wails';
+import { BarcodeService } from '../../bindings/devtoolbox/service';
 
 const BARCODE_STANDARDS = [
   { value: 'QR', label: 'QR Code (2D)' },
