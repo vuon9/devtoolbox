@@ -4,29 +4,11 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "**.go"
-      - "go.mod"
-      - "go.sum"
-      - "**.js"
-      - "**.jsx"
-      - "**.ts"
-      - "**.tsx"
-      - "package.json"
-      - "bun.lockb"
   push:
     branches:
       - main
-    paths:
-      - "**.go"
-      - "go.mod"
-      - "go.sum"
-      - "**.js"
-      - "**.jsx"
-      - "**.ts"
-      - "**.tsx"
-      - "package.json"
-      - "bun.lockb"
+  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   go-tests:
