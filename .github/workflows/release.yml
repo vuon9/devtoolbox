@@ -13,7 +13,8 @@ env:
   CGO_ENABLED: 1
 
 jobs:
-  build:
+  release-build:
+    name: Release Build
     strategy:
       fail-fast: false
       matrix:
