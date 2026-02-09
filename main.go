@@ -65,6 +65,11 @@ func main() {
 	app.RegisterService(application.NewService(service.NewDataGeneratorService(app)))
 	app.RegisterService(application.NewService(service.NewCodeFormatterService(app)))
 
+	// Start HTTP server for browser support (background)
+	go func() {
+		StartHTTPServer(8081)
+	}()
+
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:  "DevToolbox",
 		Width:  1024,
