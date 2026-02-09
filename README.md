@@ -11,6 +11,15 @@ Essential software development tools for everyday tasks.
 
 ## Features
 
+### **Browser Support**
+
+DevToolbox now works in both desktop and browser modes:
+
+- **Desktop**: Native Wails application with native performance (default)
+- **Browser**: Access via `http://localhost:8081` when the desktop app is running
+
+The frontend automatically detects the environment and uses the appropriate API (Wails runtime for desktop, HTTP for browser). See [docs/BROWSER_MODE.md](docs/BROWSER_MODE.md) for details.
+
 ### **Text Based Converter** (Unified Tool)
 The central hub with 45+ algorithms across 5 categories:
 
