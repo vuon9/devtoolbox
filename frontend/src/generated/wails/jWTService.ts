@@ -3,20 +3,14 @@
 
 import { JWTService } from '../../../bindings/devtoolbox/service';
 
-
-export function ServiceStartup(ctx: context.Context, options: application.ServiceOptions): Promise<error> {
-  return JWTService.ServiceStartup(ctx, options);
-}
-
-export function Decode(token: string): Promise<jwt.DecodeResponse> {
+export function Decode(token: string): Promise<any> {
   return JWTService.Decode(token);
 }
 
-export function Verify(token: string, secret: string, encoding: string): Promise<jwt.VerifyResponse> {
+export function Verify(token: string, secret: string, encoding: string): Promise<any> {
   return JWTService.Verify(token, secret, encoding);
 }
 
-export function Encode(headerJSON: string, payloadJSON: string, algorithm: string, secret: string): Promise<jwt.EncodeResponse> {
+export function Encode(headerJSON: string, payloadJSON: string, algorithm: string, secret: string): Promise<any> {
   return JWTService.Encode(headerJSON, payloadJSON, algorithm, secret);
 }
-

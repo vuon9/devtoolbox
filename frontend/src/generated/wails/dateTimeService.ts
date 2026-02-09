@@ -3,24 +3,18 @@
 
 import { DateTimeService } from '../../../bindings/devtoolbox/service';
 
-
-export function ServiceStartup(ctx: context.Context, options: application.ServiceOptions): Promise<error> {
-  return DateTimeService.ServiceStartup(ctx, options);
-}
-
-export function Convert(req: datetimeconverter.ConvertRequest): Promise<datetimeconverter.ConvertResponse> {
+export function Convert(req: any): Promise<any> {
   return DateTimeService.Convert(req);
 }
 
-export function GetPresets(): Promise<datetimeconverter.PresetsResponse> {
+export function GetPresets(): Promise<any> {
   return DateTimeService.GetPresets();
 }
 
-export function CalculateDelta(req: datetimeconverter.DeltaRequest): Promise<datetimeconverter.DeltaResponse> {
+export function CalculateDelta(req: any): Promise<any> {
   return DateTimeService.CalculateDelta(req);
 }
 
-export function GetAvailableTimezones(): Promise<datetimeconverter.AvailableTimezonesResponse> {
+export function GetAvailableTimezones(): Promise<any> {
   return DateTimeService.GetAvailableTimezones();
 }
-

@@ -3,20 +3,14 @@
 
 import { DataGeneratorService } from '../../../bindings/devtoolbox/service';
 
-
-export function ServiceStartup(ctx: context.Context, options: application.ServiceOptions): Promise<error> {
-  return DataGeneratorService.ServiceStartup(ctx, options);
-}
-
-export function Generate(req: datagenerator.GenerateRequest): Promise<datagenerator.GenerateResponse> {
+export function Generate(req: any): Promise<any> {
   return DataGeneratorService.Generate(req);
 }
 
-export function GetPresets(): Promise<datagenerator.PresetsResponse> {
+export function GetPresets(): Promise<any> {
   return DataGeneratorService.GetPresets();
 }
 
-export function ValidateTemplate(template: string): Promise<datagenerator.ValidationResult> {
+export function ValidateTemplate(template: string): Promise<any> {
   return DataGeneratorService.ValidateTemplate(template);
 }
-

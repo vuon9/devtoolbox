@@ -3,12 +3,11 @@
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
-
-export async function ServiceStartup(ctx: context.Context, options: application.ServiceOptions): Promise<error> {
-  const response = await fetch(`${API_BASE}/api/DateTimeService/ServiceStartup`, {
+export async function Convert(req: any): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/date-time-service/convert`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ctx, options })
+    body: JSON.stringify(req)
   });
   
   if (!response.ok) {
@@ -18,11 +17,10 @@ export async function ServiceStartup(ctx: context.Context, options: application.
   return await response.json();
 }
 
-export async function Convert(req: datetimeconverter.ConvertRequest): Promise<datetimeconverter.ConvertResponse> {
-  const response = await fetch(`${API_BASE}/api/DateTimeService/Convert`, {
+export async function GetPresets(): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/date-time-service/get-presets`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ req })
+    headers: { 'Content-Type': 'application/json' }
   });
   
   if (!response.ok) {
@@ -32,11 +30,11 @@ export async function Convert(req: datetimeconverter.ConvertRequest): Promise<da
   return await response.json();
 }
 
-export async function GetPresets(): Promise<datetimeconverter.PresetsResponse> {
-  const response = await fetch(`${API_BASE}/api/DateTimeService/GetPresets`, {
+export async function CalculateDelta(req: any): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/date-time-service/calculate-delta`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({  })
+    body: JSON.stringify(req)
   });
   
   if (!response.ok) {
@@ -46,11 +44,10 @@ export async function GetPresets(): Promise<datetimeconverter.PresetsResponse> {
   return await response.json();
 }
 
-export async function CalculateDelta(req: datetimeconverter.DeltaRequest): Promise<datetimeconverter.DeltaResponse> {
-  const response = await fetch(`${API_BASE}/api/DateTimeService/CalculateDelta`, {
+export async function GetAvailableTimezones(): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/date-time-service/get-available-timezones`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ req })
+    headers: { 'Content-Type': 'application/json' }
   });
   
   if (!response.ok) {
@@ -59,18 +56,3 @@ export async function CalculateDelta(req: datetimeconverter.DeltaRequest): Promi
   
   return await response.json();
 }
-
-export async function GetAvailableTimezones(): Promise<datetimeconverter.AvailableTimezonesResponse> {
-  const response = await fetch(`${API_BASE}/api/DateTimeService/GetAvailableTimezones`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({  })
-  });
-  
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  
-  return await response.json();
-}
-

@@ -3,12 +3,6 @@
 
 import { CodeFormatterService } from '../../../bindings/devtoolbox/service';
 
-
-export function ServiceStartup(ctx: context.Context, options: application.ServiceOptions): Promise<error> {
-  return CodeFormatterService.ServiceStartup(ctx, options);
-}
-
-export function Format(req: codeformatter.FormatRequest): Promise<codeformatter.FormatResponse> {
+export function Format(req: any): Promise<any> {
   return CodeFormatterService.Format(req);
 }
-

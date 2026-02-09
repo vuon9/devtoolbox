@@ -1,2 +1,2 @@
-// Re-export generated services for convenience
+// Re-export generated services for browser mode
 export * from '../generated';

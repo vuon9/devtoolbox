@@ -4,11 +4,11 @@ import (
 	"devtoolbox/pkg/router"
 	"devtoolbox/service"
 	"fmt"
-	"time"
+	"net/http"
 )
 
 func main() {
-	fmt.Println("Starting HTTP server test...")
+	fmt.Println("Starting HTTP server with frontend...")
 
 	// Create services
 	jwtSvc := service.NewJWTService(nil)
@@ -31,20 +31,21 @@ func main() {
 	server.Register(dateTimeSvc)
 	fmt.Println("Services registered successfully!")
 
+	// Get the gin engine and add static file serving
+	engine := server.Engine()
+
+	// Serve static files from the dist directory
+	engine.StaticFS("/", http.Dir("frontend/dist"))
+
+	// Also serve assets
+	engine.StaticFS("/assets", http.Dir("frontend/dist/assets"))
+
 	// Start server
 	fmt.Println("Starting HTTP server on port 8081...")
-	go func() {
-		if err := server.Start(8081); err != nil {
-			fmt.Printf("Server error: %v\n", err)
-		}
-	}()
-
-	// Wait for server to start
-	time.Sleep(2 * time.Second)
-	fmt.Println("Server should be running on http://localhost:8081")
-	fmt.Println("Test with: curl http://localhost:8081/health")
+	fmt.Println("Open browser: http://localhost:8081")
 	fmt.Println("Press Ctrl+C to stop")
 
-	// Keep running
-	select {}
+	if err := engine.Run(":8081"); err != nil {
+		fmt.Printf("Server error: %v\n", err)
+	}
 }

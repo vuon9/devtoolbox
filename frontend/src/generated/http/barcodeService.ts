@@ -3,12 +3,11 @@
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
-
-export async function ServiceStartup(ctx: context.Context, options: application.ServiceOptions): Promise<error> {
-  const response = await fetch(`${API_BASE}/api/BarcodeService/ServiceStartup`, {
+export async function GenerateBarcode(req: any): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/barcode-service/generate-barcode`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ctx, options })
+    body: JSON.stringify(req)
   });
   
   if (!response.ok) {
@@ -18,11 +17,10 @@ export async function ServiceStartup(ctx: context.Context, options: application.
   return await response.json();
 }
 
-export async function GenerateBarcode(req: barcode.GenerateBarcodeRequest): Promise<barcode.GenerateBarcodeResponse> {
-  const response = await fetch(`${API_BASE}/api/BarcodeService/GenerateBarcode`, {
+export async function GetBarcodeStandards(): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/barcode-service/get-barcode-standards`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ req })
+    headers: { 'Content-Type': 'application/json' }
   });
   
   if (!response.ok) {
@@ -32,11 +30,10 @@ export async function GenerateBarcode(req: barcode.GenerateBarcodeRequest): Prom
   return await response.json();
 }
 
-export async function GetBarcodeStandards(): Promise<> {
-  const response = await fetch(`${API_BASE}/api/BarcodeService/GetBarcodeStandards`, {
+export async function GetQRErrorLevels(): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/barcode-service/get-qr-error-levels`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({  })
+    headers: { 'Content-Type': 'application/json' }
   });
   
   if (!response.ok) {
@@ -46,11 +43,10 @@ export async function GetBarcodeStandards(): Promise<> {
   return await response.json();
 }
 
-export async function GetQRErrorLevels(): Promise<> {
-  const response = await fetch(`${API_BASE}/api/BarcodeService/GetQRErrorLevels`, {
+export async function GetBarcodeSizes(): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/barcode-service/get-barcode-sizes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({  })
+    headers: { 'Content-Type': 'application/json' }
   });
   
   if (!response.ok) {
@@ -60,11 +56,11 @@ export async function GetQRErrorLevels(): Promise<> {
   return await response.json();
 }
 
-export async function GetBarcodeSizes(): Promise<> {
-  const response = await fetch(`${API_BASE}/api/BarcodeService/GetBarcodeSizes`, {
+export async function ValidateContent(content: string, standard: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/barcode-service/validate-content`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({  })
+    body: JSON.stringify({ arg0: content, arg1: standard })
   });
   
   if (!response.ok) {
@@ -73,18 +69,3 @@ export async function GetBarcodeSizes(): Promise<> {
   
   return await response.json();
 }
-
-export async function ValidateContent(content: string, standard: string): Promise<> {
-  const response = await fetch(`${API_BASE}/api/BarcodeService/ValidateContent`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content, standard })
-  });
-  
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  
-  return await response.json();
-}
-

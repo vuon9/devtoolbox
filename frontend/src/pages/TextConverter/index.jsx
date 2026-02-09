@@ -17,7 +17,7 @@ import {
     PLACEHOLDERS,
     LAYOUT
 } from './strings';
-import { ConversionService } from '../../../bindings/devtoolbox/service';
+import { Convert } from '../../generated/http/conversionService';
 
 export default function TextBasedConverter() {
     // Persistent state initialization
@@ -126,7 +126,7 @@ export default function TextBasedConverter() {
         try {
             // Include subMode in backend request
             const backendConfig = { ...cfg, subMode: sub };
-            const result = await ConversionService.Convert(text, cat, meth, backendConfig);
+            const result = await Convert(text, cat, meth, backendConfig);
             setOutput(result);
             setError('');
         } catch (err) {

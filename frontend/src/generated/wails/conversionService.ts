@@ -3,12 +3,6 @@
 
 import { ConversionService } from '../../../bindings/devtoolbox/service';
 
-
-export function ServiceStartup(ctx: context.Context, options: application.ServiceOptions): Promise<error> {
-  return ConversionService.ServiceStartup(ctx, options);
-}
-
-export function Convert(input: string, category: string, method: string, config: ): Promise<string> {
+export function Convert(input: string, category: string, method: string, config: any): Promise<any> {
   return ConversionService.Convert(input, category, method, config);
 }
-

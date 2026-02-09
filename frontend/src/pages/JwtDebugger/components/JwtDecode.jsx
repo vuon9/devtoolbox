@@ -6,7 +6,7 @@ import SignatureVerification from './SignatureVerification';
 import { Button } from '@carbon/react';
 import { MagicWand } from '@carbon/icons-react';
 import { EXAMPLE_SECRET } from '../jwtUtils';
-import { JWTService } from '../../../../bindings/devtoolbox/service';
+import { Encode } from '../../../services/api';
 
 export default function JwtDecode({ state, dispatch, layout, verifySignature }) {
     // Tab change handlers
@@ -23,7 +23,7 @@ export default function JwtDecode({ state, dispatch, layout, verifySignature }) 
         };
 
         try {
-            const response = await JWTService.Encode(
+            const response = await Encode(
                 JSON.stringify(header),
                 JSON.stringify(payload),
                 'HS256',

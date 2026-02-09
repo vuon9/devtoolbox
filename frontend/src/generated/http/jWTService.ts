@@ -3,12 +3,11 @@
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
-
-export async function ServiceStartup(ctx: context.Context, options: application.ServiceOptions): Promise<error> {
-  const response = await fetch(`${API_BASE}/api/JWTService/ServiceStartup`, {
+export async function Decode(token: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/jwt-service/decode`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ctx, options })
+    body: JSON.stringify({ value: token })
   });
   
   if (!response.ok) {
@@ -18,11 +17,11 @@ export async function ServiceStartup(ctx: context.Context, options: application.
   return await response.json();
 }
 
-export async function Decode(token: string): Promise<jwt.DecodeResponse> {
-  const response = await fetch(`${API_BASE}/api/JWTService/Decode`, {
+export async function Verify(token: string, secret: string, encoding: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/jwt-service/verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token })
+    body: JSON.stringify({ arg0: token, arg1: secret, arg2: encoding })
   });
   
   if (!response.ok) {
@@ -32,11 +31,11 @@ export async function Decode(token: string): Promise<jwt.DecodeResponse> {
   return await response.json();
 }
 
-export async function Verify(token: string, secret: string, encoding: string): Promise<jwt.VerifyResponse> {
-  const response = await fetch(`${API_BASE}/api/JWTService/Verify`, {
+export async function Encode(headerJSON: string, payloadJSON: string, algorithm: string, secret: string): Promise<any> {
+  const response = await fetch(`${API_BASE}/api/jwt-service/encode`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token, secret, encoding })
+    body: JSON.stringify({ arg0: headerJSON, arg1: payloadJSON, arg2: algorithm, arg3: secret })
   });
   
   if (!response.ok) {
@@ -45,18 +44,3 @@ export async function Verify(token: string, secret: string, encoding: string): P
   
   return await response.json();
 }
-
-export async function Encode(headerJSON: string, payloadJSON: string, algorithm: string, secret: string): Promise<jwt.EncodeResponse> {
-  const response = await fetch(`${API_BASE}/api/JWTService/Encode`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ headerJSON, payloadJSON, algorithm, secret })
-  });
-  
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  
-  return await response.json();
-}
-
