@@ -9,3 +9,4 @@ runtime-debug.js
 runtime.js
 .task/*
 /package.json
+.worktrees/

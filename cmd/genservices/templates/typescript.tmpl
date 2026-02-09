@@ -1,0 +1,33 @@
+{{define "wails"}}// Auto-generated Wails client for {{.ServiceName}}
+// This file is auto-generated. DO NOT EDIT.
+
+import { {{.ServiceName}} } from '../../../bindings/devtoolbox/service';
+
+{{range .Methods}}
+export function {{.Name}}({{range $i, $p := .Parameters}}{{if $i}}, {{end}}{{$p.Name}}: {{$p.Type}}{{end}}): Promise<{{(index .Returns 0).Type}}> {
+  return {{$.ServiceName}}.{{.Name}}({{range $i, $p := .Parameters}}{{if $i}}, {{end}}{{$p.Name}}{{end}});
+}
+{{end}}
+{{end}}
+
+{{define "http"}}// Auto-generated HTTP client for {{.ServiceName}}
+// This file is auto-generated. DO NOT EDIT.
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081';
+
+{{range .Methods}}
+export async function {{.Name}}({{range $i, $p := .Parameters}}{{if $i}}, {{end}}{{$p.Name}}: {{$p.Type}}{{end}}): Promise<{{(index .Returns 0).Type}}> {
+  const response = await fetch(`${API_BASE}/api/{{$.ServiceName}}/{{.Name}}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ {{range $i, $p := .Parameters}}{{if $i}}, {{end}}{{$p.Name}}{{end}} })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return await response.json();
+}
+{{end}}
+{{end}}

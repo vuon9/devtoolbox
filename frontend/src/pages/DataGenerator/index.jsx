@@ -6,7 +6,7 @@ import { initialState, reducer } from './constants';
 import GeneratorControls from './components/GeneratorControls';
 import VariableControls from './components/VariableControls';
 import HelpModal from './components/HelpModal';
-import { DataGeneratorService } from '../../../bindings/devtoolbox/service';
+import { GetPresets, Generate, ValidateTemplate } from '../../generated/http/dataGeneratorService';
 
 export default function DataGenerator() {
     const [state, dispatch] = React.useReducer(reducer, initialState);
@@ -22,7 +22,7 @@ export default function DataGenerator() {
     useEffect(() => {
         const loadPresets = async () => {
             try {
-                const response = await DataGeneratorService.GetPresets();
+                const response = await GetPresets();
                 console.log('GetPresets response:', response);
 
                 const presets = response.presets || response;
@@ -94,7 +94,7 @@ export default function DataGenerator() {
                 separator: state.separator === 'custom' ? state.customSeparator : state.separator
             };
 
-            const response = await DataGeneratorService.Generate(request);
+            const response = await Generate(request);
 
             if (response.error) {
                 dispatch({ type: 'SET_ERROR', payload: response.error });
