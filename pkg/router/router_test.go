@@ -135,3 +135,67 @@ func TestRouter_LifecycleMethodsSkipped(t *testing.T) {
 	// Should get 404 because lifecycle methods are skipped
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
+
+// Test service with primitive parameter
+type PrimitiveService struct{}
+
+func (s *PrimitiveService) Process(value string) string {
+	return "processed: " + value
+}
+
+func TestRouter_PrimitiveParameter(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	router := New(r)
+
+	service := &PrimitiveService{}
+	err := router.Register(service)
+	assert.NoError(t, err)
+
+	// Test with "value" field convention
+	reqBody := map[string]string{"value": "hello"}
+	body, _ := json.Marshal(reqBody)
+
+	w := httptest.NewRecorder()
+	httpReq, _ := http.NewRequest("POST", "/api/primitive-service/process", bytes.NewBuffer(body))
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	r.ServeHTTP(w, httpReq)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), "processed: hello")
+}
+
+// Test service with multiple parameters
+type MultiParamService struct{}
+
+func (s *MultiParamService) Combine(a, b, c string) string {
+	return a + "-" + b + "-" + c
+}
+
+func TestRouter_MultipleParameters(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	router := New(r)
+
+	service := &MultiParamService{}
+	err := router.Register(service)
+	assert.NoError(t, err)
+
+	// Test with "arg0", "arg1", "arg2" convention
+	reqBody := map[string]string{
+		"arg0": "first",
+		"arg1": "second",
+		"arg2": "third",
+	}
+	body, _ := json.Marshal(reqBody)
+
+	w := httptest.NewRecorder()
+	httpReq, _ := http.NewRequest("POST", "/api/multi-param-service/combine", bytes.NewBuffer(body))
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	r.ServeHTTP(w, httpReq)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), "first-second-third")
+}

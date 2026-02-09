@@ -60,17 +60,71 @@ func (r *Router) createHandler(methodValue reflect.Value, method reflect.Method)
 		args := make([]reflect.Value, numIn-1) // -1 because receiver is first
 
 		if numIn > 1 {
-			// First argument should be a struct for JSON binding
-			argType := methodType.In(1)
-			argValue := reflect.New(argType).Interface()
-
-			if err := c.ShouldBindJSON(argValue); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
+			// Method has parameters - create a wrapper struct to hold all params
+			type paramInfo struct {
+				name    string
+				argType reflect.Type
+				index   int
 			}
 
-			args[0] = reflect.ValueOf(argValue).Elem()
+			var params []paramInfo
+			for i := 1; i < numIn; i++ {
+				params = append(params, paramInfo{
+					name:    methodType.In(i).Name(),
+					argType: methodType.In(i),
+					index:   i - 1,
+				})
+			}
+
+			// Single parameter handling
+			if len(params) == 1 {
+				param := params[0]
+
+				if param.argType.Kind() == reflect.Struct {
+					// Single struct parameter - bind directly
+					argValue := reflect.New(param.argType).Interface()
+					if err := c.ShouldBindJSON(argValue); err != nil {
+						c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+						return
+					}
+					args[0] = reflect.ValueOf(argValue).Elem()
+				} else {
+					// Single primitive parameter - use "value" field convention
+					var wrapper struct {
+						Value interface{} `json:"value"`
+					}
+					if err := c.ShouldBindJSON(&wrapper); err != nil {
+						c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+						return
+					}
+					args[0] = convertToType(wrapper.Value, param.argType)
+				}
+			} else {
+				// Multiple parameters - bind to a map and use "arg0", "arg1", etc.
+				var requestMap map[string]interface{}
+				if err := c.ShouldBindJSON(&requestMap); err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+
+				// Convert each parameter
+				for _, param := range params {
+					// Use "arg0", "arg1", etc. as keys for multiple parameters
+					key := fmt.Sprintf("arg%d", param.index)
+					value, exists := requestMap[key]
+					if !exists {
+						// Use zero value if not provided
+						args[param.index] = reflect.Zero(param.argType)
+						continue
+					}
+
+					// Convert value to expected type
+					argValue := convertToType(value, param.argType)
+					args[param.index] = argValue
+				}
+			}
 		}
+		// If no parameters, args is already empty
 
 		// Call the method
 		results := methodValue.Call(args)
@@ -89,6 +143,49 @@ func (r *Router) createHandler(methodValue reflect.Value, method reflect.Method)
 		} else if len(results) == 1 {
 			c.JSON(http.StatusOK, results[0].Interface())
 		}
+	}
+}
+
+// convertToType converts an interface{} value to the expected reflect.Type
+func convertToType(value interface{}, targetType reflect.Type) reflect.Value {
+	switch targetType.Kind() {
+	case reflect.String:
+		if s, ok := value.(string); ok {
+			return reflect.ValueOf(s)
+		}
+		return reflect.ValueOf("")
+	case reflect.Int:
+		if f, ok := value.(float64); ok {
+			return reflect.ValueOf(int(f))
+		}
+		return reflect.ValueOf(0)
+	case reflect.Int64:
+		if f, ok := value.(float64); ok {
+			return reflect.ValueOf(int64(f))
+		}
+		return reflect.ValueOf(int64(0))
+	case reflect.Float64:
+		if f, ok := value.(float64); ok {
+			return reflect.ValueOf(f)
+		}
+		return reflect.ValueOf(float64(0))
+	case reflect.Bool:
+		if b, ok := value.(bool); ok {
+			return reflect.ValueOf(b)
+		}
+		return reflect.ValueOf(false)
+	case reflect.Map:
+		if m, ok := value.(map[string]interface{}); ok {
+			return reflect.ValueOf(m)
+		}
+		return reflect.ValueOf(map[string]interface{}{})
+	case reflect.Slice:
+		if s, ok := value.([]interface{}); ok {
+			return reflect.ValueOf(s)
+		}
+		return reflect.ValueOf([]interface{}{})
+	default:
+		return reflect.Zero(targetType)
 	}
 }
 
