@@ -1,12 +1,16 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 )
+
+//go:embed templates/typescript.tmpl
+var typescriptTemplate string
 
 // Generator generates TypeScript code
 type Generator struct {
@@ -16,13 +20,7 @@ type Generator struct {
 
 // NewGenerator creates a new generator
 func NewGenerator(outputDir string) (*Generator, error) {
-	tmplPath := filepath.Join("cmd", "genservices", "templates", "typescript.tmpl")
-	tmplContent, err := os.ReadFile(tmplPath)
-	if err != nil {
-		return nil, err
-	}
-
-	tmpl, err := template.New("typescript").Parse(string(tmplContent))
+	tmpl, err := template.New("typescript").Parse(typescriptTemplate)
 	if err != nil {
 		return nil, err
 	}
