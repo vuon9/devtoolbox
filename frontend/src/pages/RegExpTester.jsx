@@ -37,7 +37,8 @@ const GROUP_COLORS = [
 const highlightRegex = (regexStr) => {
     if (!regexStr) return '';
 
-    const tokenRegex = /(\\.)|(\[(?:\\.|[^\]])*\])|(\((?:\\.|[^\)])*\))|([\*\+\?]\??|\{\d+(,\d*)?\}\??)|([\^$\|])/g;
+    // 1: escaped, 2: charClass, 3: group, 4: quantifier, 5: operator
+    const tokenRegex = /(\\.)|(\[(?:\\.|[^\]])*\])|(\((?:\\.|[^\)])*\))|([\*\+\?]\??|\{\d+(?:,\d*)?\}\??)|([\^$\|])/g;
 
     let lastIndex = 0;
     let result = '';
@@ -50,15 +51,15 @@ const highlightRegex = (regexStr) => {
         const [full, escaped, charClass, group, quantifier, operator] = match;
 
         if (escaped) {
-            result += `<span style="color: #ff7eb6;">${escapeHtml(escaped)}</span>`;
+            result += `<span style="color: #ff7eb6;">${escapeHtml(full)}</span>`;
         } else if (charClass) {
-            result += `<span style="color: #78a9ff;">${escapeHtml(charClass)}</span>`;
+            result += `<span style="color: #78a9ff;">${escapeHtml(full)}</span>`;
         } else if (group) {
-            result += `<span style="color: #42be65;">${escapeHtml(group)}</span>`;
+            result += `<span style="color: #42be65;">${escapeHtml(full)}</span>`;
         } else if (quantifier) {
-            result += `<span style="color: #33b1ff;">${escapeHtml(quantifier)}</span>`;
+            result += `<span style="color: #33b1ff;">${escapeHtml(full)}</span>`;
         } else if (operator) {
-            result += `<span style="color: #be95ff; font-weight: bold;">${escapeHtml(operator)}</span>`;
+            result += `<span style="color: #be95ff; font-weight: bold;">${escapeHtml(full)}</span>`;
         }
 
         lastIndex = tokenRegex.lastIndex;
@@ -292,18 +293,13 @@ const LiveHighlightedEditor = ({ text, setText, regex, flags }) => {
 const ExpandableRegexInput = ({ value, onChange, error }) => {
     const textareaRef = useRef(null);
     const backdropRef = useRef(null);
-    const [highlightedHtml, setHighlightedHtml] = useState('');
+    const highlightedHtml = React.useMemo(() => highlightRegex(value), [value]);
 
     const LINE_HEIGHT = 20;
     const MIN_LINES = 1;
     const MAX_LINES = 10;
     const MIN_HEIGHT = MIN_LINES * LINE_HEIGHT + 16;
     const MAX_HEIGHT = MAX_LINES * LINE_HEIGHT + 16;
-
-    // Update highlighting
-    useEffect(() => {
-        setHighlightedHtml(highlightRegex(value));
-    }, [value]);
 
     // Sync scroll
     const handleScroll = useCallback(() => {
@@ -367,11 +363,12 @@ const ExpandableRegexInput = ({ value, onChange, error }) => {
                     fontFamily: "'IBM Plex Mono', monospace",
                     fontSize: '0.875rem',
                     lineHeight: '1.4',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-all',
                     resize: 'vertical',
                     outline: 'none',
                     overflowY: 'auto',
                     overflowX: 'hidden',
-                    wordBreak: 'break-all',
                     color: 'transparent',
                     caretColor: 'var(--cds-text-primary)',
                     display: 'block',
@@ -650,17 +647,18 @@ export default function RegExpTester() {
         }
         try {
             const startTime = performance.now();
-            const re = new RegExp(regexStr, flags);
+            const isGlobal = flags.includes('g');
+            const sanitizedFlags = isGlobal ? flags : flags + 'g';
+            const re = new RegExp(regexStr, sanitizedFlags);
             const foundMatches = Array.from(text.matchAll(re));
-            const endTime = performance.now();
-            const duration = (endTime - startTime).toFixed(2);
-
             setMatches(foundMatches);
 
             if (foundMatches.length === 0) {
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(3);
                 setOutput([
                     <div key="summary" style={{ padding: '0.75rem', borderBottom: '1px solid var(--cds-border-subtle)', color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>
-                        No matches found. ({duration}ms)
+                        No matches found. ({parseFloat(duration) < 0.001 ? '< 0.001' : duration}ms)
                     </div>
                 ]);
             } else {
@@ -709,6 +707,9 @@ export default function RegExpTester() {
                     return rows;
                 });
 
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(3);
+
                 setOutput([
                     <div key="summary" style={{
                         padding: '0.75rem',
@@ -716,13 +717,12 @@ export default function RegExpTester() {
                         fontSize: '0.875rem',
                         fontWeight: 600,
                         color: 'var(--cds-text-primary)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
                         backgroundColor: 'var(--cds-layer-01)'
                     }}>
-                        <span>Found {foundMatches.length} match{foundMatches.length !== 1 ? 'es' : ''}:</span>
-                        <span style={{ color: 'var(--cds-text-secondary)', fontSize: '0.75rem', fontWeight: 400 }}>{duration}ms</span>
+                        Found {foundMatches.length} match{foundMatches.length !== 1 ? 'es' : ''}
+                        <span style={{ color: 'var(--cds-text-secondary)', fontSize: '0.75rem', fontWeight: 400, marginLeft: '0.5rem' }}>
+                            ({parseFloat(duration) < 0.001 ? '< 0.001' : duration}ms)
+                        </span>
                     </div>,
                     <div key="table-header" style={{
                         display: 'flex',
