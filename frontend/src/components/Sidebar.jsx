@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import logo from '../assets/images/logo-universal.png';
 
-export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar }) {
+export function Sidebar({ activeTool, setActiveTool, isVisible }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [pinned, setPinned] = useState(() => {
         try {
@@ -52,18 +51,22 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
 
     return (
         <div className={`sidebar ${!isVisible ? 'hidden' : ''}`}>
-            <div className="logo-area">
-                <img src={logo} alt="Logo" />
-                <h1>DevToolbox</h1>
-            </div>
-
-            <div style={{ padding: '10px 10px 0', minHeight: '52px' }}>
+            {/* Search bar at the top */}
+            <div style={{ padding: '12px 12px 8px' }}>
                 <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder="Search tools..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ width: '100%', padding: '6px 10px', fontSize: '13px', backgroundColor: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color)' }}
+                    style={{ 
+                        width: '100%', 
+                        padding: '8px 12px', 
+                        fontSize: '13px', 
+                        backgroundColor: 'var(--cds-field)', 
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '4px',
+                        color: 'var(--cds-text-primary)'
+                    }}
                 />
             </div>
 
@@ -134,3 +137,5 @@ export function Sidebar({ activeTool, setActiveTool, isVisible, toggleSidebar })
         </div>
     );
 }
+
+export default Sidebar;

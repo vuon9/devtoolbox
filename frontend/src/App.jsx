@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Sidebar } from './components/Sidebar';
-import { Theme, IconButton, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { Settings } from '@carbon/icons-react';
+import { TitleBar } from './components/TitleBar';
+import { Theme } from '@carbon/react';
 
 // Tools Imports
 import DateTimeConverter from './pages/DateTimeConverter';
@@ -119,83 +119,26 @@ function App() {
         <ErrorBoundary>
             <Theme theme={theme} style={{ height: '100%' }}>
                 <div className="app-container">
-                    <Sidebar
-                        activeTool={activeTool}
-                        setActiveTool={setActiveTool}
-                        isVisible={isSidebarOpen}
+                    <TitleBar 
+                        isSidebarOpen={isSidebarOpen} 
+                        toggleSidebar={toggleSidebar}
+                        themeMode={themeMode}
+                        setThemeMode={setThemeMode}
                     />
+                    
+                    <div className="app-body">
+                        <Sidebar
+                            activeTool={activeTool}
+                            setActiveTool={setActiveTool}
+                            isVisible={isSidebarOpen}
+                        />
 
-                    <main className="main-content">
-                        {/* Top Bar Area for Toggle & Settings */}
-                        <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            height: '48px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '0 16px',
-                            zIndex: 900,
-                            pointerEvents: 'none' /* Passthrough to tool interactions if no header bg */
-                        }}>
-                            <div style={{ pointerEvents: 'auto' }}>
-                                {!isSidebarOpen && (
-                                    <IconButton
-                                        kind="ghost"
-                                        size="sm"
-                                        onClick={toggleSidebar}
-                                        label="Toggle Sidebar"
-                                        align="bottom"
-                                        className="cds-icon-btn" // Ensuring Carbon class
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                                        </svg>
-                                    </IconButton>
-                                )}
+                        <main className="main-content">
+                            <div className="content-area">
+                                {renderTool()}
                             </div>
-
-                            <div style={{ pointerEvents: 'auto' }}>
-                                <OverflowMenu
-                                    renderIcon={Settings}
-                                    flipped
-                                    size="sm"
-                                    ariaLabel="Settings"
-                                    iconDescription="Settings"
-                                    title="Theme Settings"
-                                >
-                                    <OverflowMenuItem itemText="System Theme" onClick={() => setThemeMode('system')} requireTitle />
-                                    <OverflowMenuItem itemText="Dark Theme" onClick={() => setThemeMode('dark')} requireTitle />
-                                    <OverflowMenuItem itemText="Light Theme" onClick={() => setThemeMode('light')} requireTitle />
-                                </OverflowMenu>
-                            </div>
-                        </div>
-
-
-                        <div className="content-area" style={{ marginTop: '0px' }}>
-                            {renderTool()}
-                        </div>
-                    </main>
-
-                    {isSidebarOpen && (
-                        <div style={{ position: 'absolute', top: '10px', left: '215px', zIndex: 900 }}>
-                            <IconButton
-                                kind="ghost"
-                                size="sm"
-                                onClick={toggleSidebar}
-                                label="Close Sidebar"
-                                align="bottom"
-                            >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M18 6L6 18M6 6l12 12"></path>
-                                </svg>
-                            </IconButton>
-                        </div>
-                    )}
+                        </main>
+                    </div>
                 </div>
             </Theme>
         </ErrorBoundary>
