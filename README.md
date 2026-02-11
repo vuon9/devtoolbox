@@ -7,7 +7,8 @@
 
 Essential software development tools for everyday tasks.
 
-<img width="1564" height="934" alt="image" src="https://github.com/user-attachments/assets/d3082042-b657-409d-8179-9941269db8d4" />
+<img width="1552" height="922" alt="image" src="https://github.com/user-attachments/assets/7dc24777-7330-485a-b6b4-b522739536c0" />
+
 
 ## Features
 
