@@ -1,8 +1,10 @@
 import React from 'react';
 import { CheckmarkFilled, CloseFilled } from '@carbon/icons-react';
 
-export const ErrorMessage = ({ error }) => error ? (
-    <div style={{
+export const ErrorMessage = ({ error }) =>
+  error ? (
+    <div
+      style={{
         padding: '0.5rem',
         backgroundColor: 'var(--cds-support-error-light)',
         color: 'var(--cds-support-error)',
@@ -11,15 +13,18 @@ export const ErrorMessage = ({ error }) => error ? (
         display: 'flex',
         alignItems: 'center',
         gap: '0.5rem',
-        flexShrink: 0
-    }}>
-        <CloseFilled size={16} />
-        {error}
+        flexShrink: 0,
+      }}
+    >
+      <CloseFilled size={16} />
+      {error}
     </div>
-) : null;
+  ) : null;
 
-export const SuccessMessage = ({ isValid }) => isValid === true ? (
-    <div style={{
+export const SuccessMessage = ({ isValid }) =>
+  isValid === true ? (
+    <div
+      style={{
         padding: '0.5rem',
         backgroundColor: 'var(--cds-support-success-light)',
         color: 'var(--cds-support-success)',
@@ -28,9 +33,10 @@ export const SuccessMessage = ({ isValid }) => isValid === true ? (
         display: 'flex',
         alignItems: 'center',
         gap: '0.5rem',
-        flexShrink: 0
-    }}>
-        <CheckmarkFilled size={16} />
-        Valid JWT structure
+        flexShrink: 0,
+      }}
+    >
+      <CheckmarkFilled size={16} />
+      Valid JWT structure
     </div>
-) : null;
+  ) : null;

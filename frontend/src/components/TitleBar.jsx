@@ -2,19 +2,20 @@ import React from 'react';
 import { IconButton, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { Menu, Close, Subtract, Maximize, Settings } from '@carbon/icons-react';
 
-export function TitleBar({ 
-  isSidebarOpen, 
-  toggleSidebar, 
+export function TitleBar({
+  isSidebarOpen,
+  toggleSidebar,
   appName = 'DevToolbox',
   themeMode,
-  setThemeMode 
+  setThemeMode,
 }) {
   // Detect if running in desktop mode
   const isDesktop = typeof window !== 'undefined' && window.wails;
-  
+
   // Detect platform
   const userAgent = navigator.userAgent.toLowerCase();
-  const isMac = userAgent.includes('mac') && !userAgent.includes('iphone') && !userAgent.includes('ipad');
+  const isMac =
+    userAgent.includes('mac') && !userAgent.includes('iphone') && !userAgent.includes('ipad');
 
   // Don't render in browser mode
   if (!isDesktop) {
@@ -73,9 +74,21 @@ export function TitleBar({
           title="Theme Settings"
           className="titlebar-settings"
         >
-          <OverflowMenuItem itemText="System Theme" onClick={() => setThemeMode('system')} requireTitle />
-          <OverflowMenuItem itemText="Dark Theme" onClick={() => setThemeMode('dark')} requireTitle />
-          <OverflowMenuItem itemText="Light Theme" onClick={() => setThemeMode('light')} requireTitle />
+          <OverflowMenuItem
+            itemText="System Theme"
+            onClick={() => setThemeMode('system')}
+            requireTitle
+          />
+          <OverflowMenuItem
+            itemText="Dark Theme"
+            onClick={() => setThemeMode('dark')}
+            requireTitle
+          />
+          <OverflowMenuItem
+            itemText="Light Theme"
+            onClick={() => setThemeMode('light')}
+            requireTitle
+          />
         </OverflowMenu>
 
         {/* Window controls for non-macOS platforms */}

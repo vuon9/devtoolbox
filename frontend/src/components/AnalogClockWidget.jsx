@@ -29,7 +29,7 @@ export default function AnalogClockWidget({ date }) {
     const y1 = center + (radius - 15) * Math.sin(angle);
     const x2 = center + (radius - 5) * Math.cos(angle);
     const y2 = center + (radius - 5) * Math.sin(angle);
-    
+
     hourMarkers.push(
       <line
         key={i}
@@ -52,7 +52,7 @@ export default function AnalogClockWidget({ date }) {
     const y1 = center + (radius - 8) * Math.sin(angle);
     const x2 = center + (radius - 5) * Math.cos(angle);
     const y2 = center + (radius - 5) * Math.sin(angle);
-    
+
     minuteMarkers.push(
       <line
         key={i}
@@ -73,10 +73,10 @@ export default function AnalogClockWidget({ date }) {
 
   const hourX = center + hourHandLength * Math.cos((hourAngle - 90) * (Math.PI / 180));
   const hourY = center + hourHandLength * Math.sin((hourAngle - 90) * (Math.PI / 180));
-  
+
   const minuteX = center + minuteHandLength * Math.cos((minuteAngle - 90) * (Math.PI / 180));
   const minuteY = center + minuteHandLength * Math.sin((minuteAngle - 90) * (Math.PI / 180));
-  
+
   const secondX = center + secondHandLength * Math.cos((secondAngle - 90) * (Math.PI / 180));
   const secondY = center + secondHandLength * Math.sin((secondAngle - 90) * (Math.PI / 180));
 
@@ -87,16 +87,18 @@ export default function AnalogClockWidget({ date }) {
   const displaySeconds = seconds.toString().padStart(2, '0');
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '1rem',
-      background: 'var(--cds-layer)',
-      borderRadius: '4px',
-      padding: '1rem',
-      minWidth: '200px',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '1rem',
+        background: 'var(--cds-layer)',
+        borderRadius: '4px',
+        padding: '1rem',
+        minWidth: '200px',
+      }}
+    >
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {/* Clock face */}
         <circle
@@ -148,33 +150,34 @@ export default function AnalogClockWidget({ date }) {
         />
 
         {/* Center dot */}
-        <circle
-          cx={center}
-          cy={center}
-          r={4}
-          fill="var(--cds-text-primary)"
-        />
+        <circle cx={center} cy={center} r={4} fill="var(--cds-text-primary)" />
       </svg>
 
       {/* Digital display */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '0.25rem',
-      }}>
-        <div style={{
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '1.5rem',
-          fontWeight: 600,
-          color: 'var(--cds-text-primary)',
-        }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.25rem',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: '1.5rem',
+            fontWeight: 600,
+            color: 'var(--cds-text-primary)',
+          }}
+        >
           {displayHours}:{displayMinutes}:{displaySeconds}
         </div>
-        <div style={{
-          fontSize: '0.875rem',
-          color: 'var(--cds-text-secondary)',
-        }}>
+        <div
+          style={{
+            fontSize: '0.875rem',
+            color: 'var(--cds-text-secondary)',
+          }}
+        >
           {ampm}
         </div>
       </div>

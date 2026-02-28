@@ -1,19 +1,20 @@
-# Agents — Design Principles & Development Guidelines
 
-## Purpose
+Here are principles and guidelines for developing tools and agents in this project:
+
 - A short, practical reference for contributors and automation agents.
 - Focus: consistent UI, maintainable backend patterns, and a simple development workflow.
-- Keep guidance conceptual — developers should consult the code for specifics.
+  - Use the Carbon Design System and Carbon tokens for colors and theming. Avoid hardcoded color values.
+  - Default visual tone is dark; follow the project's theme provider.
+  - Prefer small, reusable components to maintain consistency.
 
-## Core Principles
-- Use the Carbon Design System and Carbon tokens for colors and theming. Avoid hardcoded color values.
-- Default visual tone is dark; follow the project's theme provider.
-- Prefer small, reusable components to maintain consistency.
-
-## Tool layout (concept)
-- Tools must present three areas: Header (title + short purpose), Controls (options + actions), and Workspace (content panes).
-- Workspace commonly uses a split layout; provide a way for users to switch orientations and persist their preference.
+## Tool layout
+- Tools must present three areas: 
+  - Header (title + short purpose)
+  - Controls (options + actions)
+  - Workspace (content panes).
+- Optional: Workspace commonly uses a split layout; provide a way for users to switch orientations and persist their preference. Please think first before deciding and confirm in case of doubt.
 - Controls should be clearly separated from utility options.
+- Front-end code must be organized into components and helpers that reflect the UI structure, with clear naming and separation of concerns.
 
 ## Component rules (high level)
 - Buttons: group logically, use consistent visual hierarchy (primary vs secondary).

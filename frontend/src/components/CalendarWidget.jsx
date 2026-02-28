@@ -19,8 +19,18 @@ export default function CalendarWidget({ date, onDateSelect }) {
 
   // Month names
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   // Day names
@@ -28,7 +38,7 @@ export default function CalendarWidget({ date, onDateSelect }) {
 
   // Generate calendar days
   const days = [];
-  
+
   // Previous month days
   for (let i = firstDay - 1; i >= 0; i--) {
     days.push({
@@ -38,15 +48,14 @@ export default function CalendarWidget({ date, onDateSelect }) {
       isSelected: false,
     });
   }
-  
+
   // Current month days
   const today = new Date();
   for (let i = 1; i <= daysInMonth; i++) {
-    const isToday = i === today.getDate() && 
-                    month === today.getMonth() && 
-                    year === today.getFullYear();
+    const isToday =
+      i === today.getDate() && month === today.getMonth() && year === today.getFullYear();
     const isSelected = i === day;
-    
+
     days.push({
       day: i,
       currentMonth: true,
@@ -54,7 +63,7 @@ export default function CalendarWidget({ date, onDateSelect }) {
       isSelected,
     });
   }
-  
+
   // Next month days to fill the grid
   const remainingCells = 42 - days.length; // 6 rows * 7 columns
   for (let i = 1; i <= remainingCells; i++) {
@@ -68,7 +77,7 @@ export default function CalendarWidget({ date, onDateSelect }) {
 
   const handleDayClick = (dayInfo, index) => {
     if (!dayInfo.currentMonth || !onDateSelect) return;
-    
+
     // Calculate the actual date
     const clickedDate = new Date(year, month, dayInfo.day);
     onDateSelect(clickedDate);
@@ -89,19 +98,23 @@ export default function CalendarWidget({ date, onDateSelect }) {
   };
 
   return (
-    <div style={{
-      background: 'var(--cds-layer)',
-      borderRadius: '4px',
-      padding: '1rem',
-      minWidth: '280px',
-    }}>
+    <div
+      style={{
+        background: 'var(--cds-layer)',
+        borderRadius: '4px',
+        padding: '1rem',
+        minWidth: '280px',
+      }}
+    >
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '1rem',
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+        }}
+      >
         <button
           onClick={goToPrevMonth}
           style={{
@@ -115,14 +128,16 @@ export default function CalendarWidget({ date, onDateSelect }) {
         >
           ‹
         </button>
-        
-        <div style={{
-          fontWeight: 600,
-          fontSize: '1rem',
-        }}>
+
+        <div
+          style={{
+            fontWeight: 600,
+            fontSize: '1rem',
+          }}
+        >
           {monthNames[month]} {year}
         </div>
-        
+
         <button
           onClick={goToNextMonth}
           style={{
@@ -139,12 +154,14 @@ export default function CalendarWidget({ date, onDateSelect }) {
       </div>
 
       {/* Day headers */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(7, 1fr)',
-        gap: '0.25rem',
-        marginBottom: '0.5rem',
-      }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: '0.25rem',
+          marginBottom: '0.5rem',
+        }}
+      >
         {dayNames.map((name) => (
           <div
             key={name}
@@ -161,11 +178,13 @@ export default function CalendarWidget({ date, onDateSelect }) {
       </div>
 
       {/* Calendar grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(7, 1fr)',
-        gap: '0.25rem',
-      }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: '0.25rem',
+        }}
+      >
         {days.map((dayInfo, index) => (
           <button
             key={index}
@@ -178,15 +197,15 @@ export default function CalendarWidget({ date, onDateSelect }) {
               border: 'none',
               borderRadius: '4px',
               cursor: dayInfo.currentMonth ? 'pointer' : 'default',
-              background: dayInfo.isSelected 
-                ? 'var(--cds-button-primary)' 
-                : dayInfo.isToday 
-                  ? 'var(--cds-layer-hover)' 
+              background: dayInfo.isSelected
+                ? 'var(--cds-button-primary)'
+                : dayInfo.isToday
+                  ? 'var(--cds-layer-hover)'
                   : 'transparent',
-              color: dayInfo.isSelected 
-                ? 'var(--cds-button-primary-text)' 
-                : dayInfo.currentMonth 
-                  ? 'var(--cds-text-primary)' 
+              color: dayInfo.isSelected
+                ? 'var(--cds-button-primary-text)'
+                : dayInfo.currentMonth
+                  ? 'var(--cds-text-primary)'
                   : 'var(--cds-text-disabled)',
               fontSize: '0.875rem',
               fontWeight: dayInfo.isToday || dayInfo.isSelected ? 600 : 400,
@@ -198,19 +217,22 @@ export default function CalendarWidget({ date, onDateSelect }) {
       </div>
 
       {/* Selected date display */}
-      <div style={{
-        marginTop: '1rem',
-        paddingTop: '0.75rem',
-        borderTop: '1px solid var(--cds-border-subtle)',
-        textAlign: 'center',
-        fontSize: '0.875rem',
-        color: 'var(--cds-text-secondary)',
-      }}>
-        Selected: {currentDate.toLocaleDateString(undefined, { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
+      <div
+        style={{
+          marginTop: '1rem',
+          paddingTop: '0.75rem',
+          borderTop: '1px solid var(--cds-border-subtle)',
+          textAlign: 'center',
+          fontSize: '0.875rem',
+          color: 'var(--cds-text-secondary)',
+        }}
+      >
+        Selected:{' '}
+        {currentDate.toLocaleDateString(undefined, {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
         })}
       </div>
     </div>

@@ -4,11 +4,10 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
-import { Create as $Create } from "@wailsio/runtime";
+import { Create as $Create } from '@wailsio/runtime';
 
 function configure() {
-    Object.freeze(Object.assign($Create.Events, {
-    }));
+  Object.freeze(Object.assign($Create.Events, {}));
 }
 
 configure();

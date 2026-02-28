@@ -23,96 +23,99 @@ import { getMonospaceFontFamily, getDataFontSize, getTextareaResize } from '../.
  * @param {Object} [props.style={}] - Additional container styles
  */
 export default function ToolTextArea({
-    label,
-    value,
-    onChange,
-    readOnly = false,
-    placeholder,
-    showCopyButton = true,
-    resizeHeight = true,
-    resizeWidth = false,
-    monospace = true,
-    fontSize,
-    fontFamily,
-    rows,
-    textAreaProps = {},
-    style = {}
+  label,
+  value,
+  onChange,
+  readOnly = false,
+  placeholder,
+  showCopyButton = true,
+  resizeHeight = true,
+  resizeWidth = false,
+  monospace = true,
+  fontSize,
+  fontFamily,
+  rows,
+  textAreaProps = {},
+  style = {},
 }) {
-    const effectiveFontFamily = monospace ? getMonospaceFontFamily() : fontFamily;
-    const effectiveFontSize = fontSize || getDataFontSize();
-    const resizeStyle = getTextareaResize(resizeHeight, resizeWidth);
+  const effectiveFontFamily = monospace ? getMonospaceFontFamily() : fontFamily;
+  const effectiveFontSize = fontSize || getDataFontSize();
+  const resizeStyle = getTextareaResize(resizeHeight, resizeWidth);
 
-    // Copy button component
-    const copyButton = showCopyButton && (
-        <ToolCopyButton
-            text={value}
-            style={{ marginLeft: 'auto' }}
-        />
-    );
+  // Copy button component
+  const copyButton = showCopyButton && (
+    <ToolCopyButton text={value} style={{ marginLeft: 'auto' }} />
+  );
 
-    return (
-        <div
-            className="tool-textarea-container"
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                minHeight: 0,
-                flex: 1,
-                ...style
-            }}
+  return (
+    <div
+      className="tool-textarea-container"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        minHeight: 0,
+        flex: 1,
+        ...style,
+      }}
+    >
+      {/* Label and copy button row */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          minHeight: '30px',
+          marginBottom: '0.5rem',
+        }}
+      >
+        <label
+          style={{
+            fontSize: '0.75rem',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: '0.32px',
+            color: 'var(--cds-text-secondary)',
+            textTransform: 'uppercase',
+          }}
         >
-            {/* Label and copy button row */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                minHeight: '30px',
-                marginBottom: '0.5rem'
-            }}>
-                <label style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 400,
-                    lineHeight: 1.5,
-                    letterSpacing: '0.32px',
-                    color: 'var(--cds-text-secondary)',
-                    textTransform: 'uppercase'
-                }}>
-                    {label}
-                </label>
-                {copyButton}
-            </div>
+          {label}
+        </label>
+        {copyButton}
+      </div>
 
-            {/* Textarea container */}
-            <div style={{
-                flex: 1,
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: 0
-            }}>
-                <TextArea
-                    value={value}
-                    onChange={onChange}
-                    readOnly={readOnly}
-                    placeholder={placeholder}
-                    rows={rows}
-                    style={{
-                        flex: 1,
-                        height: rows ? undefined : '100%',
-                        minHeight: rows ? undefined : '0',
-                        resize: resizeStyle,
-                        fontFamily: effectiveFontFamily,
-                        fontSize: effectiveFontSize,
-                        border: '1px solid var(--cds-border-strong)',
-                        backgroundColor: readOnly ? 'var(--cds-ui-01)' : 'var(--cds-field)',
-                        color: 'var(--cds-text-primary)',
-                    }}
-                    labelText=""
-                    className="tool-textarea-flex-fix"
-                    {...textAreaProps}
-                />
-            </div>
-        </div>
-    );
+      {/* Textarea container */}
+      <div
+        style={{
+          flex: 1,
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+        }}
+      >
+        <TextArea
+          value={value}
+          onChange={onChange}
+          readOnly={readOnly}
+          placeholder={placeholder}
+          rows={rows}
+          style={{
+            flex: 1,
+            height: rows ? undefined : '100%',
+            minHeight: rows ? undefined : '0',
+            resize: resizeStyle,
+            fontFamily: effectiveFontFamily,
+            fontSize: effectiveFontSize,
+            border: '1px solid var(--cds-border-strong)',
+            backgroundColor: readOnly ? 'var(--cds-ui-01)' : 'var(--cds-field)',
+            color: 'var(--cds-text-primary)',
+          }}
+          labelText=""
+          className="tool-textarea-flex-fix"
+          {...textAreaProps}
+        />
+      </div>
+    </div>
+  );
 }
