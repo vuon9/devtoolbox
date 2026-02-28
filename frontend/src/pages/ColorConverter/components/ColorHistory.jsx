@@ -9,10 +9,9 @@ export default function ColorHistory({ history, onLoadFromHistory, onClearHistor
         display: 'flex',
         flexDirection: 'column',
         border: '1px solid var(--cds-border-subtle)',
-        borderRadius: '4px',
         overflow: 'hidden',
         backgroundColor: 'var(--cds-layer)',
-        maxHeight: '200px',
+        flex: 1,
       }}
     >
       <div

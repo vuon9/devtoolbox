@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextInput } from '@carbon/react';
+import { Button, CopyButton, TextInput } from '@carbon/react';
 import { Copy } from '@carbon/icons-react';
 
 export default function ColorInputRow({ label, value, onChange, copyValue, onCopy, placeholder }) {
@@ -41,7 +41,6 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
-        padding: '8px 0',
         borderBottom: '1px solid var(--cds-border-subtle)',
       }}
     >
@@ -51,7 +50,6 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
           color: 'var(--cds-text-secondary)',
           fontWeight: 500,
           textTransform: 'uppercase',
-          width: '50px',
         }}
       >
         {label}
@@ -69,20 +67,15 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
         placeholder={placeholder}
         style={{
           fontFamily: "'IBM Plex Mono', monospace",
-          flex: 1,
           border: 'none',
           background: 'transparent',
         }}
         size="md"
       />
 
-      <Button
-        hasIconOnly
-        renderIcon={Copy}
-        kind="ghost"
-        size="sm"
+      <CopyButton
+        autoAlign
         onClick={() => onCopy(copyValue)}
-        iconDescription={`Copy ${label}`}
       />
     </div>
   );

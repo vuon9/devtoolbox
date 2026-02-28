@@ -2,7 +2,7 @@ import React from 'react';
 import ColorInputRow from './ColorInputRow';
 import { formatHex, formatRgb, formatHsl, formatHsv, formatCmyk } from '../colorUtils';
 
-export default function ColorInputs({ state, onColorInput, onCopy }) {
+export default function ColorInputs({ state, onColorInput, onCopy, style = {} }) {
   const hexDisplay = formatHex(state.hex);
   const rgbDisplay = formatRgb(state.rgb.r, state.rgb.g, state.rgb.b);
   const hslDisplay = formatHsl(state.hsl.h, state.hsl.s, state.hsl.l);
@@ -12,8 +12,8 @@ export default function ColorInputs({ state, onColorInput, onCopy }) {
   return (
     <div
       style={{
-        flex: 1,
         overflow: 'auto',
+        ...style,
       }}
     >
       <ColorInputRow

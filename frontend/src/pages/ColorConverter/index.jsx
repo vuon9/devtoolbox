@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useReducer, useMemo, useRef } from 'react';
-import { Button } from '@carbon/react';
+import { Button, Grid, Column, Tabs, TabList, Tab, TabPanels, TabPanel, Layer, Checkbox, TextInput } from '@carbon/react';
 import { Eyedropper, ColorPalette } from '@carbon/icons-react';
-import { ToolHeader, ToolSplitPane, ToolLayoutToggle } from '../../components/ToolUI';
-import useLayoutToggle from '../../hooks/useLayoutToggle';
+import { ToolHeader } from '../../components/ToolUI';
 import { colorReducer, initialState, actions } from './colorReducer';
 import {
   hexToRgb,
@@ -27,13 +26,6 @@ export default function ColorConverter() {
   const [isPicking, setIsPicking] = useState(false);
   const colorPickerRef = useRef(null);
   const historyTimeoutRef = useRef(null);
-
-  const layout = useLayoutToggle({
-    toolKey: 'color-converter-layout',
-    defaultDirection: 'horizontal',
-    showToggle: true,
-    persist: true,
-  });
 
   // Check for EyeDropper API support
   useEffect(() => {
@@ -184,160 +176,138 @@ export default function ColorConverter() {
   }, [updateFromRgb]);
 
   return (
-    <div
-      className="tool-container"
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
+    <Grid fullWidth
+      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflow: 'hidden' }}
     >
-      <ToolHeader
-        title="Color Converter"
-        description="Pick colors and generate code snippets for multiple programming languages."
-      />
-
-      {/* Controls */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          padding: '0.75rem',
-          backgroundColor: 'var(--cds-layer)',
-          borderRadius: '4px',
-        }}
-      >
-        {/* Clickable Color Preview */}
-        <div
-          onClick={openColorPicker}
-          style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: '6px',
-            backgroundColor: state.hex,
-            border: '2px solid var(--cds-border-strong)',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-            cursor: 'pointer',
-            position: 'relative',
-            flexShrink: 0,
-          }}
-          title="Click to open color picker"
-        >
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '2px',
-              right: '2px',
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              borderRadius: '2px',
-              padding: '1px',
-            }}
-          >
-            <ColorPalette size={10} style={{ color: 'white' }} />
-          </div>
-        </div>
-
-        {/* Hidden native color picker */}
-        <input
-          ref={colorPickerRef}
-          type="color"
-          value={
-            state.hex.startsWith('#') && state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex
-          }
-          onChange={handleColorPickerChange}
-          style={{ display: 'none' }}
+      <Column>
+        <ToolHeader
+          title="Color Converter"
+          description="Pick colors and generate code snippets for multiple programming languages."
         />
+      </Column>
 
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <Button
-            size="sm"
-            kind="secondary"
-            renderIcon={ColorPalette}
-            onClick={generateRandomColor}
-          >
-            Random
-          </Button>
-
-          {eyedropperSupported && (
-            <Button
-              size="sm"
-              kind="primary"
-              renderIcon={Eyedropper}
-              onClick={openEyeDropper}
-              disabled={isPicking}
-            >
-              {isPicking ? 'Picking...' : 'Eye Dropper'}
-            </Button>
-          )}
-        </div>
-
-        <div style={{ marginLeft: 'auto' }}>
-          <ToolLayoutToggle
-            direction={layout.direction}
-            onToggle={layout.toggleDirection}
-            position="controls"
-          />
-        </div>
-      </div>
-
-      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-        {/* Left Pane: Color Inputs & History */}
-        <div
-          className="pane"
+      <Grid>
+        {/* Controls */}
+        <Column sm={4} md={8} lg={16}
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            minHeight: '50vh',
-            flex: 1,
-            gap: '0.75rem',
+            gap: '1rem',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            padding: '0.75rem',
+            backgroundColor: 'var(--cds-layer)',
+            borderRadius: '4px',
+            marginBottom: '2rem',
           }}
         >
-          <label
+          {/* Clickable Color Preview */}
+          <div
+            onClick={openColorPicker}
+            style={{
+              width: '90px',
+              height: '90px',
+              borderRadius: '8px',
+              backgroundColor: state.hex,
+              border: '2px solid var(--cds-border-strong)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              cursor: 'pointer',
+              position: 'relative',
+              flexShrink: 0,
+            }}
+            title="Click to open color picker"
+          >
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '4px',
+                right: '4px',
+                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                borderRadius: '4px',
+                padding: '3px',
+              }}
+            >
+              <ColorPalette size={14} style={{ color: 'white' }} />
+            </div>
+          </div>
+
+          {/* Hidden native color picker */}
+          <input
+            ref={colorPickerRef}
+            type="color"
+            value={
+              state.hex.startsWith('#') && state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex
+            }
+            onChange={handleColorPickerChange}
+            style={{ display: 'none' }}
+          />
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <Button
+              size="sm"
+              kind="secondary"
+              renderIcon={ColorPalette}
+              onClick={generateRandomColor}
+            >
+              Random
+            </Button>
+
+            {eyedropperSupported && (
+              <Button
+                size="sm"
+                kind="primary"
+                renderIcon={Eyedropper}
+                onClick={openEyeDropper}
+                disabled={isPicking}
+              >
+                {isPicking ? 'Picking...' : 'Eye Dropper'}
+              </Button>
+            )}
+          </div>
+        </Column>
+
+        {/* Left Pane: Color Inputs & History */}
+        <Column sm={4} md={3} lg={6} style={{ minHeight: '30vh' }}>
+          <h4
             style={{
               fontSize: '0.75rem',
               fontWeight: 400,
               lineHeight: 1.5,
-              letterSpacing: '0.32px',
               color: 'var(--cds-text-secondary)',
               textTransform: 'uppercase',
             }}
           >
             Color Values
-          </label>
+          </h4>
 
-          <ColorInputs state={state} onColorInput={handleColorInput} onCopy={copyToClipboard} />
+          <ColorInputs
+            state={state}
+            onColorInput={handleColorInput}
+            onCopy={copyToClipboard}
+            style={{ marginBottom: '1.5rem' }}
+          />
 
           <ColorHistory
             history={state.history}
             onLoadFromHistory={loadFromHistory}
             onClearHistory={() => dispatch(actions.clearHistory())}
           />
-        </div>
+        </Column>
 
         {/* Right Pane: Code Snippets */}
-        <div
-          className="pane"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            minHeight: '50vh',
-            flex: 1,
-          }}
-        >
-          <label
+        <Column sm={4} md={5} lg={10}>
+          <h4
+            area-label="Code Snippets"
             style={{
               fontSize: '0.75rem',
-              fontWeight: 400,
               lineHeight: 1.5,
-              letterSpacing: '0.32px',
               color: 'var(--cds-text-secondary)',
               textTransform: 'uppercase',
-              marginBottom: '0.5rem',
+              marginBottom: '.5rem',
             }}
           >
             Code Snippets
-          </label>
+          </h4>
 
           <CodeSnippetsPanel
             codeSnippets={codeSnippets}
@@ -345,8 +315,9 @@ export default function ColorConverter() {
             onTabChange={(idx) => dispatch(actions.setSelectedTab(idx))}
             onCopy={copyToClipboard}
           />
-        </div>
-      </ToolSplitPane>
-    </div>
+        </Column>
+      </Grid>
+    </Grid>
+
   );
 }

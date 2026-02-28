@@ -18,98 +18,93 @@ const languageTabs = [
 
 export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChange, onCopy }) {
   return (
-    <div
-      style={{
-        flex: 1,
-        minHeight: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'var(--cds-layer)',
-        border: '1px solid var(--cds-border-strong)',
-        borderRadius: '4px',
-        overflow: 'hidden',
-      }}
+    <Tabs
+      selectedIndex={selectedTab}
+      onChange={({ selectedIndex }) => onTabChange(selectedIndex)}
     >
-      <Tabs
-        selectedIndex={selectedTab}
-        onChange={({ selectedIndex }) => onTabChange(selectedIndex)}
-      >
-        <TabList aria-label="Language tabs" contained style={{ overflowX: 'auto' }}>
-          {languageTabs.map((tab) => (
-            <Tab key={tab.id}>{tab.label}</Tab>
-          ))}
-        </TabList>
+      <TabList aria-label="Language tabs" contained>
+        {languageTabs.map((tab) => (
+          <Tab key={tab.id} style={{ flexShrink: 0 }}>{tab.label}</Tab>
+        ))}
+      </TabList>
 
-        <TabPanels style={{ flex: 1, overflow: 'auto', padding: '0.75rem' }}>
-          {languageTabs.map((tab) => (
-            <TabPanel key={tab.id}>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: '0.75rem',
-                }}
-              >
-                {(codeSnippets[tab.id] || []).map((snippet, idx) => (
-                  <Tile
-                    key={idx}
+      <TabPanels style={{ flex: 1, overflow: 'hidden', minWidth: 0 }}>
+        {languageTabs.map((tab) => (
+          <TabPanel key={tab.id} style={{ overflow: 'auto', padding: '0.75rem', minWidth: 0 }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+              }}
+            >
+              {(codeSnippets[tab.id] || []).map((snippet, idx) => (
+                <Tile
+                  key={idx}
+                  style={{
+                    padding: '0.75rem',
+                    backgroundColor: 'var(--cds-layer-hover)',
+                    minWidth: 0,
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
                     style={{
-                      padding: '0.75rem',
-                      backgroundColor: 'var(--cds-layer-hover)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      gap: '1rem',
+                      minWidth: 0,
                     }}
                   >
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        gap: '1rem',
-                      }}
-                    >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            fontSize: '0.75rem',
-                            color: 'var(--cds-text-secondary)',
-                            marginBottom: '0.5rem',
-                            textTransform: 'uppercase',
-                            fontWeight: 500,
-                          }}
-                        >
-                          {snippet.name}
-                        </div>
-
-                        <pre
-                          style={{
-                            fontFamily: "'IBM Plex Mono', monospace",
-                            fontSize: '0.8rem',
-                            margin: 0,
-                            whiteSpace: 'pre-wrap',
-                            wordBreak: 'break-all',
-                            color: 'var(--cds-text-primary)',
-                          }}
-                        >
-                          {snippet.code}
-                        </pre>
+                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', maxWidth: '100%' }}>
+                      <div
+                        style={{
+                          fontSize: '0.75rem',
+                          color: 'var(--cds-text-secondary)',
+                          marginBottom: '0.5rem',
+                          textTransform: 'uppercase',
+                          fontWeight: 500,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {snippet.name}
                       </div>
 
-                      <Button
-                        hasIconOnly
-                        renderIcon={Copy}
-                        kind="ghost"
-                        size="sm"
-                        onClick={() => onCopy(snippet.code)}
-                        iconDescription="Copy"
-                        style={{ flexShrink: 0 }}
-                      />
+                      <pre
+                        style={{
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontSize: '0.8rem',
+                          margin: 0,
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-all',
+                          color: 'var(--cds-text-primary)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {snippet.code}
+                      </pre>
                     </div>
-                  </Tile>
-                ))}
-              </div>
-            </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
-    </div>
+
+                    <Button
+                      hasIconOnly
+                      renderIcon={Copy}
+                      kind="ghost"
+                      size="sm"
+                      onClick={() => onCopy(snippet.code)}
+                      iconDescription="Copy"
+                      style={{ flexShrink: 0 }}
+                    />
+                  </div>
+                </Tile>
+              ))}
+            </div>
+          </TabPanel>
+        ))}
+      </TabPanels>
+    </Tabs>
   );
 }

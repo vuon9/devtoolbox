@@ -111,7 +111,7 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
 }
 
 export function ToolSplitPane({ children, columnCount = 2 }) {
-  const gridColumns = columnCount === 1 ? '1fr' : `repeat(${columnCount}, 1fr)`;
+  const gridColumns = columnCount === 1 ? '1fr' : `repeat(${columnCount}, minmax(0, 1fr))`;
   return (
     <div
       className="split-pane"
@@ -121,6 +121,7 @@ export function ToolSplitPane({ children, columnCount = 2 }) {
         gap: '16px',
         flex: 1,
         minHeight: 0,
+        overflow: 'hidden',
       }}
     >
       {children}
