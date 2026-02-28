@@ -1,0 +1,2 @@
+{"time":"2026-02-23T12:04:10.777456+07:00","level":"INFO","source":{"function":"github.com/charmbracelet/crush/internal/config.(*catwalkSync).Get.func1","file":"github.com/charmbracelet/crush/internal/config/catwalk.go","line":55},"msg":"Fetching providers from Catwalk"}
+{"time":"2026-02-23T12:04:11.177713+07:00","level":"INFO","source":{"function":"github.com/charmbracelet/crush/internal/config.(*catwalkSync).Get.func1","file":"github.com/charmbracelet/crush/internal/config/catwalk.go","line":63},"msg":"Catwalk providers not modified"}
