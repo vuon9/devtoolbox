@@ -14,53 +14,53 @@ import { TOGGLE_POSITIONS } from './constants';
  * @param {Object} [props.style={}] - Additional styles
  */
 export default function ToolLayoutToggle({
-    direction,
-    onToggle,
-    position = 'top-right',
-    disabled = false,
-    style = {}
+  direction,
+  onToggle,
+  position = 'top-right',
+  disabled = false,
+  style = {},
 }) {
-    const isHorizontal = direction === 'horizontal';
+  const isHorizontal = direction === 'horizontal';
 
-    // Position styling based on position prop
-    const positionStyles = {
-        'top-right': {
-            position: 'absolute',
-            top: '0',
-            right: '0',
-            zIndex: 10,
-        },
-        'controls': {
-            marginLeft: 'auto', // Pushes to end of flex container
-        },
-        'floating': {
-            position: 'absolute',
-            top: '0.5rem',
-            right: '0.5rem',
-            zIndex: 10,
-            backgroundColor: 'var(--cds-layer)',
-            borderRadius: '4px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-        }
-    };
+  // Position styling based on position prop
+  const positionStyles = {
+    'top-right': {
+      position: 'absolute',
+      top: '0',
+      right: '0',
+      zIndex: 10,
+    },
+    controls: {
+      marginLeft: 'auto', // Pushes to end of flex container
+    },
+    floating: {
+      position: 'absolute',
+      top: '0.5rem',
+      right: '0.5rem',
+      zIndex: 10,
+      backgroundColor: 'var(--cds-layer)',
+      borderRadius: '4px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    },
+  };
 
-    const containerStyle = {
-        ...positionStyles[position] || positionStyles['top-right'],
-        ...style
-    };
+  const containerStyle = {
+    ...(positionStyles[position] || positionStyles['top-right']),
+    ...style,
+  };
 
-    return (
-        <div style={containerStyle}>
-            <Button
-                kind="ghost"
-                size="sm"
-                renderIcon={isHorizontal ? VerticalView : SplitScreen}
-                iconDescription={isHorizontal ? "Vertical layout" : "Horizontal layout"}
-                hasIconOnly
-                disabled={disabled}
-                onClick={onToggle}
-                title={isHorizontal ? "Switch to vertical layout" : "Switch to horizontal layout"}
-            />
-        </div>
-    );
+  return (
+    <div style={containerStyle}>
+      <Button
+        kind="ghost"
+        size="sm"
+        renderIcon={isHorizontal ? VerticalView : SplitScreen}
+        iconDescription={isHorizontal ? 'Vertical layout' : 'Horizontal layout'}
+        hasIconOnly
+        disabled={disabled}
+        onClick={onToggle}
+        title={isHorizontal ? 'Switch to vertical layout' : 'Switch to horizontal layout'}
+      />
+    </div>
+  );
 }

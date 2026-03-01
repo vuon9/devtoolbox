@@ -22,94 +22,93 @@ import { getMonospaceFontFamily, getDataFontSize } from '../../utils/inputUtils'
  * @param {Object} [props.style={}] - Additional container styles
  */
 export default function ToolInput({
-    label,
-    value,
-    onChange,
-    type = 'text',
-    placeholder,
-    readOnly = false,
-    showCopyButton = true,
-    monospace = true,
-    fontSize,
-    fontFamily,
-    inputProps = {},
-    style = {}
+  label,
+  value,
+  onChange,
+  type = 'text',
+  placeholder,
+  readOnly = false,
+  showCopyButton = true,
+  monospace = true,
+  fontSize,
+  fontFamily,
+  inputProps = {},
+  style = {},
 }) {
-    const [showPassword, setShowPassword] = useState(false);
-    const effectiveFontFamily = monospace ? getMonospaceFontFamily() : fontFamily;
-    const effectiveFontSize = fontSize || getDataFontSize();
+  const [showPassword, setShowPassword] = useState(false);
+  const effectiveFontFamily = monospace ? getMonospaceFontFamily() : fontFamily;
+  const effectiveFontSize = fontSize || getDataFontSize();
 
-    // Determine effective input type
-    const inputType = type === 'password' ? (showPassword ? 'text' : 'password') : type;
+  // Determine effective input type
+  const inputType = type === 'password' ? (showPassword ? 'text' : 'password') : type;
 
-    // Copy button component
-    const copyButton = showCopyButton && (
-        <ToolCopyButton
-            text={value}
-            size="sm"
-        />
-    );
+  // Copy button component
+  const copyButton = showCopyButton && <ToolCopyButton text={value} size="sm" />;
 
-    // Toggle password visibility button
-    const passwordToggleButton = type === 'password' && (
-        <IconButton
-            kind="ghost"
-            size="sm"
-            onClick={() => setShowPassword(!showPassword)}
-            label={showPassword ? "Hide value" : "Show value"}
-            align="bottom"
-            className="password-toggle-button"
-        >
-            {showPassword ? <ViewOff /> : <View />}
-        </IconButton>
-    );
+  // Toggle password visibility button
+  const passwordToggleButton = type === 'password' && (
+    <IconButton
+      kind="ghost"
+      size="sm"
+      onClick={() => setShowPassword(!showPassword)}
+      label={showPassword ? 'Hide value' : 'Show value'}
+      align="bottom"
+      className="password-toggle-button"
+    >
+      {showPassword ? <ViewOff /> : <View />}
+    </IconButton>
+  );
 
-    return (
-        <div
-            className="tool-input-container"
+  return (
+    <div
+      className="tool-input-container"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        ...style,
+      }}
+    >
+      {/* Label */}
+      <label
+        style={{
+          display: 'block',
+          fontSize: '0.75rem',
+          fontWeight: 400,
+          color: 'var(--cds-text-secondary)',
+          textTransform: 'uppercase',
+        }}
+      >
+        {label}
+      </label>
+
+      {/* Input and copy button row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <TextInput
+            value={value}
+            onChange={onChange}
+            type={inputType}
+            placeholder={placeholder}
+            readOnly={readOnly}
             style={{
-                display: 'flex',
-                flexDirection: 'column',
-                ...style
+              fontFamily: effectiveFontFamily,
+              fontSize: effectiveFontSize,
+              backgroundColor: readOnly ? 'var(--cds-ui-01)' : 'var(--cds-field)',
+              color: 'var(--cds-text-primary)',
+              width: '100%',
             }}
-        >
-            {/* Label */}
-            <label style={{
-                display: 'block',
-                fontSize: '0.75rem',
-                fontWeight: 400,
-                color: 'var(--cds-text-secondary)',
-                textTransform: 'uppercase',
-            }}>
-                {label}
-            </label>
-
-            {/* Input and copy button row */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-            }}>
-                <div style={{ flex: 1 }}>
-                    <TextInput
-                        value={value}
-                        onChange={onChange}
-                        type={inputType}
-                        placeholder={placeholder}
-                        readOnly={readOnly}
-                        style={{
-                            fontFamily: effectiveFontFamily,
-                            fontSize: effectiveFontSize,
-                            backgroundColor: readOnly ? 'var(--cds-ui-01)' : 'var(--cds-field)',
-                            color: 'var(--cds-text-primary)',
-                            width: '100%'
-                        }}
-                        {...inputProps}
-                    />
-                </div>
-                {passwordToggleButton}
-                {copyButton}
-            </div>
+            {...inputProps}
+          />
         </div>
-    );
+        {passwordToggleButton}
+        {copyButton}
+      </div>
+    </div>
+  );
 }

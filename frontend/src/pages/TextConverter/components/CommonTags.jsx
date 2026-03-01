@@ -4,141 +4,141 @@ import { Add, Close, Checkmark } from '@carbon/icons-react';
 import { STORAGE_KEYS, DEFAULT_COMMON_TAGS, LABELS, BUTTONS } from '../strings';
 
 export default function CommonTags({ currentCategory, currentMethod, onTagSelect }) {
-    const [customTags, setCustomTags] = useState(() => {
-        try {
-            return JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_TAGS)) || [];
-        } catch {
-            return [];
-        }
-    });
-    const [isHovering, setIsHovering] = useState(false);
+  const [customTags, setCustomTags] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_TAGS)) || [];
+    } catch {
+      return [];
+    }
+  });
+  const [isHovering, setIsHovering] = useState(false);
 
-    // Save custom tags to localStorage whenever they change
-    useEffect(() => {
-        localStorage.setItem(STORAGE_KEYS.CUSTOM_TAGS, JSON.stringify(customTags));
-    }, [customTags]);
+  // Save custom tags to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_TAGS, JSON.stringify(customTags));
+  }, [customTags]);
 
-    // Combine default and custom tags
-    const allTags = [...DEFAULT_COMMON_TAGS, ...customTags];
+  // Combine default and custom tags
+  const allTags = [...DEFAULT_COMMON_TAGS, ...customTags];
 
-    const handleTagClick = (tag) => {
-        onTagSelect(tag.category, tag.method);
-    };
+  const handleTagClick = (tag) => {
+    onTagSelect(tag.category, tag.method);
+  };
 
-    const handleRemoveTag = (e, tagId) => {
-        e.stopPropagation();
-        setCustomTags(customTags.filter(tag => tag.id !== tagId));
-    };
+  const handleRemoveTag = (e, tagId) => {
+    e.stopPropagation();
+    setCustomTags(customTags.filter((tag) => tag.id !== tagId));
+  };
 
-    return (
-        <div
-            style={{
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        padding: '0.5rem 0',
+        borderBottom: '1px solid var(--cds-border-subtle)',
+        marginBottom: '0.75rem',
+      }}
+    >
+      <span
+        style={{
+          fontSize: '0.75rem',
+          color: 'var(--cds-text-secondary)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.32px',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {LABELS.QUICK_ACTION}
+      </span>
+
+      {/* Scrollable tags container */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '0.5rem',
+          overflowX: 'auto',
+          flex: 1,
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'var(--cds-border-subtle) transparent',
+          paddingBottom: '2px',
+          cursor: isHovering ? 'grab' : 'default',
+        }}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        onWheel={(e) => {
+          // Enable horizontal scroll with mouse wheel
+          if (e.deltaY !== 0) {
+            e.currentTarget.scrollLeft += e.deltaY;
+            e.preventDefault();
+          }
+        }}
+      >
+        {allTags.map((tag) => {
+          const isActive = tag.category === currentCategory && tag.method === currentMethod;
+          const isCustom = tag.id.startsWith('custom-');
+
+          return (
+            <div
+              key={tag.id}
+              style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 0',
-                borderBottom: '1px solid var(--cds-border-subtle)',
-                marginBottom: '0.75rem',
-            }}
-        >
-            <span
-                style={{
-                    fontSize: '0.75rem',
-                    color: 'var(--cds-text-secondary)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.32px',
-                    whiteSpace: 'nowrap',
-                }}
+                flexShrink: 0,
+                position: 'relative',
+              }}
             >
-                {LABELS.QUICK_ACTION}
-            </span>
-
-            {/* Scrollable tags container */}
-            <div
+              <Tag
+                type={isActive ? 'blue' : isCustom ? 'green' : 'gray'}
+                size="md"
+                onClick={() => handleTagClick(tag)}
                 style={{
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  paddingRight: isCustom ? '24px' : '8px',
+                }}
+              >
+                {tag.label}
+              </Tag>
+              {isCustom && (
+                <div
+                  onClick={(e) => handleRemoveTag(e, tag.id)}
+                  style={{
+                    position: 'absolute',
+                    right: '4px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
                     display: 'flex',
-                    gap: '0.5rem',
-                    overflowX: 'auto',
-                    flex: 1,
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: 'var(--cds-border-subtle) transparent',
-                    paddingBottom: '2px',
-                    cursor: isHovering ? 'grab' : 'default',
-                }}
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
-                onWheel={(e) => {
-                    // Enable horizontal scroll with mouse wheel
-                    if (e.deltaY !== 0) {
-                        e.currentTarget.scrollLeft += e.deltaY;
-                        e.preventDefault();
-                    }
-                }}
-            >
-                {allTags.map((tag) => {
-                    const isActive = tag.category === currentCategory && tag.method === currentMethod;
-                    const isCustom = tag.id.startsWith('custom-');
-
-                    return (
-                        <div
-                            key={tag.id}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                flexShrink: 0,
-                                position: 'relative',
-                            }}
-                        >
-                            <Tag
-                                type={isActive ? 'blue' : isCustom ? 'green' : 'gray'}
-                                size="md"
-                                onClick={() => handleTagClick(tag)}
-                                style={{
-                                    cursor: 'pointer',
-                                    userSelect: 'none',
-                                    paddingRight: isCustom ? '24px' : '8px',
-                                }}
-                            >
-                                {tag.label}
-                            </Tag>
-                            {isCustom && (
-                                <div
-                                    onClick={(e) => handleRemoveTag(e, tag.id)}
-                                    style={{
-                                        position: 'absolute',
-                                        right: '4px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: '18px',
-                                        height: '18px',
-                                        borderRadius: '50%',
-                                        backgroundColor: 'var(--cds-background-inverse-hover, #393939)',
-                                        color: 'var(--cds-text-inverse, #ffffff)',
-                                        opacity: 0.6,
-                                        transition: 'all 0.2s',
-                                        zIndex: 10,
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.opacity = '1';
-                                        e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.opacity = '0.6';
-                                        e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                                    }}
-                                    title="Remove from quick select"
-                                >
-                                    <Close size={14} />
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--cds-background-inverse-hover, #393939)',
+                    color: 'var(--cds-text-inverse, #ffffff)',
+                    opacity: 0.6,
+                    transition: 'all 0.2s',
+                    zIndex: 10,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '0.6';
+                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                  }}
+                  title="Remove from quick select"
+                >
+                  <Close size={14} />
+                </div>
+              )}
             </div>
-        </div>
-    );
+          );
+        })}
+      </div>
+    </div>
+  );
 }

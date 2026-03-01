@@ -21,10 +21,10 @@ export const getDataFontSize = () => '0.875rem';
  * @returns {string} CSS resize value
  */
 export const getTextareaResize = (resizeHeight = true, resizeWidth = false) => {
-    if (!resizeHeight && !resizeWidth) return 'none';
-    if (resizeHeight && !resizeWidth) return 'vertical';
-    if (!resizeHeight && resizeWidth) return 'horizontal';
-    return 'both';
+  if (!resizeHeight && !resizeWidth) return 'none';
+  if (resizeHeight && !resizeWidth) return 'vertical';
+  if (!resizeHeight && resizeWidth) return 'horizontal';
+  return 'both';
 };
 
 /**
@@ -33,20 +33,20 @@ export const getTextareaResize = (resizeHeight = true, resizeWidth = false) => {
  * @returns {Object} { isValid: boolean, data: any, error: string|null }
  */
 export const validateJson = (jsonString) => {
-    if (!jsonString.trim()) {
-        return { isValid: true, data: null, error: null };
-    }
-    
-    try {
-        const parsed = JSON.parse(jsonString);
-        return { isValid: true, data: parsed, error: null };
-    } catch (error) {
-        return { 
-            isValid: false, 
-            data: null, 
-            error: error.message 
-        };
-    }
+  if (!jsonString.trim()) {
+    return { isValid: true, data: null, error: null };
+  }
+
+  try {
+    const parsed = JSON.parse(jsonString);
+    return { isValid: true, data: parsed, error: null };
+  } catch (error) {
+    return {
+      isValid: false,
+      data: null,
+      error: error.message,
+    };
+  }
 };
 
 /**
@@ -56,8 +56,8 @@ export const validateJson = (jsonString) => {
  * @returns {string} Formatted JSON string
  */
 export const formatJson = (data, indent = 2) => {
-    if (data == null) return '';
-    return JSON.stringify(data, null, indent);
+  if (data == null) return '';
+  return JSON.stringify(data, null, indent);
 };
 
 /**
@@ -66,9 +66,9 @@ export const formatJson = (data, indent = 2) => {
  * @returns {string} Key: value pairs separated by newlines
  */
 export const objectToKeyValueString = (obj) => {
-    if (!obj || typeof obj !== 'object') return '';
-    
-    return Object.entries(obj)
-        .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
-        .join('\n');
+  if (!obj || typeof obj !== 'object') return '';
+
+  return Object.entries(obj)
+    .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+    .join('\n');
 };

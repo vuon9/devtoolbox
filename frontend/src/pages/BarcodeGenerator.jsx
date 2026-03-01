@@ -3,7 +3,13 @@ import { Button, Dropdown, InlineLoading } from '@carbon/react';
 import { Renew, Download } from '@carbon/icons-react';
 import { ToolHeader, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
-import { GenerateBarcode, GetBarcodeStandards, GetQRErrorLevels, GetBarcodeSizes, ValidateContent } from '../services/api';
+import {
+  GenerateBarcode,
+  GetBarcodeStandards,
+  GetQRErrorLevels,
+  GetBarcodeSizes,
+  ValidateContent,
+} from '../services/api';
 
 const BARCODE_STANDARDS = [
   { value: 'QR', label: 'QR Code (2D)' },
@@ -61,7 +67,7 @@ const validateContent = (content, standard) => {
         if (providedChecksum !== calculatedChecksum) {
           return {
             valid: false,
-            message: `Invalid checksum. Use: ${content.slice(0, 12)}${calculatedChecksum} or just ${content.slice(0, 12)}`
+            message: `Invalid checksum. Use: ${content.slice(0, 12)}${calculatedChecksum} or just ${content.slice(0, 12)}`,
           };
         }
       }
@@ -80,7 +86,7 @@ const validateContent = (content, standard) => {
         if (providedChecksum !== calculatedChecksum) {
           return {
             valid: false,
-            message: `Invalid checksum. Use: ${content.slice(0, 7)}${calculatedChecksum} or just ${content.slice(0, 7)}`
+            message: `Invalid checksum. Use: ${content.slice(0, 7)}${calculatedChecksum} or just ${content.slice(0, 7)}`,
           };
         }
       }
@@ -124,7 +130,7 @@ export default function BarcodeGenerator() {
     toolKey: 'barcode-generator-layout',
     defaultDirection: 'horizontal',
     showToggle: true,
-    persist: true
+    persist: true,
   });
 
   // Track what was last generated to prevent duplicate generation
@@ -145,11 +151,13 @@ export default function BarcodeGenerator() {
 
     // Prevent duplicate generation if nothing changed
     const currentParams = { content: content.trim(), standard, size, level };
-    if (qrImage &&
+    if (
+      qrImage &&
       currentParams.content === lastGeneratedParams.current.content &&
       currentParams.standard === lastGeneratedParams.current.standard &&
       currentParams.size === lastGeneratedParams.current.size &&
-      (standard !== 'QR' || currentParams.level === lastGeneratedParams.current.level)) {
+      (standard !== 'QR' || currentParams.level === lastGeneratedParams.current.level)
+    ) {
       return;
     }
 
@@ -225,22 +233,27 @@ export default function BarcodeGenerator() {
   const isQR = standard === 'QR';
 
   return (
-    <div className="tool-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}>
+    <div
+      className="tool-container"
+      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
+    >
       <ToolHeader
         title="Barcode / QR Code Generator"
         description="Generate various barcode types including QR codes, EAN, and Code 128/39."
       />
 
       {/* Controls */}
-      <div style={{
-        display: 'flex',
-        gap: '1rem',
-        alignItems: 'flex-end',
-        flexWrap: 'wrap',
-        padding: '0.75rem',
-        backgroundColor: 'var(--cds-layer)',
-        borderRadius: '4px',
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'flex-end',
+          flexWrap: 'wrap',
+          padding: '0.75rem',
+          backgroundColor: 'var(--cds-layer)',
+          borderRadius: '4px',
+        }}
+      >
         <div style={{ flex: 2, minWidth: '200px' }}>
           <Dropdown
             id="barcode-standard"
@@ -248,7 +261,7 @@ export default function BarcodeGenerator() {
             label="Select standard"
             items={BARCODE_STANDARDS}
             itemToString={(item) => item?.label || ''}
-            selectedItem={BARCODE_STANDARDS.find(s => s.value === standard)}
+            selectedItem={BARCODE_STANDARDS.find((s) => s.value === standard)}
             onChange={handleStandardChange}
             size="sm"
           />
@@ -261,7 +274,7 @@ export default function BarcodeGenerator() {
             label="Select size"
             items={BARCODE_SIZES}
             itemToString={(item) => item?.label || ''}
-            selectedItem={BARCODE_SIZES.find(s => s.value === size)}
+            selectedItem={BARCODE_SIZES.find((s) => s.value === size)}
             onChange={({ selectedItem }) => {
               setSize(selectedItem?.value || 256);
               setQrImage('');
@@ -278,7 +291,7 @@ export default function BarcodeGenerator() {
               label="Select level"
               items={QR_ERROR_LEVELS}
               itemToString={(item) => item?.label || ''}
-              selectedItem={QR_ERROR_LEVELS.find(l => l.value === level)}
+              selectedItem={QR_ERROR_LEVELS.find((l) => l.value === level)}
               onChange={({ selectedItem }) => {
                 setLevel(selectedItem?.value || 'M');
                 setQrImage('');
@@ -318,28 +331,35 @@ export default function BarcodeGenerator() {
         />
 
         {/* Output Pane */}
-        <div className="pane" style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          minHeight: '50vh',
-          flex: 1,
-        }}>
-          <div style={{
+        <div
+          className="pane"
+          style={{
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            minHeight: '30px',
-            overflowX: 'hidden',
-          }}>
-            <label style={{
-              fontSize: '0.75rem',
-              fontWeight: 400,
-              lineHeight: 1.5,
-              letterSpacing: '0.32px',
-              color: 'var(--cds-text-secondary)',
-              textTransform: 'uppercase',
-            }}>
+            flexDirection: 'column',
+            height: '100%',
+            minHeight: '50vh',
+            flex: 1,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              minHeight: '30px',
+              overflowX: 'hidden',
+            }}
+          >
+            <label
+              style={{
+                fontSize: '0.75rem',
+                fontWeight: 400,
+                lineHeight: 1.5,
+                letterSpacing: '0.32px',
+                color: 'var(--cds-text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
               {isQR ? 'QR Code' : `${standard} Barcode`}
             </label>
             {qrImage && (
@@ -354,15 +374,17 @@ export default function BarcodeGenerator() {
             )}
           </div>
 
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'var(--cds-layer)',
-            padding: '1rem',
-            overflow: 'auto',
-          }}>
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'var(--cds-layer)',
+              padding: '1rem',
+              overflow: 'auto',
+            }}
+          >
             {loading ? (
               <InlineLoading description="Generating barcode..." />
             ) : qrImage ? (
@@ -376,10 +398,12 @@ export default function BarcodeGenerator() {
                 }}
               />
             ) : (
-              <div style={{
-                color: 'var(--cds-text-secondary)',
-                textAlign: 'center',
-              }}>
+              <div
+                style={{
+                  color: 'var(--cds-text-secondary)',
+                  textAlign: 'center',
+                }}
+              >
                 <p>{isQR ? 'QR code' : `${standard} barcode`} will appear here</p>
                 <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
                   Enter content and click Generate

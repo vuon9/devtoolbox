@@ -7,12 +7,14 @@
     "dev": "vite",
     "build:dev": "vite build --minify false --mode development",
     "build": "vite build --mode production",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@carbon/icons-react": "^11.71.0",
-    "@carbon/react": "^1.97.0",
-    "@carbon/styles": "^1.96.0",
+    "@carbon/icons-react": "^11.76.0",
+    "@carbon/react": "^1.102.0",
+    "@carbon/styles": "^1.101.0",
     "@wailsio/runtime": "^3.0.0-alpha.79",
     "cronstrue": "^3.9.0",
     "diff": "^8.0.2",
@@ -34,6 +36,7 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^4.0.0",
+    "prettier": "^3.5.3",
     "vite": "^5.4.21"
   }
 }
