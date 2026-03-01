@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 
-export function Sidebar({ activeTool, setActiveTool, isVisible }) {
+export function Sidebar({ isVisible }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [pinned, setPinned] = useState(() => {
     try {
@@ -80,9 +81,9 @@ export function Sidebar({ activeTool, setActiveTool, isVisible }) {
             <ul className="nav-list">
               {pinnedTools.map((tool) => (
                 <li key={tool.id} className="nav-item">
-                  <button
-                    className={`nav-button ${activeTool === tool.id ? 'active' : ''}`}
-                    onClick={() => setActiveTool(tool.id)}
+                  <NavLink
+                    to={`/tool/${tool.id}`}
+                    className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
                   >
                     <div className="nav-content">
                       <span className="nav-icon">{tool.icon}</span>
@@ -96,7 +97,7 @@ export function Sidebar({ activeTool, setActiveTool, isVisible }) {
                     >
                       ✕
                     </span>
-                  </button>
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -107,9 +108,9 @@ export function Sidebar({ activeTool, setActiveTool, isVisible }) {
         <ul className="nav-list">
           {regularTools.map((tool) => (
             <li key={tool.id} className="nav-item">
-              <button
-                className={`nav-button ${activeTool === tool.id ? 'active' : ''}`}
-                onClick={() => setActiveTool(tool.id)}
+              <NavLink
+                to={`/tool/${tool.id}`}
+                className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
               >
                 <div className="nav-content">
                   <span className="nav-icon">{tool.icon}</span>
@@ -123,7 +124,7 @@ export function Sidebar({ activeTool, setActiveTool, isVisible }) {
                 >
                   📌
                 </span>
-              </button>
+              </NavLink>
             </li>
           ))}
         </ul>

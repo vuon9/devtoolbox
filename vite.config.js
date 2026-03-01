@@ -6,6 +6,10 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), wails("./bindings")],
+  server: {
+    port: 3000,
+    historyApiFallback: true
+  },
   css: {
     preprocessorOptions: {
       scss: {

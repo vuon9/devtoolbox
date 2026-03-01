@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextInput, Tag, Tile, CopyButton, ComboBox } from '@carbon/react';
-import { Time, Sun, Moon, Sunrise, SendToBack, Calendar, Clean } from '@carbon/icons-react';
+import { Button, TextInput, Tag, ComboBox } from '@carbon/react';
+import { Time, Sun, Moon, Sunrise, SendToBack, Calendar, Clean, Close, Add } from '@carbon/icons-react';
 import { ToolHeader, ToolControls } from '../../components/ToolUI';
+import DateTimeOutputField from '../../components/DateTimeOutputField';
+import { getDayOfYear, getWeekOfYear, isLeapYear, parseMathExpression } from '../../utils/datetimeHelpers';
+import storage from '../../utils/storage';
 
-// Output formats
+// Output formats for "Other formats" section
 const OUTPUT_FORMATS = [
   { id: 'iso', label: 'ISO 8601' },
   { id: 'rfc2822', label: 'RFC 2822' },
@@ -13,7 +16,7 @@ const OUTPUT_FORMATS = [
   { id: 'compact', label: 'Compact' },
 ];
 
-// Timezones
+// Common timezones
 const TIMEZONES = [
   { id: 'local', label: 'Local Time' },
   { id: 'UTC', label: 'UTC' },
@@ -27,6 +30,22 @@ const TIMEZONES = [
   { id: 'Asia/Tokyo', label: 'Tokyo' },
   { id: 'Australia/Sydney', label: 'Sydney' },
 ];
+
+// Extended timezone list for "Add timezone" dropdown
+const ALL_TIMEZONES = [
+  ...TIMEZONES,
+  { id: 'Asia/Shanghai', label: 'Shanghai' },
+  { id: 'Asia/Singapore', label: 'Singapore' },
+  { id: 'Asia/Dubai', label: 'Dubai' },
+  { id: 'Europe/Berlin', label: 'Berlin' },
+  { id: 'Europe/Moscow', label: 'Moscow' },
+  { id: 'Pacific/Auckland', label: 'Auckland' },
+  { id: 'Pacific/Honolulu', label: 'Honolulu' },
+  { id: 'America/Sao_Paulo', label: 'São Paulo' },
+];
+
+// Storage key
+const STORAGE_KEY = 'datetime-converter.timezones';
 
 // Helper for presets
 const toSQLFormat = (d) => {
@@ -77,11 +96,18 @@ const PRESETS = [
   },
 ];
 
-// Parse input to Date object
+// Parse input to Date object (handles math expressions)
 function parseInput(input) {
   if (!input || !input.trim()) return null;
 
   const trimmed = input.trim();
+
+  // Try math expression first
+  const mathResult = parseMathExpression(trimmed);
+  if (mathResult !== null) {
+    // Treat as timestamp (seconds) and convert to date
+    return new Date(mathResult * 1000);
+  }
 
   // Try as timestamp (numeric)
   if (/^\d+$/.test(trimmed)) {
@@ -110,7 +136,7 @@ function parseInput(input) {
   return null;
 }
 
-// Helper to get date object shifted to target timezone (so UTC getters return target time)
+// Helper to get date object shifted to target timezone
 function getShiftedDate(date, timezone) {
   let year, month, day, hour, minute, second;
 
@@ -206,13 +232,21 @@ function getRelativeTime(date) {
 export default function DateTimeConverter() {
   // Main input
   const [input, setInput] = useState('');
-  const [outputFormat, setOutputFormat] = useState('iso');
-  const [outputTimezone, setOutputTimezone] = useState('local');
   const [timezone, setTimezone] = useState('local');
 
   // Parsed result
   const [parsedDate, setParsedDate] = useState(null);
   const [error, setError] = useState(null);
+
+  // Custom timezones
+  const [customTimezones, setCustomTimezones] = useState([]);
+  const [selectedNewTimezone, setSelectedNewTimezone] = useState(null);
+
+  // Load custom timezones from storage on mount
+  useEffect(() => {
+    const saved = storage.getArray(STORAGE_KEY);
+    setCustomTimezones(saved);
+  }, []);
 
   // Parse input
   useEffect(() => {
@@ -229,67 +263,82 @@ export default function DateTimeConverter() {
     }
   }, [input]);
 
-  const copyToClipboard = (text) => {
-    if (text) navigator.clipboard.writeText(text);
-  };
-
   const handlePreset = (preset) => {
     setInput(preset.getValue().toString());
   };
 
+  const addTimezone = () => {
+    if (selectedNewTimezone && !customTimezones.includes(selectedNewTimezone.id)) {
+      const newTimezones = [...customTimezones, selectedNewTimezone.id];
+      setCustomTimezones(newTimezones);
+      storage.setArray(STORAGE_KEY, newTimezones);
+      setSelectedNewTimezone(null);
+    }
+  };
+
+  const removeTimezone = (tzId) => {
+    const newTimezones = customTimezones.filter((id) => id !== tzId);
+    setCustomTimezones(newTimezones);
+    storage.setArray(STORAGE_KEY, newTimezones);
+  };
+
+  // Get available timezones for dropdown (exclude already added)
+  const availableTimezones = ALL_TIMEZONES.filter(
+    (tz) => !customTimezones.includes(tz.id)
+  );
+
   return (
     <div
       className="tool-container"
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
+      style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}
     >
       <ToolHeader
         title="DateTime Converter"
-        description="Convert between timestamps and date formats. Supports Unix timestamps, ISO dates, and various formats."
+        description="Convert between timestamps and date formats. Supports Unix timestamps, ISO dates, math expressions (+, -, *, /), and various formats."
       />
 
-      {/* Main Input Section */}
+      {/* Control Section */}
       <ToolControls>
-        {/* Quick Presets */}
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', flex: 1 }}>
+          {PRESETS.map((preset) => (
+            <Button
+              key={preset.id}
+              size="sm"
+              kind="tertiary"
+              onClick={() => handlePreset(preset)}
+              renderIcon={preset?.icon}
+            >
+              {preset.label}
+            </Button>
+          ))}
+        </div>
+      </ToolControls>
+
+      <ToolControls>
         <div
           style={{
             display: 'flex',
-            alignItems: 'flex-start',
+            alignItems: 'flex-end',
             gap: '1rem',
             flexWrap: 'wrap',
             flex: 1,
           }}
         >
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {PRESETS.map((preset) => (
-              <Button
-                key={preset.id}
-                size="sm"
-                kind="tertiary"
-                onClick={() => handlePreset(preset)}
-                renderIcon={preset?.icon}
-              >
-                {preset.label}
-              </Button>
-            ))}
-          </div>
-          <div
-            style={{
-              minWidth: '350px',
-              display: 'flex',
-              alignItems: 'flex-end',
-              flexWrap: 'nowrap',
-              gap: '1rem',
-            }}
-          >
+          <div style={{ flex: 1, minWidth: '300px' }}>
             <TextInput
               id="datetime-input"
               labelText="Input Date/Time (or Unix timestamp)"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="e.g., 1738412345, 2026-02-01T12:24:05Z, 02/01/2026..."
-              style={{ fontFamily: "'IBM Plex Mono', monospace", minWidth: '350px' }}
+              placeholder="e.g., 1738412345, 2026-02-01T12:24:05Z, 1738412345 + 3600..."
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             />
+            <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginTop: '0.25rem' }}>
+              Math operators + - * / are supported
+            </div>
+          </div>
 
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <ComboBox
               id="timezone"
               titleText="Input timezone"
@@ -297,116 +346,169 @@ export default function DateTimeConverter() {
               itemToString={(item) => (item ? item.label : '')}
               selectedItem={TIMEZONES.find((t) => t.id === timezone)}
               onChange={({ selectedItem }) => selectedItem && setTimezone(selectedItem.id)}
-              style={{ minWidth: '250px' }}
+              style={{ minWidth: '200px' }}
             />
-
-            <Button size={'md'} kind="primary" onClick={() => setInput('')} renderIcon={Clean}>
-              Clear
-            </Button>
+            <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginTop: '0.25rem', visibility: 'hidden' }}>
+              placeholder
+            </div>
           </div>
         </div>
-      </ToolControls>
-
-      {/* Settings */}
-      <ToolControls>
-        <ComboBox
-          id="output-format"
-          titleText="Output Format"
-          items={OUTPUT_FORMATS}
-          itemToString={(item) => (item ? item.label : '')}
-          selectedItem={OUTPUT_FORMATS.find((f) => f.id === outputFormat)}
-          onChange={({ selectedItem }) => selectedItem && setOutputFormat(selectedItem.id)}
-          style={{ minWidth: '250px' }}
-        />
-        <ComboBox
-          id="output-timezone"
-          titleText="Output Timezone"
-          items={TIMEZONES}
-          itemToString={(item) => (item ? item.label : '')}
-          selectedItem={TIMEZONES.find((t) => t.id === timezone)}
-          onChange={({ selectedItem }) => selectedItem && setOutputTimezone(selectedItem.id)}
-          style={{ minWidth: '250px' }}
-          defaultValue={'local'}
-        />
       </ToolControls>
 
       {/* Error */}
       {error && <Tag type="red">{error}</Tag>}
 
-      {/* Main Result */}
+      {/* Results Section */}
       {parsedDate && (
-        <Tile style={{ background: 'var(--cds-layer)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '1.25rem', fontWeight: 600 }}>
-                {formatDate(parsedDate, outputFormat, outputTimezone)}
-              </span>
-              <CopyButton
-                onClick={() =>
-                  copyToClipboard(formatDate(parsedDate, outputFormat, outputTimezone))
-                }
-                size="sm"
+        <>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '0.75rem',
+            }}
+          >
+            {/* Left Column - Primary Outputs */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <DateTimeOutputField
+                label="Local"
+                value={formatDate(parsedDate, 'sql', 'local')}
+              />
+              <DateTimeOutputField
+                label="UTC (ISO 8601)"
+                value={formatDate(parsedDate, 'iso', 'UTC')}
+              />
+              <DateTimeOutputField
+                label="Relative"
+                value={getRelativeTime(parsedDate)}
+              />
+              <DateTimeOutputField
+                label="Unix time"
+                value={Math.floor(parsedDate.getTime() / 1000).toString()}
               />
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                gap: '1rem',
-                fontSize: '0.875rem',
-                color: 'var(--cds-text-secondary)',
-                flexWrap: 'wrap',
-              }}
-            >
-              <Tag type="blue">{getRelativeTime(parsedDate)}</Tag>
-              <span>Unix: {Math.floor(parsedDate.getTime() / 1000)}</span>
-              <span>•</span>
-              <span>Unix (ms): {parsedDate.getTime()}</span>
-            </div>
-          </div>
-        </Tile>
-      )}
-
-      {/* All Formats */}
-      {parsedDate && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '0.5rem',
-          }}
-        >
-          {OUTPUT_FORMATS.map((fmt) => (
-            <Tile key={fmt.id} style={{ padding: '0.75rem', background: 'var(--cds-layer)' }}>
-              <div
-                style={{
-                  fontSize: '0.75rem',
-                  color: 'var(--cds-text-secondary)',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {fmt.label}
-              </div>
-              <div
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: '0.875rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {formatDate(parsedDate, fmt.id, timezone)}
-                </span>
-                <CopyButton
-                  onClick={() => copyToClipboard(formatDate(parsedDate, fmt.id, timezone))}
-                  size="sm"
+            {/* Right Column - Metadata */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {/* Three fields in a row */}
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <DateTimeOutputField
+                  label="Day of year"
+                  value={getDayOfYear(parsedDate)?.toString() || ''}
+                  style={{ flex: 1 }}
+                />
+                <DateTimeOutputField
+                  label="Week of year"
+                  value={getWeekOfYear(parsedDate)?.toString() || ''}
+                  style={{ flex: 1 }}
+                />
+                <DateTimeOutputField
+                  label="Is leap year?"
+                  value={isLeapYear(parsedDate.getFullYear()) ? 'Yes' : 'No'}
+                  style={{ flex: 1 }}
                 />
               </div>
-            </Tile>
-          ))}
-        </div>
+
+              {/* Other formats section - 2 per row */}
+              <div style={{ marginTop: '0.5rem' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                  Other formats
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  {OUTPUT_FORMATS.map((fmt) => (
+                    <DateTimeOutputField
+                      key={fmt.id}
+                      label={fmt.label}
+                      value={formatDate(parsedDate, fmt.id, timezone)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Custom Timezones Section - Horizontal Layout */}
+          <div style={{ marginTop: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                Other timezones:
+              </span>
+              <ComboBox
+                id="add-timezone"
+                titleText=""
+                placeholder="Add timezone..."
+                items={availableTimezones}
+                itemToString={(item) => (item ? item.label : '')}
+                selectedItem={selectedNewTimezone}
+                onChange={({ selectedItem }) => setSelectedNewTimezone(selectedItem)}
+                style={{ minWidth: '160px', maxWidth: '180px' }}
+                size="sm"
+              />
+              <Button
+                size="sm"
+                onClick={addTimezone}
+                disabled={!selectedNewTimezone}
+                renderIcon={Add}
+                iconDescription="Add timezone"
+              >
+                Add
+              </Button>
+
+              {customTimezones.length > 0 && (
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.5rem',
+                    overflowX: 'auto',
+                    flex: 1,
+                    paddingBottom: '0.25rem',
+                  }}
+                >
+                  {customTimezones.map((tzId) => {
+                    const tz = ALL_TIMEZONES.find((t) => t.id === tzId) || { id: tzId, label: tzId };
+                    return (
+                      <div
+                        key={tzId}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          padding: '0.5rem 0.75rem',
+                          background: 'var(--cds-layer)',
+                          borderRadius: '4px',
+                          border: '1px solid var(--cds-border-subtle)',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontSize: '0.625rem', color: 'var(--cds-text-secondary)', textTransform: 'uppercase' }}>
+                            {tz.label}
+                          </div>
+                          <div style={{ fontSize: '0.875rem', fontFamily: "'IBM Plex Mono', monospace" }}>
+                            {formatDate(parsedDate, 'sql', tzId)}
+                          </div>
+                        </div>
+                        <Button
+                          kind="ghost"
+                          size="sm"
+                          renderIcon={Close}
+                          iconDescription="Remove timezone"
+                          onClick={() => removeTimezone(tzId)}
+                          style={{
+                            minHeight: '1.5rem',
+                            padding: '0 0.25rem',
+                            marginLeft: '0.25rem',
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
