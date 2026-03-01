@@ -222,10 +222,10 @@ export const cmykToRgb = (c, m, y, k) => {
 
 // Format display values
 export const formatHex = (hex) => hex.toUpperCase();
-export const formatRgb = (r, g, b) => `rgb(${r},${g},${b})`;
-export const formatHsl = (h, s, l) => `hsl(${h},${s}%,${l}%)`;
-export const formatHsv = (h, s, v) => `hsv(${h},${s}%,${v}%)`;
-export const formatCmyk = (c, m, y, k) => `cmyk(${c},${m},${y},${k})`;
+export const formatRgb = (r, g, b) => `${r}, ${g}, ${b}`;
+export const formatHsl = (h, s, l) => `${h}, ${s}%, ${l}%`;
+export const formatHsv = (h, s, v) => `${h}, ${s}%, ${v}%`;
+export const formatCmyk = (c, m, y, k) => `${c}, ${m}, ${y}, ${k}`;
 
 // Parse input values
 export const parseHex = (value) => {
@@ -239,7 +239,7 @@ export const parseHex = (value) => {
 };
 
 export const parseRgb = (value) => {
-  const match = value.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+  const match = value.match(/^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*$/i);
   if (match) {
     const r = parseInt(match[1], 10);
     const g = parseInt(match[2], 10);
@@ -252,7 +252,7 @@ export const parseRgb = (value) => {
 };
 
 export const parseHsl = (value) => {
-  const match = value.match(/^hsl\s*\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)$/i);
+  const match = value.match(/^\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*$/i);
   if (match) {
     const h = parseInt(match[1], 10);
     const s = parseInt(match[2], 10);
@@ -266,7 +266,7 @@ export const parseHsl = (value) => {
 };
 
 export const parseHsv = (value) => {
-  const match = value.match(/^hsv\s*\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)$/i);
+  const match = value.match(/^\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*$/i);
   if (match) {
     const h = parseInt(match[1], 10);
     const s = parseInt(match[2], 10);
@@ -280,7 +280,7 @@ export const parseHsv = (value) => {
 };
 
 export const parseCmyk = (value) => {
-  const match = value.match(/^cmyk\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+  const match = value.match(/^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*$/i);
   if (match) {
     const c = parseInt(match[1], 10);
     const m = parseInt(match[2], 10);
@@ -431,5 +431,31 @@ export const generateCodeSnippets = (r, g, b, a, hsl, hsv) => {
       { name: 'Stroke', code: `stroke="${rgbToHex(r, g, b)}"` },
       { name: 'Fill with Opacity', code: `fill="${rgbToHex(r, g, b)}" fill-opacity="${af}"` },
     ],
+  };
+};
+
+// Language keys for indexed access (matches CodeSnippetsPanel languageTabs order)
+const languageKeys = [
+  'css',
+  'swift',
+  'dotnet',
+  'java',
+  'android',
+  'objc',
+  'flutter',
+  'unity',
+  'reactnative',
+  'opengl',
+  'svg',
+];
+
+// Generate code snippets for a specific language only (lazy loading optimization)
+export const generateCodeSnippetsForLanguage = (languageIndex, r, g, b, a, hsl, hsv) => {
+  const languageKey = languageKeys[languageIndex] || 'css';
+  const allSnippets = generateCodeSnippets(r, g, b, a, hsl, hsv);
+
+  // Return only the selected language to minimize object creation
+  return {
+    [languageKey]: allSnippets[languageKey] || [],
   };
 };

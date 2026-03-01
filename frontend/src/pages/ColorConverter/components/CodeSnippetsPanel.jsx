@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Tile, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
+import { Button, Tile, Tabs, TabList, Tab, TabPanels, TabPanel, CopyButton } from '@carbon/react';
 import { Copy } from '@carbon/icons-react';
 
 const languageTabs = [
@@ -28,7 +28,7 @@ export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChan
         ))}
       </TabList>
 
-      <TabPanels style={{ flex: 1, overflow: 'hidden', minWidth: 0 }}>
+      <TabPanels style={{ flex: 1, minWidth: 0 }}>
         {languageTabs.map((tab) => (
           <TabPanel key={tab.id} style={{ overflow: 'auto', padding: '0.75rem', minWidth: 0 }}>
             <div
@@ -44,9 +44,6 @@ export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChan
                   style={{
                     padding: '0.75rem',
                     backgroundColor: 'var(--cds-layer-hover)',
-                    minWidth: 0,
-                    maxWidth: '100%',
-                    overflow: 'hidden',
                   }}
                 >
                   <div
@@ -58,7 +55,7 @@ export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChan
                       minWidth: 0,
                     }}
                   >
-                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', maxWidth: '100%' }}>
+                    <div style={{ flex: 1 }}>
                       <div
                         style={{
                           fontSize: '0.75rem',
@@ -66,7 +63,6 @@ export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChan
                           marginBottom: '0.5rem',
                           textTransform: 'uppercase',
                           fontWeight: 500,
-                          overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
                         }}
@@ -82,16 +78,13 @@ export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChan
                           whiteSpace: 'pre-wrap',
                           wordBreak: 'break-all',
                           color: 'var(--cds-text-primary)',
-                          overflow: 'hidden',
                         }}
                       >
                         {snippet.code}
                       </pre>
                     </div>
 
-                    <Button
-                      hasIconOnly
-                      renderIcon={Copy}
+                    <CopyButton
                       kind="ghost"
                       size="sm"
                       onClick={() => onCopy(snippet.code)}

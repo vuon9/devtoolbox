@@ -40,6 +40,7 @@ export default function ColorHistory({ history, onLoadFromHistory, onClearHistor
           flex: 1,
           overflowY: 'auto',
           padding: '0.5rem',
+          maxHeight: '300px',
         }}
       >
         {history.length === 0 ? (

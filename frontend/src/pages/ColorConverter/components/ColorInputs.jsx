@@ -31,7 +31,7 @@ export default function ColorInputs({ state, onColorInput, onCopy, style = {} })
         onChange={(value) => onColorInput('rgb', value)}
         copyValue={rgbDisplay}
         onCopy={onCopy}
-        placeholder="rgb(61,214,245)"
+        placeholder="61,214,245"
       />
 
       <ColorInputRow
@@ -40,7 +40,7 @@ export default function ColorInputs({ state, onColorInput, onCopy, style = {} })
         onChange={(value) => onColorInput('hsl', value)}
         copyValue={hslDisplay}
         onCopy={onCopy}
-        placeholder="hsl(191,90%,60%)"
+        placeholder="191,90%,60%"
       />
 
       <ColorInputRow
@@ -49,7 +49,7 @@ export default function ColorInputs({ state, onColorInput, onCopy, style = {} })
         onChange={(value) => onColorInput('hsv', value)}
         copyValue={hsvDisplay}
         onCopy={onCopy}
-        placeholder="hsv(191,75%,96%)"
+        placeholder="191,75%,96%"
       />
 
       <ColorInputRow
@@ -58,7 +58,7 @@ export default function ColorInputs({ state, onColorInput, onCopy, style = {} })
         onChange={(value) => onColorInput('cmyk', value)}
         copyValue={cmykDisplay}
         onCopy={onCopy}
-        placeholder="cmyk(75,13,0,4)"
+        placeholder="75,13,0,4"
       />
     </div>
   );

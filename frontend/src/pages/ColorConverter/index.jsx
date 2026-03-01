@@ -1,6 +1,18 @@
 import React, { useState, useEffect, useCallback, useReducer, useMemo, useRef } from 'react';
-import { Button, Grid, Column, Tabs, TabList, Tab, TabPanels, TabPanel, Layer, Checkbox, TextInput } from '@carbon/react';
-import { Eyedropper, ColorPalette } from '@carbon/icons-react';
+import {
+  Button,
+  Grid,
+  Column,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+  Layer,
+  Checkbox,
+  TextInput,
+} from '@carbon/react';
+import { Eyedropper, ColorPalette, CircleStroke } from '@carbon/icons-react';
 import { ToolHeader } from '../../components/ToolUI';
 import { colorReducer, initialState, actions } from './colorReducer';
 import {
@@ -14,7 +26,7 @@ import {
   parseHsl,
   parseHsv,
   parseCmyk,
-  generateCodeSnippets,
+  generateCodeSnippetsForLanguage,
 } from './colorUtils';
 import ColorInputs from './components/ColorInputs';
 import ColorHistory from './components/ColorHistory';
@@ -26,6 +38,9 @@ export default function ColorConverter() {
   const [isPicking, setIsPicking] = useState(false);
   const colorPickerRef = useRef(null);
   const historyTimeoutRef = useRef(null);
+  const throttleRef = useRef(null);
+  const pendingColorRef = useRef(null);
+  const snippetsCacheRef = useRef(new Map());
 
   // Check for EyeDropper API support
   useEffect(() => {
@@ -38,22 +53,44 @@ export default function ColorConverter() {
       if (historyTimeoutRef.current) {
         clearTimeout(historyTimeoutRef.current);
       }
+      if (throttleRef.current) {
+        clearTimeout(throttleRef.current);
+      }
     };
   }, []);
 
-  // Generate code snippets when color changes
-  const codeSnippets = useMemo(
-    () =>
-      generateCodeSnippets(
-        state.rgb.r,
-        state.rgb.g,
-        state.rgb.b,
-        state.rgb.a,
-        state.hsl,
-        state.hsv
-      ),
-    [state.rgb, state.hsl, state.hsv]
-  );
+  // Generate code snippets with caching - only generate for active tab
+  const codeSnippets = useMemo(() => {
+    const colorKey = `${state.rgb.r},${state.rgb.g},${state.rgb.b},${state.rgb.a}`;
+    const cacheKey = `${colorKey}-${state.selectedTab}`;
+
+    // Check cache first
+    if (snippetsCacheRef.current.has(cacheKey)) {
+      return snippetsCacheRef.current.get(cacheKey);
+    }
+
+    // Generate snippets for current tab only
+    const snippets = generateCodeSnippetsForLanguage(
+      state.selectedTab,
+      state.rgb.r,
+      state.rgb.g,
+      state.rgb.b,
+      state.rgb.a,
+      state.hsl,
+      state.hsv
+    );
+
+    // Cache the result
+    snippetsCacheRef.current.set(cacheKey, snippets);
+
+    // Limit cache size to prevent memory leaks (keep last 50 entries)
+    if (snippetsCacheRef.current.size > 50) {
+      const firstKey = snippetsCacheRef.current.keys().next().value;
+      snippetsCacheRef.current.delete(firstKey);
+    }
+
+    return snippets;
+  }, [state.selectedTab, state.rgb, state.hsl, state.hsv]);
 
   // Debounced history recording
   const debouncedAddToHistory = useCallback((hex, rgb) => {
@@ -119,12 +156,29 @@ export default function ColorConverter() {
     }
   }, []);
 
-  // Handle native color picker change
+  // Handle native color picker change with throttling (60fps max)
   const handleColorPickerChange = useCallback(
     (e) => {
       const rgb = hexToRgb(e.target.value);
-      if (rgb) {
+      if (!rgb) return;
+
+      // Store the pending color
+      pendingColorRef.current = rgb;
+
+      // If we're not already throttling, update immediately and start throttle
+      if (!throttleRef.current) {
         updateFromRgb(rgb.r, rgb.g, rgb.b, rgb.a);
+
+        // Set throttle to prevent updates for 16ms (~60fps)
+        throttleRef.current = setTimeout(() => {
+          throttleRef.current = null;
+          // Apply any pending color that accumulated during throttle
+          if (pendingColorRef.current && pendingColorRef.current !== rgb) {
+            const pending = pendingColorRef.current;
+            updateFromRgb(pending.r, pending.g, pending.b, pending.a);
+          }
+          pendingColorRef.current = null;
+        }, 16);
       }
     },
     [updateFromRgb]
@@ -176,8 +230,9 @@ export default function ColorConverter() {
   }, [updateFromRgb]);
 
   return (
-    <Grid fullWidth
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%', overflow: 'hidden' }}
+    <Grid
+      fullWidth
+      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
       <Column>
         <ToolHeader
@@ -187,87 +242,112 @@ export default function ColorConverter() {
       </Column>
 
       <Grid>
-        {/* Controls */}
-        <Column sm={4} md={8} lg={16}
-          style={{
-            display: 'flex',
-            gap: '1rem',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            padding: '0.75rem',
-            backgroundColor: 'var(--cds-layer)',
-            borderRadius: '4px',
-            marginBottom: '2rem',
-          }}
-        >
+        {/* Left Pane: Color Inputs & History */}
+        <Column sm={4} md={3} lg={6} style={{ minHeight: '30vh' }}>
+          {/* Controls */}
           {/* Clickable Color Preview */}
-          <div
-            onClick={openColorPicker}
+          <h4
             style={{
-              width: '90px',
-              height: '90px',
-              borderRadius: '8px',
-              backgroundColor: state.hex,
-              border: '2px solid var(--cds-border-strong)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-              cursor: 'pointer',
-              position: 'relative',
-              flexShrink: 0,
+              fontSize: '0.75rem',
+              fontWeight: 400,
+              lineHeight: 1.5,
+              color: 'var(--cds-text-secondary)',
+              textTransform: 'uppercase',
+              marginBottom: '0.5rem',
             }}
-            title="Click to open color picker"
+          >
+            Color Picker
+          </h4>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              marginBottom: '1rem',
+              flexWrap: 'wrap',
+            }}
           >
             <div
+              onClick={openColorPicker}
               style={{
-                position: 'absolute',
-                bottom: '4px',
-                right: '4px',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                borderRadius: '4px',
-                padding: '3px',
+                width: '90px',
+                height: '90px',
+                borderRadius: '8px',
+                backgroundColor: state.hex,
+                border: '2px solid var(--cds-border-strong)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                cursor: 'pointer',
+                position: 'relative',
+                flexShrink: 0,
               }}
+              title="Click to open color picker"
             >
-              <ColorPalette size={14} style={{ color: 'white' }} />
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '4px',
+                  right: '4px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  borderRadius: '4px',
+                  padding: '3px',
+                }}
+              >
+                <ColorPalette size={14} style={{ color: 'white' }} />
+              </div>
+
+              {/* Hidden native color picker */}
+              <input
+                ref={colorPickerRef}
+                type="color"
+                value={
+                  state.hex.startsWith('#') && state.hex.length === 9
+                    ? state.hex.slice(0, 7)
+                    : state.hex
+                }
+                onChange={handleColorPickerChange}
+                style={{
+                  // display: 'none'
+                  width: 0,
+                  height: 0,
+                  color: 'transparent',
+                  zIndex: -1,
+                  opacity: 0,
+                  position: 'absolute',
+                  marginTop: '90px',
+                }}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div
+              style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', flexDirection: 'column' }}
+            >
+              <Button
+                size="md"
+                kind="secondary"
+                renderIcon={CircleStroke}
+                onClick={generateRandomColor}
+                style={{ minWidth: '160px' }}
+              >
+                Random
+              </Button>
+
+              {eyedropperSupported && (
+                <Button
+                  size="md"
+                  kind="primary"
+                  renderIcon={Eyedropper}
+                  onClick={openEyeDropper}
+                  disabled={isPicking}
+                  style={{ minWidth: '160px' }}
+                >
+                  {isPicking ? 'Picking...' : 'Eye Dropper'}
+                </Button>
+              )}
             </div>
           </div>
 
-          {/* Hidden native color picker */}
-          <input
-            ref={colorPickerRef}
-            type="color"
-            value={
-              state.hex.startsWith('#') && state.hex.length === 9 ? state.hex.slice(0, 7) : state.hex
-            }
-            onChange={handleColorPickerChange}
-            style={{ display: 'none' }}
-          />
-
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <Button
-              size="sm"
-              kind="secondary"
-              renderIcon={ColorPalette}
-              onClick={generateRandomColor}
-            >
-              Random
-            </Button>
-
-            {eyedropperSupported && (
-              <Button
-                size="sm"
-                kind="primary"
-                renderIcon={Eyedropper}
-                onClick={openEyeDropper}
-                disabled={isPicking}
-              >
-                {isPicking ? 'Picking...' : 'Eye Dropper'}
-              </Button>
-            )}
-          </div>
-        </Column>
-
-        {/* Left Pane: Color Inputs & History */}
-        <Column sm={4} md={3} lg={6} style={{ minHeight: '30vh' }}>
+          {/* Color values */}
           <h4
             style={{
               fontSize: '0.75rem',
@@ -318,6 +398,5 @@ export default function ColorConverter() {
         </Column>
       </Grid>
     </Grid>
-
   );
 }

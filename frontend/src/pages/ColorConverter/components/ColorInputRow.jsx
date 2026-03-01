@@ -69,6 +69,8 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
           fontFamily: "'IBM Plex Mono', monospace",
           border: 'none',
           background: 'transparent',
+          padding: '0.5rem',
+          margin: '0.5rem 0',
         }}
         size="md"
       />
