@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { TextInput, CopyButton } from '@carbon/react';
+import { Grid, Column, TextInput, CopyButton } from '@carbon/react';
 import { ChevronDown } from '@carbon/icons-react';
 import { ToolHeader, ToolSplitPane } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
@@ -857,16 +857,19 @@ export default function RegExpTester() {
   };
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', height: '100%' }}
     >
-      <ToolHeader
-        title="RegExp Tester"
-        description="Test Regular Expressions against text. Matches are highlighted in the test string."
-      />
+      <Column>
+        <ToolHeader
+          title="RegExp Tester"
+          description="Test Regular Expressions against text. Matches are highlighted in the test string."
+        />
+      </Column>
 
       {/* Regex Input Row - Unified Input Group */}
+      <Column>
       <div
         style={{
           display: 'flex',
@@ -988,23 +991,27 @@ export default function RegExpTester() {
                     }
                 `}</style>
       </div>
+      </Column>
 
       {/* Error Display */}
       {error && (
-        <div
-          style={{
-            color: 'var(--cds-support-error)',
-            padding: '0.5rem',
-            backgroundColor: 'var(--cds-support-error-inverse)',
-            borderRadius: '4px',
-            fontSize: '0.875rem',
-            margin: '0 0.5rem',
-          }}
-        >
-          {error}
-        </div>
+        <Column>
+          <div
+            style={{
+              color: 'var(--cds-support-error)',
+              padding: '0.5rem',
+              backgroundColor: 'var(--cds-support-error-inverse)',
+              borderRadius: '4px',
+              fontSize: '0.875rem',
+              margin: '0 0.5rem',
+            }}
+          >
+            {error}
+          </div>
+        </Column>
       )}
 
+      <Column style={{ flex: 1, minHeight: 0 }}>
       <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
         {/* Left Pane: Live Highlighted Input */}
         <ToolPaneWithLabel
@@ -1035,6 +1042,7 @@ export default function RegExpTester() {
           </div>
         </ToolPaneWithLabel>
       </ToolSplitPane>
-    </div>
+      </Column>
+    </Grid>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import cronstrue from 'cronstrue';
-import { TextInput, Tile } from '@carbon/react';
+import { Grid, Column, TextInput, Tile } from '@carbon/react';
 import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
 
@@ -44,16 +44,19 @@ export default function CronJobParser() {
   ];
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
-      <ToolHeader
-        title="Cron Job Parser"
-        description="Translate cron expressions into human-readable text."
-      />
+      <Column>
+        <ToolHeader
+          title="Cron Job Parser"
+          description="Translate cron expressions into human-readable text."
+        />
+      </Column>
 
-      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
+      <Column style={{ flex: 1, minHeight: 0 }}>
+        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
         <div
           className="pane"
           style={{
@@ -225,6 +228,7 @@ export default function CronJobParser() {
           </div>
         </div>
       </ToolSplitPane>
-    </div>
+      </Column>
+    </Grid>
   );
 }

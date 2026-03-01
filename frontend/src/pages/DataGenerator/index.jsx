@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import { InlineNotification } from '@carbon/react';
+import { Grid, Column, InlineNotification } from '@carbon/react';
 import {
   ToolHeader,
   ToolControls,
@@ -132,25 +132,30 @@ export default function DataGenerator() {
   const presetLabels = state.presets.reduce((acc, p) => ({ ...acc, [p.id]: p.name }), {});
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
-      <ToolHeader
-        title="Data Generator"
-        description="Generate mock data with templates using Faker library"
-      />
+      <Column>
+        <ToolHeader
+          title="Data Generator"
+          description="Generate mock data with templates using Faker library"
+        />
+      </Column>
 
       {state.error && (
-        <InlineNotification
-          kind="error"
-          title="Error"
-          subtitle={state.error}
-          onClose={() => dispatch({ type: 'SET_ERROR', payload: null })}
-        />
+        <Column>
+          <InlineNotification
+            kind="error"
+            title="Error"
+            subtitle={state.error}
+            onClose={() => dispatch({ type: 'SET_ERROR', payload: null })}
+          />
+        </Column>
       )}
 
-      <ToolControls>
+      <Column>
+        <ToolControls>
         <GeneratorControls
           state={state}
           dispatch={dispatch}
@@ -167,30 +172,35 @@ export default function DataGenerator() {
           />
         </div>
       </ToolControls>
+      </Column>
 
-      <VariableControls
-        variables={currentPreset?.variables}
-        values={state.variables}
-        onChange={handleVariableChange}
-      />
-
-      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-        <ToolPane
-          label="Template"
-          value={state.template}
-          onChange={(e) => dispatch({ type: 'SET_TEMPLATE', payload: e.target.value })}
-          placeholder="Enter your template here..."
+      <Column>
+        <VariableControls
+          variables={currentPreset?.variables}
+          values={state.variables}
+          onChange={handleVariableChange}
         />
+      </Column>
 
-        <ToolPane
-          label={state.duration > 0 ? `Output (${state.duration}ms)` : 'Output'}
-          value={state.output}
-          readOnly
-          placeholder="Generated data will appear here..."
-        />
-      </ToolSplitPane>
+      <Column style={{ flex: 1, minHeight: 0 }}>
+        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
+          <ToolPane
+            label="Template"
+            value={state.template}
+            onChange={(e) => dispatch({ type: 'SET_TEMPLATE', payload: e.target.value })}
+            placeholder="Enter your template here..."
+          />
+
+          <ToolPane
+            label={state.duration > 0 ? `Output (${state.duration}ms)` : 'Output'}
+            value={state.output}
+            readOnly
+            placeholder="Generated data will appear here..."
+          />
+        </ToolSplitPane>
+      </Column>
 
       <HelpModal open={state.showHelp} onClose={() => dispatch({ type: 'TOGGLE_HELP' })} />
-    </div>
+    </Grid>
   );
 }

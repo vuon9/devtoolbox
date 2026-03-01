@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tile, CopyButton } from '@carbon/react';
-import { getMonospaceFontFamily, getDataFontSize } from '../utils/inputUtils';
+import { getMonospaceFontFamily, getDataFontSize } from '../../../utils/inputUtils';
 
 /**
  * Display-only output field with label and copy button
