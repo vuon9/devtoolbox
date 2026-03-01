@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Grid, Column } from '@carbon/react';
 import { ToolHeader } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
 import ToolLayoutToggle from '../../components/layout/ToolLayoutToggle';
@@ -48,41 +49,37 @@ export default function StringUtilities() {
   };
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: '1rem',
-          flexWrap: 'wrap',
-        }}
-      >
+      <Column>
         <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
-      </div>
+      </Column>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <ModeTabBar activeMode={activeTab} onChange={setActiveTab} />
-        {layout.showToggle && (
-          <ToolLayoutToggle
-            direction={layout.direction}
-            onToggle={layout.toggleDirection}
-            position="controls"
-            style={{ marginLeft: 'auto' }}
-          />
-        )}
-      </div>
+      <Column>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <ModeTabBar activeMode={activeTab} onChange={setActiveTab} />
+          {layout.showToggle && (
+            <ToolLayoutToggle
+              direction={layout.direction}
+              onToggle={layout.toggleDirection}
+              position="controls"
+              style={{ marginLeft: 'auto' }}
+            />
+          )}
+        </div>
+      </Column>
 
-      {renderPane()}
-    </div>
+      <Column style={{ flex: 1, minHeight: 0 }}>
+        {renderPane()}
+      </Column>
+    </Grid>
   );
 }

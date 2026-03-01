@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as Diff from 'diff';
-import { Button, ContentSwitcher, Switch } from '@carbon/react';
+import { Grid, Column, Button, ContentSwitcher, Switch } from '@carbon/react';
 import { Compare, Renew } from '@carbon/icons-react';
 import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
@@ -147,16 +147,19 @@ export default function TextDiffChecker() {
   }, [oldText, newText, diffMode]);
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
-      <ToolHeader
-        title="Text Diff Checker"
-        description="Compare two blocks of text to find the differences."
-      />
+      <Column>
+        <ToolHeader
+          title="Text Diff Checker"
+          description="Compare two blocks of text to find the differences."
+        />
+      </Column>
 
-      <ToolControls>
+      <Column>
+        <ToolControls>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <label
@@ -194,25 +197,31 @@ export default function TextDiffChecker() {
           </Button>
         </div>
       </ToolControls>
+      </Column>
 
-      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-        <ToolPane
-          label="Original Text"
-          value={oldText}
-          onChange={(e) => setOldText(e.target.value)}
-          placeholder="Paste original text..."
-        />
-        <ToolPane
-          label="New Text"
-          value={newText}
-          onChange={(e) => setNewText(e.target.value)}
-          placeholder="Paste new text..."
-        />
-      </ToolSplitPane>
-
-      <div style={{ flex: 1, minHeight: '200px', marginTop: '0.5rem' }}>
-        <DiffView diffs={diffs} mode={diffMode} />
-      </div>
-    </div>
+      <Grid style={{ flex: 1, minHeight: 0 }}>
+        <Column sm={4} md={8} lg={16} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ flex: '1 1 50%', minHeight: '200px' }}>
+            <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
+              <ToolPane
+                label="Original Text"
+                value={oldText}
+                onChange={(e) => setOldText(e.target.value)}
+                placeholder="Paste original text..."
+              />
+              <ToolPane
+                label="New Text"
+                value={newText}
+                onChange={(e) => setNewText(e.target.value)}
+                placeholder="Paste new text..."
+              />
+            </ToolSplitPane>
+          </div>
+          <div style={{ flex: '1 1 50%', minHeight: '200px' }}>
+            <DiffView diffs={diffs} mode={diffMode} />
+          </div>
+        </Column>
+      </Grid>
+    </Grid>
   );
 }

@@ -83,6 +83,9 @@
   transition: all 0.2s;
   border: 1px solid transparent;
   position: relative;
+  /* Reset anchor tag defaults for NavLink */
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .nav-button:hover {

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { Button, Dropdown, InlineLoading } from '@carbon/react';
+import { Grid, Column, Button, Dropdown, InlineLoading } from '@carbon/react';
 import { Renew, Download } from '@carbon/icons-react';
 import { ToolHeader, ToolPane, ToolSplitPane, ToolLayoutToggle } from '../components/ToolUI';
 import useLayoutToggle from '../hooks/useLayoutToggle';
@@ -233,27 +233,30 @@ export default function BarcodeGenerator() {
   const isQR = standard === 'QR';
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
-      <ToolHeader
-        title="Barcode / QR Code Generator"
-        description="Generate various barcode types including QR codes, EAN, and Code 128/39."
-      />
+      <Column>
+        <ToolHeader
+          title="Barcode / QR Code Generator"
+          description="Generate various barcode types including QR codes, EAN, and Code 128/39."
+        />
+      </Column>
 
       {/* Controls */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'flex-end',
-          flexWrap: 'wrap',
-          padding: '0.75rem',
-          backgroundColor: 'var(--cds-layer)',
-          borderRadius: '4px',
-        }}
-      >
+      <Column>
+        <div
+          style={{
+            display: 'flex',
+            gap: '1rem',
+            alignItems: 'flex-end',
+            flexWrap: 'wrap',
+            padding: '0.75rem',
+            backgroundColor: 'var(--cds-layer)',
+            borderRadius: '4px',
+          }}
+        >
         <div style={{ flex: 2, minWidth: '200px' }}>
           <Dropdown
             id="barcode-standard"
@@ -318,7 +321,9 @@ export default function BarcodeGenerator() {
           />
         </div>
       </div>
+      </Column>
 
+      <Column style={{ flex: 1, minHeight: 0 }}>
       <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
         {/* Input Pane */}
         <ToolPane
@@ -413,6 +418,7 @@ export default function BarcodeGenerator() {
           </div>
         </div>
       </ToolSplitPane>
-    </div>
+      </Column>
+    </Grid>
   );
 }

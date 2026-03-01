@@ -1,7 +1,6 @@
 package datetimeconverter
 
 import (
-	"fmt"
 	"os"
 	"strings"
 )
@@ -35,9 +34,9 @@ func readTimezonesFromFile(path string, timezones *[]TimezoneInfo) {
 
 			tzAbbr := (path + "/" + f.Name())[1:]
 			label := tzAbbr
-			if strings.Contains(tzAbbr, "/") {
-				label = fmt.Sprintf("%s (%s)", f.Name(), tzAbbr)
-			}
+			// if strings.Contains(tzAbbr, "/") {
+			// 	label = fmt.Sprintf("%s (%s)", f.Name(), tzAbbr)
+			// }
 
 			*timezones = append(*timezones, TimezoneInfo{
 				Label:    label,

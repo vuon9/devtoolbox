@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Grid, Column } from '@carbon/react';
 import { ToolHeader, ToolPane, ToolSplitPane } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
 import ConversionControls from './components/ConversionControls';
@@ -164,46 +165,55 @@ export default function TextBasedConverter() {
   const isImageOutput = !isAllHashes && isBase64Image(output);
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
-      <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
+      <Column>
+        <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
+      </Column>
 
-      <CommonTags
-        currentCategory={category}
-        currentMethod={method}
-        onTagSelect={(cat, meth) => {
-          setCategory(cat);
-          setMethod(meth);
-        }}
-        customTags={customTags}
-      />
+      <Column>
+        <CommonTags
+          currentCategory={category}
+          currentMethod={method}
+          onTagSelect={(cat, meth) => {
+            setCategory(cat);
+            setMethod(meth);
+          }}
+          customTags={customTags}
+        />
+      </Column>
 
-      <ConversionControls
-        category={category}
-        setCategory={(c) => {
-          setCategory(c);
-          setMethod(CONVERTER_MAP[c][0]);
-        }}
-        method={method}
-        setMethod={setMethod}
-        subMode={subMode}
-        setSubMode={setSubMode}
-        layout={layout}
-        autoRun={config.autoRun}
-        setAutoRun={(val) => updateConfig({ autoRun: val })}
-        onConvert={handleConvert}
-        isAllHashes={isAllHashes}
-        onAddQuickAction={addCurrentToQuickActions}
-        isCurrentInQuickActions={isCurrentInQuickActions()}
-      />
+      <Column>
+        <ConversionControls
+          category={category}
+          setCategory={(c) => {
+            setCategory(c);
+            setMethod(CONVERTER_MAP[c][0]);
+          }}
+          method={method}
+          setMethod={setMethod}
+          subMode={subMode}
+          setSubMode={setSubMode}
+          layout={layout}
+          autoRun={config.autoRun}
+          setAutoRun={(val) => updateConfig({ autoRun: val })}
+          onConvert={handleConvert}
+          isAllHashes={isAllHashes}
+          onAddQuickAction={addCurrentToQuickActions}
+          isCurrentInQuickActions={isCurrentInQuickActions()}
+        />
+      </Column>
 
       {showConfig && (
-        <ConfigurationPane config={config} updateConfig={updateConfig} method={method} />
+        <Column>
+          <ConfigurationPane config={config} updateConfig={updateConfig} method={method} />
+        </Column>
       )}
 
-      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
+      <Column style={{ flex: 1, minHeight: 0 }}>
+        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
         <ToolPane
           label={LABELS.INPUT(category, subMode, method)}
           value={input}
@@ -278,6 +288,7 @@ export default function TextBasedConverter() {
           />
         )}
       </ToolSplitPane>
-    </div>
+      </Column>
+    </Grid>
   );
 }

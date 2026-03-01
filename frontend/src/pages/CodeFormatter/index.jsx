@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Button, Select, SelectItem, TextInput, IconButton } from '@carbon/react';
+import { Grid, Column, Button, Select, SelectItem, TextInput, IconButton } from '@carbon/react';
 import { Code, TrashCan, Close } from '@carbon/icons-react';
 import {
   ToolHeader,
@@ -202,16 +202,19 @@ export default function CodeFormatter() {
   }, [filter, formattedOutput]);
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
-      <ToolHeader
-        title="Code Formatter"
-        description="Format, minify, and query JSON, XML, HTML, SQL, CSS, and JavaScript with filter support."
-      />
+      <Column>
+        <ToolHeader
+          title="Code Formatter"
+          description="Format, minify, and query JSON, XML, HTML, SQL, CSS, and JavaScript with filter support."
+        />
+      </Column>
 
-      <ToolControls>
+      <Column>
+        <ToolControls>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <Select
             id="format-type"
@@ -241,21 +244,25 @@ export default function CodeFormatter() {
           </div>
         </div>
       </ToolControls>
+      </Column>
 
       {error && (
-        <div
-          style={{
-            color: 'var(--cds-support-error)',
-            padding: '0.75rem',
-            backgroundColor: 'var(--cds-layer-hover)',
-            borderRadius: '4px',
-            fontSize: '0.875rem',
-          }}
-        >
-          {error}
-        </div>
+        <Column>
+          <div
+            style={{
+              color: 'var(--cds-support-error)',
+              padding: '0.75rem',
+              backgroundColor: 'var(--cds-layer-hover)',
+              borderRadius: '4px',
+              fontSize: '0.875rem',
+            }}
+          >
+            {error}
+          </div>
+        </Column>
       )}
 
+      <Column style={{ flex: 1, minHeight: 0 }}>
       <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
         <ToolPane
           label="Input"
@@ -294,6 +301,7 @@ export default function CodeFormatter() {
           )}
         </div>
       </ToolSplitPane>
-    </div>
+      </Column>
+    </Grid>
   );
 }

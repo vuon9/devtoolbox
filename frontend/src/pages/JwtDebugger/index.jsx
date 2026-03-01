@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, useCallback } from 'react';
+import { Grid, Column } from '@carbon/react';
 import { ToolHeader } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
 import ToolLayoutToggle from '../../components/layout/ToolLayoutToggle';
@@ -111,20 +112,12 @@ export default function JwtDebugger() {
   }, [state.headerInput, state.payloadInput, state.algorithm, state.secret]);
 
   return (
-    <div
-      className="tool-container"
+    <Grid
+      fullWidth
       style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
     >
       {/* Header row with title and conditional button */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: '1rem',
-          flexWrap: 'wrap',
-        }}
-      >
+      <Column>
         <ToolHeader
           title="JWT Debugger"
           description={
@@ -133,44 +126,50 @@ export default function JwtDebugger() {
               : 'Create a JWT by providing header and payload JSON, algorithm, and secret.'
           }
         />
-      </div>
+      </Column>
 
       {/* Row with mode tabs and layout toggle */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <ModeTabBar
-          activeMode={state.mode === 'decode' ? 0 : 1}
-          onChange={(tab) => dispatch(actions.setMode(tab === 0 ? 'decode' : 'encode'))}
-        />
-        {layout.showToggle && (
-          <ToolLayoutToggle
-            direction={layout.direction}
-            onToggle={layout.toggleDirection}
-            position="controls"
-            style={{ marginLeft: 'auto' }}
+      <Column>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <ModeTabBar
+            activeMode={state.mode === 'decode' ? 0 : 1}
+            onChange={(tab) => dispatch(actions.setMode(tab === 0 ? 'decode' : 'encode'))}
           />
-        )}
-      </div>
+          {layout.showToggle && (
+            <ToolLayoutToggle
+              direction={layout.direction}
+              onToggle={layout.toggleDirection}
+              position="controls"
+              style={{ marginLeft: 'auto' }}
+            />
+          )}
+        </div>
+      </Column>
 
       {/* Decode Mode */}
       {state.mode === 'decode' && (
-        <JwtDecode
-          state={state}
-          dispatch={dispatch}
-          layout={layout}
-          verifySignature={verifySignature}
-        />
+        <Column style={{ flex: 1, minHeight: 0 }}>
+          <JwtDecode
+            state={state}
+            dispatch={dispatch}
+            layout={layout}
+            verifySignature={verifySignature}
+          />
+        </Column>
       )}
 
       {/* Encode Mode */}
       {state.mode === 'encode' && (
-        <JwtEncode state={state} dispatch={dispatch} layout={layout} encodeJWT={encodeJWT} />
+        <Column style={{ flex: 1, minHeight: 0 }}>
+          <JwtEncode state={state} dispatch={dispatch} layout={layout} encodeJWT={encodeJWT} />
+        </Column>
       )}
-    </div>
+    </Grid>
   );
 }
