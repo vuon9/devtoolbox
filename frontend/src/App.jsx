@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import { Sidebar } from './components/Sidebar';
 import { TitleBar } from './components/TitleBar';
+import { CommandPalette } from './components/CommandPalette';
 import { Theme } from '@carbon/react';
 import ToolRouter from './ToolRouter';
 
@@ -54,10 +55,15 @@ class ErrorBoundary extends React.Component {
 function App() {
   console.log('App mounting');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [theme, setTheme] = useState('g100'); // 'white', 'g10', 'g90', 'g100'
   const [themeMode, setThemeMode] = useState('dark'); // 'system', 'light', 'dark'
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleCommandPalette = useCallback(() => {
+    setIsCommandPaletteOpen(prev => !prev);
+  }, []);
+  const closeCommandPalette = useCallback(() => setIsCommandPaletteOpen(false), []);
 
   useEffect(() => {
     // Detect System Theme
@@ -84,11 +90,27 @@ function App() {
         e.preventDefault();
         toggleSidebar();
       }
+      // Command palette shortcuts - toggle on/off
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || (e.key === 'p' && e.shiftKey))) {
+        e.preventDefault();
+        toggleCommandPalette();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, toggleCommandPalette]);
+
+  // Listen for command palette toggle event from backend (global hotkey)
+  useEffect(() => {
+    const unsubscribe = window.runtime?.EventsOn?.('command-palette:open', () => {
+      toggleCommandPalette();
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [toggleCommandPalette]);
 
   return (
     <ErrorBoundary>
@@ -108,12 +130,19 @@ function App() {
               <div className="content-area">
                 <Routes>
                   <Route path="/" element={<Navigate to="/tool/text-converter" replace />} />
-                  <Route path="/tool/:toolId" element={<ToolRouter />} />
+                  <Route path="/tool/:toolId/*" element={<ToolRouter />} />
                   <Route path="*" element={<Navigate to="/tool/text-converter" replace />} />
                 </Routes>
               </div>
             </main>
           </div>
+
+          <CommandPalette
+            isOpen={isCommandPaletteOpen}
+            onClose={closeCommandPalette}
+            themeMode={themeMode}
+            setThemeMode={setThemeMode}
+          />
         </div>
       </Theme>
     </ErrorBoundary>

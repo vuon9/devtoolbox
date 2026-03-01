@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Grid, Column, InlineNotification } from '@carbon/react';
 import {
   ToolHeader,
@@ -15,7 +16,11 @@ import HelpModal from './components/HelpModal';
 import { GetPresets, Generate, ValidateTemplate } from '../../generated/http/dataGeneratorService';
 
 export default function DataGenerator() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [state, dispatch] = React.useReducer(reducer, initialState);
+
+  // Get preset from URL params
+  const urlPreset = searchParams.get('preset');
 
   const layout = useLayoutToggle({
     toolKey: 'data-generator-layout',
@@ -36,9 +41,21 @@ export default function DataGenerator() {
         if (presets && Array.isArray(presets) && presets.length > 0) {
           dispatch({ type: 'SET_PRESETS', payload: presets });
 
+          // Check for URL preset, otherwise use first preset
+          let selectedPreset = presets[0];
+          if (urlPreset) {
+            const urlPresetMatch = presets.find(p =>
+              p.id.toLowerCase() === urlPreset.toLowerCase() ||
+              p.name.toLowerCase() === urlPreset.toLowerCase()
+            );
+            if (urlPresetMatch) {
+              selectedPreset = urlPresetMatch;
+            }
+          }
+
           const defaultVars = {};
-          if (presets[0].variables && Array.isArray(presets[0].variables)) {
-            presets[0].variables.forEach((v) => {
+          if (selectedPreset.variables && Array.isArray(selectedPreset.variables)) {
+            selectedPreset.variables.forEach((v) => {
               defaultVars[v.name] = v.default;
             });
           }
@@ -46,8 +63,8 @@ export default function DataGenerator() {
           dispatch({
             type: 'SELECT_PRESET',
             payload: {
-              id: presets[0].id,
-              template: presets[0].template,
+              id: selectedPreset.id,
+              template: selectedPreset.template,
               defaultVars,
             },
           });
@@ -61,6 +78,13 @@ export default function DataGenerator() {
     };
     loadPresets();
   }, []);
+
+  // Clear URL params after using preset
+  useEffect(() => {
+    if (urlPreset) {
+      setSearchParams({}, { replace: true });
+    }
+  }, [urlPreset, setSearchParams]);
 
   // Handle preset selection
   const handlePresetChange = useCallback(

@@ -56,7 +56,7 @@ export function Sidebar({ isVisible }) {
       <div style={{ padding: '12px 12px 8px' }}>
         <input
           type="text"
-          placeholder="Search tools..."
+          placeholder="Search tools... (cmd+k for palette)"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{

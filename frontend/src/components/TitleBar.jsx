@@ -1,6 +1,8 @@
-import React from 'react';
-import { IconButton, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import React, { useState } from 'react';
+import { IconButton } from '@carbon/react';
 import { Menu, Close, Subtract, Maximize, Settings } from '@carbon/icons-react';
+import { SettingsModal } from './SettingsModal';
+import { Minimise, Maximise, Close as WindowClose } from '../generated';
 
 export function TitleBar({
   isSidebarOpen,
@@ -9,8 +11,9 @@ export function TitleBar({
   themeMode,
   setThemeMode,
 }) {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   // Detect if running in desktop mode
-  const isDesktop = typeof window !== 'undefined' && window.wails;
+  const isDesktop = typeof window !== 'undefined' && window.go?.devtoolbox?.service?.WindowControls;
 
   // Detect platform
   const userAgent = navigator.userAgent.toLowerCase();
@@ -23,21 +26,27 @@ export function TitleBar({
   }
 
   // Window control handlers for non-macOS platforms
-  const handleMinimize = () => {
-    if (window.wails?.WindowMinimise) {
-      window.wails.WindowMinimise();
+  const handleMinimize = async () => {
+    try {
+      await Minimise();
+    } catch (err) {
+      console.error('Failed to minimise window:', err);
     }
   };
 
-  const handleMaximize = () => {
-    if (window.wails?.WindowMaximise) {
-      window.wails.WindowMaximise();
+  const handleMaximize = async () => {
+    try {
+      await Maximise();
+    } catch (err) {
+      console.error('Failed to maximise window:', err);
     }
   };
 
-  const handleClose = () => {
-    if (window.wails?.Quit) {
-      window.wails.Quit();
+  const handleClose = async () => {
+    try {
+      await WindowClose();
+    } catch (err) {
+      console.error('Failed to close window:', err);
     }
   };
 
@@ -64,32 +73,16 @@ export function TitleBar({
 
       {/* Right section - Settings + Window controls */}
       <div className="titlebar-right">
-        {/* Settings menu */}
-        <OverflowMenu
-          renderIcon={Settings}
-          flipped
+        {/* Settings button */}
+        <IconButton
+          kind="ghost"
           size="sm"
-          ariaLabel="Settings"
-          iconDescription="Settings"
-          title="Theme Settings"
+          onClick={() => setIsSettingsOpen(true)}
+          label="Settings"
           className="titlebar-settings"
         >
-          <OverflowMenuItem
-            itemText="System Theme"
-            onClick={() => setThemeMode('system')}
-            requireTitle
-          />
-          <OverflowMenuItem
-            itemText="Dark Theme"
-            onClick={() => setThemeMode('dark')}
-            requireTitle
-          />
-          <OverflowMenuItem
-            itemText="Light Theme"
-            onClick={() => setThemeMode('light')}
-            requireTitle
-          />
-        </OverflowMenu>
+          <Settings size={16} />
+        </IconButton>
 
         {/* Window controls for non-macOS platforms */}
         {!isMac && (
@@ -123,6 +116,14 @@ export function TitleBar({
             </IconButton>
           </div>
         )}
+
+        {/* Settings Modal */}
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
+        />
       </div>
     </div>
   );

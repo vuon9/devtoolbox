@@ -8,3 +8,5 @@ export * from './http/codeFormatterService';
 export * from './http/conversionService';
 export * from './http/dataGeneratorService';
 export * from './http/dateTimeService';
+export * from './http/settingsService';
+export * from './http/windowControlsService';

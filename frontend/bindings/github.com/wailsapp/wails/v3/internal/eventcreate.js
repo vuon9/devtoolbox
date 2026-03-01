@@ -8,7 +8,11 @@ import { Create as $Create } from "@wailsio/runtime";
 
 function configure() {
     Object.freeze(Object.assign($Create.Events, {
+        "settings:changed": $$createType0,
     }));
 }
+
+// Private type creation functions
+const $$createType0 = $Create.Map($Create.Any, $Create.Any);
 
 configure();

@@ -1,9 +1,9 @@
 package codeformatter
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/itchyny/gojq"
@@ -162,15 +162,9 @@ func applyXPathFilter(xml string, xpath string) (string, error) {
 
 	xpath = strings.TrimSpace(xpath)
 
-	// Handle simple element selection: //element or /element
-	if strings.HasPrefix(xpath, "//") {
-		elementName := xpath[2:]
-		return extractXMLElements(xml, elementName)
-	}
-
-	if strings.HasPrefix(xpath, "/") {
-		elementName := xpath[1:]
-		return extractXMLElements(xml, elementName)
+	// Handle element[@attr='value'] pattern - extract element with specific attribute
+	if strings.Contains(xpath, "[@") && strings.Contains(xpath, "='") {
+		return extractElementByAttribute(xml, xpath)
 	}
 
 	// Handle attribute selection: //element/@attr
@@ -183,7 +177,210 @@ func applyXPathFilter(xml string, xpath string) (string, error) {
 		}
 	}
 
-	return xml, fmt.Errorf("complex XPath expressions not yet supported, use //element or //element/@attribute")
+	// Handle simple element selection: //element or /element (single element, no nested path)
+	if strings.HasPrefix(xpath, "//") {
+		elementName := xpath[2:]
+		// Check if it's a simple element name (no nested path)
+		if !strings.Contains(elementName, "/") {
+			return extractXMLElements(xml, elementName)
+		}
+		// It's a nested path like //catalog/book, fall through to nested handling
+		xpath = elementName
+	} else if strings.HasPrefix(xpath, "/") {
+		elementName := xpath[1:]
+		// Check if it's a simple element name (no nested path)
+		if !strings.Contains(elementName, "/") {
+			return extractXMLElements(xml, elementName)
+		}
+		// It's a nested path like /catalog/book, fall through to nested handling
+		xpath = elementName
+	}
+
+	// Handle nested paths like catalog/book/author or //book/author
+	parts := strings.Split(xpath, "/")
+	if len(parts) > 1 {
+		// Multi-level path: process step by step
+		return extractNestedXMLElements(xml, parts)
+	}
+
+	// Single element name without prefix (e.g., just "book")
+	if xpath != "" {
+		return extractXMLElements(xml, xpath)
+	}
+
+	return xml, fmt.Errorf("complex XPath expressions not yet supported, use //element, /element, or //element/child")
+}
+
+// extractElementByAttribute extracts element with specific attribute value
+func extractElementByAttribute(xmlStr, xpath string) (string, error) {
+	// Parse pattern like: element[@attr='value'] or //element[@attr='value']
+	// Also supports: element[@attr='value']/child
+	xpath = strings.TrimPrefix(xpath, "//")
+
+	// Find the end of attribute selector ']' to check for nested path
+	startBracket := strings.Index(xpath, "[@")
+	if startBracket == -1 {
+		return xmlStr, fmt.Errorf("invalid attribute selector")
+	}
+
+	// Find matching closing bracket
+	bracketCount := 1
+	endBracket := -1
+	for i := startBracket + 2; i < len(xpath); i++ {
+		if xpath[i] == '[' {
+			bracketCount++
+		} else if xpath[i] == ']' {
+			bracketCount--
+			if bracketCount == 0 {
+				endBracket = i
+				break
+			}
+		}
+	}
+	if endBracket == -1 {
+		return xmlStr, fmt.Errorf("invalid attribute selector: unclosed bracket")
+	}
+
+	// Check if there's a nested path after the attribute selector
+	var nestedPath []string
+	if endBracket+1 < len(xpath) && xpath[endBracket+1] == '/' {
+		nestedPathStr := xpath[endBracket+2:]
+		if nestedPathStr != "" {
+			nestedPath = strings.Split(nestedPathStr, "/")
+		}
+	}
+
+	// Extract element name, attribute name, and value
+	elementName := xpath[:startBracket]
+	attrSelector := xpath[startBracket+2 : endBracket] // Remove '[@' and ']'
+
+	// Find the attribute name and value
+	eqIdx := strings.Index(attrSelector, "=")
+	if eqIdx == -1 {
+		return xmlStr, fmt.Errorf("invalid attribute selector: missing =")
+	}
+
+	attrName := strings.TrimSpace(attrSelector[:eqIdx])
+
+	// Extract value between quotes
+	valueStart := strings.IndexAny(attrSelector[eqIdx:], "'\"")
+	if valueStart == -1 {
+		return xmlStr, fmt.Errorf("invalid attribute selector: missing quotes")
+	}
+	valueStart += eqIdx
+
+	quoteChar := attrSelector[valueStart]
+	valueEnd := strings.Index(attrSelector[valueStart+1:], string(quoteChar))
+	if valueEnd == -1 {
+		return xmlStr, fmt.Errorf("invalid attribute selector: unclosed quotes")
+	}
+	valueEnd += valueStart + 1
+
+	attrValue := attrSelector[valueStart+1 : valueEnd]
+
+	// Find elements with matching attribute
+	searchPattern := "<" + elementName + " " + attrName + "=" + string(quoteChar) + attrValue + string(quoteChar)
+	endTag := "</" + elementName + ">"
+
+	var results []string
+	start := 0
+
+	for {
+		// Find element with this attribute
+		idx := strings.Index(xmlStr[start:], searchPattern)
+		if idx == -1 {
+			// Try alternate quote style
+			altQuote := "'"
+			if quoteChar == '\'' {
+				altQuote = "\""
+			}
+			searchPattern = "<" + elementName + " " + attrName + "=" + altQuote + attrValue + altQuote
+			idx = strings.Index(xmlStr[start:], searchPattern)
+			if idx == -1 {
+				break
+			}
+		}
+		idx += start
+
+		// Find end of this element
+		endIdx := strings.Index(xmlStr[idx:], endTag)
+		if endIdx == -1 {
+			// Self-closing or no end tag
+			closeIdx := strings.Index(xmlStr[idx:], "/>")
+			if closeIdx == -1 {
+				break
+			}
+			results = append(results, xmlStr[idx:idx+closeIdx+2])
+			start = idx + closeIdx + 2
+		} else {
+			results = append(results, xmlStr[idx:idx+endIdx+len(endTag)])
+			start = idx + endIdx + len(endTag)
+		}
+	}
+
+	if len(results) == 0 {
+		return "", fmt.Errorf("no elements found with %s[@%s='%s']", elementName, attrName, attrValue)
+	}
+
+	// If there's a nested path, apply it to the results
+	if len(nestedPath) > 0 {
+		var finalResults []string
+		for _, result := range results {
+			nestedResult, err := extractNestedXMLElements(result, nestedPath)
+			if err == nil && nestedResult != "" {
+				finalResults = append(finalResults, nestedResult)
+			}
+		}
+		if len(finalResults) == 0 {
+			return "", fmt.Errorf("no nested elements found with path: %s", strings.Join(nestedPath, "/"))
+		}
+		return strings.Join(finalResults, "\n"), nil
+	}
+
+	return strings.Join(results, "\n"), nil
+}
+
+// extractNestedXMLElements extracts elements following a path like catalog/book/author
+func extractNestedXMLElements(xmlStr string, pathParts []string) (string, error) {
+	if len(pathParts) == 0 {
+		return xmlStr, nil
+	}
+
+	// Get the first element in the path
+	currentElement := pathParts[0]
+
+	// Extract all elements with the first name
+	extracted, err := extractXMLElements(xmlStr, currentElement)
+	if err != nil {
+		return "", err
+	}
+
+	// If this is the last part, return it
+	if len(pathParts) == 1 {
+		return extracted, nil
+	}
+
+	// Continue with the rest of the path
+	// Split the extracted content by newlines and process each match
+	matches := strings.Split(extracted, "\n")
+	var finalResults []string
+
+	for _, match := range matches {
+		if strings.TrimSpace(match) == "" {
+			continue
+		}
+		// Process remaining path parts on each match
+		result, err := extractNestedXMLElements(match, pathParts[1:])
+		if err == nil && result != "" {
+			finalResults = append(finalResults, result)
+		}
+	}
+
+	if len(finalResults) == 0 {
+		return "", fmt.Errorf("no elements found with path: %s", strings.Join(pathParts, "/"))
+	}
+
+	return strings.Join(finalResults, "\n"), nil
 }
 
 // extractXMLElements extracts elements by name from XML
@@ -513,9 +710,7 @@ func findHTMLElements(n *html.Node, tagName string) []string {
 	var traverse func(*html.Node)
 	traverse = func(node *html.Node) {
 		if node.Type == html.ElementNode && node.Data == tagName {
-			var buf strings.Builder
-			html.Render(&buf, node)
-			results = append(results, buf.String())
+			results = append(results, renderNodeToString(node))
 		}
 		for c := node.FirstChild; c != nil; c = c.NextSibling {
 			traverse(c)
@@ -524,6 +719,50 @@ func findHTMLElements(n *html.Node, tagName string) []string {
 
 	traverse(n)
 	return results
+}
+
+// renderNodeToString renders a single HTML node to string without wrapping in html/body
+func renderNodeToString(node *html.Node) string {
+	if node == nil {
+		return ""
+	}
+
+	var buf strings.Builder
+
+	// Write opening tag
+	buf.WriteString("<")
+	buf.WriteString(node.Data)
+
+	// Write attributes
+	for _, attr := range node.Attr {
+		buf.WriteString(" ")
+		buf.WriteString(attr.Key)
+		buf.WriteString(`="`)
+		buf.WriteString(html.EscapeString(attr.Val))
+		buf.WriteString(`"`)
+	}
+	buf.WriteString(">")
+
+	// Write children
+	for c := node.FirstChild; c != nil; c = c.NextSibling {
+		switch c.Type {
+		case html.ElementNode:
+			buf.WriteString(renderNodeToString(c))
+		case html.TextNode:
+			buf.WriteString(html.EscapeString(c.Data))
+		case html.CommentNode:
+			buf.WriteString("<!--")
+			buf.WriteString(c.Data)
+			buf.WriteString("-->")
+		}
+	}
+
+	// Write closing tag
+	buf.WriteString("</")
+	buf.WriteString(node.Data)
+	buf.WriteString(">")
+
+	return buf.String()
 }
 
 // findElementsByClass finds elements by class name
@@ -538,9 +777,7 @@ func findElementsByClass(n *html.Node, className string) []string {
 					classes := strings.Fields(attr.Val)
 					for _, c := range classes {
 						if c == className {
-							var buf strings.Builder
-							html.Render(&buf, node)
-							results = append(results, buf.String())
+							results = append(results, renderNodeToString(node))
 							break
 						}
 					}
@@ -568,9 +805,7 @@ func findElementByID(n *html.Node, id string) string {
 		if node.Type == html.ElementNode {
 			for _, attr := range node.Attr {
 				if attr.Key == "id" && attr.Val == id {
-					var buf strings.Builder
-					html.Render(&buf, node)
-					result = buf.String()
+					result = renderNodeToString(node)
 					return
 				}
 			}
@@ -612,12 +847,10 @@ func findElementsByDescendant(n *html.Node, selector string) []string {
 					if attr.Key == "class" {
 						classes := strings.Fields(attr.Val)
 						for _, c := range classes {
-							if c == className {
-								var buf strings.Builder
-								html.Render(&buf, node)
-								results = append(results, buf.String())
-								break
-							}
+								if c == className {
+									results = append(results, renderNodeToString(node))
+									break
+								}
 						}
 					}
 				}
@@ -639,10 +872,6 @@ func formatHTMLPretty(htmlStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	var buf bytes.Buffer
-	encoder := html.NewTokenizer(&buf)
-	_ = encoder
 
 	// Use html.Render and then pretty print
 	var rawBuf strings.Builder
@@ -913,7 +1142,9 @@ func minifyJS(js string) string {
 
 // regexpReplaceAllString is a helper for regex replacement
 func regexpReplaceAllString(s, pattern, replacement string) string {
-	// Simple implementation - in production use regexp package
-	// This is a placeholder
-	return s
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return s
+	}
+	return re.ReplaceAllString(s, replacement)
 }
