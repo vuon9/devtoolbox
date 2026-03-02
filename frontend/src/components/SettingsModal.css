@@ -1,0 +1,39 @@
+.settings-modal {
+  --settings-bg: var(--cds-layer);
+  --settings-border: var(--cds-border-subtle);
+}
+
+.settings-modal .cds--modal-container {
+  background: var(--settings-bg);
+  border: 1px solid var(--settings-border);
+  border-radius: 8px;
+}
+
+.settings-modal-body {
+  padding: 1.5rem;
+}
+
+.settings-modal-body .cds--form-group {
+  margin-bottom: 1.5rem;
+}
+
+.settings-modal-body .cds--form-group:last-child {
+  margin-bottom: 0;
+}
+
+.settings-description {
+  color: var(--cds-text-secondary);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  margin-left: 1.75rem;
+  line-height: 1.5;
+}
+
+.settings-modal-body .cds--radio-button-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.settings-modal-body .cds--checkbox-label-text {
+  font-weight: 500;
+}

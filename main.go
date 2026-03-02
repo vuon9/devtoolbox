@@ -1,15 +1,20 @@
 package main
 
 import (
+	"devtoolbox/internal/settings"
 	"devtoolbox/service"
 	"embed"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
 //go:embed all:frontend/dist
@@ -20,6 +25,14 @@ func init() {
 	// This is not required, but the binding generator will pick up registered events
 	// and provide a strongly typed JS/TS API for them.
 	application.RegisterEvent[string]("time")
+
+	// Register event for command palette - emit empty string as data
+	application.RegisterEvent[string]("command-palette:open")
+	application.RegisterEvent[string]("window:toggle")
+	application.RegisterEvent[string]("app:quit")
+
+	// Register settings changed event
+	application.RegisterEvent[map[string]interface{}]("settings:changed")
 }
 
 func main() {
@@ -48,7 +61,7 @@ func main() {
 			application.NewService(&GreetService{}),
 		},
 		Mac: application.MacOptions{
-			ApplicationShouldTerminateAfterLastWindowClosed: true,
+			ApplicationShouldTerminateAfterLastWindowClosed: false,
 		},
 		Assets: application.AssetOptions{
 			// Handler:    ginEngine,
@@ -57,6 +70,21 @@ func main() {
 		},
 	})
 
+	// Initialize settings manager
+	var configDir string
+	if runtime.GOOS == "darwin" {
+		configDir = filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "DevToolbox")
+	} else if runtime.GOOS == "windows" {
+		configDir = filepath.Join(os.Getenv("APPDATA"), "DevToolbox")
+	} else {
+		configDir = filepath.Join(os.Getenv("HOME"), ".config", "devtoolbox")
+	}
+
+	settingsManager := settings.NewManager(configDir)
+	if err := settingsManager.Load(); err != nil {
+		log.Printf("Failed to load settings: %v", err)
+	}
+
 	// Register app services
 	app.RegisterService(application.NewService(service.NewJWTService(app)))
 	app.RegisterService(application.NewService(service.NewDateTimeService(app)))
@@ -64,13 +92,16 @@ func main() {
 	app.RegisterService(application.NewService(service.NewBarcodeService(app)))
 	app.RegisterService(application.NewService(service.NewDataGeneratorService(app)))
 	app.RegisterService(application.NewService(service.NewCodeFormatterService(app)))
+	app.RegisterService(application.NewService(service.NewSettingsService(app, settingsManager)))
+	// WindowControls service will be registered after window creation
 
 	// Start HTTP server for browser support (background)
 	go func() {
 		StartHTTPServer(8081)
 	}()
 
-	app.Window.NewWithOptions(application.WebviewWindowOptions{
+	// Create main window
+	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:  "DevToolbox",
 		Width:  1024,
 		Height: 768,
@@ -86,6 +117,76 @@ func main() {
 			TitleBar:                application.MacTitleBarHiddenInset,
 		},
 		URL: "/",
+	})
+
+	// Handle window close - minimize to tray or quit based on setting
+	mainWindow.OnWindowEvent(events.Common.WindowClosing, func(event *application.WindowEvent) {
+		closeMinimizes := settingsManager.GetCloseMinimizesToTray()
+		log.Printf("WindowClosing event triggered. Close minimizes to tray: %v", closeMinimizes)
+		if closeMinimizes {
+			// Prevent the window from closing
+			event.Cancel()
+			log.Println("Window close cancelled, hiding window instead")
+			// Hide the window instead
+			mainWindow.Hide()
+			log.Println("Window hidden")
+		} else {
+			log.Println("Window close allowed (setting is disabled)")
+		}
+	})
+
+	// Register WindowControls service after window creation
+	app.RegisterService(application.NewService(service.NewWindowControls(mainWindow)))
+
+	// Setup system tray
+	systray := app.SystemTray.New()
+
+	// Create tray menu
+	trayMenu := app.NewMenu()
+	trayMenu.Add("Show DevToolbox").OnClick(func(ctx *application.Context) {
+		// NOTE: macOS window restore from tray has known issues
+		// See: KNOWN_ISSUES.md - "macOS: Tray 'Show DevToolbox' doesn't restore hidden window"
+		log.Println("Tray menu 'Show DevToolbox' clicked")
+		log.Printf("Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
+
+		// On macOS, we need to activate the app first before showing the window
+		log.Println("Activating application")
+		app.Show()
+
+		// On macOS, we need to handle hidden windows differently
+		if !mainWindow.IsVisible() {
+			log.Println("Window is not visible, showing it")
+			mainWindow.Show()
+		}
+
+		if mainWindow.IsMinimised() {
+			log.Println("Restoring minimized window")
+			mainWindow.Restore()
+		}
+
+		log.Println("Focusing window")
+		mainWindow.Focus()
+		log.Printf("After show - Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
+	})
+	trayMenu.AddSeparator()
+	trayMenu.Add("Quit").OnClick(func(ctx *application.Context) {
+		app.Quit()
+	})
+	systray.SetMenu(trayMenu)
+
+	// Register global hotkey for command palette
+	// macOS: Cmd+Ctrl+M, Windows/Linux: Ctrl+Alt+M
+	var hotkeyAccelerator string
+	if runtime.GOOS == "darwin" {
+		hotkeyAccelerator = "Cmd+Ctrl+M"
+	} else {
+		hotkeyAccelerator = "Ctrl+Alt+M"
+	}
+
+	app.KeyBinding.Add(hotkeyAccelerator, func(window application.Window) {
+		mainWindow.Show()
+		mainWindow.Focus()
+		mainWindow.EmitEvent("command-palette:open", "")
 	})
 
 	if err := app.Run(); err != nil {

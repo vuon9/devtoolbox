@@ -5,7 +5,7 @@ import { Copy } from '@carbon/icons-react';
 // Re-export new layout components
 export { ToolLayout, ToolLayoutToggle, ToolVerticalSplit } from './layout';
 export { LAYOUT_DIRECTIONS, TOGGLE_POSITIONS } from './layout/constants';
-export { ToolCopyButton, ToolTextArea, ToolInput, ToolInputGroup, ToolTabBar } from './inputs';
+export { ToolCopyButton, ToolTextArea, ToolInput, ToolInputGroup, ToolTabBar, CodeEditor, HighlightedCode, EditorToggle } from './inputs';
 
 export function ToolHeader({ title, description }) {
   return (

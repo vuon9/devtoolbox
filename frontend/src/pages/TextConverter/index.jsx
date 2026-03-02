@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Grid, Column } from '@carbon/react';
 import { ToolHeader, ToolPane, ToolSplitPane } from '../../components/ToolUI';
 import useLayoutToggle from '../../hooks/useLayoutToggle';
@@ -21,16 +22,36 @@ import {
 import { Convert } from '../../generated/http/conversionService';
 
 export default function TextBasedConverter() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get preset from URL params
+  const urlCategory = searchParams.get('category');
+  const urlMethod = searchParams.get('method');
+
+  // Validate and use URL params or fall back to localStorage defaults
+  const validCategories = Object.keys(CONVERTER_MAP);
+  const initialCategory = validCategories.includes(urlCategory)
+    ? urlCategory
+    : (localStorage.getItem(STORAGE_KEYS.CATEGORY) || DEFAULTS.CATEGORY);
+
+  const validMethods = CONVERTER_MAP[initialCategory] || [];
+  const initialMethod = validMethods.includes(urlMethod)
+    ? urlMethod
+    : (localStorage.getItem(STORAGE_KEYS.METHOD) || DEFAULTS.METHOD);
+
   // Persistent state initialization
-  const [category, setCategory] = useState(
-    () => localStorage.getItem(STORAGE_KEYS.CATEGORY) || DEFAULTS.CATEGORY
-  );
-  const [method, setMethod] = useState(
-    () => localStorage.getItem(STORAGE_KEYS.METHOD) || DEFAULTS.METHOD
-  );
+  const [category, setCategory] = useState(initialCategory);
+  const [method, setMethod] = useState(initialMethod);
   const [subMode, setSubMode] = useState(
     () => localStorage.getItem(STORAGE_KEYS.SUBMODE) || DEFAULTS.SUBMODE
   );
+
+  // Clear URL params after using preset
+  useEffect(() => {
+    if (urlCategory || urlMethod) {
+      setSearchParams({}, { replace: true });
+    }
+  }, [urlCategory, urlMethod, setSearchParams]);
 
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
