@@ -3,16 +3,19 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
-import type { Events } from '@wailsio/runtime';
+import type { Events } from "@wailsio/runtime";
 
-declare module '@wailsio/runtime' {
-  namespace Events {
-    interface CustomEvents {
-      'app:quit': string;
-      'command-palette:open': string;
-      'settings:changed': { [_ in string]?: any };
-      time: string;
-      'window:toggle': string;
+declare module "@wailsio/runtime" {
+    namespace Events {
+        interface CustomEvents {
+            "app:quit": string;
+            "command-palette:open": string;
+            "settings:changed": { [_ in string]?: any };
+            "spotlight:closed": string;
+            "spotlight:command-selected": string;
+            "spotlight:opened": string;
+            "time": string;
+            "window:toggle": string;
+        }
     }
-  }
 }

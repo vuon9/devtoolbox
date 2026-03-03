@@ -149,13 +149,13 @@ func main() {
 	app.RegisterService(application.NewService(service.NewWindowControls(mainWindow)))
 
 	// Create spotlight window with special behaviors
-	// Create spotlight window with special behaviors
 	// Note: MacWindowLevelFloating and ActivationPolicyAccessory may require
 	// platform-specific code. CollectionBehaviors provide most spotlight functionality.
 	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:  "DevToolbox Spotlight",
-		Width:  640,
-		Height: 480,
+		Title:     "DevToolbox Spotlight",
+		Width:     640,
+		Height:    480,
+		Frameless: true, // Hide window controls (close/minimize/maximize buttons)
 		BackgroundColour: application.RGBA{
 			Red:   27,
 			Green: 38,

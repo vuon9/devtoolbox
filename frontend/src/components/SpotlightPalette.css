@@ -3,23 +3,25 @@
   max-width: 90vw;
   background: var(--cds-layer);
   border: 1px solid var(--cds-border-subtle);
-  border-radius: 12px;
-  box-shadow: var(--cds-shadow);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
   overflow: hidden;
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
 .spotlight-search-box {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem;
+  padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--cds-border-subtle);
 }
 
 .spotlight-search-icon {
   color: var(--cds-text-secondary);
   flex-shrink: 0;
+  opacity: 0.7;
 }
 
 .spotlight-input {
@@ -27,14 +29,17 @@
   background: transparent;
   border: none;
   color: var(--cds-text-primary);
-  font-size: 1.125rem;
+  font-size: 1.25rem;
+  font-weight: 400;
   padding: 0;
   outline: none;
   font-family: var(--cds-font-sans);
+  letter-spacing: -0.01em;
 }
 
 .spotlight-input::placeholder {
   color: var(--cds-text-secondary);
+  opacity: 0.6;
 }
 
 .spotlight-clear-btn {
@@ -47,38 +52,43 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
+  opacity: 0.7;
 }
 
 .spotlight-clear-btn:hover {
   background: var(--cds-layer-hover);
+  opacity: 1;
 }
 
 .spotlight-results {
-  max-height: 400px;
+  max-height: 360px;
   overflow: hidden;
 }
 
 .spotlight-empty {
-  padding: 2rem;
+  padding: 2.5rem 1.5rem;
   text-align: center;
   color: var(--cds-text-secondary);
   font-size: 0.875rem;
+  opacity: 0.8;
 }
 
 .spotlight-list {
   overflow-y: auto;
-  max-height: 400px;
+  max-height: 360px;
+  padding: 0.5rem 0;
 }
 
 .spotlight-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 1.5rem;
   cursor: pointer;
-  transition: background-color 0.15s ease;
-  border-bottom: 1px solid transparent;
+  transition: all 0.12s ease;
+  margin: 0 0.5rem;
+  border-radius: 6px;
 }
 
 .spotlight-item:hover,
@@ -93,7 +103,7 @@
 .spotlight-item-content {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
   flex: 1;
   min-width: 0;
 }
@@ -101,42 +111,47 @@
 .spotlight-item-icon {
   color: var(--cds-text-secondary);
   flex-shrink: 0;
+  opacity: 0.8;
 }
 
 .spotlight-item-label {
   color: var(--cds-text-primary);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 400;
 }
 
 .spotlight-item-category {
   color: var(--cds-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   text-transform: uppercase;
-  letter-spacing: 0.025em;
+  letter-spacing: 0.04em;
   flex-shrink: 0;
   margin-left: 1rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.625rem;
   background: var(--cds-layer-active);
   border-radius: 4px;
+  font-weight: 500;
+  opacity: 0.8;
 }
 
 /* Scrollbar styling */
 .spotlight-list::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .spotlight-list::-webkit-scrollbar-track {
   background: transparent;
+  margin: 0.5rem 0;
 }
 
 .spotlight-list::-webkit-scrollbar-thumb {
-  background: var(--cds-layer-active);
-  border-radius: 4px;
+  background: var(--cds-border-subtle);
+  border-radius: 3px;
 }
 
 .spotlight-list::-webkit-scrollbar-thumb:hover {
-  background: var(--cds-border-subtle);
+  background: var(--cds-text-secondary);
 }
