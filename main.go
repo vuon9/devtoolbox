@@ -160,7 +160,7 @@ func main() {
 			Red:   27,
 			Green: 38,
 			Blue:  54,
-			Alpha: 242, // ~95% opacity for translucent effect
+			Alpha: 220, // ~86% opacity for better transparency
 		},
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 0,

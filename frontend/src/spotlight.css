@@ -1,7 +1,10 @@
-html,
-body {
+/* Spotlight window specific styles */
+html, body, #root {
   background: transparent !important;
+  margin: 0;
+  padding: 0;
 }
+
 #root {
   display: flex;
   align-items: flex-start;
