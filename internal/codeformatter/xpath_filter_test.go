@@ -6,8 +6,6 @@ import (
 )
 
 func TestApplyXPathFilter(t *testing.T) {
-	// TODO: Fix these tests - XPath filter implementation is incomplete
-	t.Skip("Skipping test: known issue with XPath filter implementation")
 	tests := []struct {
 		name      string
 		xml       string
@@ -19,7 +17,7 @@ func TestApplyXPathFilter(t *testing.T) {
 			name:  "Simple element selector with //",
 			xml:   `<root><item>One</item><item>Two</item></root>`,
 			xpath: "//item",
-			want:  `<item>One</item>\n<item>Two</item>`,
+			want:  "<item>One</item>\n<item>Two</item>",
 		},
 		{
 			name:  "Simple element selector with /",
@@ -103,16 +101,16 @@ func TestApplyXPathFilter(t *testing.T) {
 }
 
 func TestExtractXMLElements(t *testing.T) {
-	// TODO: Fix this test - XML extraction implementation is incomplete
-	t.Skip("Skipping test: known issue with XML element extraction")
 	xml := `<root><item>First</item><item>Second</item><other>Other</other></root>`
 
 	results, err := extractXMLElements(xml, "item")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	if len(results) != 2 {
-		t.Errorf("Expected 2 items, got %d", len(results))
+	// Split by newline to count elements since function returns joined string
+	elements := strings.Split(strings.TrimSpace(results), "\n")
+	if len(elements) != 2 {
+		t.Errorf("Expected 2 items, got %d", len(elements))
 	}
 
 	_, err = extractXMLElements(xml, "nonexistent")
@@ -122,8 +120,6 @@ func TestExtractXMLElements(t *testing.T) {
 }
 
 func TestExtractNestedXMLElements(t *testing.T) {
-	// TODO: Fix this test - nested XML extraction implementation is incomplete
-	t.Skip("Skipping test: known issue with nested XML element extraction")
 	xml := `<catalog>
 		<book>
 			<author>Author1</author>
@@ -145,19 +141,17 @@ func TestExtractNestedXMLElements(t *testing.T) {
 		t.Errorf("Expected to find both authors, got: %s", results)
 	}
 
-	// Test single level
-	results, err = extractNestedXMLElements(xml, []string{"book"})
+	// Test single level - use extractXMLElementsSlice to get slice and count properly
+	booksSlice, err := extractXMLElementsSlice(xml, "book")
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	if len(results) != 2 {
-		t.Errorf("Expected 2 books, got %d", len(results))
+	if len(booksSlice) != 2 {
+		t.Errorf("Expected 2 books, got %d", len(booksSlice))
 	}
 }
 
 func TestExtractElementByAttribute(t *testing.T) {
-	// TODO: Fix this test - attribute extraction implementation is incomplete
-	t.Skip("Skipping test: known issue with XML attribute extraction")
 	xml := `<library>
 		<book id="bk101" genre="fiction"><title>Book1</title></book>
 		<book id="bk102" genre="tech"><title>Book2</title></book>

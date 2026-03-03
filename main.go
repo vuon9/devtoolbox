@@ -144,8 +144,6 @@ func main() {
 	// Create tray menu
 	trayMenu := app.NewMenu()
 	trayMenu.Add("Show DevToolbox").OnClick(func(ctx *application.Context) {
-		// NOTE: macOS window restore from tray has known issues
-		// See: KNOWN_ISSUES.md - "macOS: Tray 'Show DevToolbox' doesn't restore hidden window"
 		log.Println("Tray menu 'Show DevToolbox' clicked")
 		log.Printf("Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
 

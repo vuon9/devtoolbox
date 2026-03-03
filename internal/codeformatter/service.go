@@ -162,8 +162,8 @@ func applyXPathFilter(xml string, xpath string) (string, error) {
 
 	xpath = strings.TrimSpace(xpath)
 
-	// Handle element[@attr='value'] pattern - extract element with specific attribute
-	if strings.Contains(xpath, "[@") && strings.Contains(xpath, "='") {
+	// Handle element[@attr='value'] or element[@attr="value"] pattern - extract element with specific attribute
+	if strings.Contains(xpath, "[@") && (strings.Contains(xpath, "='") || strings.Contains(xpath, "=\"")) {
 		return extractElementByAttribute(xml, xpath)
 	}
 
@@ -278,30 +278,59 @@ func extractElementByAttribute(xmlStr, xpath string) (string, error) {
 
 	attrValue := attrSelector[valueStart+1 : valueEnd]
 
-	// Find elements with matching attribute
-	searchPattern := "<" + elementName + " " + attrName + "=" + string(quoteChar) + attrValue + string(quoteChar)
+	// Find elements with matching attribute by searching for element tags first,
+	// then checking if they have the specified attribute
+	startTag := "<" + elementName
 	endTag := "</" + elementName + ">"
 
 	var results []string
 	start := 0
 
 	for {
-		// Find element with this attribute
-		idx := strings.Index(xmlStr[start:], searchPattern)
+		// Find the next occurrence of the element start tag
+		idx := strings.Index(xmlStr[start:], startTag)
 		if idx == -1 {
-			// Try alternate quote style
-			altQuote := "'"
-			if quoteChar == '\'' {
-				altQuote = "\""
-			}
-			searchPattern = "<" + elementName + " " + attrName + "=" + altQuote + attrValue + altQuote
-			idx = strings.Index(xmlStr[start:], searchPattern)
-			if idx == -1 {
-				break
-			}
+			break
 		}
 		idx += start
 
+		// Check that this is a complete tag name (not a prefix)
+		afterTag := idx + len(startTag)
+		if afterTag < len(xmlStr) {
+			nextChar := xmlStr[afterTag]
+			if nextChar != ' ' && nextChar != '>' && nextChar != '/' {
+				// This is a prefix match (e.g., "book" matching "bookmark"), skip it
+				start = idx + len(startTag)
+				continue
+			}
+		}
+
+		// Find the end of the opening tag to extract attributes
+		tagEnd := idx + len(startTag)
+		for tagEnd < len(xmlStr) && xmlStr[tagEnd] != '>' && xmlStr[tagEnd] != '/' {
+			tagEnd++
+		}
+
+		// Extract the tag content (attributes)
+		tagContent := xmlStr[idx:tagEnd]
+
+		// Check if this tag has the attribute with the specified value
+		// Look for attr="value" or attr='value'
+		attrPattern1 := attrName + "=" + string(quoteChar) + attrValue + string(quoteChar)
+		attrPattern2 := attrName + "=" + string(quoteChar) + attrValue + string(quoteChar)
+		if quoteChar == '\'' {
+			attrPattern2 = attrName + "=\"" + attrValue + "\""
+		} else {
+			attrPattern2 = attrName + "='" + attrValue + "'"
+		}
+
+		if !strings.Contains(tagContent, attrPattern1) && !strings.Contains(tagContent, attrPattern2) {
+			// Attribute not found in this tag, skip to next
+			start = idx + len(startTag)
+			continue
+		}
+
+		// Found matching element, extract it
 		// Find end of this element
 		endIdx := strings.Index(xmlStr[idx:], endTag)
 		if endIdx == -1 {
@@ -349,20 +378,18 @@ func extractNestedXMLElements(xmlStr string, pathParts []string) (string, error)
 	// Get the first element in the path
 	currentElement := pathParts[0]
 
-	// Extract all elements with the first name
-	extracted, err := extractXMLElements(xmlStr, currentElement)
+	// Extract all elements with the first name (returns slice to avoid newline issues)
+	matches, err := extractXMLElementsSlice(xmlStr, currentElement)
 	if err != nil {
 		return "", err
 	}
 
-	// If this is the last part, return it
+	// If this is the last part, return joined results
 	if len(pathParts) == 1 {
-		return extracted, nil
+		return strings.Join(matches, "\n"), nil
 	}
 
 	// Continue with the rest of the path
-	// Split the extracted content by newlines and process each match
-	matches := strings.Split(extracted, "\n")
 	var finalResults []string
 
 	for _, match := range matches {
@@ -385,6 +412,15 @@ func extractNestedXMLElements(xmlStr string, pathParts []string) (string, error)
 
 // extractXMLElements extracts elements by name from XML
 func extractXMLElements(xmlStr, elementName string) (string, error) {
+	elements, err := extractXMLElementsSlice(xmlStr, elementName)
+	if err != nil {
+		return "", err
+	}
+	return strings.Join(elements, "\n"), nil
+}
+
+// extractXMLElementsSlice extracts elements by name from XML and returns as a slice
+func extractXMLElementsSlice(xmlStr, elementName string) ([]string, error) {
 	// Simple extraction using string manipulation
 	// In production, use proper XML parsing
 	startTag := "<" + elementName
@@ -399,6 +435,17 @@ func extractXMLElements(xmlStr, elementName string) (string, error) {
 			break
 		}
 		idx += start
+
+		// Check that this is a complete tag name (not a prefix like "item" matching "items")
+		afterTag := idx + len(startTag)
+		if afterTag < len(xmlStr) {
+			nextChar := xmlStr[afterTag]
+			if nextChar != ' ' && nextChar != '>' && nextChar != '/' {
+				// This is a prefix match, skip it
+				start = idx + len(startTag)
+				continue
+			}
+		}
 
 		// Find end of this element
 		endIdx := strings.Index(xmlStr[idx:], endTag)
@@ -417,10 +464,10 @@ func extractXMLElements(xmlStr, elementName string) (string, error) {
 	}
 
 	if len(results) == 0 {
-		return "", fmt.Errorf("no elements found with name: %s", elementName)
+		return nil, fmt.Errorf("no elements found with name: %s", elementName)
 	}
 
-	return strings.Join(results, "\n"), nil
+	return results, nil
 }
 
 // extractXMLAttributes extracts attribute values from XML elements
@@ -691,6 +738,20 @@ func applyCSSSelector(htmlStr, selector string) (string, error) {
 		return result, nil
 	}
 
+	// Handle element with class selector (e.g., "div.header")
+	if strings.Contains(selector, ".") && !strings.Contains(selector, " ") && !strings.Contains(selector, ">") {
+		parts := strings.Split(selector, ".")
+		if len(parts) == 2 {
+			tagName := parts[0]
+			className := parts[1]
+			results := findElementsByTagAndClass(doc, tagName, className)
+			if len(results) == 0 {
+				return "", fmt.Errorf("no elements found matching selector: %s", selector)
+			}
+			return strings.Join(results, "\n"), nil
+		}
+	}
+
 	// Handle descendant selector (e.g., "div.container > h1")
 	if strings.Contains(selector, " ") || strings.Contains(selector, ">") {
 		results := findElementsByDescendant(doc, selector)
@@ -793,6 +854,34 @@ func findElementsByClass(n *html.Node, className string) []string {
 	return results
 }
 
+// findElementsByTagAndClass finds elements by tag name and class
+func findElementsByTagAndClass(n *html.Node, tagName, className string) []string {
+	var results []string
+
+	var traverse func(*html.Node)
+	traverse = func(node *html.Node) {
+		if node.Type == html.ElementNode && node.Data == tagName {
+			for _, attr := range node.Attr {
+				if attr.Key == "class" {
+					classes := strings.Fields(attr.Val)
+					for _, c := range classes {
+						if c == className {
+							results = append(results, renderNodeToString(node))
+							break
+						}
+					}
+				}
+			}
+		}
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			traverse(c)
+		}
+	}
+
+	traverse(n)
+	return results
+}
+
 // findElementByID finds element by ID
 func findElementByID(n *html.Node, id string) string {
 	var result string
@@ -819,51 +908,220 @@ func findElementByID(n *html.Node, id string) string {
 	return result
 }
 
+// cssSelectorPart represents a part of a CSS selector chain
+type cssSelectorPart struct {
+	selector    string
+	directChild bool
+}
+
 // findElementsByDescendant finds elements by descendant selector
 func findElementsByDescendant(n *html.Node, selector string) []string {
-	// Parse simple descendant selectors like "div.container > h1"
-	parts := strings.FieldsFunc(selector, func(r rune) bool {
-		return r == ' ' || r == '>'
-	})
+	// Parse selector into parts with relationship info
+	// e.g., "div.container > h1" becomes [(div.container, >), (h1, )]
+	var parts []cssSelectorPart
+	current := ""
+	directChild := false
+
+	for i, r := range selector {
+		if r == '>' {
+			if strings.TrimSpace(current) != "" {
+				parts = append(parts, cssSelectorPart{selector: strings.TrimSpace(current), directChild: directChild})
+			}
+			current = ""
+			directChild = true
+		} else if r == ' ' {
+			// Check if next non-space char is >
+			nextIsDirect := false
+			for j := i + 1; j < len(selector); j++ {
+				if selector[j] == '>' {
+					nextIsDirect = true
+					break
+				} else if selector[j] != ' ' {
+					break
+				}
+			}
+
+			if strings.TrimSpace(current) != "" && !nextIsDirect {
+				parts = append(parts, cssSelectorPart{selector: strings.TrimSpace(current), directChild: directChild})
+				current = ""
+				directChild = false
+			}
+		} else {
+			current += string(r)
+		}
+	}
+
+	if strings.TrimSpace(current) != "" {
+		parts = append(parts, cssSelectorPart{selector: strings.TrimSpace(current), directChild: directChild})
+	}
 
 	if len(parts) == 0 {
 		return nil
 	}
 
-	// For now, just find the last element
-	lastPart := parts[len(parts)-1]
+	// Find elements matching the full selector chain
+	return findElementsMatchingSelectorChain(n, parts)
+}
 
-	// Check if it has a class
-	if strings.Contains(lastPart, ".") {
-		classParts := strings.Split(lastPart, ".")
-		tagName := classParts[0]
-		className := classParts[1]
+// findElementsMatchingSelectorChain finds elements matching a chain of selectors
+func findElementsMatchingSelectorChain(n *html.Node, parts []cssSelectorPart) []string {
+	if len(parts) == 0 {
+		return nil
+	}
 
+	// Find all nodes matching the first selector
+	firstMatches := findNodesMatchingSimpleSelector(n, parts[0].selector)
+
+	if len(parts) == 1 {
+		// Last part - convert nodes to strings (deduplicate)
+		seen := make(map[*html.Node]bool)
 		var results []string
-		var traverse func(*html.Node)
-		traverse = func(node *html.Node) {
-			if node.Type == html.ElementNode && (tagName == "" || node.Data == tagName) {
-				for _, attr := range node.Attr {
-					if attr.Key == "class" {
-						classes := strings.Fields(attr.Val)
-						for _, c := range classes {
-								if c == className {
-									results = append(results, renderNodeToString(node))
-									break
-								}
+		for _, node := range firstMatches {
+			if !seen[node] {
+				seen[node] = true
+				results = append(results, renderNodeToString(node))
+			}
+		}
+		return results
+	}
+
+	// For each match, search its descendants for the rest of the chain
+	// Use a map to deduplicate nodes (same node found through different paths)
+	seen := make(map[*html.Node]bool)
+	var results []string
+
+	for _, matchNode := range firstMatches {
+		if parts[1].directChild {
+			// For direct child (>), check if immediate children match the next selector
+			for c := matchNode.FirstChild; c != nil; c = c.NextSibling {
+				if c.Type == html.ElementNode && matchesSimpleSelector(c, parts[1].selector) {
+					// Found a match - continue with rest of chain
+					if len(parts) == 2 {
+						// This is the last selector in chain
+						if !seen[c] {
+							seen[c] = true
+							results = append(results, renderNodeToString(c))
+						}
+					} else {
+						// More selectors to match - search from this node
+						subResults := findElementsMatchingSelectorChain(c, parts[2:])
+						for _, r := range subResults {
+							results = append(results, r)
 						}
 					}
 				}
 			}
-			for c := node.FirstChild; c != nil; c = c.NextSibling {
-				traverse(c)
+		} else {
+			// For descendant (space), search entire subtree
+			for c := matchNode.FirstChild; c != nil; c = c.NextSibling {
+				subResults := findElementsMatchingSelectorChain(c, parts[1:])
+				for _, r := range subResults {
+					results = append(results, r)
+				}
 			}
 		}
-		traverse(n)
-		return results
 	}
 
-	return findHTMLElements(n, lastPart)
+	// Deduplicate results by string content
+	seenStr := make(map[string]bool)
+	var uniqueResults []string
+	for _, r := range results {
+		if !seenStr[r] {
+			seenStr[r] = true
+			uniqueResults = append(uniqueResults, r)
+		}
+	}
+
+	return uniqueResults
+}
+
+// findNodesMatchingSimpleSelector finds nodes (not strings) matching a simple selector
+func findNodesMatchingSimpleSelector(n *html.Node, selector string) []*html.Node {
+	var results []*html.Node
+
+	var traverse func(*html.Node)
+	traverse = func(node *html.Node) {
+		if node.Type == html.ElementNode && matchesSimpleSelector(node, selector) {
+			results = append(results, node)
+		}
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			traverse(c)
+		}
+	}
+
+	traverse(n)
+	return results
+}
+
+// findElementsMatchingSimpleSelector finds elements matching a simple selector (e.g., "div", ".class", "div.class")
+func findElementsMatchingSimpleSelector(n *html.Node, selector string) []string {
+	var results []string
+
+	var traverse func(*html.Node)
+	traverse = func(node *html.Node) {
+		if node.Type == html.ElementNode && matchesSimpleSelector(node, selector) {
+			results = append(results, renderNodeToString(node))
+		}
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			traverse(c)
+		}
+	}
+
+	traverse(n)
+	return results
+}
+
+// matchesSimpleSelector checks if a node matches a simple CSS selector
+func matchesSimpleSelector(node *html.Node, selector string) bool {
+	selector = strings.TrimSpace(selector)
+
+	// Handle class selector: .classname or tag.classname
+	if strings.Contains(selector, ".") {
+		parts := strings.Split(selector, ".")
+		tagName := parts[0]
+		className := parts[1]
+
+		// Check tag name if specified
+		if tagName != "" && node.Data != tagName {
+			return false
+		}
+
+		// Check class
+		for _, attr := range node.Attr {
+			if attr.Key == "class" {
+				classes := strings.Fields(attr.Val)
+				for _, c := range classes {
+					if c == className {
+						return true
+					}
+				}
+			}
+		}
+		return false
+	}
+
+	// Handle ID selector: #id or tag#id
+	if strings.Contains(selector, "#") {
+		parts := strings.Split(selector, "#")
+		tagName := parts[0]
+		id := parts[1]
+
+		// Check tag name if specified
+		if tagName != "" && node.Data != tagName {
+			return false
+		}
+
+		// Check ID
+		for _, attr := range node.Attr {
+			if attr.Key == "id" && attr.Val == id {
+				return true
+			}
+		}
+		return false
+	}
+
+	// Simple tag selector
+	return node.Data == selector
 }
 
 // formatHTMLPretty formats HTML with indentation
