@@ -37,7 +37,7 @@ func init() {
 	// Register spotlight events
 	application.RegisterEvent[string]("spotlight:opened")
 	application.RegisterEvent[string]("spotlight:closed")
-	application.RegisterEvent[string]("spotlight:command-selected")
+	application.RegisterEvent[string]("spotlight:command-selected") // Event triggered when user selects a command from spotlight - used for navigation from spotlight to main window
 }
 
 func main() {
@@ -103,7 +103,7 @@ func main() {
 	spotlightService := service.NewSpotlightService(app)
 	app.RegisterService(application.NewService(spotlightService))
 
-	// WindowControls service will be registered after window creation
+	// WindowControls service must be registered after main window creation (see line 149)
 
 	// Start HTTP server for browser support (background)
 	go func() {
@@ -157,15 +157,15 @@ func main() {
 			Red:   27,
 			Green: 38,
 			Blue:  54,
-			Alpha: 242,
+			Alpha: 242, // ~95% opacity (242/255) for translucent effect
 		},
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 0,
 			Backdrop:                application.MacBackdropTranslucent,
 			TitleBar:                application.MacTitleBarHidden,
-			CollectionBehavior: application.MacWindowCollectionBehaviorCanJoinAllSpaces |
-				application.MacWindowCollectionBehaviorFullScreenAuxiliary |
-				application.MacWindowCollectionBehaviorTransient,
+			CollectionBehavior: application.MacWindowCollectionBehaviorCanJoinAllSpaces | // Window appears on all Spaces
+				application.MacWindowCollectionBehaviorFullScreenAuxiliary | // Can overlay fullscreen apps
+				application.MacWindowCollectionBehaviorTransient, // Temporary window behavior
 		},
 		Windows: application.WindowsWindow{
 			HiddenOnTaskbar: true,
@@ -230,6 +230,7 @@ func main() {
 	app.KeyBinding.Add(hotkeyAccelerator, func(window application.Window) {
 		spotlightService.Toggle()
 	})
+	// Note: Wails v3 doesn't return an error from KeyBinding.Add - errors are logged internally
 
 	if err := app.Run(); err != nil {
 		panic(err)
