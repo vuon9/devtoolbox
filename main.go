@@ -255,6 +255,10 @@ func main() {
 		mainWindow.Focus()
 		log.Printf("After show - Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
 	})
+	trayMenu.Add("Open Spotlight (Cmd+Ctrl+M)").OnClick(func(ctx *application.Context) {
+		log.Println("Tray menu 'Open Spotlight' clicked")
+		spotlightService.Toggle()
+	})
 	trayMenu.AddSeparator()
 	trayMenu.Add("Quit").OnClick(func(ctx *application.Context) {
 		app.Quit()
