@@ -149,6 +149,9 @@ func main() {
 	app.RegisterService(application.NewService(service.NewWindowControls(mainWindow)))
 
 	// Create spotlight window with special behaviors
+	// Create spotlight window with special behaviors
+	// Note: MacWindowLevelFloating and ActivationPolicyAccessory may require
+	// platform-specific code. CollectionBehaviors provide most spotlight functionality.
 	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:  "DevToolbox Spotlight",
 		Width:  640,
@@ -157,18 +160,22 @@ func main() {
 			Red:   27,
 			Green: 38,
 			Blue:  54,
-			Alpha: 242, // ~95% opacity (242/255) for translucent effect
+			Alpha: 242, // ~95% opacity for translucent effect
 		},
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 0,
 			Backdrop:                application.MacBackdropTranslucent,
 			TitleBar:                application.MacTitleBarHidden,
-			CollectionBehavior: application.MacWindowCollectionBehaviorCanJoinAllSpaces | // Window appears on all Spaces
-				application.MacWindowCollectionBehaviorFullScreenAuxiliary | // Can overlay fullscreen apps
-				application.MacWindowCollectionBehaviorTransient, // Temporary window behavior
+			// Collection behaviors for Spotlight-like functionality:
+			// - CanJoinAllSpaces: Appears on all Spaces (virtual desktops)
+			// - FullScreenAuxiliary: Can overlay fullscreen apps
+			// - Transient: Temporary window, doesn't affect window order
+			CollectionBehavior: application.MacWindowCollectionBehaviorCanJoinAllSpaces |
+				application.MacWindowCollectionBehaviorFullScreenAuxiliary |
+				application.MacWindowCollectionBehaviorTransient,
 		},
 		Windows: application.WindowsWindow{
-			HiddenOnTaskbar: true,
+			HiddenOnTaskbar: true, // Hide from taskbar for tool window behavior
 		},
 		Hidden: true,
 		URL:    "/spotlight",
