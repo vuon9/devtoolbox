@@ -7,13 +7,12 @@ import * as httpDateTime from '../../../generated/http/dateTimeService';
 export const dateTimeAPI = {
   async GetAvailableTimezones() {
     // Check if we're in Wails environment (desktop app)
-    const isWails = typeof window !== 'undefined' && 
-                    window.go && 
-                    typeof window.go.main !== 'undefined';
-    
+    const isWails =
+      typeof window !== 'undefined' && window.go && typeof window.go.main !== 'undefined';
+
     console.log('Environment check - isWails:', isWails);
     console.log('Window.go:', typeof window !== 'undefined' ? window.go : 'undefined');
-    
+
     if (isWails) {
       try {
         console.log('Trying Wails API...');
@@ -25,7 +24,7 @@ export const dateTimeAPI = {
         console.log('Falling back to HTTP API...');
       }
     }
-    
+
     // Fallback to HTTP API (web app)
     try {
       console.log('Trying HTTP API...');
@@ -36,7 +35,7 @@ export const dateTimeAPI = {
       console.error('HTTP API failed:', e);
       throw e;
     }
-  }
+  },
 };
 
 // Expose for debugging

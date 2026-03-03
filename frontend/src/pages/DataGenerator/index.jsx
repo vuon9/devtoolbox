@@ -44,9 +44,10 @@ export default function DataGenerator() {
           // Check for URL preset, otherwise use first preset
           let selectedPreset = presets[0];
           if (urlPreset) {
-            const urlPresetMatch = presets.find(p =>
-              p.id.toLowerCase() === urlPreset.toLowerCase() ||
-              p.name.toLowerCase() === urlPreset.toLowerCase()
+            const urlPresetMatch = presets.find(
+              (p) =>
+                p.id.toLowerCase() === urlPreset.toLowerCase() ||
+                p.name.toLowerCase() === urlPreset.toLowerCase()
             );
             if (urlPresetMatch) {
               selectedPreset = urlPresetMatch;
@@ -180,22 +181,22 @@ export default function DataGenerator() {
 
       <Column>
         <ToolControls>
-        <GeneratorControls
-          state={state}
-          dispatch={dispatch}
-          presetItems={presetItems}
-          presetLabels={presetLabels}
-          onPresetChange={handlePresetChange}
-          onGenerate={handleGenerate}
-        />
-        <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
-          <ToolLayoutToggle
-            direction={layout.direction}
-            onToggle={layout.toggleDirection}
-            position="controls"
+          <GeneratorControls
+            state={state}
+            dispatch={dispatch}
+            presetItems={presetItems}
+            presetLabels={presetLabels}
+            onPresetChange={handlePresetChange}
+            onGenerate={handleGenerate}
           />
-        </div>
-      </ToolControls>
+          <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+            <ToolLayoutToggle
+              direction={layout.direction}
+              onToggle={layout.toggleDirection}
+              position="controls"
+            />
+          </div>
+        </ToolControls>
       </Column>
 
       <Column>

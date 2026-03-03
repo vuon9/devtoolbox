@@ -7,7 +7,7 @@ import { formatNumber } from '../utils';
 /**
  * ConversionCard component
  * Displays a number input for a specific base with copy/sync functionality
- * 
+ *
  * @param {Object} props
  * @param {string} props.label - Display label (e.g., "Decimal")
  * @param {number} props.base - Numeric base (2, 8, 10, 16, or custom)
@@ -118,7 +118,13 @@ const ConversionCard = ({
         hideLabel
         value={displayValue}
         onChange={handleInputChange}
-        placeholder={placeholder || (isCustom ? `Base ${customBase}` : BASES[Object.keys(BASES).find(k => BASES[k].base === base)]?.placeholder || `Enter ${label.toLowerCase()}...`)}
+        placeholder={
+          placeholder ||
+          (isCustom
+            ? `Base ${customBase}`
+            : BASES[Object.keys(BASES).find((k) => BASES[k].base === base)]?.placeholder ||
+              `Enter ${label.toLowerCase()}...`)
+        }
         invalid={!!error}
         invalidText={error}
         style={{

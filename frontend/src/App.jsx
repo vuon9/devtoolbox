@@ -61,7 +61,7 @@ function App() {
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleCommandPalette = useCallback(() => {
-    setIsCommandPaletteOpen(prev => !prev);
+    setIsCommandPaletteOpen((prev) => !prev);
   }, []);
   const closeCommandPalette = useCallback(() => setIsCommandPaletteOpen(false), []);
 

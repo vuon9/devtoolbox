@@ -128,31 +128,31 @@ body {
 // Neon Syntax Highlighting Colors for CodeMirror
 // SQL Categorized Keywords
 .cm-sql-ddl {
-  color: #FF6B9D !important; // Hot Pink - CREATE, DROP, ALTER
+  color: #ff6b9d !important; // Hot Pink - CREATE, DROP, ALTER
   font-weight: 600;
 }
 
 .cm-sql-dml {
-  color: #00F0FF !important; // Electric Cyan - SELECT, INSERT
+  color: #00f0ff !important; // Electric Cyan - SELECT, INSERT
   font-weight: 600;
 }
 
 .cm-sql-conditional {
-  color: #B388FF !important; // Electric Purple - WHERE, AND, OR
+  color: #b388ff !important; // Electric Purple - WHERE, AND, OR
   font-weight: 600;
 }
 
 .cm-sql-join {
-  color: #FFAB40 !important; // Bright Orange - JOIN, INNER, LEFT
+  color: #ffab40 !important; // Bright Orange - JOIN, INNER, LEFT
   font-weight: 600;
 }
 
 .cm-sql-aggregate {
-  color: #69F0AE !important; // Bright Mint - COUNT, SUM, AVG
+  color: #69f0ae !important; // Bright Mint - COUNT, SUM, AVG
   font-weight: 600;
 }
 
 .cm-sql-ordering {
-  color: #FFD740 !important; // Golden Yellow - ORDER BY, GROUP BY
+  color: #ffd740 !important; // Golden Yellow - ORDER BY, GROUP BY
   font-weight: 600;
 }

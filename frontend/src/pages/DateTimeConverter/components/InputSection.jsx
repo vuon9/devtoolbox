@@ -3,7 +3,17 @@ import { Button, TextInput, ComboBox } from '@carbon/react';
 import { Add } from '@carbon/icons-react';
 import { ToolControls } from '../../../components/ToolUI';
 
-export function InputSection({ availableTimezones, input, setInput, timezone, setTimezone, selectedNewTimezone, setSelectedNewTimezone, onAddTimezone, disabled }) {
+export function InputSection({
+  availableTimezones,
+  input,
+  setInput,
+  timezone,
+  setTimezone,
+  selectedNewTimezone,
+  setSelectedNewTimezone,
+  onAddTimezone,
+  disabled,
+}) {
   return (
     <ToolControls>
       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
@@ -19,7 +29,7 @@ export function InputSection({ availableTimezones, input, setInput, timezone, se
           <ComboBox
             id="timezone"
             titleText="Input timezone"
-            placeholder={availableTimezones.length === 0 ? "Loading..." : "Select timezone"}
+            placeholder={availableTimezones.length === 0 ? 'Loading...' : 'Select timezone'}
             items={availableTimezones}
             itemToString={(item) => (item ? item.label : '')}
             selectedItem={availableTimezones.find((tz) => tz.id === timezone)}
@@ -31,7 +41,7 @@ export function InputSection({ availableTimezones, input, setInput, timezone, se
         <ComboBox
           id="add-timezone"
           titleText="Add timezone"
-          placeholder={disabled ? "Loading timezones..." : "Search timezone..."}
+          placeholder={disabled ? 'Loading timezones...' : 'Search timezone...'}
           items={availableTimezones}
           itemToString={(item) => (item ? item.label : '')}
           selectedItem={selectedNewTimezone}

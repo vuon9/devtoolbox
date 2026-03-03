@@ -13,7 +13,10 @@ import { getMonospaceFontFamily, getDataFontSize } from '../../../utils/inputUti
  */
 export default function DateTimeOutputField({ label, value, className, style }) {
   return (
-    <Tile className={className} style={{ padding: '0.75rem', background: 'var(--cds-layer)', ...style }}>
+    <Tile
+      className={className}
+      style={{ padding: '0.75rem', background: 'var(--cds-layer)', ...style }}
+    >
       <div
         style={{
           fontSize: '0.75rem',

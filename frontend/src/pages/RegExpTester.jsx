@@ -870,109 +870,109 @@ export default function RegExpTester() {
 
       {/* Regex Input Row - Unified Input Group */}
       <Column>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'stretch',
-          padding: '0 0.5rem',
-          backgroundColor: 'var(--cds-layer)',
-          border: error
-            ? '2px solid var(--cds-support-error)'
-            : '1px solid var(--cds-border-strong)',
-          borderRadius: '4px',
-          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-          boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)',
-          position: 'relative',
-          overflow: 'visible', // For popover
-        }}
-        className="regex-input-row"
-      >
-        {/* Prefix / */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            padding: '0.75rem 0.5rem 0',
-            userSelect: 'none',
-            borderRight: '1px solid var(--cds-border-subtle)',
-            minWidth: '40px',
-          }}
-        >
-          <span
-            style={{
-              color: 'var(--cds-text-secondary)',
-              fontSize: '1.25rem',
-              fontFamily: "'IBM Plex Mono', monospace",
-              opacity: 0.7,
-              lineHeight: '1.2',
-            }}
-          >
-            /
-          </span>
-        </div>
-
-        <div
-          style={{
-            flex: 1,
             display: 'flex',
             alignItems: 'stretch',
-            padding: '0',
+            padding: '0 0.5rem',
+            backgroundColor: 'var(--cds-layer)',
+            border: error
+              ? '2px solid var(--cds-support-error)'
+              : '1px solid var(--cds-border-strong)',
+            borderRadius: '4px',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)',
+            position: 'relative',
+            overflow: 'visible', // For popover
           }}
+          className="regex-input-row"
         >
-          <ExpandableRegexInput value={regexStr} onChange={setRegexStr} error={error} />
-        </div>
-
-        {/* Suffix / */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            padding: '0.75rem 0.5rem 0',
-            userSelect: 'none',
-            borderLeft: '1px solid var(--cds-border-subtle)',
-            minWidth: '40px',
-          }}
-        >
-          <span
+          {/* Prefix / */}
+          <div
             style={{
-              color: 'var(--cds-text-secondary)',
-              fontSize: '1.25rem',
-              fontFamily: "'IBM Plex Mono', monospace",
-              opacity: 0.7,
-              lineHeight: '1.2',
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              padding: '0.75rem 0.5rem 0',
+              userSelect: 'none',
+              borderRight: '1px solid var(--cds-border-subtle)',
+              minWidth: '40px',
             }}
           >
-            /
-          </span>
-        </div>
+            <span
+              style={{
+                color: 'var(--cds-text-secondary)',
+                fontSize: '1.25rem',
+                fontFamily: "'IBM Plex Mono', monospace",
+                opacity: 0.7,
+                lineHeight: '1.2',
+              }}
+            >
+              /
+            </span>
+          </div>
 
-        {/* Flags Input */}
-        <FlagsInputWithPopover flags={flags} setFlags={setFlags} />
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'stretch',
+              padding: '0',
+            }}
+          >
+            <ExpandableRegexInput value={regexStr} onChange={setRegexStr} error={error} />
+          </div>
 
-        {/* Copy Button */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderLeft: '1px solid var(--cds-border-subtle)',
-            minWidth: '48px',
-          }}
-        >
-          <CopyButton
-            onClick={handleCopyFullRegex}
-            disabled={!regexStr}
-            size="md"
-            iconDescription="Copy full regex string"
-            align="center"
-            kind="ghost"
-            className="transparent-copy-btn"
-          />
-        </div>
+          {/* Suffix / */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              padding: '0.75rem 0.5rem 0',
+              userSelect: 'none',
+              borderLeft: '1px solid var(--cds-border-subtle)',
+              minWidth: '40px',
+            }}
+          >
+            <span
+              style={{
+                color: 'var(--cds-text-secondary)',
+                fontSize: '1.25rem',
+                fontFamily: "'IBM Plex Mono', monospace",
+                opacity: 0.7,
+                lineHeight: '1.2',
+              }}
+            >
+              /
+            </span>
+          </div>
 
-        <style>{`
+          {/* Flags Input */}
+          <FlagsInputWithPopover flags={flags} setFlags={setFlags} />
+
+          {/* Copy Button */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderLeft: '1px solid var(--cds-border-subtle)',
+              minWidth: '48px',
+            }}
+          >
+            <CopyButton
+              onClick={handleCopyFullRegex}
+              disabled={!regexStr}
+              size="md"
+              iconDescription="Copy full regex string"
+              align="center"
+              kind="ghost"
+              className="transparent-copy-btn"
+            />
+          </div>
+
+          <style>{`
                     .regex-input-row:focus-within {
                         border-color: var(--cds-focus) !important;
                         box-shadow: 0 0 0 2px var(--cds-focus), inset 0 1px 2px rgba(0,0,0,0.1);
@@ -990,7 +990,7 @@ export default function RegExpTester() {
                         background-color: var(--cds-layer-hover-01) !important;
                     }
                 `}</style>
-      </div>
+        </div>
       </Column>
 
       {/* Error Display */}
@@ -1012,36 +1012,36 @@ export default function RegExpTester() {
       )}
 
       <Column style={{ flex: 1, minHeight: 0 }}>
-      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-        {/* Left Pane: Live Highlighted Input */}
-        <ToolPaneWithLabel
-          label={`Test String${matches.length > 0 ? ` (${matches.length} match${matches.length !== 1 ? 'es' : ''})` : ''}`}
-        >
-          <LiveHighlightedEditor text={text} setText={setText} regex={regexStr} flags={flags} />
-        </ToolPaneWithLabel>
-
-        {/* Right Pane: Match Information */}
-        <ToolPaneWithLabel label="MATCH INFORMATION">
-          <div
-            style={{
-              flex: 1,
-              overflowY: 'auto',
-              backgroundColor: 'var(--cds-layer)',
-              border: '1px solid var(--cds-border-strong)',
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: '0.875rem',
-            }}
+        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
+          {/* Left Pane: Live Highlighted Input */}
+          <ToolPaneWithLabel
+            label={`Test String${matches.length > 0 ? ` (${matches.length} match${matches.length !== 1 ? 'es' : ''})` : ''}`}
           >
-            {output.length > 0 ? (
-              output
-            ) : (
-              <div style={{ padding: '1rem', color: 'var(--cds-text-secondary)' }}>
-                Matching results will appear here...
-              </div>
-            )}
-          </div>
-        </ToolPaneWithLabel>
-      </ToolSplitPane>
+            <LiveHighlightedEditor text={text} setText={setText} regex={regexStr} flags={flags} />
+          </ToolPaneWithLabel>
+
+          {/* Right Pane: Match Information */}
+          <ToolPaneWithLabel label="MATCH INFORMATION">
+            <div
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                backgroundColor: 'var(--cds-layer)',
+                border: '1px solid var(--cds-border-strong)',
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '0.875rem',
+              }}
+            >
+              {output.length > 0 ? (
+                output
+              ) : (
+                <div style={{ padding: '1rem', color: 'var(--cds-text-secondary)' }}>
+                  Matching results will appear here...
+                </div>
+              )}
+            </div>
+          </ToolPaneWithLabel>
+        </ToolSplitPane>
       </Column>
     </Grid>
   );

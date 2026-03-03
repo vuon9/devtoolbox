@@ -22,13 +22,13 @@ export function sanitizeInput(input) {
  */
 export function validateInputChars(input, base) {
   const validChars = getValidCharsForBase(base);
-  
+
   for (const char of input) {
     if (!validChars.includes(char)) {
       return { valid: false, invalidChar: char };
     }
   }
-  
+
   return { valid: true, invalidChar: null };
 }
 
@@ -40,50 +40,50 @@ export function validateInputChars(input, base) {
  */
 export function parseInput(input, base) {
   const sanitized = sanitizeInput(input);
-  
+
   if (sanitized === '') {
     return { value: null, error: null }; // Empty is valid (no change)
   }
-  
+
   // Check for negative sign
   if (sanitized.startsWith('-')) {
     return { value: null, error: ERROR_MESSAGES.NEGATIVE };
   }
-  
+
   // Check for scientific notation
   if (/[eE]/.test(sanitized)) {
     return { value: null, error: ERROR_MESSAGES.PARSE_ERROR(base) };
   }
-  
+
   // Validate characters
   const { valid, invalidChar } = validateInputChars(sanitized, base);
   if (!valid) {
     return { value: null, error: ERROR_MESSAGES.INVALID_CHAR(invalidChar, base) };
   }
-  
+
   // Parse the number
   const parsed = parseInt(sanitized, base);
-  
+
   if (isNaN(parsed)) {
     return { value: null, error: ERROR_MESSAGES.PARSE_ERROR(base) };
   }
-  
+
   // Check for overflow and clamp
   let value = parsed;
   let error = null;
-  
+
   if (value < 0) {
     return { value: null, error: ERROR_MESSAGES.NEGATIVE };
   }
-  
+
   if (value > LIMITS.MAX_32BIT_DECIMAL) {
     value = LIMITS.MAX_32BIT;
     error = ERROR_MESSAGES.OVERFLOW;
   }
-  
+
   // Ensure unsigned 32-bit
   value = value >>> 0;
-  
+
   return { value, error };
 }
 
@@ -103,12 +103,12 @@ export function parseDecimal(input) {
  */
 export function parseHex(input) {
   let sanitized = sanitizeInput(input);
-  
+
   // Remove 0x or 0X prefix if present
   if (sanitized.toLowerCase().startsWith('0x')) {
     sanitized = sanitized.slice(2);
   }
-  
+
   return parseInput(sanitized, 16);
 }
 
@@ -119,12 +119,12 @@ export function parseHex(input) {
  */
 export function parseBinary(input) {
   let sanitized = sanitizeInput(input);
-  
+
   // Remove 0b or 0B prefix if present
   if (sanitized.toLowerCase().startsWith('0b')) {
     sanitized = sanitized.slice(2);
   }
-  
+
   return parseInput(sanitized, 2);
 }
 
@@ -135,12 +135,12 @@ export function parseBinary(input) {
  */
 export function parseOctal(input) {
   let sanitized = sanitizeInput(input);
-  
+
   // Remove 0o or 0O prefix if present
   if (sanitized.toLowerCase().startsWith('0o')) {
     sanitized = sanitized.slice(2);
   }
-  
+
   return parseInput(sanitized, 8);
 }
 
@@ -260,7 +260,7 @@ export function getBit(value, position) {
   if (position < 0 || position > 31) {
     return 0;
   }
-  return ((value >>> position) & 1);
+  return (value >>> position) & 1;
 }
 
 /**
@@ -273,7 +273,7 @@ export function toggleBit(value, position) {
   if (position < 0 || position > 31) {
     return value >>> 0;
   }
-  return ((value ^ (1 << position)) >>> 0);
+  return (value ^ (1 << position)) >>> 0;
 }
 
 /**
@@ -286,7 +286,7 @@ export function setBit(value, position) {
   if (position < 0 || position > 31) {
     return value >>> 0;
   }
-  return ((value | (1 << position)) >>> 0);
+  return (value | (1 << position)) >>> 0;
 }
 
 /**
@@ -299,7 +299,7 @@ export function clearBit(value, position) {
   if (position < 0 || position > 31) {
     return value >>> 0;
   }
-  return ((value & ~(1 << position)) >>> 0);
+  return (value & ~(1 << position)) >>> 0;
 }
 
 /**
@@ -313,7 +313,7 @@ export function shiftLeft(value, n = 1) {
   if (shiftAmount >= 32) {
     return 0;
   }
-  return ((value << shiftAmount) >>> 0);
+  return (value << shiftAmount) >>> 0;
 }
 
 /**
@@ -327,7 +327,7 @@ export function shiftRight(value, n = 1) {
   if (shiftAmount >= 32) {
     return 0;
   }
-  return (value >>> shiftAmount);
+  return value >>> shiftAmount;
 }
 
 /**
@@ -336,7 +336,7 @@ export function shiftRight(value, n = 1) {
  * @returns {number} Inverted value (32-bit)
  */
 export function bitwiseNot(value) {
-  return (~value >>> 0);
+  return ~value >>> 0;
 }
 
 /**
@@ -346,7 +346,7 @@ export function bitwiseNot(value) {
  * @returns {number} Result (32-bit)
  */
 export function bitwiseAnd(value, mask) {
-  return ((value & mask) >>> 0);
+  return (value & mask) >>> 0;
 }
 
 /**
@@ -356,7 +356,7 @@ export function bitwiseAnd(value, mask) {
  * @returns {number} Result (32-bit)
  */
 export function bitwiseOr(value, mask) {
-  return ((value | mask) >>> 0);
+  return (value | mask) >>> 0;
 }
 
 /**
@@ -369,7 +369,7 @@ export function getByte(value, bytePos) {
   if (bytePos < 0 || bytePos > 3) {
     return 0;
   }
-  return ((value >>> (bytePos * 8)) & 0xFF);
+  return (value >>> (bytePos * 8)) & 0xff;
 }
 
 /**

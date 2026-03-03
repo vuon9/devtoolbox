@@ -77,9 +77,7 @@ export default function StringUtilities() {
         </div>
       </Column>
 
-      <Column style={{ flex: 1, minHeight: 0 }}>
-        {renderPane()}
-      </Column>
+      <Column style={{ flex: 1, minHeight: 0 }}>{renderPane()}</Column>
     </Grid>
   );
 }

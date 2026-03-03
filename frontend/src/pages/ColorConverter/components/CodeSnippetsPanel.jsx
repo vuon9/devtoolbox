@@ -18,13 +18,12 @@ const languageTabs = [
 
 export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChange, onCopy }) {
   return (
-    <Tabs
-      selectedIndex={selectedTab}
-      onChange={({ selectedIndex }) => onTabChange(selectedIndex)}
-    >
+    <Tabs selectedIndex={selectedTab} onChange={({ selectedIndex }) => onTabChange(selectedIndex)}>
       <TabList aria-label="Language tabs" contained>
         {languageTabs.map((tab) => (
-          <Tab key={tab.id} style={{ flexShrink: 0 }}>{tab.label}</Tab>
+          <Tab key={tab.id} style={{ flexShrink: 0 }}>
+            {tab.label}
+          </Tab>
         ))}
       </TabList>
 
