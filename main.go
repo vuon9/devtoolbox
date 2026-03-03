@@ -33,6 +33,11 @@ func init() {
 
 	// Register settings changed event
 	application.RegisterEvent[map[string]interface{}]("settings:changed")
+
+	// Register spotlight events
+	application.RegisterEvent[string]("spotlight:opened")
+	application.RegisterEvent[string]("spotlight:closed")
+	application.RegisterEvent[string]("spotlight:command-selected")
 }
 
 func main() {
@@ -93,6 +98,11 @@ func main() {
 	app.RegisterService(application.NewService(service.NewDataGeneratorService(app)))
 	app.RegisterService(application.NewService(service.NewCodeFormatterService(app)))
 	app.RegisterService(application.NewService(service.NewSettingsService(app, settingsManager)))
+
+	// Create and register spotlight service
+	spotlightService := service.NewSpotlightService(app)
+	app.RegisterService(application.NewService(spotlightService))
+
 	// WindowControls service will be registered after window creation
 
 	// Start HTTP server for browser support (background)
@@ -138,6 +148,39 @@ func main() {
 	// Register WindowControls service after window creation
 	app.RegisterService(application.NewService(service.NewWindowControls(mainWindow)))
 
+	// Create spotlight window with special behaviors
+	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
+		Title:  "DevToolbox Spotlight",
+		Width:  640,
+		Height: 480,
+		BackgroundColour: application.RGBA{
+			Red:   27,
+			Green: 38,
+			Blue:  54,
+			Alpha: 242,
+		},
+		Mac: application.MacWindow{
+			InvisibleTitleBarHeight: 0,
+			Backdrop:                application.MacBackdropTranslucent,
+			TitleBar:                application.MacTitleBarHidden,
+			CollectionBehavior: application.MacWindowCollectionBehaviorCanJoinAllSpaces |
+				application.MacWindowCollectionBehaviorFullScreenAuxiliary |
+				application.MacWindowCollectionBehaviorTransient,
+		},
+		Hidden: true,
+		URL:    "/spotlight",
+	})
+
+	// Set the window in spotlight service
+	spotlightService.SetWindow(spotlightWindow)
+
+	// Handle spotlight window close - hide instead of close
+	spotlightWindow.OnWindowEvent(events.Common.WindowClosing, func(event *application.WindowEvent) {
+		event.Cancel()
+		spotlightWindow.Hide()
+		spotlightWindow.EmitEvent("spotlight:closed", "")
+	})
+
 	// Setup system tray
 	systray := app.SystemTray.New()
 
@@ -182,9 +225,7 @@ func main() {
 	}
 
 	app.KeyBinding.Add(hotkeyAccelerator, func(window application.Window) {
-		mainWindow.Show()
-		mainWindow.Focus()
-		mainWindow.EmitEvent("command-palette:open", "")
+		spotlightService.Toggle()
 	})
 
 	if err := app.Run(); err != nil {
