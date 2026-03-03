@@ -2,3 +2,5 @@ tmp/
 settings.local.json
 metadata/
 logs/
+.crush/logs
+.entire/metadata/
