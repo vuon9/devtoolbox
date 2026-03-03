@@ -21,10 +21,10 @@ describe('storage', () => {
     it('should return null and log error for invalid JSON', () => {
       window.localStorage.setItem('invalid', 'not-json');
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       expect(storage.get('invalid')).toBeNull();
       expect(consoleSpy).toHaveBeenCalled();
-      
+
       consoleSpy.mockRestore();
     });
   });
@@ -46,7 +46,7 @@ describe('storage', () => {
 
       expect(storage.set('test', circular)).toBe(false);
       expect(consoleSpy).toHaveBeenCalled();
-      
+
       consoleSpy.mockRestore();
     });
   });

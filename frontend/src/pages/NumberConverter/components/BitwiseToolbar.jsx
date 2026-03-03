@@ -5,7 +5,7 @@ import { BITWISE_OPERATIONS } from '../constants';
 /**
  * BitwiseToolbar component
  * Displays buttons for common bitwise operations
- * 
+ *
  * @param {Object} props
  * @param {function} props.onOperation - Callback when an operation is clicked
  */

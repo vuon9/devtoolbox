@@ -19,21 +19,21 @@ const toolComponents = {
   'text-converter': TextConverter,
   'string-utilities': StringUtilities,
   'datetime-converter': DateTimeConverter,
-  'jwt': JwtDebugger,
-  'barcode': BarcodeGenerator,
+  jwt: JwtDebugger,
+  barcode: BarcodeGenerator,
   'data-generator': DataGenerator,
   'code-formatter': CodeFormatter,
   'color-converter': ColorConverter,
-  'regexp': RegExpTester,
-  'cron': CronJobParser,
-  'diff': TextDiffChecker,
+  regexp: RegExpTester,
+  cron: CronJobParser,
+  diff: TextDiffChecker,
   'number-converter': NumberConverter,
 };
 
 function ToolRouter() {
   const { toolId } = useParams();
   const ToolComponent = toolComponents[toolId];
-  
+
   if (!ToolComponent) {
     return (
       <div className="tool-container" style={{ padding: '2rem' }}>
@@ -42,7 +42,7 @@ function ToolRouter() {
       </div>
     );
   }
-  
+
   return <ToolComponent />;
 }
 

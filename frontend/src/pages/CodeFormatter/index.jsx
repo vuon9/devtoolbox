@@ -27,32 +27,37 @@ const FORMATTERS = [
     name: 'XML',
     supportsFilter: true,
     filterPlaceholder: '//book[price<30]/title',
-    sample: '<?xml version="1.0"?>\n<catalog>\n  <book id="bk101">\n    <author>Gambardella, Matthew</author>\n    <title>XML Developer\'s Guide</title>\n    <genre>Computer</genre>\n    <price>44.95</price>\n  </book>\n</catalog>',
+    sample:
+      '<?xml version="1.0"?>\n<catalog>\n  <book id="bk101">\n    <author>Gambardella, Matthew</author>\n    <title>XML Developer\'s Guide</title>\n    <genre>Computer</genre>\n    <price>44.95</price>\n  </book>\n</catalog>',
   },
   {
     id: 'html',
     name: 'HTML',
     supportsFilter: true,
     filterPlaceholder: 'div.container > h1',
-    sample: '<!DOCTYPE html>\n<html>\n<body>\n  <div class="container">\n    <h1>Hello World</h1>\n    <p>This is a paragraph.</p>\n  </div>\n</body>\n</html>',
+    sample:
+      '<!DOCTYPE html>\n<html>\n<body>\n  <div class="container">\n    <h1>Hello World</h1>\n    <p>This is a paragraph.</p>\n  </div>\n</body>\n</html>',
   },
   {
     id: 'sql',
     name: 'SQL',
     supportsFilter: false,
-    sample: 'SELECT u.id, u.name, o.order_date FROM users u JOIN orders o ON u.id = o.user_id WHERE u.active = 1 ORDER BY o.order_date DESC;',
+    sample:
+      'SELECT u.id, u.name, o.order_date FROM users u JOIN orders o ON u.id = o.user_id WHERE u.active = 1 ORDER BY o.order_date DESC;',
   },
   {
     id: 'css',
     name: 'CSS',
     supportsFilter: false,
-    sample: '.container { display: flex; flex-direction: column; padding: 1rem; } .container h1 { color: blue; font-size: 2rem; }',
+    sample:
+      '.container { display: flex; flex-direction: column; padding: 1rem; } .container h1 { color: blue; font-size: 2rem; }',
   },
   {
     id: 'javascript',
     name: 'JavaScript',
     supportsFilter: false,
-    sample: 'function greet(name) { const message = `Hello, ${name}!`; console.log(message); return message; } greet("World");',
+    sample:
+      'function greet(name) { const message = `Hello, ${name}!`; console.log(message); return message; } greet("World");',
   },
 ];
 
@@ -78,10 +83,10 @@ export default function CodeFormatter() {
 
   // Check for format preset in URL params
   const urlFormat = searchParams.get('format');
-  const validFormats = FORMATTERS.map(f => f.id);
+  const validFormats = FORMATTERS.map((f) => f.id);
   const initialFormatType = validFormats.includes(urlFormat)
     ? urlFormat
-    : (persisted?.formatType || 'json');
+    : persisted?.formatType || 'json';
 
   const [formatType, setFormatType] = useState(initialFormatType);
   const [input, setInput] = useState(persisted?.input || '');
@@ -133,23 +138,23 @@ export default function CodeFormatter() {
   // Handle format type changes - cache current input/filter and restore cached for new type
   useEffect(() => {
     const prevType = prevFormatTypeRef.current;
-    
+
     if (formatType !== prevType) {
       // Save current input and filter to cache for previous type
       inputCacheRef.current[prevType] = input;
       filterCacheRef.current[prevType] = filter;
-      
+
       // Load cached input and filter for new type, or empty string if not cached
       const cachedInput = inputCacheRef.current[formatType];
       const cachedFilter = filterCacheRef.current[formatType];
       setInput(cachedInput !== undefined ? cachedInput : '');
       setFilter(cachedFilter !== undefined ? cachedFilter : '');
-      
+
       // Clear output when switching languages
       setOutput('');
       setFormattedOutput('');
       setError(null);
-      
+
       // Update ref
       prevFormatTypeRef.current = formatType;
     }
@@ -300,51 +305,47 @@ export default function CodeFormatter() {
 
       <Column>
         <ToolControls>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <Select
-            id="format-type"
-            labelText="Format Type"
-            value={formatType}
-            onChange={(e) => setFormatType(e.target.value)}
-            style={{ minWidth: '150px' }}
-          >
-            {FORMATTERS.map((f) => (
-              <SelectItem key={f.id} value={f.id} text={f.name} />
-            ))}
-          </Select>
-
-          <Button onClick={format} renderIcon={Code} size="md">
-            Format
-          </Button>
-          <Button onClick={minify} kind="secondary" size="md">
-            Minify
-          </Button>
-
-          <EditorToggle
-            enabled={highlightEnabled}
-            onToggle={setHighlightEnabled}
-            toolKey="codeFormatter"
-          />
-
-          {currentFormatter?.sample && (
-            <Button
-              kind="tertiary"
-              size="md"
-              onClick={() => setInput(currentFormatter.sample)}
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <Select
+              id="format-type"
+              labelText="Format Type"
+              value={formatType}
+              onChange={(e) => setFormatType(e.target.value)}
+              style={{ minWidth: '150px' }}
             >
-              Load Sample
-            </Button>
-          )}
+              {FORMATTERS.map((f) => (
+                <SelectItem key={f.id} value={f.id} text={f.name} />
+              ))}
+            </Select>
 
-          <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
-            <ToolLayoutToggle
-              direction={layout.direction}
-              onToggle={layout.toggleDirection}
-              position="controls"
+            <Button onClick={format} renderIcon={Code} size="md">
+              Format
+            </Button>
+            <Button onClick={minify} kind="secondary" size="md">
+              Minify
+            </Button>
+
+            <EditorToggle
+              enabled={highlightEnabled}
+              onToggle={setHighlightEnabled}
+              toolKey="codeFormatter"
             />
+
+            {currentFormatter?.sample && (
+              <Button kind="tertiary" size="md" onClick={() => setInput(currentFormatter.sample)}>
+                Load Sample
+              </Button>
+            )}
+
+            <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+              <ToolLayoutToggle
+                direction={layout.direction}
+                onToggle={layout.toggleDirection}
+                position="controls"
+              />
+            </div>
           </div>
-        </div>
-      </ToolControls>
+        </ToolControls>
       </Column>
 
       {error && (
@@ -364,50 +365,50 @@ export default function CodeFormatter() {
       )}
 
       <Column style={{ flex: 1, minHeight: 0 }}>
-      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-        <CodeEditor
-          label="Input"
-          language={formatType}
-          value={input}
-          onChange={setInput}
-          highlight={false}
-          placeholder={`Paste ${currentFormatter?.name || 'code'} here...`}
-          style={{ minHeight: '100%' }}
-        />
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '0.5rem' }}>
+        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
           <CodeEditor
-            label={isMinified ? 'Output (Minified)' : 'Output (Formatted)'}
-            language={formatType.toLowerCase()}
-            value={output}
-            highlight={highlightEnabled}
-            readOnly
-            placeholder={`Formatted ${currentFormatter?.name || 'code'} will appear here...`}
-            style={{ flex: 1, minHeight: 0 }}
+            label="Input"
+            language={formatType}
+            value={input}
+            onChange={setInput}
+            highlight={false}
+            placeholder={`Paste ${currentFormatter?.name || 'code'} here...`}
+            style={{ minHeight: '100%' }}
           />
-          {currentFormatter?.supportsFilter && (
-            <div
-              style={{
-                display: 'flex',
-                gap: '0.5rem',
-                alignItems: 'flex-end',
-                alignContent: 'flex-end',
-              }}
-            >
-              <TextInput
-                id="filter-input"
-                labelText="Filter"
-                placeholder={currentFormatter.filterPlaceholder}
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                style={{ flex: 1 }}
-              />
-              <IconButton label="Clear filter" onClick={clearFilter} disabled={!filter} size="md">
-                <Close />
-              </IconButton>
-            </div>
-          )}
-        </div>
-      </ToolSplitPane>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '0.5rem' }}>
+            <CodeEditor
+              label={isMinified ? 'Output (Minified)' : 'Output (Formatted)'}
+              language={formatType.toLowerCase()}
+              value={output}
+              highlight={highlightEnabled}
+              readOnly
+              placeholder={`Formatted ${currentFormatter?.name || 'code'} will appear here...`}
+              style={{ flex: 1, minHeight: 0 }}
+            />
+            {currentFormatter?.supportsFilter && (
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  alignItems: 'flex-end',
+                  alignContent: 'flex-end',
+                }}
+              >
+                <TextInput
+                  id="filter-input"
+                  labelText="Filter"
+                  placeholder={currentFormatter.filterPlaceholder}
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  style={{ flex: 1 }}
+                />
+                <IconButton label="Clear filter" onClick={clearFilter} disabled={!filter} size="md">
+                  <Close />
+                </IconButton>
+              </div>
+            )}
+          </div>
+        </ToolSplitPane>
       </Column>
     </Grid>
   );

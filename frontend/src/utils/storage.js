@@ -71,7 +71,7 @@ const storage = {
       console.error(`Error setting array in localStorage: ${key}`, error);
       return false;
     }
-  }
+  },
 };
 
 export default storage;

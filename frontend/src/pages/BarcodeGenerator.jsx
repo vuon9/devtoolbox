@@ -257,167 +257,167 @@ export default function BarcodeGenerator() {
             borderRadius: '4px',
           }}
         >
-        <div style={{ flex: 2, minWidth: '200px' }}>
-          <Dropdown
-            id="barcode-standard"
-            titleText="Barcode Standard"
-            label="Select standard"
-            items={BARCODE_STANDARDS}
-            itemToString={(item) => item?.label || ''}
-            selectedItem={BARCODE_STANDARDS.find((s) => s.value === standard)}
-            onChange={handleStandardChange}
-            size="sm"
-          />
-        </div>
+          <div style={{ flex: 2, minWidth: '200px' }}>
+            <Dropdown
+              id="barcode-standard"
+              titleText="Barcode Standard"
+              label="Select standard"
+              items={BARCODE_STANDARDS}
+              itemToString={(item) => item?.label || ''}
+              selectedItem={BARCODE_STANDARDS.find((s) => s.value === standard)}
+              onChange={handleStandardChange}
+              size="sm"
+            />
+          </div>
 
-        <div style={{ flex: 1, minWidth: '150px' }}>
-          <Dropdown
-            id="barcode-size"
-            titleText="Size"
-            label="Select size"
-            items={BARCODE_SIZES}
-            itemToString={(item) => item?.label || ''}
-            selectedItem={BARCODE_SIZES.find((s) => s.value === size)}
-            onChange={({ selectedItem }) => {
-              setSize(selectedItem?.value || 256);
-              setQrImage('');
-            }}
-            size="sm"
-          />
-        </div>
-
-        {isQR && (
           <div style={{ flex: 1, minWidth: '150px' }}>
             <Dropdown
-              id="qr-level"
-              titleText="Error Correction"
-              label="Select level"
-              items={QR_ERROR_LEVELS}
+              id="barcode-size"
+              titleText="Size"
+              label="Select size"
+              items={BARCODE_SIZES}
               itemToString={(item) => item?.label || ''}
-              selectedItem={QR_ERROR_LEVELS.find((l) => l.value === level)}
+              selectedItem={BARCODE_SIZES.find((s) => s.value === size)}
               onChange={({ selectedItem }) => {
-                setLevel(selectedItem?.value || 'M');
+                setSize(selectedItem?.value || 256);
                 setQrImage('');
               }}
               size="sm"
             />
           </div>
-        )}
 
-        <Button
-          renderIcon={Renew}
-          onClick={generateBarcode}
-          disabled={loading || !content.trim()}
-          size="sm"
-        >
-          Generate
-        </Button>
+          {isQR && (
+            <div style={{ flex: 1, minWidth: '150px' }}>
+              <Dropdown
+                id="qr-level"
+                titleText="Error Correction"
+                label="Select level"
+                items={QR_ERROR_LEVELS}
+                itemToString={(item) => item?.label || ''}
+                selectedItem={QR_ERROR_LEVELS.find((l) => l.value === level)}
+                onChange={({ selectedItem }) => {
+                  setLevel(selectedItem?.value || 'M');
+                  setQrImage('');
+                }}
+                size="sm"
+              />
+            </div>
+          )}
 
-        <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
-          <ToolLayoutToggle
-            direction={layout.direction}
-            onToggle={layout.toggleDirection}
-            position="controls"
-          />
+          <Button
+            renderIcon={Renew}
+            onClick={generateBarcode}
+            disabled={loading || !content.trim()}
+            size="sm"
+          >
+            Generate
+          </Button>
+
+          <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+            <ToolLayoutToggle
+              direction={layout.direction}
+              onToggle={layout.toggleDirection}
+              position="controls"
+            />
+          </div>
         </div>
-      </div>
       </Column>
 
       <Column style={{ flex: 1, minHeight: 0 }}>
-      <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-        {/* Input Pane */}
-        <ToolPane
-          label="Content"
-          value={content}
-          onChange={handleContentChange}
-          placeholder={getPlaceholder(standard)}
-          invalid={!!error}
-          invalidText={error}
-        />
+        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
+          {/* Input Pane */}
+          <ToolPane
+            label="Content"
+            value={content}
+            onChange={handleContentChange}
+            placeholder={getPlaceholder(standard)}
+            invalid={!!error}
+            invalidText={error}
+          />
 
-        {/* Output Pane */}
-        <div
-          className="pane"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            minHeight: '50vh',
-            flex: 1,
-          }}
-        >
+          {/* Output Pane */}
           <div
+            className="pane"
             style={{
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              minHeight: '30px',
-              overflowX: 'hidden',
+              flexDirection: 'column',
+              height: '100%',
+              minHeight: '50vh',
+              flex: 1,
             }}
           >
-            <label
+            <div
               style={{
-                fontSize: '0.75rem',
-                fontWeight: 400,
-                lineHeight: 1.5,
-                letterSpacing: '0.32px',
-                color: 'var(--cds-text-secondary)',
-                textTransform: 'uppercase',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                minHeight: '30px',
+                overflowX: 'hidden',
               }}
             >
-              {isQR ? 'QR Code' : `${standard} Barcode`}
-            </label>
-            {qrImage && (
-              <Button
-                renderIcon={Download}
-                onClick={downloadBarcode}
-                kind="ghost"
-                size="sm"
-                iconDescription="Download barcode"
-                hasIconOnly
-              />
-            )}
-          </div>
-
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'var(--cds-layer)',
-              padding: '1rem',
-              overflow: 'auto',
-            }}
-          >
-            {loading ? (
-              <InlineLoading description="Generating barcode..." />
-            ) : qrImage ? (
-              <img
-                src={qrImage}
-                alt={`Generated ${standard}`}
+              <label
                 style={{
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  objectFit: 'contain',
-                }}
-              />
-            ) : (
-              <div
-                style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 400,
+                  lineHeight: 1.5,
+                  letterSpacing: '0.32px',
                   color: 'var(--cds-text-secondary)',
-                  textAlign: 'center',
+                  textTransform: 'uppercase',
                 }}
               >
-                <p>{isQR ? 'QR code' : `${standard} barcode`} will appear here</p>
-                <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
-                  Enter content and click Generate
-                </p>
-              </div>
-            )}
+                {isQR ? 'QR Code' : `${standard} Barcode`}
+              </label>
+              {qrImage && (
+                <Button
+                  renderIcon={Download}
+                  onClick={downloadBarcode}
+                  kind="ghost"
+                  size="sm"
+                  iconDescription="Download barcode"
+                  hasIconOnly
+                />
+              )}
+            </div>
+
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'var(--cds-layer)',
+                padding: '1rem',
+                overflow: 'auto',
+              }}
+            >
+              {loading ? (
+                <InlineLoading description="Generating barcode..." />
+              ) : qrImage ? (
+                <img
+                  src={qrImage}
+                  alt={`Generated ${standard}`}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    color: 'var(--cds-text-secondary)',
+                    textAlign: 'center',
+                  }}
+                >
+                  <p>{isQR ? 'QR code' : `${standard} barcode`} will appear here</p>
+                  <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                    Enter content and click Generate
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </ToolSplitPane>
+        </ToolSplitPane>
       </Column>
     </Grid>
   );

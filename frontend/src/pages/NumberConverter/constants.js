@@ -64,13 +64,13 @@ export const BITWISE_OPERATIONS = {
     id: 'not',
     label: 'NOT',
     description: 'Flip all bits',
-    apply: (value) => (~value) >>> 0,
+    apply: (value) => ~value >>> 0,
   },
   MASK_BYTE: {
     id: 'maskByte',
     label: '& 0xFF',
     description: 'Keep only lowest byte',
-    apply: (value) => value & 0xFF,
+    apply: (value) => value & 0xff,
   },
   SET_LSB: {
     id: 'setLSB',
@@ -120,7 +120,7 @@ export const ERROR_MESSAGES = {
  * Numeric limits
  */
 export const LIMITS = {
-  MAX_32BIT: 0xFFFFFFFF, // 4,294,967,295
+  MAX_32BIT: 0xffffffff, // 4,294,967,295
   MIN_32BIT: 0,
   MAX_32BIT_DECIMAL: 4294967295,
 };

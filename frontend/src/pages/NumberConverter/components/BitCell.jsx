@@ -4,7 +4,7 @@ import { BIT_CELL_CONFIG } from '../constants';
 /**
  * Individual bit cell component
  * Displays a single bit (0 or 1) as a clickable toggle
- * 
+ *
  * @param {Object} props
  * @param {number} props.bitValue - Current bit value (0 or 1)
  * @param {number} props.position - Bit position (0-31)
@@ -35,12 +35,8 @@ const BitCell = ({ bitValue, position, onToggle, isActive = false }) => {
       style={{
         width: `${BIT_CELL_CONFIG.SIZE}px`,
         height: `${BIT_CELL_CONFIG.SIZE}px`,
-        border: isSet
-          ? 'none'
-          : `2px solid ${BIT_CELL_CONFIG.INACTIVE_BORDER}`,
-        backgroundColor: isSet
-          ? BIT_CELL_CONFIG.ACTIVE_COLOR
-          : 'transparent',
+        border: isSet ? 'none' : `2px solid ${BIT_CELL_CONFIG.INACTIVE_BORDER}`,
+        backgroundColor: isSet ? BIT_CELL_CONFIG.ACTIVE_COLOR : 'transparent',
         borderRadius: '4px',
         cursor: 'pointer',
         display: 'flex',
@@ -49,14 +45,10 @@ const BitCell = ({ bitValue, position, onToggle, isActive = false }) => {
         fontFamily: "'IBM Plex Mono', monospace",
         fontSize: '14px',
         fontWeight: 600,
-        color: isSet
-          ? 'var(--cds-text-inverse)'
-          : 'var(--cds-text-primary)',
+        color: isSet ? 'var(--cds-text-inverse)' : 'var(--cds-text-primary)',
         transition: 'all 0.15s ease',
         transform: isActive ? `scale(${BIT_CELL_CONFIG.HOVER_SCALE})` : 'scale(1)',
-        boxShadow: isActive
-          ? '0 2px 8px rgba(0, 0, 0, 0.3)'
-          : 'none',
+        boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.3)' : 'none',
         outline: 'none',
       }}
       onMouseEnter={(e) => {
