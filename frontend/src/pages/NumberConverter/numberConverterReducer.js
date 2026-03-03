@@ -77,16 +77,16 @@ export function numberConverterReducer(state = INITIAL_STATE, action) {
 
       switch (operation) {
         case 'shiftLeft':
-          newValue = ((state.value << 1) >>> 0);
+          newValue = (state.value << 1) >>> 0;
           break;
         case 'shiftRight':
-          newValue = (state.value >>> 1);
+          newValue = state.value >>> 1;
           break;
         case 'not':
-          newValue = (~state.value >>> 0);
+          newValue = ~state.value >>> 0;
           break;
         case 'maskByte':
-          newValue = (state.value & 0xFF) >>> 0;
+          newValue = (state.value & 0xff) >>> 0;
           break;
         case 'setLSB':
           newValue = (state.value | 1) >>> 0;
@@ -217,7 +217,7 @@ export function clearAll() {
  */
 export function handleConversionInput(dispatch, input, base, field, parseFn) {
   const result = parseFn(input);
-  
+
   if (result.error) {
     // Set error but keep current value
     dispatch(setError(field, result.error));

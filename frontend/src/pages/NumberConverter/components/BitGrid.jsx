@@ -6,7 +6,7 @@ import { getBit, getByte, formatByte } from '../utils';
 /**
  * BitGrid component
  * Displays a 32-bit value as a 4×8 grid of bit cells
- * 
+ *
  * @param {Object} props
  * @param {number} props.value - Current 32-bit value
  * @param {function} props.onToggleBit - Callback when a bit is toggled
@@ -88,9 +88,10 @@ const BitGrid = ({ value, onToggleBit, layout = 'horizontal' }) => {
                     <span
                       style={{
                         fontSize: '0.6rem',
-                        color: hoveredBit === bitPosition
-                          ? 'var(--cds-text-primary)'
-                          : 'var(--cds-text-secondary)',
+                        color:
+                          hoveredBit === bitPosition
+                            ? 'var(--cds-text-primary)'
+                            : 'var(--cds-text-secondary)',
                         marginTop: '2px',
                         fontFamily: "'IBM Plex Mono', monospace",
                         transition: 'color 0.15s ease',

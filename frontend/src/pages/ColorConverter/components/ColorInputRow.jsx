@@ -75,10 +75,7 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
         size="md"
       />
 
-      <CopyButton
-        autoAlign
-        onClick={() => onCopy(copyValue)}
-      />
+      <CopyButton autoAlign onClick={() => onCopy(copyValue)} />
     </div>
   );
 }

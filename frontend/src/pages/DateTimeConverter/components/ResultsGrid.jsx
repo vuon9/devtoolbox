@@ -8,22 +8,40 @@ import {
   getRelativeTime,
   getDayOfYear,
   getWeekOfYear,
-  isLeapYear
+  isLeapYear,
 } from '../datetimeHelpers';
 
-export function ResultsGrid({ parsedDate, timezone, customTimezones, getTimezoneLabel, onRemoveTimezone }) {
+export function ResultsGrid({
+  parsedDate,
+  timezone,
+  customTimezones,
+  getTimezoneLabel,
+  onRemoveTimezone,
+}) {
   return (
     <Grid>
-
       {/* Column 1: Custom Timezones */}
       <Column lg={4} md={8} sm={4}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginBottom: '0.25rem', textTransform: 'uppercase' }}>
+          <div
+            style={{
+              fontSize: '0.75rem',
+              color: 'var(--cds-text-secondary)',
+              marginBottom: '0.25rem',
+              textTransform: 'uppercase',
+            }}
+          >
             Other timezones
           </div>
 
           {customTimezones.length === 0 && (
-            <div style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', fontStyle: 'italic' }}>
+            <div
+              style={{
+                fontSize: '0.875rem',
+                color: 'var(--cds-text-secondary)',
+                fontStyle: 'italic',
+              }}
+            >
               Select a timezone above to add
             </div>
           )}
@@ -56,23 +74,24 @@ export function ResultsGrid({ parsedDate, timezone, customTimezones, getTimezone
 
       {/* Column 2: Primary Outputs */}
       <Column lg={4} md={4} sm={4}>
-        <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+        <div
+          style={{
+            fontSize: '0.75rem',
+            color: 'var(--cds-text-secondary)',
+            marginBottom: '0.5rem',
+            textTransform: 'uppercase',
+          }}
+        >
           Format
         </div>
         {/* Three fields in a row */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <DateTimeOutputField
-            label="Local"
-            value={formatDate(parsedDate, 'sql', 'local')}
-          />
+          <DateTimeOutputField label="Local" value={formatDate(parsedDate, 'sql', 'local')} />
           <DateTimeOutputField
             label="UTC (ISO 8601)"
             value={formatDate(parsedDate, 'iso', 'UTC')}
           />
-          <DateTimeOutputField
-            label="Relative"
-            value={getRelativeTime(parsedDate)}
-          />
+          <DateTimeOutputField label="Relative" value={getRelativeTime(parsedDate)} />
           <DateTimeOutputField
             label="Unix time"
             value={Math.floor(parsedDate.getTime() / 1000).toString()}
@@ -85,7 +104,14 @@ export function ResultsGrid({ parsedDate, timezone, customTimezones, getTimezone
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {/* Other formats section - 2 per row */}
           <div style={{ marginTop: '0.5rem' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--cds-text-secondary)',
+                marginBottom: '0.5rem',
+                textTransform: 'uppercase',
+              }}
+            >
               Other formats
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.2rem' }}>
@@ -97,7 +123,15 @@ export function ResultsGrid({ parsedDate, timezone, customTimezones, getTimezone
                 />
               ))}
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem', marginTop: '1rem', textTransform: 'uppercase' }}>
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--cds-text-secondary)',
+                marginBottom: '0.5rem',
+                marginTop: '1rem',
+                textTransform: 'uppercase',
+              }}
+            >
               Additional
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.2rem' }}>

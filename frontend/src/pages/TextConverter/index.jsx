@@ -32,12 +32,12 @@ export default function TextBasedConverter() {
   const validCategories = Object.keys(CONVERTER_MAP);
   const initialCategory = validCategories.includes(urlCategory)
     ? urlCategory
-    : (localStorage.getItem(STORAGE_KEYS.CATEGORY) || DEFAULTS.CATEGORY);
+    : localStorage.getItem(STORAGE_KEYS.CATEGORY) || DEFAULTS.CATEGORY;
 
   const validMethods = CONVERTER_MAP[initialCategory] || [];
   const initialMethod = validMethods.includes(urlMethod)
     ? urlMethod
-    : (localStorage.getItem(STORAGE_KEYS.METHOD) || DEFAULTS.METHOD);
+    : localStorage.getItem(STORAGE_KEYS.METHOD) || DEFAULTS.METHOD;
 
   // Persistent state initialization
   const [category, setCategory] = useState(initialCategory);
@@ -235,80 +235,80 @@ export default function TextBasedConverter() {
 
       <Column style={{ flex: 1, minHeight: 0 }}>
         <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-        <ToolPane
-          label={LABELS.INPUT(category, subMode, method)}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder={PLACEHOLDERS.INPUT}
-        />
+          <ToolPane
+            label={LABELS.INPUT(category, subMode, method)}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={PLACEHOLDERS.INPUT}
+          />
 
-        {isAllHashes ? (
-          <div
-            className="pane"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              minHeight: 0,
-              flex: 1,
-            }}
-          >
+          {isAllHashes ? (
             <div
+              className="pane"
               style={{
                 display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                minHeight: '30px',
+                flexDirection: 'column',
+                height: '100%',
+                minHeight: 0,
+                flex: 1,
               }}
             >
-              <label
+              <div
                 style={{
-                  fontSize: '0.75rem',
-                  fontWeight: 400,
-                  lineHeight: 1.5,
-                  letterSpacing: '0.32px',
-                  color: 'var(--cds-text-secondary)',
-                  textTransform: 'uppercase',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  minHeight: '30px',
                 }}
               >
-                {LABELS.OUTPUT}
-              </label>
+                <label
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 400,
+                    lineHeight: 1.5,
+                    letterSpacing: '0.32px',
+                    color: 'var(--cds-text-secondary)',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {LABELS.OUTPUT}
+                </label>
+              </div>
+              <div
+                style={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  padding: '0.75rem',
+                  backgroundColor: 'var(--cds-layer)',
+                }}
+              >
+                <MultiHashOutput value={output} error={error} />
+              </div>
             </div>
+          ) : isImageOutput ? (
             <div
+              className="pane"
               style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                minHeight: 0,
                 flex: 1,
-                overflowY: 'auto',
-                padding: '0.75rem',
-                backgroundColor: 'var(--cds-layer)',
               }}
             >
-              <MultiHashOutput value={output} error={error} />
+              <ImageOutput value={output} />
             </div>
-          </div>
-        ) : isImageOutput ? (
-          <div
-            className="pane"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              minHeight: 0,
-              flex: 1,
-            }}
-          >
-            <ImageOutput value={output} />
-          </div>
-        ) : (
-          <ToolPane
-            label={LABELS.OUTPUT}
-            value={output}
-            readOnly
-            placeholder={PLACEHOLDERS.OUTPUT}
-            invalid={!!error}
-            invalidText={error}
-          />
-        )}
-      </ToolSplitPane>
+          ) : (
+            <ToolPane
+              label={LABELS.OUTPUT}
+              value={output}
+              readOnly
+              placeholder={PLACEHOLDERS.OUTPUT}
+              invalid={!!error}
+              invalidText={error}
+            />
+          )}
+        </ToolSplitPane>
       </Column>
     </Grid>
   );

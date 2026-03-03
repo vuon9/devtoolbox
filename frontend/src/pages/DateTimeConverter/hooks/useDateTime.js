@@ -35,10 +35,10 @@ export function useDateTime() {
             id: tz.timezone,
             label: tz.label || tz.timezone,
           }));
-          
+
           // Add 'local' as the first option
           const allTimezonesList = [{ id: 'local', label: 'Local Time' }, ...tzList];
-          
+
           console.log(`Loaded ${allTimezonesList.length} timezones from backend`);
           setAllTimezones(allTimezonesList);
         } else {
@@ -85,9 +85,7 @@ export function useDateTime() {
   };
 
   // Get available timezones for dropdown (exclude already added only)
-  const availableTimezones = allTimezones.filter(
-    (tz) => !customTimezones.includes(tz.id)
-  );
+  const availableTimezones = allTimezones.filter((tz) => !customTimezones.includes(tz.id));
 
   // Get timezone label by ID
   const getTimezoneLabel = (tzId) => {

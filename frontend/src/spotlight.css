@@ -1,4 +1,7 @@
-html, body { background: transparent !important; }
+html,
+body {
+  background: transparent !important;
+}
 #root {
   display: flex;
   align-items: flex-start;

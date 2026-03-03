@@ -12,12 +12,7 @@ import { Settings } from '@carbon/icons-react';
 import { GetCloseMinimizesToTray, SetCloseMinimizesToTray } from '../generated';
 import './SettingsModal.css';
 
-export function SettingsModal({
-  isOpen,
-  onClose,
-  themeMode,
-  setThemeMode,
-}) {
+export function SettingsModal({ isOpen, onClose, themeMode, setThemeMode }) {
   const [closeMinimizesToTray, setCloseMinimizesToTray] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,17 +34,8 @@ export function SettingsModal({
   };
 
   return (
-    <ComposedModal
-      open={isOpen}
-      onClose={onClose}
-      size="sm"
-      className="settings-modal"
-    >
-      <ModalHeader
-        icon={<Settings size={20} />}
-        label=""
-        title="Application Settings"
-      />
+    <ComposedModal open={isOpen} onClose={onClose} size="sm" className="settings-modal">
+      <ModalHeader icon={<Settings size={20} />} label="" title="Application Settings" />
       <ModalBody className="settings-modal-body">
         <FormGroup legendText="Appearance">
           <RadioButtonGroup
@@ -93,7 +79,8 @@ export function SettingsModal({
             id="close-minimizes"
           />
           <p className="settings-description">
-            When enabled, clicking the close button will minimize the app to the system tray instead of quitting.
+            When enabled, clicking the close button will minimize the app to the system tray instead
+            of quitting.
           </p>
         </FormGroup>
       </ModalBody>

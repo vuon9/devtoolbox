@@ -197,47 +197,47 @@ export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
   // Fuzzy match function - checks if query characters appear in order in target
   const fuzzyMatch = (target, query) => {
     if (!query) return true;
-    
+
     const targetLower = target.toLowerCase();
     const queryLower = query.toLowerCase();
     let targetIndex = 0;
     let queryIndex = 0;
-    
+
     while (targetIndex < targetLower.length && queryIndex < queryLower.length) {
       if (targetLower[targetIndex] === queryLower[queryIndex]) {
         queryIndex++;
       }
       targetIndex++;
     }
-    
+
     return queryIndex === queryLower.length;
   };
 
   // Calculate fuzzy match score (lower is better)
   const fuzzyScore = (target, query) => {
     if (!query) return 0;
-    
+
     const targetLower = target.toLowerCase();
     const queryLower = query.toLowerCase();
-    
+
     // Exact match gets highest priority
     if (targetLower === queryLower) return -1000;
-    
+
     // Starts with query gets high priority
     if (targetLower.startsWith(queryLower)) return -100;
-    
+
     // Word boundary match gets medium priority
     const words = targetLower.split(/[\s>]/);
     for (let word of words) {
       if (word.startsWith(queryLower)) return -50;
     }
-    
+
     // Calculate distance score for fuzzy match
     let targetIndex = 0;
     let queryIndex = 0;
     let score = 0;
     let lastMatchIndex = -1;
-    
+
     while (targetIndex < targetLower.length && queryIndex < queryLower.length) {
       if (targetLower[targetIndex] === queryLower[queryIndex]) {
         if (lastMatchIndex !== -1) {
@@ -249,10 +249,10 @@ export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
       }
       targetIndex++;
     }
-    
+
     // If didn't match all query characters, return high score (bad match)
     if (queryIndex < queryLower.length) return 9999;
-    
+
     return score;
   };
 
@@ -271,19 +271,19 @@ export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
     }
 
     const query = searchQuery.toLowerCase();
-    
+
     // Filter and score commands
-    const scored = COMMANDS.map(cmd => {
+    const scored = COMMANDS.map((cmd) => {
       const labelScore = fuzzyScore(cmd.label, query);
       const categoryScore = fuzzyScore(cmd.category, query);
       const bestScore = Math.min(labelScore, categoryScore);
       return { cmd, score: bestScore };
-    }).filter(item => item.score < 9999);
-    
+    }).filter((item) => item.score < 9999);
+
     // Sort by score (lower is better)
     scored.sort((a, b) => a.score - b.score);
-    
-    setCommands(scored.map(item => item.cmd));
+
+    setCommands(scored.map((item) => item.cmd));
     setSelectedIndex(0);
   }, [searchQuery, recentCommands]);
 
