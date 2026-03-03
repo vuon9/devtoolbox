@@ -167,6 +167,9 @@ func main() {
 				application.MacWindowCollectionBehaviorFullScreenAuxiliary |
 				application.MacWindowCollectionBehaviorTransient,
 		},
+		Windows: application.WindowsWindow{
+			HiddenOnTaskbar: true,
+		},
 		Hidden: true,
 		URL:    "/spotlight",
 	})
