@@ -205,7 +205,7 @@ func main() {
 	})
 
 	// Listen for close request from spotlight
-	app.Event.On("spotlight:close", func(event *application.CustomEvent) {
+	app.Event.On("spotlight:closed", func(event *application.CustomEvent) {
 		spotlightWindow.Hide()
 	})
 
