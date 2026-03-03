@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import './App.css';
 import { Sidebar } from './components/Sidebar';
 import { TitleBar } from './components/TitleBar';
@@ -54,6 +54,7 @@ class ErrorBoundary extends React.Component {
 
 function App() {
   console.log('App mounting');
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [theme, setTheme] = useState('g100'); // 'white', 'g10', 'g90', 'g100'
@@ -111,6 +112,28 @@ function App() {
       if (unsubscribe) unsubscribe();
     };
   }, [toggleCommandPalette]);
+
+  // Listen for navigation from spotlight
+  useEffect(() => {
+    const unsubscribe = window.runtime?.EventsOn?.('navigate:to', (path) => {
+      navigate(path);
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [navigate]);
+
+  // Listen for theme toggle from spotlight
+  useEffect(() => {
+    const unsubscribe = window.runtime?.EventsOn?.('theme:toggle', () => {
+      setThemeMode(prev => prev === 'dark' ? 'light' : 'dark');
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [setThemeMode]);
 
   return (
     <ErrorBoundary>

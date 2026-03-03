@@ -184,6 +184,42 @@ func main() {
 		spotlightWindow.EmitEvent("spotlight:closed", "")
 	})
 
+	// Listen for spotlight navigation events
+	app.Event.On("spotlight:command-selected", func(event *application.CustomEvent) {
+		path := event.Data.(string)
+		log.Printf("Spotlight command selected: %s", path)
+
+		// Show and focus main window
+		mainWindow.Show()
+		mainWindow.Focus()
+
+		// Emit navigation event to frontend
+		mainWindow.EmitEvent("navigate:to", path)
+	})
+
+	// Listen for close request from spotlight
+	app.Event.On("spotlight:close", func(event *application.CustomEvent) {
+		spotlightWindow.Hide()
+	})
+
+	// Listen for system commands from spotlight
+	app.Event.On("theme:toggle", func(event *application.CustomEvent) {
+		mainWindow.EmitEvent("theme:toggle", "")
+	})
+
+	app.Event.On("window:toggle", func(event *application.CustomEvent) {
+		if mainWindow.IsVisible() {
+			mainWindow.Hide()
+		} else {
+			mainWindow.Show()
+			mainWindow.Focus()
+		}
+	})
+
+	app.Event.On("app:quit", func(event *application.CustomEvent) {
+		app.Quit()
+	})
+
 	// Setup system tray
 	systray := app.SystemTray.New()
 
