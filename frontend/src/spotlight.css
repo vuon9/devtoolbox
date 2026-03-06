@@ -1,5 +1,10 @@
 /* Spotlight window specific styles */
-:root, html, body, #root, [class*="cds--theme-"], .app-container {
+:root,
+html,
+body,
+#root,
+[class*='cds--theme-'],
+.app-container {
   background: #161616 !important;
   background-color: #161616 !important;
   color: #f4f4f4 !important;

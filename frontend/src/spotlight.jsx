@@ -11,7 +11,10 @@ const getInitialTheme = () => 'g100';
 
 function SpotlightApp() {
   return (
-    <div className="spotlight-app-wrapper" style={{ height: '100%', width: '100%', background: 'transparent' }}>
+    <div
+      className="spotlight-app-wrapper"
+      style={{ height: '100%', width: '100%', background: 'transparent' }}
+    >
       <BrowserRouter>
         <SpotlightPalette />
       </BrowserRouter>

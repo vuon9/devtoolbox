@@ -114,7 +114,7 @@ function App() {
       unsubscribe = Events.On('command-palette:open', () => {
         toggleCommandPalette();
       });
-    } catch(err) {
+    } catch (err) {
       console.error('Failed to listen to command-palette:open', err);
     }
 
@@ -150,7 +150,7 @@ function App() {
         console.log('Received navigate:to event', event);
         handleNavigation(event);
       });
-    } catch(err) {
+    } catch (err) {
       console.error('Failed to listen to navigate:to', err);
     }
 
@@ -164,9 +164,9 @@ function App() {
     let unsubscribe = null;
     try {
       unsubscribe = Events.On('theme:toggle', () => {
-        setThemeMode(prev => prev === 'dark' ? 'light' : 'dark');
+        setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
       });
-    } catch(err) {
+    } catch (err) {
       console.error('Failed to listen to theme:toggle', err);
     }
 
