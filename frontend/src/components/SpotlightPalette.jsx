@@ -332,26 +332,28 @@ export function SpotlightPalette() {
 
   return (
     <div className="spotlight-container">
-      <div className="spotlight-search-box">
-        <Search size={20} className="spotlight-search-icon" />
-        <input
-          ref={inputRef}
-          type="text"
-          className="spotlight-input"
-          placeholder="Search tools..."
-          value={searchQuery}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          autoComplete="off"
-        />
-        {searchQuery && (
-          <button className="spotlight-clear-btn" onClick={() => setSearchQuery('')}>
-            <Close size={16} />
-          </button>
-        )}
+      <div className="spotlight-search-section">
+        <div className="spotlight-search-box">
+          <Search size={20} className="spotlight-search-icon" />
+          <input
+            ref={inputRef}
+            type="text"
+            className="spotlight-input"
+            placeholder="Search tools..."
+            value={searchQuery}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            autoComplete="off"
+          />
+          {searchQuery && (
+            <button className="spotlight-clear-btn" onClick={() => setSearchQuery('')}>
+              <Close size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="spotlight-results">
+      <div className="spotlight-results-section">
         {commands.length === 0 ? (
           <div className="spotlight-empty">No commands found matching "{searchQuery}"</div>
         ) : (

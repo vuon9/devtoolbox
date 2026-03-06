@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
+	"golang.design/x/hotkey"
 )
 
 //go:embed all:frontend/dist
@@ -152,33 +153,33 @@ func main() {
 	// Note: MacWindowLevelFloating and ActivationPolicyAccessory may require
 	// platform-specific code. CollectionBehaviors provide most spotlight functionality.
 	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:     "DevToolbox Spotlight",
+		Title:     "Spotlight",
 		Width:     640,
-		Height:    480,
+		Height:    80, // 80px search + 400px results
+		MinHeight: 80,
+		MaxHeight: 480,
 		Frameless: true, // Hide window controls (close/minimize/maximize buttons)
-		BackgroundColour: application.RGBA{
-			Red:   27,
-			Green: 38,
-			Blue:  54,
-			Alpha: 220, // ~86% opacity for better transparency
-		},
+		// Center the window
+		InitialPosition: application.WindowCentered,
+		// Prevent resizing
+		DisableResize: true,
 		Mac: application.MacWindow{
-			InvisibleTitleBarHeight: 0,
-			Backdrop:                application.MacBackdropTranslucent,
-			TitleBar:                application.MacTitleBarHidden,
-			// Collection behaviors for Spotlight-like functionality:
-			// - CanJoinAllSpaces: Appears on all Spaces (virtual desktops)
-			// - FullScreenAuxiliary: Can overlay fullscreen apps
-			// - Transient: Temporary window, doesn't affect window order
+			// Combine multiple behaviors using bitwise OR:
+			// - CanJoinAllSpaces: window appears on ALL Spaces (virtual desktops)
+			// - FullScreenAuxiliary: window can overlay fullscreen applications
 			CollectionBehavior: application.MacWindowCollectionBehaviorCanJoinAllSpaces |
-				application.MacWindowCollectionBehaviorFullScreenAuxiliary |
-				application.MacWindowCollectionBehaviorTransient,
+				application.MacWindowCollectionBehaviorFullScreenAuxiliary,
+			// Float above other windows
+			WindowLevel: application.MacWindowLevelFloating,
+			// Translucent vibrancy effect
+			Backdrop: application.MacBackdropTranslucent,
+			// Hidden title bar for clean look
+			TitleBar: application.MacTitleBar{
+				AppearsTransparent: true,
+				Hide:               true,
+			},
 		},
-		Windows: application.WindowsWindow{
-			HiddenOnTaskbar: true, // Hide from taskbar for tool window behavior
-		},
-		Hidden: true,
-		URL:    "/spotlight",
+		URL: "/spotlight",
 	})
 
 	// Set the window in spotlight service
@@ -255,7 +256,7 @@ func main() {
 		mainWindow.Focus()
 		log.Printf("After show - Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
 	})
-	trayMenu.Add("Open Spotlight (Cmd+Ctrl+M)").OnClick(func(ctx *application.Context) {
+	trayMenu.Add("Open Spotlight (Cmd+Shift+Space)").OnClick(func(ctx *application.Context) {
 		log.Println("Tray menu 'Open Spotlight' clicked")
 		spotlightService.Toggle()
 	})
@@ -265,22 +266,37 @@ func main() {
 	})
 	systray.SetMenu(trayMenu)
 
-	// Register global hotkey for command palette
-	// macOS: Cmd+Ctrl+M, Windows/Linux: Ctrl+Alt+M
-	var hotkeyAccelerator string
-	if runtime.GOOS == "darwin" {
-		hotkeyAccelerator = "Cmd+Ctrl+M"
-	} else {
-		hotkeyAccelerator = "Ctrl+Alt+M"
-	}
-
-	app.KeyBinding.Add(hotkeyAccelerator, func(window application.Window) {
-		spotlightService.Toggle()
-	})
-	// Note: Wails v3 doesn't return an error from KeyBinding.Add - errors are logged internally
+	// Register global hotkey using golang-design/hotkey for system-wide shortcuts
+	go registerGlobalHotkey(spotlightService)
 
 	if err := app.Run(); err != nil {
 		panic(err)
+	}
+}
+
+// registerGlobalHotkey registers a system-wide global hotkey
+func registerGlobalHotkey(spotlightService *service.SpotlightService) {
+	// Use Cmd+Shift+Space for macOS, Ctrl+Shift+Space for others
+	var hk *hotkey.Hotkey
+	if runtime.GOOS == "darwin" {
+		hk = hotkey.New([]hotkey.Modifier{hotkey.ModCmd, hotkey.ModShift}, hotkey.KeySpace)
+	} else {
+		hk = hotkey.New([]hotkey.Modifier{hotkey.ModCtrl, hotkey.ModShift}, hotkey.KeySpace)
+	}
+
+	log.Printf("Registering global hotkey: %s", hk)
+
+	if err := hk.Register(); err != nil {
+		log.Printf("Failed to register hotkey: %v", err)
+		return
+	}
+
+	log.Println("Global hotkey registered successfully. Press Cmd/Ctrl+Shift+Space to toggle spotlight.")
+
+	// Listen for hotkey events
+	for range hk.Keydown() {
+		log.Println("Global hotkey pressed, toggling spotlight")
+		spotlightService.Toggle()
 	}
 }
 

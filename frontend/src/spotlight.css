@@ -9,5 +9,5 @@ html, body, #root {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 20vh;
+  padding-top: 15vh; /* Adjusted for taller window */
 }
