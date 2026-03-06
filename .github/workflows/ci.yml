@@ -27,10 +27,12 @@ jobs:
         with:
           go-version: "1.25.0"
           check-latest: true
+          cache: true
+          cache-dependency-path: go.sum
 
       - name: Run Go Tests
         run: |
-          go test ./internal/... -v -race -coverprofile=coverage.out
+          go test -race -count=1 ./internal/... -coverprofile=coverage.out
           go install github.com/boumenot/gocover-cobertura@latest
           gocover-cobertura < coverage.out > coverage.xml
 
@@ -55,8 +57,8 @@ jobs:
           recreate: true
           path: code-coverage-results.md
 
-  app-build:
-    name: App Build
+  frontend-checks:
+    name: Frontend Tests & Build
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -70,21 +72,66 @@ jobs:
         with:
           go-version: "1.25.0"
           check-latest: true
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Cache APT packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libgtk-3-dev libwebkit2gtk-4.1-dev
+          version: 1.0
+          execute_install_scripts: false
+
+      - name: Cache Wails CLI
+        id: cache-wails
+        uses: actions/cache@v4
+        with:
+          path: ~/go/bin/wails3
+          key: wails-cli-${{ runner.os }}-${{ hashFiles('go.mod') }}
+
+      - name: Install Wails CLI
+        if: steps.cache-wails.outputs.cache-hit != 'true'
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+
+      - name: Setup Wails CLI PATH
+        run: |
+          mkdir -p /usr/local/bin
+          cp $(go env GOPATH)/bin/wails3 /usr/local/bin/wails
+          chmod +x /usr/local/bin/wails
+          echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
-          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
-          chmod +x $(go env GOPATH)/bin/wails3
-          sudo cp $(go env GOPATH)/bin/wails3 /usr/local/bin/wails
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            frontend/node_modules
+            ~/.bun/install/cache
+          key: bun-deps-${{ runner.os }}-${{ hashFiles('frontend/bun.lockb') }}
+          restore-keys: |
+            bun-deps-${{ runner.os }}-
 
-      - name: Build the app
+      - name: Install frontend dependencies
+        run: |
+          cd frontend && bun install
+
+      - name: Generate Wails bindings
         run: |
           wails generate bindings
-          wails build
+
+      - name: Format check
+        run: |
+          cd frontend && bun run format:check
+
+      - name: Build frontend
+        run: |
+          cd frontend && bun run build
+
+      - name: Run frontend tests
+        run: |
+          cd frontend && bun run test
