@@ -6,8 +6,5 @@ html, body, #root {
 }
 
 #root {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 15vh; /* Adjusted for taller window */
+  display: block;
 }
