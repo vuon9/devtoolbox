@@ -37,7 +37,6 @@
   display: flex;
   flex-direction: column;
   transition:
-    margin-left 0.3s ease,
     width 0.3s ease,
     opacity 0.3s ease;
   overflow: hidden;
@@ -46,8 +45,26 @@
 }
 
 .sidebar.hidden {
-  margin-left: -260px;
+  width: 48px;
+}
+
+.sidebar.hidden .nav-scroll-area,
+.sidebar.hidden .sidebar-section-header {
   opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar-footer {
+  padding: 12px 8px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.sidebar.hidden .sidebar-footer {
+  padding: 12px 8px;
+  justify-content: center;
 }
 
 .nav-scroll-area {

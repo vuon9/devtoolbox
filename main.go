@@ -15,6 +15,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
+	"github.com/wailsapp/wails/v3/pkg/icons"
+	"golang.design/x/hotkey"
 )
 
 //go:embed all:frontend/dist
@@ -33,6 +35,11 @@ func init() {
 
 	// Register settings changed event
 	application.RegisterEvent[map[string]interface{}]("settings:changed")
+
+	// Register spotlight events
+	application.RegisterEvent[string]("spotlight:closed")
+	application.RegisterEvent[string]("spotlight:close")
+	application.RegisterEvent[string]("spotlight:command-selected") // Event triggered when user selects a command from spotlight - used for navigation from spotlight to main window
 }
 
 func main() {
@@ -93,7 +100,12 @@ func main() {
 	app.RegisterService(application.NewService(service.NewDataGeneratorService(app)))
 	app.RegisterService(application.NewService(service.NewCodeFormatterService(app)))
 	app.RegisterService(application.NewService(service.NewSettingsService(app, settingsManager)))
-	// WindowControls service will be registered after window creation
+
+	// Create and register spotlight service
+	spotlightService := service.NewSpotlightService(app)
+	app.RegisterService(application.NewService(spotlightService))
+
+	// WindowControls service must be registered after main window creation (see line 149)
 
 	// Start HTTP server for browser support (background)
 	go func() {
@@ -102,6 +114,7 @@ func main() {
 
 	// Create main window
 	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
+		Name:   "main",
 		Title:  "DevToolbox",
 		Width:  1024,
 		Height: 768,
@@ -112,9 +125,11 @@ func main() {
 			Alpha: 1,
 		},
 		Mac: application.MacWindow{
-			InvisibleTitleBarHeight: 50,
-			Backdrop:                application.MacBackdropTranslucent,
-			TitleBar:                application.MacTitleBarHiddenInset,
+			Backdrop: application.MacBackdropTranslucent,
+			TitleBar: application.MacTitleBar{
+				AppearsTransparent: false,
+				Hide:               false,
+			},
 		},
 		URL: "/",
 	})
@@ -138,33 +153,144 @@ func main() {
 	// Register WindowControls service after window creation
 	app.RegisterService(application.NewService(service.NewWindowControls(mainWindow)))
 
+	// Create spotlight window with special behaviors
+	// Note: MacWindowLevelFloating and ActivationPolicyAccessory may require
+	// platform-specific code. CollectionBehaviors provide most spotlight functionality.
+	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
+		Title:            "Spotlight",
+		Width:            640,
+		Height:           480,
+		MinHeight:        480,
+		MaxHeight:        480,
+		Frameless:        true,
+		Hidden:           true,
+		BackgroundColour: application.RGBA{Red: 22, Green: 22, Blue: 22, Alpha: 255},
+		// Center the window
+		InitialPosition: application.WindowCentered,
+		// Prevent resizing
+		DisableResize: true,
+		Mac: application.MacWindow{
+			// Combine multiple behaviors using bitwise OR:
+			// - CanJoinAllSpaces: window appears on ALL Spaces (virtual desktops)
+			// - FullScreenAuxiliary: window can overlay fullscreen applications
+			CollectionBehavior: application.MacWindowCollectionBehaviorCanJoinAllSpaces |
+				application.MacWindowCollectionBehaviorFullScreenAuxiliary,
+			// Float above other windows
+			WindowLevel: application.MacWindowLevelFloating,
+			// Hidden title bar for clean look
+			TitleBar: application.MacTitleBar{
+				AppearsTransparent: true,
+				Hide:               true,
+			},
+		},
+		URL: "/spotlight",
+	})
+
+	// Set the window in spotlight service
+	spotlightService.SetWindow(spotlightWindow)
+
+	// Handle spotlight window close - hide instead of close
+	spotlightWindow.OnWindowEvent(events.Common.WindowClosing, func(event *application.WindowEvent) {
+		event.Cancel()
+		spotlightWindow.Hide()
+		spotlightWindow.EmitEvent("spotlight:closed", "")
+	})
+
+	// Listen for spotlight navigation events
+	app.Event.On("spotlight:command-selected", func(event *application.CustomEvent) {
+		log.Printf("[Spotlight] Received command-selected event with data: %#v", event.Data)
+
+		var path string
+		switch v := event.Data.(type) {
+		case string:
+			path = v
+		case []interface{}:
+			if len(v) > 0 {
+				path, _ = v[0].(string)
+			}
+		case map[string]interface{}:
+			if p, ok := v["path"].(string); ok {
+				path = p
+			} else if d, ok := v["data"].(string); ok {
+				path = d
+			}
+		}
+
+		if path == "" {
+			log.Printf("[Spotlight] Command selected with empty path")
+			return
+		}
+
+		log.Printf("[Spotlight] Navigating main window to: %s", path)
+
+		// Switch to main app context
+		mainWindow.Show()
+		mainWindow.Focus()
+
+		// Hide spotlight window asynchronously to prevent macOS from reverting focus
+		// to the previously active non-DevToolbox app
+		go func() {
+			time.Sleep(100 * time.Millisecond)
+			spotlightWindow.Hide()
+		}()
+
+		// Tell the frontend to navigate
+		mainWindow.EmitEvent("navigate:to", path)
+	})
+
+	// Close spotlight window
+	app.Event.On("spotlight:close", func(_ *application.CustomEvent) {
+		log.Printf("[Spotlight] Spotlight close requested")
+		spotlightWindow.Hide()
+	})
+
+	// Proxy these events to the main window
+	app.Event.On("spotlight:theme:toggle", func(_ *application.CustomEvent) {
+		log.Printf("[Spotlight] Relaying theme:toggle to main window")
+		mainWindow.EmitEvent("theme:toggle", nil)
+	})
+
+	app.Event.On("window:toggle", func(_ *application.CustomEvent) {
+		log.Printf("[Spotlight] Window toggle requested")
+		if mainWindow.IsVisible() {
+			mainWindow.Hide()
+		} else {
+			mainWindow.Show()
+			mainWindow.Focus()
+		}
+	})
+
+	app.Event.On("app:quit", func(_ *application.CustomEvent) {
+		log.Printf("[Spotlight] App quit requested via spotlight")
+		app.Quit()
+	})
+
 	// Setup system tray
 	systray := app.SystemTray.New()
+
+	// Set system tray icon
+	if runtime.GOOS == "darwin" {
+		systray.SetTemplateIcon(icons.SystrayMacTemplate)
+	} else {
+		systray.SetDarkModeIcon(icons.SystrayDark)
+		systray.SetIcon(icons.SystrayLight)
+	}
 
 	// Create tray menu
 	trayMenu := app.NewMenu()
 	trayMenu.Add("Show DevToolbox").OnClick(func(ctx *application.Context) {
 		log.Println("Tray menu 'Show DevToolbox' clicked")
-		log.Printf("Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
-
-		// On macOS, we need to activate the app first before showing the window
-		log.Println("Activating application")
-		app.Show()
-
-		// On macOS, we need to handle hidden windows differently
 		if !mainWindow.IsVisible() {
-			log.Println("Window is not visible, showing it")
 			mainWindow.Show()
 		}
-
 		if mainWindow.IsMinimised() {
-			log.Println("Restoring minimized window")
 			mainWindow.Restore()
 		}
-
-		log.Println("Focusing window")
 		mainWindow.Focus()
-		log.Printf("After show - Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
+	})
+	trayMenu.Add("Open Spotlight (Cmd+Shift+Space)").OnClick(func(ctx *application.Context) {
+		log.Println("Tray menu 'Open Spotlight' clicked")
+		spotlightService.Toggle()
 	})
 	trayMenu.AddSeparator()
 	trayMenu.Add("Quit").OnClick(func(ctx *application.Context) {
@@ -172,23 +298,37 @@ func main() {
 	})
 	systray.SetMenu(trayMenu)
 
-	// Register global hotkey for command palette
-	// macOS: Cmd+Ctrl+M, Windows/Linux: Ctrl+Alt+M
-	var hotkeyAccelerator string
-	if runtime.GOOS == "darwin" {
-		hotkeyAccelerator = "Cmd+Ctrl+M"
-	} else {
-		hotkeyAccelerator = "Ctrl+Alt+M"
-	}
-
-	app.KeyBinding.Add(hotkeyAccelerator, func(window application.Window) {
-		mainWindow.Show()
-		mainWindow.Focus()
-		mainWindow.EmitEvent("command-palette:open", "")
-	})
+	// Register global hotkey using golang-design/hotkey for system-wide shortcuts
+	go registerGlobalHotkey(spotlightService)
 
 	if err := app.Run(); err != nil {
 		panic(err)
+	}
+}
+
+// registerGlobalHotkey registers a system-wide global hotkey
+func registerGlobalHotkey(spotlightService *service.SpotlightService) {
+	// Use Cmd+Shift+Space for macOS, Ctrl+Shift+Space for others
+	var hk *hotkey.Hotkey
+	if runtime.GOOS == "darwin" {
+		hk = hotkey.New([]hotkey.Modifier{hotkey.ModCmd, hotkey.ModShift}, hotkey.KeySpace)
+	} else {
+		hk = hotkey.New([]hotkey.Modifier{hotkey.ModCtrl, hotkey.ModShift}, hotkey.KeySpace)
+	}
+
+	log.Printf("Registering global hotkey: %s", hk)
+
+	if err := hk.Register(); err != nil {
+		log.Printf("Failed to register hotkey: %v", err)
+		return
+	}
+
+	log.Println("Global hotkey registered successfully. Press Cmd/Ctrl+Shift+Space to toggle spotlight.")
+
+	// Listen for hotkey events
+	for range hk.Keydown() {
+		log.Println("Global hotkey pressed, toggling spotlight")
+		spotlightService.Toggle()
 	}
 }
 

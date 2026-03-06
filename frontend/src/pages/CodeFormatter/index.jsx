@@ -104,12 +104,14 @@ export default function CodeFormatter() {
     }
   });
 
-  // Clear URL params after using preset
+  // React to URL format changes even when already mounted
   useEffect(() => {
-    if (urlFormat) {
+    if (urlFormat && validFormats.includes(urlFormat)) {
+      setFormatType(urlFormat);
+      // Clear URL params after using preset to avoid re-triggering on reload
       setSearchParams({}, { replace: true });
     }
-  }, [urlFormat, setSearchParams]);
+  }, [urlFormat, setSearchParams, validFormats]);
 
   // Cache for per-language inputs and filters (in memory only)
   const inputCacheRef = useRef({});

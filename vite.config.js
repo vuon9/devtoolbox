@@ -33,5 +33,13 @@ export default defineConfig({
       // Ensure @ibm/plex can be resolved
       '@ibm/plex': path.resolve(__dirname, 'node_modules/@ibm/plex')
     }
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'frontend/index.html'),
+        spotlight: path.resolve(__dirname, 'frontend/spotlight.html'),
+      },
+    },
   }
 })
