@@ -3,30 +3,19 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Theme } from '@carbon/react';
 import { SpotlightPalette } from './components/SpotlightPalette';
+import './index.scss'; // Import global styles and Carbon tokens
 import './spotlight.css';
 
+// Force g100 theme for Spotlight as per project guidelines
+const getInitialTheme = () => 'g100';
+
 function SpotlightApp() {
-  const [theme, setTheme] = React.useState('g100');
-
-  // Listen for system theme changes
-  React.useEffect(() => {
-    const matchMedia = window.matchMedia('(prefers-color-scheme: dark)');
-
-    const updateTheme = () => {
-      setTheme(matchMedia.matches ? 'g100' : 'white');
-    };
-
-    updateTheme();
-    matchMedia.addEventListener('change', updateTheme);
-    return () => matchMedia.removeEventListener('change', updateTheme);
-  }, []);
-
   return (
-    <Theme theme={theme} style={{ height: '100%' }}>
+    <div className="spotlight-app-wrapper" style={{ height: '100%', width: '100%', background: 'transparent' }}>
       <BrowserRouter>
         <SpotlightPalette />
       </BrowserRouter>
-    </Theme>
+    </div>
   );
 }
 

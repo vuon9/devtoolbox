@@ -80,12 +80,32 @@ export default function DataGenerator() {
     loadPresets();
   }, []);
 
-  // Clear URL params after using preset
+  // Sync preset if URL param changes
   useEffect(() => {
-    if (urlPreset) {
-      setSearchParams({}, { replace: true });
+    if (urlPreset && state.presets.length > 0) {
+      const preset = state.presets.find(
+        (p) =>
+          p.id.toLowerCase() === urlPreset.toLowerCase() ||
+          p.name.toLowerCase() === urlPreset.toLowerCase()
+      );
+      if (preset) {
+        const defaultVars = {};
+        preset.variables.forEach((v) => {
+          defaultVars[v.name] = v.default;
+        });
+        dispatch({
+          type: 'SELECT_PRESET',
+          payload: {
+            id: preset.id,
+            template: preset.template,
+            defaultVars,
+          },
+        });
+        // Clear URL params after using preset
+        setSearchParams({}, { replace: true });
+      }
     }
-  }, [urlPreset, setSearchParams]);
+  }, [urlPreset, state.presets, setSearchParams]);
 
   // Handle preset selection
   const handlePresetChange = useCallback(

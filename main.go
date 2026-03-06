@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
+	"github.com/wailsapp/wails/v3/pkg/icons"
 	"golang.design/x/hotkey"
 )
 
@@ -36,8 +37,8 @@ func init() {
 	application.RegisterEvent[map[string]interface{}]("settings:changed")
 
 	// Register spotlight events
-	application.RegisterEvent[string]("spotlight:opened")
 	application.RegisterEvent[string]("spotlight:closed")
+	application.RegisterEvent[string]("spotlight:close")
 	application.RegisterEvent[string]("spotlight:command-selected") // Event triggered when user selects a command from spotlight - used for navigation from spotlight to main window
 }
 
@@ -113,6 +114,7 @@ func main() {
 
 	// Create main window
 	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
+		Name:   "main",
 		Title:  "DevToolbox",
 		Width:  1024,
 		Height: 768,
@@ -123,9 +125,11 @@ func main() {
 			Alpha: 1,
 		},
 		Mac: application.MacWindow{
-			InvisibleTitleBarHeight: 50,
-			Backdrop:                application.MacBackdropTranslucent,
-			TitleBar:                application.MacTitleBarHiddenInset,
+			Backdrop: application.MacBackdropTranslucent,
+			TitleBar: application.MacTitleBar{
+				AppearsTransparent: false,
+				Hide:               false,
+			},
 		},
 		URL: "/",
 	})
@@ -153,12 +157,14 @@ func main() {
 	// Note: MacWindowLevelFloating and ActivationPolicyAccessory may require
 	// platform-specific code. CollectionBehaviors provide most spotlight functionality.
 	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:     "Spotlight",
-		Width:     640,
-		Height:    80, // 80px search + 400px results
-		MinHeight: 80,
-		MaxHeight: 480,
-		Frameless: true, // Hide window controls (close/minimize/maximize buttons)
+		Title:            "Spotlight",
+		Width:            640,
+		Height:           480,
+		MinHeight:        480,
+		MaxHeight:        480,
+		Frameless:        true,
+		Hidden:           true,
+		BackgroundColour: application.RGBA{Red: 22, Green: 22, Blue: 22, Alpha: 255},
 		// Center the window
 		InitialPosition: application.WindowCentered,
 		// Prevent resizing
@@ -171,8 +177,6 @@ func main() {
 				application.MacWindowCollectionBehaviorFullScreenAuxiliary,
 			// Float above other windows
 			WindowLevel: application.MacWindowLevelFloating,
-			// Translucent vibrancy effect
-			Backdrop: application.MacBackdropTranslucent,
 			// Hidden title bar for clean look
 			TitleBar: application.MacTitleBar{
 				AppearsTransparent: true,
@@ -194,28 +198,60 @@ func main() {
 
 	// Listen for spotlight navigation events
 	app.Event.On("spotlight:command-selected", func(event *application.CustomEvent) {
-		path := event.Data.(string)
-		log.Printf("Spotlight command selected: %s", path)
+		log.Printf("[Spotlight] Received command-selected event with data: %#v", event.Data)
 
-		// Show and focus main window
+		var path string
+		switch v := event.Data.(type) {
+		case string:
+			path = v
+		case []interface{}:
+			if len(v) > 0 {
+				path, _ = v[0].(string)
+			}
+		case map[string]interface{}:
+			if p, ok := v["path"].(string); ok {
+				path = p
+			} else if d, ok := v["data"].(string); ok {
+				path = d
+			}
+		}
+
+		if path == "" {
+			log.Printf("[Spotlight] Command selected with empty path")
+			return
+		}
+
+		log.Printf("[Spotlight] Navigating main window to: %s", path)
+
+		// Switch to main app context
 		mainWindow.Show()
 		mainWindow.Focus()
 
-		// Emit navigation event to frontend
+		// Hide spotlight window asynchronously to prevent macOS from reverting focus
+		// to the previously active non-DevToolbox app
+		go func() {
+			time.Sleep(100 * time.Millisecond)
+			spotlightWindow.Hide()
+		}()
+
+		// Tell the frontend to navigate
 		mainWindow.EmitEvent("navigate:to", path)
 	})
 
-	// Listen for close request from spotlight
-	app.Event.On("spotlight:closed", func(event *application.CustomEvent) {
+	// Close spotlight window
+	app.Event.On("spotlight:close", func(_ *application.CustomEvent) {
+		log.Printf("[Spotlight] Spotlight close requested")
 		spotlightWindow.Hide()
 	})
 
-	// Listen for system commands from spotlight
-	app.Event.On("theme:toggle", func(event *application.CustomEvent) {
-		mainWindow.EmitEvent("theme:toggle", "")
+	// Proxy these events to the main window
+	app.Event.On("spotlight:theme:toggle", func(_ *application.CustomEvent) {
+		log.Printf("[Spotlight] Relaying theme:toggle to main window")
+		mainWindow.EmitEvent("theme:toggle", nil)
 	})
 
-	app.Event.On("window:toggle", func(event *application.CustomEvent) {
+	app.Event.On("window:toggle", func(_ *application.CustomEvent) {
+		log.Printf("[Spotlight] Window toggle requested")
 		if mainWindow.IsVisible() {
 			mainWindow.Hide()
 		} else {
@@ -224,37 +260,33 @@ func main() {
 		}
 	})
 
-	app.Event.On("app:quit", func(event *application.CustomEvent) {
+	app.Event.On("app:quit", func(_ *application.CustomEvent) {
+		log.Printf("[Spotlight] App quit requested via spotlight")
 		app.Quit()
 	})
 
 	// Setup system tray
 	systray := app.SystemTray.New()
 
+	// Set system tray icon
+	if runtime.GOOS == "darwin" {
+		systray.SetTemplateIcon(icons.SystrayMacTemplate)
+	} else {
+		systray.SetDarkModeIcon(icons.SystrayDark)
+		systray.SetIcon(icons.SystrayLight)
+	}
+
 	// Create tray menu
 	trayMenu := app.NewMenu()
 	trayMenu.Add("Show DevToolbox").OnClick(func(ctx *application.Context) {
 		log.Println("Tray menu 'Show DevToolbox' clicked")
-		log.Printf("Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
-
-		// On macOS, we need to activate the app first before showing the window
-		log.Println("Activating application")
-		app.Show()
-
-		// On macOS, we need to handle hidden windows differently
 		if !mainWindow.IsVisible() {
-			log.Println("Window is not visible, showing it")
 			mainWindow.Show()
 		}
-
 		if mainWindow.IsMinimised() {
-			log.Println("Restoring minimized window")
 			mainWindow.Restore()
 		}
-
-		log.Println("Focusing window")
 		mainWindow.Focus()
-		log.Printf("After show - Window visible: %v, minimized: %v", mainWindow.IsVisible(), mainWindow.IsMinimised())
 	})
 	trayMenu.Add("Open Spotlight (Cmd+Shift+Space)").OnClick(func(ctx *application.Context) {
 		log.Println("Tray menu 'Open Spotlight' clicked")

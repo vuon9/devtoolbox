@@ -46,12 +46,18 @@ export default function TextBasedConverter() {
     () => localStorage.getItem(STORAGE_KEYS.SUBMODE) || DEFAULTS.SUBMODE
   );
 
-  // Clear URL params after using preset
+  // React to URL preset changes even when already mounted
   useEffect(() => {
-    if (urlCategory || urlMethod) {
+    if (urlCategory && validCategories.includes(urlCategory)) {
+      setCategory(urlCategory);
+      const methodsForCategory = CONVERTER_MAP[urlCategory] || [];
+      if (urlMethod && methodsForCategory.includes(urlMethod)) {
+        setMethod(urlMethod);
+      }
+      // Clear URL params after using preset
       setSearchParams({}, { replace: true });
     }
-  }, [urlCategory, urlMethod, setSearchParams]);
+  }, [urlCategory, urlMethod, setSearchParams, validCategories]);
 
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');

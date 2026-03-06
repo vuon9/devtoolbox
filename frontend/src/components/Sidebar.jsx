@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { IconButton } from '@carbon/react';
+import { Settings } from '@carbon/icons-react';
 
-export function Sidebar({ isVisible }) {
+export function Sidebar({ isVisible, onOpenSettings }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [pinned, setPinned] = useState(() => {
     try {
@@ -134,6 +136,19 @@ export function Sidebar({ isVisible }) {
             No tools found
           </div>
         )}
+      </div>
+
+      {/* Settings button at bottom */}
+      <div className="sidebar-footer">
+        <IconButton
+          kind="ghost"
+          size="sm"
+          onClick={onOpenSettings}
+          label="Settings"
+          className="sidebar-settings-btn"
+        >
+          <Settings size={20} />
+        </IconButton>
       </div>
     </div>
   );

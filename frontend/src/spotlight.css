@@ -1,10 +1,14 @@
 /* Spotlight window specific styles */
-html, body, #root {
-  background: transparent !important;
-  margin: 0;
-  padding: 0;
+:root, html, body, #root, [class*="cds--theme-"], .app-container {
+  background: #161616 !important;
+  background-color: #161616 !important;
+  color: #f4f4f4 !important;
 }
 
 #root {
   display: block;
+  width: 100vw;
+  height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
 }

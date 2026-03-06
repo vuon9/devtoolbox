@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { CopyButton, TextInput } from '@carbon/react';
 
 const HASH_DISPLAY_ORDER = [

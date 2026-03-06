@@ -11,9 +11,9 @@ declare module "@wailsio/runtime" {
             "app:quit": string;
             "command-palette:open": string;
             "settings:changed": { [_ in string]?: any };
+            "spotlight:close": string;
             "spotlight:closed": string;
             "spotlight:command-selected": string;
-            "spotlight:opened": string;
             "time": string;
             "window:toggle": string;
         }
