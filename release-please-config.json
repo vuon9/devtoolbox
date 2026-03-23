@@ -1,0 +1,12 @@
+{
+  "packages": {
+    ".": {
+      "package-name": "devtoolbox",
+      "release-type": "go",
+      "include-component-in-tag": false,
+      "extra-files": [
+        "build/config.yml"
+      ]
+    }
+  }
+}
