@@ -8,13 +8,13 @@ export function ToolInput({
   value,
   onChange,
   placeholder,
-  type = "text",
+  type = 'text',
   className,
   containerClassName,
   ...props
 }) {
   return (
-    <div className={cn("grid w-full items-center gap-1.5", containerClassName)}>
+    <div className={cn('grid w-full items-center gap-1.5', containerClassName)}>
       {label && (
         <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 ml-1">
           {label}
@@ -25,7 +25,7 @@ export function ToolInput({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={cn("h-9 bg-background/50 border-border/40", className)}
+        className={cn('h-9 bg-background/50 border-border/40', className)}
         {...props}
       />
     </div>

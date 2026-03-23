@@ -16,7 +16,7 @@ import {
   Timer,
   Regex,
   Diff,
-  Hash
+  Hash,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -141,22 +141,23 @@ function SidebarItem({ tool, isPinned, onTogglePin }) {
   return (
     <NavLink
       to={`/tool/${tool.id}`}
-      className={({ isActive }) => cn(
-        "group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all",
-        "hover:bg-accent hover:text-accent-foreground",
-        isActive ? "bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20" : "text-muted-foreground"
-      )}
+      className={({ isActive }) =>
+        cn(
+          'group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all',
+          'hover:bg-accent hover:text-accent-foreground',
+          isActive
+            ? 'bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20'
+            : 'text-muted-foreground'
+        )
+      }
     >
-      <Icon className={cn(
-        "h-4 w-4 shrink-0 transition-colors",
-        "group-hover:text-primary"
-      )} />
+      <Icon className={cn('h-4 w-4 shrink-0 transition-colors', 'group-hover:text-primary')} />
       <span className="flex-1 truncate">{tool.name}</span>
       <button
         onClick={(e) => onTogglePin(e, tool.id)}
         className={cn(
-          "opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-background rounded",
-          isPinned && "opacity-100 text-primary"
+          'opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-background rounded',
+          isPinned && 'opacity-100 text-primary'
         )}
       >
         {isPinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}

@@ -12,13 +12,15 @@ import {
   AlertCircle,
   Hash,
   Binary,
-  Code2
+  Code2,
 } from 'lucide-react';
 
 export default function TextDiffChecker() {
   const [original, setOriginal] = useState('');
   const [modified, setModified] = useState('');
-  const [activeMode, setActiveMode] = useState(() => localStorage.getItem('diff-mode') || 'side-by-side');
+  const [activeMode, setActiveMode] = useState(
+    () => localStorage.getItem('diff-mode') || 'side-by-side'
+  );
 
   useEffect(() => {
     localStorage.setItem('diff-mode', activeMode);
@@ -48,10 +50,10 @@ export default function TextDiffChecker() {
               key={mode.id}
               onClick={() => setActiveMode(mode.id)}
               className={cn(
-                "flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all",
+                'flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all',
                 activeMode === mode.id
-                  ? "bg-background text-primary shadow-sm ring-1 ring-border/50"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? 'bg-background text-primary shadow-sm ring-1 ring-border/50'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <mode.icon className="h-3.5 w-3.5" />
@@ -112,20 +114,20 @@ export default function TextDiffChecker() {
         </div>
         <div className="space-y-1 font-mono text-sm leading-relaxed opacity-60">
           <div className="flex items-center gap-4 text-muted-foreground">
-             <span className="w-8 text-[10px] opacity-40">1</span>
-             <span>This line is common to both versions.</span>
+            <span className="w-8 text-[10px] opacity-40">1</span>
+            <span>This line is common to both versions.</span>
           </div>
           <div className="flex items-center gap-4 bg-destructive/10 text-destructive border-l-2 border-destructive px-2 -mx-2 py-0.5">
-             <span className="w-8 text-[10px] opacity-40 text-destructive/50">-</span>
-             <span>This line was removed in the modified version.</span>
+            <span className="w-8 text-[10px] opacity-40 text-destructive/50">-</span>
+            <span>This line was removed in the modified version.</span>
           </div>
           <div className="flex items-center gap-4 bg-green-500/10 text-green-500 border-l-2 border-green-500 px-2 -mx-2 py-0.5">
-             <span className="w-8 text-[10px] opacity-40 text-green-500/50">+</span>
-             <span>This line was added in the modified version.</span>
+            <span className="w-8 text-[10px] opacity-40 text-green-500/50">+</span>
+            <span>This line was added in the modified version.</span>
           </div>
           <div className="flex items-center gap-4 text-muted-foreground">
-             <span className="w-8 text-[10px] opacity-40">2</span>
-             <span>Another common line here.</span>
+            <span className="w-8 text-[10px] opacity-40">2</span>
+            <span>Another common line here.</span>
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ import {
   AlertCircle,
   Hash,
   Binary,
-  Code2
+  Code2,
 } from 'lucide-react';
 import { Decode, Encode } from '../../generated/wails/jWTService';
 
@@ -71,10 +71,10 @@ export default function JwtDebugger() {
               key={mode.id}
               onClick={() => setActiveMode(mode.id)}
               className={cn(
-                "flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all",
+                'flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all',
                 activeMode === mode.id
-                  ? "bg-background text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? 'bg-background text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <mode.icon className="h-3.5 w-3.5" />
@@ -106,11 +106,19 @@ export default function JwtDebugger() {
               className="flex-1"
             />
             {isValid !== null && (
-              <div className={cn(
-                "p-3 rounded-lg border flex items-center gap-3",
-                isValid ? "bg-green-500/10 border-green-500/20 text-green-500" : "bg-destructive/10 border-destructive/20 text-destructive"
-              )}>
-                {isValid ? <CheckCircle2 className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
+              <div
+                className={cn(
+                  'p-3 rounded-lg border flex items-center gap-3',
+                  isValid
+                    ? 'bg-green-500/10 border-green-500/20 text-green-500'
+                    : 'bg-destructive/10 border-destructive/20 text-destructive'
+                )}
+              >
+                {isValid ? (
+                  <CheckCircle2 className="h-5 w-5" />
+                ) : (
+                  <AlertCircle className="h-5 w-5" />
+                )}
                 <div className="text-[11px] font-bold uppercase tracking-widest">
                   {isValid ? 'Signature Verified' : 'Invalid Signature / Format'}
                 </div>

@@ -10,7 +10,9 @@ import { cn } from '../../utils/cn';
 export default function DateTimeConverter() {
   const [input, setInput] = useState(() => Date.now().toString());
   const [results, setResults] = useState(null);
-  const [isVertical, setIsVertical] = useState(() => localStorage.getItem('datetime-layout') === 'vertical');
+  const [isVertical, setIsVertical] = useState(
+    () => localStorage.getItem('datetime-layout') === 'vertical'
+  );
 
   useEffect(() => {
     localStorage.setItem('datetime-layout', isVertical ? 'vertical' : 'horizontal');
@@ -37,8 +39,7 @@ export default function DateTimeConverter() {
     else if (preset === 'today') {
       now.setHours(0, 0, 0, 0);
       newVal = now.toISOString();
-    }
-    else if (preset === 'tomorrow') {
+    } else if (preset === 'tomorrow') {
       now.setDate(now.getDate() + 1);
       now.setHours(0, 0, 0, 0);
       newVal = now.toISOString();
@@ -57,9 +58,30 @@ export default function DateTimeConverter() {
 
       <ToolControls className="justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => handleQuickPreset('now')} className="h-8 text-[10px] font-bold uppercase tracking-wider">Now</Button>
-          <Button variant="outline" size="sm" onClick={() => handleQuickPreset('today')} className="h-8 text-[10px] font-bold uppercase tracking-wider">Today 00:00</Button>
-          <Button variant="outline" size="sm" onClick={() => handleQuickPreset('tomorrow')} className="h-8 text-[10px] font-bold uppercase tracking-wider">Tomorrow 00:00</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleQuickPreset('now')}
+            className="h-8 text-[10px] font-bold uppercase tracking-wider"
+          >
+            Now
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleQuickPreset('today')}
+            className="h-8 text-[10px] font-bold uppercase tracking-wider"
+          >
+            Today 00:00
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleQuickPreset('tomorrow')}
+            className="h-8 text-[10px] font-bold uppercase tracking-wider"
+          >
+            Tomorrow 00:00
+          </Button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -69,13 +91,17 @@ export default function DateTimeConverter() {
             className="h-8 w-8"
             onClick={() => setIsVertical(!isVertical)}
           >
-            {isVertical ? <Columns className="h-4 w-4 rotate-90" /> : <Columns className="h-4 w-4" />}
+            {isVertical ? (
+              <Columns className="h-4 w-4 rotate-90" />
+            ) : (
+              <Columns className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </ToolControls>
 
       <div className="flex-1 min-h-0">
-        <ToolSplitPane className={cn(isVertical && "grid-cols-1 md:grid-cols-1")}>
+        <ToolSplitPane className={cn(isVertical && 'grid-cols-1 md:grid-cols-1')}>
           <div className="flex flex-col h-full">
             <ToolPane
               label="Input (Timestamp or ISO String)"
@@ -127,9 +153,7 @@ function ResultGroup({ icon: Icon, label, children }) {
         <Icon className="h-3 w-3" />
         {label}
       </div>
-      <div className="space-y-1">
-        {children}
-      </div>
+      <div className="space-y-1">{children}</div>
     </div>
   );
 }
@@ -144,12 +168,20 @@ function ResultRow({ label, value }) {
   };
 
   return (
-    <div className="flex items-center justify-between group hover:bg-muted/30 p-1.5 rounded-sm transition-colors cursor-pointer" onClick={handleCopy}>
+    <div
+      className="flex items-center justify-between group hover:bg-muted/30 p-1.5 rounded-sm transition-colors cursor-pointer"
+      onClick={handleCopy}
+    >
       <span className="text-xs text-muted-foreground font-medium">{label}</span>
       <div className="flex items-center gap-2">
         <code className="text-[13px] font-mono text-primary font-medium">{value}</code>
-        <div className={cn("opacity-0 group-hover:opacity-100 transition-opacity", copied && "opacity-100")}>
-          <Copy className={cn("h-3 w-3", copied && "text-green-500")} />
+        <div
+          className={cn(
+            'opacity-0 group-hover:opacity-100 transition-opacity',
+            copied && 'opacity-100'
+          )}
+        >
+          <Copy className={cn('h-3 w-3', copied && 'text-green-500')} />
         </div>
       </div>
     </div>

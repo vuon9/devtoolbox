@@ -1,21 +1,28 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import wails from "@wailsio/runtime/plugins/vite";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import wails from '@wailsio/runtime/plugins/vite';
 import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), wails("./bindings")],
+  plugins: [react(), wails('./bindings')],
   server: {
     port: 3000,
-    historyApiFallback: true
+    historyApiFallback: true,
   },
   css: {
     preprocessorOptions: {
       scss: {
         // Suppress expected carbon-design-system deprecation warnings
         // until the library updates its internal Sass usage
-        silenceDeprecations: ['modern', 'import', 'global-builtin', 'if-function', 'mixed-decls', 'color-functions'],
+        silenceDeprecations: [
+          'modern',
+          'import',
+          'global-builtin',
+          'if-function',
+          'mixed-decls',
+          'color-functions',
+        ],
         // Handle ~@ibm/plex/... imports from Carbon
         importer: [
           (url) => {
@@ -23,16 +30,16 @@ export default defineConfig({
               return { file: url.substring(1) };
             }
             return null;
-          }
-        ]
-      }
-    }
+          },
+        ],
+      },
+    },
   },
   resolve: {
     alias: {
       // Ensure @ibm/plex can be resolved
-      '@ibm/plex': path.resolve(__dirname, 'node_modules/@ibm/plex')
-    }
+      '@ibm/plex': path.resolve(__dirname, 'node_modules/@ibm/plex'),
+    },
   },
   build: {
     rollupOptions: {
@@ -41,5 +48,5 @@ export default defineConfig({
         spotlight: path.resolve(__dirname, 'frontend/spotlight.html'),
       },
     },
-  }
-})
+  },
+});

@@ -59,7 +59,12 @@ export default function CronJobParser() {
 
       <ToolControls className="mb-6 justify-between items-end">
         <div className="flex-1 max-w-lg">
-          <Label htmlFor="cron-input" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5 ml-1">Cron Expression</Label>
+          <Label
+            htmlFor="cron-input"
+            className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5 ml-1"
+          >
+            Cron Expression
+          </Label>
           <div className="relative group">
             <Hash className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
             <Input
@@ -93,34 +98,49 @@ export default function CronJobParser() {
             <Info className="h-3 w-3" />
             Human Readable Description
           </div>
-          <div className={cn(
-            "text-2xl font-semibold tracking-tight leading-relaxed",
-            error ? "text-destructive" : "text-foreground"
-          )}>
-            {error ? 'Invalid Cron Expression' : (description || 'Enter an expression above...')}
+          <div
+            className={cn(
+              'text-2xl font-semibold tracking-tight leading-relaxed',
+              error ? 'text-destructive' : 'text-foreground'
+            )}
+          >
+            {error ? 'Invalid Cron Expression' : description || 'Enter an expression above...'}
           </div>
-          {error && <div className="mt-2 text-xs font-mono text-destructive/70 italic">{error}</div>}
+          {error && (
+            <div className="mt-2 text-xs font-mono text-destructive/70 italic">{error}</div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-6 rounded-lg bg-muted/20 border border-border/40 space-y-4">
-             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
               <Clock className="h-3 w-3" />
               Next Execution Times
             </div>
             <div className="space-y-2">
               {nextRuns.map((run, i) => (
-                <div key={i} className="flex items-center gap-4 group p-2 rounded hover:bg-muted/30 transition-colors cursor-default">
-                  <span className="text-[10px] font-mono text-muted-foreground/40 w-4">{i + 1}</span>
-                  <span className="text-xs font-mono font-medium text-foreground/80 group-hover:text-primary transition-colors">{run}</span>
+                <div
+                  key={i}
+                  className="flex items-center gap-4 group p-2 rounded hover:bg-muted/30 transition-colors cursor-default"
+                >
+                  <span className="text-[10px] font-mono text-muted-foreground/40 w-4">
+                    {i + 1}
+                  </span>
+                  <span className="text-xs font-mono font-medium text-foreground/80 group-hover:text-primary transition-colors">
+                    {run}
+                  </span>
                 </div>
               ))}
-              {nextRuns.length === 0 && <div className="text-xs text-muted-foreground italic px-2">Waiting for valid expression...</div>}
+              {nextRuns.length === 0 && (
+                <div className="text-xs text-muted-foreground italic px-2">
+                  Waiting for valid expression...
+                </div>
+              )}
             </div>
           </div>
 
           <div className="p-6 rounded-lg bg-muted/20 border border-border/40 space-y-4">
-             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
               <Timer className="h-3 w-3" />
               Syntax Guide
             </div>

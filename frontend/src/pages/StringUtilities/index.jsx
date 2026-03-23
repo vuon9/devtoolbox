@@ -10,7 +10,7 @@ import {
   Trash2,
   ArrowDownAz,
   Undo2,
-  Trash
+  Trash,
 } from 'lucide-react';
 import CaseConverterPane from './components/CaseConverterPane';
 import SortDedupePane from './components/SortDedupePane';
@@ -22,13 +22,15 @@ import {
   removeDuplicates,
   getTextStats,
   trimLines,
-  removeEmptyLines
+  removeEmptyLines,
 } from './strings';
 
 export default function StringUtilities() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
-  const [activeMode, setActiveMode] = useState(() => localStorage.getItem('string-utils-mode') || 'case');
+  const [activeMode, setActiveMode] = useState(
+    () => localStorage.getItem('string-utils-mode') || 'case'
+  );
 
   useEffect(() => {
     localStorage.setItem('string-utils-mode', activeMode);
@@ -75,11 +77,7 @@ export default function StringUtilities() {
       />
 
       <div className="mb-6 flex items-center justify-between border-b pb-4">
-        <ModeTabBar
-          modes={modes}
-          activeMode={activeMode}
-          onModeChange={setActiveMode}
-        />
+        <ModeTabBar modes={modes} activeMode={activeMode} onModeChange={setActiveMode} />
 
         <div className="flex items-center gap-2">
           <Button
@@ -159,7 +157,9 @@ export default function StringUtilities() {
 function StatItem({ label, value }) {
   return (
     <div>
-      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">{label}</div>
+      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
+        {label}
+      </div>
       <div className="text-lg font-mono font-semibold text-primary">{value}</div>
     </div>
   );

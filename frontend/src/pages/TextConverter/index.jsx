@@ -52,7 +52,9 @@ export default function TextBasedConverter() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
-  const [isVertical, setIsVertical] = useState(() => localStorage.getItem('text-converter-layout') === 'vertical');
+  const [isVertical, setIsVertical] = useState(
+    () => localStorage.getItem('text-converter-layout') === 'vertical'
+  );
 
   // Custom tags state with localStorage persistence
   const [customTags, setCustomTags] = useState(() => {
@@ -225,7 +227,12 @@ export default function TextBasedConverter() {
               checked={config.autoRun}
               onCheckedChange={(val) => updateConfig({ autoRun: val })}
             />
-            <Label htmlFor="auto-run" className="text-[10px] font-bold uppercase tracking-wider opacity-70">Auto-run</Label>
+            <Label
+              htmlFor="auto-run"
+              className="text-[10px] font-bold uppercase tracking-wider opacity-70"
+            >
+              Auto-run
+            </Label>
           </div>
 
           <Button
@@ -234,7 +241,11 @@ export default function TextBasedConverter() {
             className="h-8 w-8"
             onClick={() => setIsVertical(!isVertical)}
           >
-            {isVertical ? <Columns className="h-4 w-4 rotate-90" /> : <Columns className="h-4 w-4" />}
+            {isVertical ? (
+              <Columns className="h-4 w-4 rotate-90" />
+            ) : (
+              <Columns className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </ToolControls>
@@ -246,7 +257,7 @@ export default function TextBasedConverter() {
       )}
 
       <div className="flex-1 min-h-0">
-        <ToolSplitPane className={cn(isVertical && "grid-cols-1 md:grid-cols-1")}>
+        <ToolSplitPane className={cn(isVertical && 'grid-cols-1 md:grid-cols-1')}>
           <ToolPane
             label={LABELS.INPUT(category, subMode, method)}
             value={input}
@@ -273,7 +284,7 @@ export default function TextBasedConverter() {
               value={output}
               readOnly
               placeholder={PLACEHOLDERS.OUTPUT}
-              className={error ? "border-destructive/50" : ""}
+              className={error ? 'border-destructive/50' : ''}
             />
           )}
         </ToolSplitPane>

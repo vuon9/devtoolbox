@@ -21,8 +21,8 @@ export default function ColorConverter() {
   const updateAll = (color) => {
     // Simple mock logic for demonstration since color-utils is not available
     setHex(color);
-    setHistory(prev => {
-      const next = [color, ...prev.filter(c => c !== color)].slice(0, 10);
+    setHistory((prev) => {
+      const next = [color, ...prev.filter((c) => c !== color)].slice(0, 10);
       localStorage.setItem('color-history', JSON.stringify(next));
       return next;
     });
@@ -76,12 +76,22 @@ export default function ColorConverter() {
             </div>
 
             <ColorInput label="Hexadecimal" value={hex} onChange={handleHexChange} icon={Hash} />
-            <ColorInput label="RGB (Red, Green, Blue)" value={rgb} onChange={setRgb} icon={Pipette} />
-            <ColorInput label="HSL (Hue, Saturation, Light)" value={hsl} onChange={setHsl} icon={Pipette} />
+            <ColorInput
+              label="RGB (Red, Green, Blue)"
+              value={rgb}
+              onChange={setRgb}
+              icon={Pipette}
+            />
+            <ColorInput
+              label="HSL (Hue, Saturation, Light)"
+              value={hsl}
+              onChange={setHsl}
+              icon={Pipette}
+            />
           </div>
 
           <div className="space-y-4">
-             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2 px-1">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2 px-1">
               <History className="h-3 w-3" />
               Recent Colors
             </div>
@@ -108,8 +118,12 @@ export default function ColorConverter() {
             Generated Palette
           </div>
           <div className="flex h-24 rounded-lg overflow-hidden border border-border/40 shadow-inner">
-            {[10, 20, 30, 40, 50, 60, 70, 80, 90].map(p => (
-              <div key={p} className="flex-1 transition-all hover:flex-[1.5]" style={{ backgroundColor: hex, opacity: p/100 }} />
+            {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((p) => (
+              <div
+                key={p}
+                className="flex-1 transition-all hover:flex-[1.5]"
+                style={{ backgroundColor: hex, opacity: p / 100 }}
+              />
             ))}
           </div>
         </div>
@@ -129,7 +143,9 @@ function ColorInput({ label, value, onChange, icon: Icon }) {
 
   return (
     <div className="grid w-full items-center gap-1.5">
-      <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">{label}</Label>
+      <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
+        {label}
+      </Label>
       <div className="relative">
         <Icon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/50" />
         <Input
@@ -141,7 +157,11 @@ function ColorInput({ label, value, onChange, icon: Icon }) {
           onClick={handleCopy}
           className="absolute right-2 top-2 p-1.5 hover:bg-muted rounded transition-colors"
         >
-          {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground/50" />}
+          {copied ? (
+            <Check className="h-3.5 w-3.5 text-green-500" />
+          ) : (
+            <Copy className="h-3.5 w-3.5 text-muted-foreground/50" />
+          )}
         </button>
       </div>
     </div>

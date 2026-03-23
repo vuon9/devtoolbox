@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
 import { Button } from '../../components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
 import { Label } from '../../components/ui/label';
 import { Play, Copy, Check, Braces, Code2, Code, Brackets } from 'lucide-react';
 import { Format } from '../../generated/wails/codeFormatterService';
@@ -20,7 +26,9 @@ const languages = [
 export default function CodeFormatter() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
-  const [language, setLanguage] = useState(() => localStorage.getItem('code-formatter-lang') || 'json');
+  const [language, setLanguage] = useState(
+    () => localStorage.getItem('code-formatter-lang') || 'json'
+  );
   const [error, setError] = useState('');
   const [isFormatting, setIsFormatting] = useState(false);
 
@@ -53,9 +61,17 @@ export default function CodeFormatter() {
       <ToolControls className="justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <Label htmlFor="language-select" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Language</Label>
+            <Label
+              htmlFor="language-select"
+              className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
+            >
+              Language
+            </Label>
             <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger id="language-select" className="w-[180px] h-9 bg-background/50 border-border/40">
+              <SelectTrigger
+                id="language-select"
+                className="w-[180px] h-9 bg-background/50 border-border/40"
+              >
                 <SelectValue placeholder="Select language" />
               </SelectTrigger>
               <SelectContent>
@@ -79,7 +95,7 @@ export default function CodeFormatter() {
             size="sm"
             className="h-9 gap-2 font-bold uppercase tracking-wider text-[10px] px-6"
           >
-            <Play className={cn("h-3.5 w-3.5 fill-current", isFormatting && "animate-pulse")} />
+            <Play className={cn('h-3.5 w-3.5 fill-current', isFormatting && 'animate-pulse')} />
             {isFormatting ? 'Formatting...' : 'Format Code'}
           </Button>
         </div>
@@ -103,7 +119,7 @@ export default function CodeFormatter() {
               value={output}
               readOnly
               placeholder="Result will appear here..."
-              className={cn("flex-1", error && "border-destructive/30 ring-destructive/20")}
+              className={cn('flex-1', error && 'border-destructive/30 ring-destructive/20')}
             />
             {error && (
               <div className="mt-2 p-2 px-3 rounded bg-destructive/10 border border-destructive/20 text-destructive text-[11px] font-medium leading-relaxed">

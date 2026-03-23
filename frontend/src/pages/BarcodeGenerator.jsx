@@ -3,8 +3,24 @@ import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../components
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { ScanBarcode, Play, Download, Settings, QrCode, Hash, Columns, Layout, Trash2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import {
+  ScanBarcode,
+  Play,
+  Download,
+  Settings,
+  QrCode,
+  Hash,
+  Columns,
+  Layout,
+  Trash2,
+} from 'lucide-react';
 import { Generate } from '../generated/wails/barcodeService';
 import { cn } from '../utils/cn';
 
@@ -19,7 +35,9 @@ export default function BarcodeGenerator() {
   const [type, setType] = useState('qr');
   const [output, setOutput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isVertical, setIsVertical] = useState(() => localStorage.getItem('barcode-layout') === 'vertical');
+  const [isVertical, setIsVertical] = useState(
+    () => localStorage.getItem('barcode-layout') === 'vertical'
+  );
 
   useEffect(() => {
     localStorage.setItem('barcode-layout', isVertical ? 'vertical' : 'horizontal');
@@ -51,9 +69,17 @@ export default function BarcodeGenerator() {
       <ToolControls className="mb-6 justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <Label htmlFor="type-select" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Type</Label>
+            <Label
+              htmlFor="type-select"
+              className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
+            >
+              Type
+            </Label>
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger id="type-select" className="w-[160px] h-9 bg-background/50 border-border/40">
+              <SelectTrigger
+                id="type-select"
+                className="w-[160px] h-9 bg-background/50 border-border/40"
+              >
                 <SelectValue placeholder="Code Type" />
               </SelectTrigger>
               <SelectContent>
@@ -87,13 +113,17 @@ export default function BarcodeGenerator() {
             className="h-9 w-9"
             onClick={() => setIsVertical(!isVertical)}
           >
-            {isVertical ? <Columns className="h-4 w-4 rotate-90" /> : <Columns className="h-4 w-4" />}
+            {isVertical ? (
+              <Columns className="h-4 w-4 rotate-90" />
+            ) : (
+              <Columns className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </ToolControls>
 
       <div className="flex-1 min-h-0">
-        <ToolSplitPane className={cn(isVertical && "grid-cols-1 md:grid-cols-1")}>
+        <ToolSplitPane className={cn(isVertical && 'grid-cols-1 md:grid-cols-1')}>
           <div className="flex flex-col h-full">
             <ToolPane
               label="Input Content"
@@ -115,17 +145,26 @@ export default function BarcodeGenerator() {
               ) : (
                 <div className="h-64 w-64 flex flex-col items-center justify-center text-muted-foreground gap-4 bg-muted/10 rounded-lg">
                   <QrCode className="h-16 w-16 opacity-10 animate-pulse" />
-                  <span className="text-xs font-medium uppercase tracking-widest opacity-30">Generating...</span>
+                  <span className="text-xs font-medium uppercase tracking-widest opacity-30">
+                    Generating...
+                  </span>
                 </div>
               )}
             </div>
 
             <div className="absolute bottom-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button size="sm" className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] shadow-lg">
+              <Button
+                size="sm"
+                className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] shadow-lg"
+              >
                 <Download className="h-3.5 w-3.5" />
                 Download SVG
               </Button>
-              <Button variant="outline" size="sm" className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] bg-background/80 backdrop-blur-sm">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] bg-background/80 backdrop-blur-sm"
+              >
                 <Download className="h-3.5 w-3.5" />
                 Download PNG
               </Button>

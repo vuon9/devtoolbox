@@ -10,7 +10,11 @@ export default function NumberConverter() {
   const [input, setInput] = useState('42');
   const [base, setBase] = useState(10);
   const [results, setResults] = useState({
-    bin: '', oct: '', dec: '', hex: '', base64: ''
+    bin: '',
+    oct: '',
+    dec: '',
+    hex: '',
+    base64: '',
   });
 
   const convert = (val = input, currentBase = base) => {
@@ -23,7 +27,7 @@ export default function NumberConverter() {
         oct: num.toString(8),
         dec: num.toString(10),
         hex: num.toString(16).toUpperCase(),
-        base64: btoa(num.toString(10))
+        base64: btoa(num.toString(10)),
       });
     } catch (e) {
       console.error(e);
@@ -55,10 +59,10 @@ export default function NumberConverter() {
               key={b.id}
               onClick={() => setBase(b.value)}
               className={cn(
-                "flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all",
+                'flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all',
                 base === b.value
-                  ? "bg-background text-primary shadow-sm ring-1 ring-border/50"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? 'bg-background text-primary shadow-sm ring-1 ring-border/50'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <b.icon className="h-3.5 w-3.5" />
@@ -101,14 +105,22 @@ export default function NumberConverter() {
             Bit Representation (Binary 32-bit)
           </div>
           <div className="grid grid-cols-8 sm:grid-cols-16 gap-1 md:gap-2">
-            {results.bin.padStart(32, '0').split('').map((bit, i) => (
-              <div key={i} className={cn(
-                "h-8 flex items-center justify-center rounded border font-mono text-xs transition-colors",
-                bit === '1' ? "bg-primary/20 border-primary/40 text-primary font-bold shadow-inner" : "bg-background/40 border-border/20 text-muted-foreground/30"
-              )}>
-                {bit}
-              </div>
-            ))}
+            {results.bin
+              .padStart(32, '0')
+              .split('')
+              .map((bit, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    'h-8 flex items-center justify-center rounded border font-mono text-xs transition-colors',
+                    bit === '1'
+                      ? 'bg-primary/20 border-primary/40 text-primary font-bold shadow-inner'
+                      : 'bg-background/40 border-border/20 text-muted-foreground/30'
+                  )}
+                >
+                  {bit}
+                </div>
+              ))}
           </div>
         </div>
       </div>
@@ -126,12 +138,23 @@ function BaseCard({ label, value, base }) {
   };
 
   return (
-    <div className="p-4 rounded-lg bg-muted/30 border border-border/40 group hover:border-primary/30 transition-all cursor-pointer" onClick={handleCopy}>
+    <div
+      className="p-4 rounded-lg bg-muted/30 border border-border/40 group hover:border-primary/30 transition-all cursor-pointer"
+      onClick={handleCopy}
+    >
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{label}</span>
-        {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />}
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+          {label}
+        </span>
+        {copied ? (
+          <Check className="h-3.5 w-3.5 text-green-500" />
+        ) : (
+          <Copy className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+        )}
       </div>
-      <div className="text-xl font-mono font-bold text-foreground truncate select-all">{value || '0'}</div>
+      <div className="text-xl font-mono font-bold text-foreground truncate select-all">
+        {value || '0'}
+      </div>
     </div>
   );
 }

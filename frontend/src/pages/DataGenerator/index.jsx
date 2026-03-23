@@ -3,8 +3,24 @@ import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../compone
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { LayoutDashboard, Play, FileJson, FileCode, FileType, Columns, Layout, Trash2, Plus } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
+import {
+  LayoutDashboard,
+  Play,
+  FileJson,
+  FileCode,
+  FileType,
+  Columns,
+  Layout,
+  Trash2,
+  Plus,
+} from 'lucide-react';
 import { Generate } from '../../generated/wails/dataGeneratorService';
 import { cn } from '../../utils/cn';
 
@@ -19,7 +35,9 @@ export default function DataGenerator() {
   const [count, setCount] = useState(10);
   const [output, setOutput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isVertical, setIsVertical] = useState(() => localStorage.getItem('datagen-layout') === 'vertical');
+  const [isVertical, setIsVertical] = useState(
+    () => localStorage.getItem('datagen-layout') === 'vertical'
+  );
 
   useEffect(() => {
     localStorage.setItem('datagen-layout', isVertical ? 'vertical' : 'horizontal');
@@ -47,9 +65,17 @@ export default function DataGenerator() {
       <ToolControls className="mb-6 justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <Label htmlFor="format-select" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Format</Label>
+            <Label
+              htmlFor="format-select"
+              className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
+            >
+              Format
+            </Label>
             <Select value={format} onValueChange={setFormat}>
-              <SelectTrigger id="format-select" className="w-[140px] h-9 bg-background/50 border-border/40">
+              <SelectTrigger
+                id="format-select"
+                className="w-[140px] h-9 bg-background/50 border-border/40"
+              >
                 <SelectValue placeholder="Format" />
               </SelectTrigger>
               <SelectContent>
@@ -66,7 +92,12 @@ export default function DataGenerator() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Label htmlFor="count-input" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Count</Label>
+            <Label
+              htmlFor="count-input"
+              className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
+            >
+              Count
+            </Label>
             <Input
               id="count-input"
               type="number"
@@ -86,7 +117,7 @@ export default function DataGenerator() {
             size="sm"
             className="h-9 gap-2 font-bold uppercase tracking-wider text-[10px] px-6"
           >
-            <Play className={cn("h-3.5 w-3.5 fill-current", isGenerating && "animate-pulse")} />
+            <Play className={cn('h-3.5 w-3.5 fill-current', isGenerating && 'animate-pulse')} />
             {isGenerating ? 'Generating...' : 'Generate Data'}
           </Button>
 
@@ -96,18 +127,28 @@ export default function DataGenerator() {
             className="h-9 w-9"
             onClick={() => setIsVertical(!isVertical)}
           >
-            {isVertical ? <Columns className="h-4 w-4 rotate-90" /> : <Columns className="h-4 w-4" />}
+            {isVertical ? (
+              <Columns className="h-4 w-4 rotate-90" />
+            ) : (
+              <Columns className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </ToolControls>
 
       <div className="flex-1 min-h-0">
-        <ToolSplitPane className={cn(isVertical && "grid-cols-1 md:grid-cols-1")}>
+        <ToolSplitPane className={cn(isVertical && 'grid-cols-1 md:grid-cols-1')}>
           {/* Schema definition mockup */}
           <div className="flex flex-col h-full border rounded-md bg-muted/5 overflow-hidden">
             <div className="flex items-center justify-between p-3 border-b bg-muted/10">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Schema Definition</span>
-              <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] gap-1.5 hover:bg-primary/10 hover:text-primary transition-colors">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                Schema Definition
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-[10px] gap-1.5 hover:bg-primary/10 hover:text-primary transition-colors"
+              >
                 <Plus className="h-3 w-3" />
                 Add Field
               </Button>
@@ -139,9 +180,17 @@ export default function DataGenerator() {
 function SchemaField({ label, type }) {
   return (
     <div className="flex items-center gap-3 p-2 rounded border border-border/40 bg-background/50 group hover:border-primary/20 transition-all">
-      <Input value={label} readOnly className="h-8 text-xs font-mono bg-transparent border-none focus:ring-0 w-24" />
+      <Input
+        value={label}
+        readOnly
+        className="h-8 text-xs font-mono bg-transparent border-none focus:ring-0 w-24"
+      />
       <div className="flex-1 text-[11px] font-medium text-muted-foreground px-2 italic">{type}</div>
-      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground/30 hover:text-destructive hover:bg-destructive/10">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7 text-muted-foreground/30 hover:text-destructive hover:bg-destructive/10"
+      >
         <Trash2 className="h-3.5 w-3.5" />
       </Button>
     </div>
