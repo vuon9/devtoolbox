@@ -1,131 +1,80 @@
-import React, { useState } from 'react';
-import { IconButton } from '@carbon/react';
-import { Menu, Close, Subtract, Maximize, Settings } from '@carbon/icons-react';
-import { SettingsModal } from './SettingsModal';
-import { Minimise, Maximise, Close as WindowClose } from '../generated';
+import React from 'react';
+import {
+  Menu,
+  Settings,
+  Minus,
+  Square,
+  X,
+  Sidebar as SidebarIcon
+} from 'lucide-react';
+import { Button } from './ui/button';
+import { cn } from '../utils/cn';
 
 export function TitleBar({
   isSidebarOpen,
   toggleSidebar,
   appName = 'DevToolbox',
-  themeMode,
-  setThemeMode,
+  onOpenSettings,
 }) {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  // Detect if running in desktop mode
+  // Detect if running in desktop mode (Wails)
   const isDesktop = typeof window !== 'undefined' && window.go?.devtoolbox?.service?.WindowControls;
 
   // Detect platform
   const userAgent = navigator.userAgent.toLowerCase();
-  const isMac =
-    userAgent.includes('mac') && !userAgent.includes('iphone') && !userAgent.includes('ipad');
+  const isMac = userAgent.includes('mac') && !userAgent.includes('iphone') && !userAgent.includes('ipad');
 
-  // Don't render in browser mode
-  if (!isDesktop) {
-    return null;
-  }
-
-  // Window control handlers for non-macOS platforms
-  const handleMinimize = async () => {
-    try {
-      await Minimise();
-    } catch (err) {
-      console.error('Failed to minimise window:', err);
-    }
-  };
-
-  const handleMaximize = async () => {
-    try {
-      await Maximise();
-    } catch (err) {
-      console.error('Failed to maximise window:', err);
-    }
-  };
-
-  const handleClose = async () => {
-    try {
-      await WindowClose();
-    } catch (err) {
-      console.error('Failed to close window:', err);
-    }
-  };
+  const handleMinimize = () => window.runtime?.WindowMinimise?.();
+  const handleMaximize = () => window.runtime?.WindowToggleMaximise?.();
+  const handleClose = () => window.runtime?.WindowQuit?.();
 
   return (
-    <div className={`titlebar ${isMac ? 'macos' : 'other-platform'}`}>
-      {/* Left section - Sidebar toggle (always visible on desktop) */}
-      <div className="titlebar-left">
-        <IconButton
-          kind="ghost"
-          size="sm"
+    <header className={cn(
+      "h-10 border-b bg-background flex items-center justify-between px-3 select-none drag-region",
+      isMac && "pl-20" // Space for Mac traffic lights
+    )}>
+      {/* Left section */}
+      <div className="flex items-center gap-2 no-drag">
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={toggleSidebar}
-          label={isSidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
-          align="bottom"
-          className="titlebar-sidebar-toggle"
+          className="h-7 w-7"
         >
-          <Menu size={16} />
-        </IconButton>
+          {isSidebarOpen ? <SidebarIcon className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </Button>
       </div>
 
-      {/* Center section - App name */}
-      <div className="titlebar-center">
-        <span className="titlebar-appname">{appName}</span>
+      {/* Center section */}
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none">
+        <span className="text-xs font-semibold tracking-tight text-muted-foreground uppercase">{appName}</span>
       </div>
 
-      {/* Right section - Settings + Window controls */}
-      <div className="titlebar-right">
-        {/* Settings button */}
-        <IconButton
-          kind="ghost"
-          size="sm"
-          onClick={() => setIsSettingsOpen(true)}
-          label="Settings"
-          className="titlebar-settings"
+      {/* Right section */}
+      <div className="flex items-center gap-1 no-drag">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onOpenSettings}
+          className="h-7 w-7"
         >
-          <Settings size={16} />
-        </IconButton>
+          <Settings className="h-4 w-4" />
+        </Button>
 
-        {/* Window controls for non-macOS platforms */}
-        {!isMac && (
-          <div className="window-controls">
-            <IconButton
-              kind="ghost"
-              size="sm"
-              onClick={handleMinimize}
-              label="Minimize"
-              className="window-control-btn minimize"
-            >
-              <Subtract size={16} />
-            </IconButton>
-            <IconButton
-              kind="ghost"
-              size="sm"
-              onClick={handleMaximize}
-              label="Maximize"
-              className="window-control-btn maximize"
-            >
-              <Maximize size={16} />
-            </IconButton>
-            <IconButton
-              kind="ghost"
-              size="sm"
-              onClick={handleClose}
-              label="Close"
-              className="window-control-btn close"
-            >
-              <Close size={16} />
-            </IconButton>
+        {isDesktop && !isMac && (
+          <div className="flex items-center ml-2 border-l pl-2 gap-0.5">
+            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-accent" onClick={handleMinimize}>
+              <Minus className="h-3 w-3" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-accent" onClick={handleMaximize}>
+              <Square className="h-2.5 w-2.5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive hover:text-destructive-foreground" onClick={handleClose}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         )}
-
-        {/* Settings Modal */}
-        <SettingsModal
-          isOpen={isSettingsOpen}
-          onClose={() => setIsSettingsOpen(false)}
-          themeMode={themeMode}
-          setThemeMode={setThemeMode}
-        />
       </div>
-    </div>
+    </header>
   );
 }
 

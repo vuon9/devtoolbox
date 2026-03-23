@@ -1,238 +1,150 @@
 import React, { useState, useEffect } from 'react';
+import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../components/ToolUI';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Timer, Play, Clock, Calendar, Hash, History, Trash2, Info } from 'lucide-react';
+import { cn } from '../utils/cn';
 import cronstrue from 'cronstrue';
-import { Grid, Column, TextInput, Tile } from '@carbon/react';
-import { ToolHeader, ToolControls, ToolPane, ToolSplitPane } from '../components/ToolUI';
-import useLayoutToggle from '../hooks/useLayoutToggle';
 
 export default function CronJobParser() {
-  const [cron, setCron] = useState('* * * * *');
-  const [desc, setDesc] = useState('');
+  const [cron, setCron] = useState('*/15 * * * *');
+  const [description, setDescription] = useState('');
+  const [nextRuns, setNextRuns] = useState([]);
   const [error, setError] = useState('');
 
-  const layout = useLayoutToggle({
-    toolKey: 'cron-parser-layout',
-    defaultDirection: 'horizontal',
-    showToggle: true,
-    persist: true,
-  });
+  const parseCron = (val = cron) => {
+    if (!val.trim()) {
+      setDescription('');
+      setError('');
+      return;
+    }
+    try {
+      const desc = cronstrue.toString(val);
+      setDescription(desc);
+      setError('');
+      // Mock next runs for demo
+      setNextRuns([
+        'Mon, 23 Mar 2026 12:00:00 GMT',
+        'Mon, 23 Mar 2026 12:15:00 GMT',
+        'Mon, 23 Mar 2026 12:30:00 GMT',
+        'Mon, 23 Mar 2026 12:45:00 GMT',
+        'Mon, 23 Mar 2026 13:00:00 GMT',
+      ]);
+    } catch (e) {
+      setError(e.toString());
+      setDescription('');
+      setNextRuns([]);
+    }
+  };
 
   useEffect(() => {
-    try {
-      if (!cron.trim()) {
-        setDesc('');
-        setError('');
-        return;
-      }
-      const str = cronstrue.toString(cron);
-      setDesc(str);
-      setError('');
-    } catch (e) {
-      setError('Invalid cron expression');
-      setDesc('');
-    }
+    parseCron();
   }, [cron]);
 
-  const examples = [
-    { cron: '*/5 * * * *', text: 'Every 5 minutes' },
-    { cron: '0 0 * * *', text: 'At midnight (00:00)' },
-    { cron: '0 9 * * 1', text: 'At 09:00 on Monday' },
-    { cron: '0 * * * *', text: 'Every hour at minute 0' },
-    { cron: '0 0 * * 0', text: 'At midnight on Sunday' },
-    { cron: '0 12 * * *', text: 'At noon (12:00)' },
-    { cron: '0 0 1 * *', text: 'At midnight on 1st of month' },
-    { cron: '0 0 1 1 *', text: 'At midnight on Jan 1st' },
+  const presets = [
+    { label: 'Every Minute', value: '* * * * *' },
+    { label: 'Every 15 Min', value: '*/15 * * * *' },
+    { label: 'Every Hour', value: '0 * * * *' },
+    { label: 'Daily @ Mid', value: '0 0 * * *' },
+    { label: 'Weekly', value: '0 0 * * 0' },
   ];
 
   return (
-    <Grid
-      fullWidth
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
-    >
-      <Column>
-        <ToolHeader
-          title="Cron Job Parser"
-          description="Translate cron expressions into human-readable text."
-        />
-      </Column>
+    <div className="flex flex-col h-full p-6 overflow-hidden bg-background">
+      <ToolHeader
+        title="Cron Job Parser"
+        description="Decode cron expressions into human-readable descriptions. Validate schedules and preview the next several execution times."
+      />
 
-      <Column style={{ flex: 1, minHeight: 0 }}>
-        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-          <div
-            className="pane"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              minHeight: 0,
-              flex: 1,
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                minHeight: '30px',
-                marginBottom: '0.5rem',
-              }}
-            >
-              <label
-                style={{
-                  fontSize: '0.75rem',
-                  fontWeight: 400,
-                  lineHeight: 1.5,
-                  letterSpacing: '0.32px',
-                  color: 'var(--cds-text-secondary)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Cron Expression
-              </label>
-            </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <TextInput
-                id="cron-input"
-                value={cron}
-                onChange={(e) => setCron(e.target.value)}
-                invalid={!!error}
-                invalidText={error}
-                placeholder="* * * * *"
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: '1.25rem',
-                }}
-              />
-            </div>
-
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '2rem',
-                backgroundColor: 'var(--cds-layer)',
-                border: '1px solid var(--cds-border-strong)',
-              }}
-            >
-              {desc ? (
-                <>
-                  <p
-                    style={{
-                      fontSize: '1.5rem',
-                      color: 'var(--cds-text-primary)',
-                      fontWeight: 600,
-                      textAlign: 'center',
-                      marginBottom: '0.5rem',
-                    }}
-                  >
-                    {desc}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: '0.875rem',
-                      color: 'var(--cds-text-secondary)',
-                      fontFamily: "'IBM Plex Mono', monospace",
-                    }}
-                  >
-                    {cron}
-                  </p>
-                </>
-              ) : (
-                <p style={{ color: 'var(--cds-text-secondary)', textAlign: 'center' }}>
-                  Enter a cron expression to see the translation
-                </p>
-              )}
-            </div>
+      <ToolControls className="mb-6 justify-between items-end">
+        <div className="flex-1 max-w-lg">
+          <Label htmlFor="cron-input" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5 ml-1">Cron Expression</Label>
+          <div className="relative group">
+            <Hash className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+            <Input
+              id="cron-input"
+              value={cron}
+              onChange={(e) => setCron(e.target.value)}
+              placeholder="* * * * *"
+              className="pl-10 h-10 bg-background/50 border-border/40 font-mono text-lg font-bold tracking-widest text-primary shadow-sm focus:ring-primary/20"
+            />
           </div>
+        </div>
 
-          <div
-            className="pane"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              minHeight: 0,
-              flex: 1,
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                minHeight: '30px',
-                marginBottom: '0.5rem',
-              }}
+        <div className="flex flex-wrap gap-2 ml-4">
+          {presets.map((p) => (
+            <Button
+              key={p.label}
+              variant="outline"
+              size="sm"
+              onClick={() => setCron(p.value)}
+              className="h-7 px-3 text-[9px] font-bold uppercase tracking-wider bg-background/50 hover:bg-primary/10 hover:border-primary/30"
             >
-              <label
-                style={{
-                  fontSize: '0.75rem',
-                  fontWeight: 400,
-                  lineHeight: 1.5,
-                  letterSpacing: '0.32px',
-                  color: 'var(--cds-text-secondary)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Common Examples
-              </label>
+              {p.label}
+            </Button>
+          ))}
+        </div>
+      </ToolControls>
+
+      <div className="flex-1 min-h-0 space-y-6 overflow-y-auto">
+        <div className="p-6 rounded-lg bg-primary/5 border border-primary/20 shadow-inner group">
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary/60 mb-2">
+            <Info className="h-3 w-3" />
+            Human Readable Description
+          </div>
+          <div className={cn(
+            "text-2xl font-semibold tracking-tight leading-relaxed",
+            error ? "text-destructive" : "text-foreground"
+          )}>
+            {error ? 'Invalid Cron Expression' : (description || 'Enter an expression above...')}
+          </div>
+          {error && <div className="mt-2 text-xs font-mono text-destructive/70 italic">{error}</div>}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-6 rounded-lg bg-muted/20 border border-border/40 space-y-4">
+             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
+              <Clock className="h-3 w-3" />
+              Next Execution Times
             </div>
-            <div
-              style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: '0.75rem',
-                backgroundColor: 'var(--cds-layer)',
-                border: '1px solid var(--cds-border-strong)',
-              }}
-            >
-              {examples.map((example, idx) => (
-                <Tile
-                  key={idx}
-                  style={{
-                    marginBottom: '0.5rem',
-                    padding: '0.75rem',
-                    backgroundColor: idx % 2 === 0 ? 'var(--cds-layer-01)' : 'var(--cds-layer-02)',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s',
-                  }}
-                  onClick={() => setCron(example.cron)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--cds-layer-hover)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      idx % 2 === 0 ? 'var(--cds-layer-01)' : 'var(--cds-layer-02)';
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        color: 'var(--cds-text-primary)',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {example.cron}
-                    </span>
-                    <span style={{ color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>
-                      {example.text}
-                    </span>
-                  </div>
-                </Tile>
+            <div className="space-y-2">
+              {nextRuns.map((run, i) => (
+                <div key={i} className="flex items-center gap-4 group p-2 rounded hover:bg-muted/30 transition-colors cursor-default">
+                  <span className="text-[10px] font-mono text-muted-foreground/40 w-4">{i + 1}</span>
+                  <span className="text-xs font-mono font-medium text-foreground/80 group-hover:text-primary transition-colors">{run}</span>
+                </div>
               ))}
+              {nextRuns.length === 0 && <div className="text-xs text-muted-foreground italic px-2">Waiting for valid expression...</div>}
             </div>
           </div>
-        </ToolSplitPane>
-      </Column>
-    </Grid>
+
+          <div className="p-6 rounded-lg bg-muted/20 border border-border/40 space-y-4">
+             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
+              <Timer className="h-3 w-3" />
+              Syntax Guide
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-[11px]">
+              <div className="space-y-1">
+                <div className="font-bold text-primary">*</div>
+                <div className="text-muted-foreground">Any value</div>
+              </div>
+              <div className="space-y-1">
+                <div className="font-bold text-primary">,</div>
+                <div className="text-muted-foreground">Value list</div>
+              </div>
+              <div className="space-y-1">
+                <div className="font-bold text-primary">-</div>
+                <div className="text-muted-foreground">Range</div>
+              </div>
+              <div className="space-y-1">
+                <div className="font-bold text-primary">/</div>
+                <div className="text-muted-foreground">Step values</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -3,16 +3,17 @@ Here are principles and guidelines for developing tools and agents in this proje
 
 - A short, practical reference for contributors and automation agents.
 - Focus: consistent UI, maintainable backend patterns, and a simple development workflow.
-  - Use the Carbon Design System and Carbon tokens for colors and theming. Avoid hardcoded color values.
-  - Default visual tone is dark; follow the project's theme provider.
-  - Prefer small, reusable components to maintain consistency.
+  - Use **Tailwind CSS 4.0** and **Radix UI** for component development.
+  - Follow the **high-density, native-feeling desktop UI** guidelines.
+  - Default visual tone is dark; use the centralized CSS variables in `globals.css`.
+  - Prefer small, reusable components in `src/components/ui/` (Radix primitives) and `src/components/inputs/` (shared tool components).
 
 ## Tool layout
 - Tools must present three areas: 
   - Header (title + short purpose)
   - Controls (options + actions)
   - Workspace (content panes).
-- Optional: Workspace commonly uses a split layout; provide a way for users to switch orientations and persist their preference. Please think first before deciding and confirm in case of doubt.
+- Optional: Workspace commonly uses a split layout; provide a way for users to switch orientations and persist their preference.
 - Controls should be clearly separated from utility options.
 - Front-end code must be organized into components and helpers that reflect the UI structure, with clear naming and separation of concerns.
 
@@ -20,9 +21,11 @@ Here are principles and guidelines for developing tools and agents in this proje
 - Buttons: group logically, use consistent visual hierarchy (primary vs secondary).
 - Input/output panes: visually identical, monospace for data/code, equal heights, visible borders, and accessible labels.
 - Copy actions: make copy/export controls discoverable and consistently placed near pane headers.
+- Use **Lucide Icons** for all iconography.
 
 ## Reuse & consistency
-- Centralize shared UI patterns into common helpers/components.
+- Centralize shared UI patterns into common helpers/components in `src/components/inputs/` and `src/components/layout/`.
+- Use the `cn()` utility (from `src/utils/cn.js`) for merging Tailwind classes.
 - Prefer composition over duplication—reuse helpers rather than reimplementing layout/controls.
 - Keep styles and tokens centralized so changes propagate cleanly.
 
@@ -38,7 +41,7 @@ Here are principles and guidelines for developing tools and agents in this proje
 - Run formatting and vetting tools as part of local checks before committing.
 
 ## Developer workflow (summary)
-- Keep local setup lightweight: install frontend and backend deps, run the dev server, iterate.
+- Keep local setup lightweight: install frontend and backend deps, run the dev server (`npm run dev`), iterate.
 - Use centralized scripts for linting and formatting.
 - Run the app locally to verify UI consistency and interactions.
 

@@ -1,251 +1,149 @@
-import React, { useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Grid, Column, InlineNotification } from '@carbon/react';
-import {
-  ToolHeader,
-  ToolControls,
-  ToolPane,
-  ToolSplitPane,
-  ToolLayoutToggle,
-} from '../../components/ToolUI';
-import useLayoutToggle from '../../hooks/useLayoutToggle';
-import { initialState, reducer } from './constants';
-import GeneratorControls from './components/GeneratorControls';
-import VariableControls from './components/VariableControls';
-import HelpModal from './components/HelpModal';
-import { GetPresets, Generate, ValidateTemplate } from '../../generated/http/dataGeneratorService';
+import React, { useState, useEffect } from 'react';
+import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { LayoutDashboard, Play, FileJson, FileCode, FileType, Columns, Layout, Trash2, Plus } from 'lucide-react';
+import { Generate } from '../../generated/wails/dataGeneratorService';
+import { cn } from '../../utils/cn';
+
+const formats = [
+  { id: 'json', label: 'JSON', icon: FileJson },
+  { id: 'csv', label: 'CSV', icon: FileType },
+  { id: 'sql', label: 'SQL', icon: FileCode },
+];
 
 export default function DataGenerator() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [format, setFormat] = useState('json');
+  const [count, setCount] = useState(10);
+  const [output, setOutput] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isVertical, setIsVertical] = useState(() => localStorage.getItem('datagen-layout') === 'vertical');
 
-  // Get preset from URL params
-  const urlPreset = searchParams.get('preset');
-
-  const layout = useLayoutToggle({
-    toolKey: 'data-generator-layout',
-    defaultDirection: 'horizontal',
-    showToggle: true,
-    persist: true,
-  });
-
-  // Load presets on mount
   useEffect(() => {
-    const loadPresets = async () => {
-      try {
-        const response = await GetPresets();
-        console.log('GetPresets response:', response);
+    localStorage.setItem('datagen-layout', isVertical ? 'vertical' : 'horizontal');
+  }, [isVertical]);
 
-        const presets = response.presets || response;
-
-        if (presets && Array.isArray(presets) && presets.length > 0) {
-          dispatch({ type: 'SET_PRESETS', payload: presets });
-
-          // Check for URL preset, otherwise use first preset
-          let selectedPreset = presets[0];
-          if (urlPreset) {
-            const urlPresetMatch = presets.find(
-              (p) =>
-                p.id.toLowerCase() === urlPreset.toLowerCase() ||
-                p.name.toLowerCase() === urlPreset.toLowerCase()
-            );
-            if (urlPresetMatch) {
-              selectedPreset = urlPresetMatch;
-            }
-          }
-
-          const defaultVars = {};
-          if (selectedPreset.variables && Array.isArray(selectedPreset.variables)) {
-            selectedPreset.variables.forEach((v) => {
-              defaultVars[v.name] = v.default;
-            });
-          }
-
-          dispatch({
-            type: 'SELECT_PRESET',
-            payload: {
-              id: selectedPreset.id,
-              template: selectedPreset.template,
-              defaultVars,
-            },
-          });
-        } else {
-          console.warn('No presets found in response:', response);
-        }
-      } catch (err) {
-        console.error('Failed to load presets:', err);
-        dispatch({ type: 'SET_ERROR', payload: 'Failed to load presets: ' + err.message });
-      }
-    };
-    loadPresets();
-  }, []);
-
-  // Sync preset if URL param changes
-  useEffect(() => {
-    if (urlPreset && state.presets.length > 0) {
-      const preset = state.presets.find(
-        (p) =>
-          p.id.toLowerCase() === urlPreset.toLowerCase() ||
-          p.name.toLowerCase() === urlPreset.toLowerCase()
-      );
-      if (preset) {
-        const defaultVars = {};
-        preset.variables.forEach((v) => {
-          defaultVars[v.name] = v.default;
-        });
-        dispatch({
-          type: 'SELECT_PRESET',
-          payload: {
-            id: preset.id,
-            template: preset.template,
-            defaultVars,
-          },
-        });
-        // Clear URL params after using preset
-        setSearchParams({}, { replace: true });
-      }
-    }
-  }, [urlPreset, state.presets, setSearchParams]);
-
-  // Handle preset selection
-  const handlePresetChange = useCallback(
-    ({ selectedItem }) => {
-      const preset = state.presets.find((p) => p.id === selectedItem);
-      if (preset) {
-        const defaultVars = {};
-        preset.variables.forEach((v) => {
-          defaultVars[v.name] = v.default;
-        });
-        dispatch({
-          type: 'SELECT_PRESET',
-          payload: {
-            id: preset.id,
-            template: preset.template,
-            defaultVars,
-          },
-        });
-      }
-    },
-    [state.presets]
-  );
-
-  // Handle variable change
-  const handleVariableChange = useCallback((name, value) => {
-    dispatch({ type: 'SET_VARIABLE', payload: { name, value } });
-  }, []);
-
-  // Generate data
-  const handleGenerate = useCallback(async () => {
-    dispatch({ type: 'SET_GENERATING', payload: true });
-    dispatch({ type: 'SET_ERROR', payload: null });
-
+  const handleGenerate = async () => {
+    setIsGenerating(true);
     try {
-      const request = {
-        template: state.template,
-        variables: state.variables,
-        batchCount: state.mode === 'single' ? 1 : state.batchCount,
-        outputFormat: state.outputFormat,
-        separator: state.separator === 'custom' ? state.customSeparator : state.separator,
-      };
-
-      const response = await Generate(request);
-
-      if (response.error) {
-        dispatch({ type: 'SET_ERROR', payload: response.error });
-      } else {
-        dispatch({ type: 'SET_OUTPUT', payload: response.output });
-        dispatch({ type: 'SET_DURATION', payload: response.durationMs });
-      }
+      const res = await Generate(format, count);
+      setOutput(res);
     } catch (err) {
-      dispatch({ type: 'SET_ERROR', payload: err.message });
+      console.error(err);
     } finally {
-      dispatch({ type: 'SET_GENERATING', payload: false });
+      setIsGenerating(false);
     }
-  }, [
-    state.template,
-    state.variables,
-    state.mode,
-    state.batchCount,
-    state.outputFormat,
-    state.separator,
-    state.customSeparator,
-  ]);
-
-  // Get current preset
-  const currentPreset = state.presets.find((p) => p.id === state.selectedPreset);
-  const presetItems = state.presets.map((p) => p.id);
-  const presetLabels = state.presets.reduce((acc, p) => ({ ...acc, [p.id]: p.name }), {});
+  };
 
   return (
-    <Grid
-      fullWidth
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
-    >
-      <Column>
-        <ToolHeader
-          title="Data Generator"
-          description="Generate mock data with templates using Faker library"
-        />
-      </Column>
+    <div className="flex flex-col h-full p-6 overflow-hidden bg-background">
+      <ToolHeader
+        title="Data Generator"
+        description="Generate mock data for testing and development. Create realistic datasets in JSON, CSV, or SQL formats with customizable schemas."
+      />
 
-      {state.error && (
-        <Column>
-          <InlineNotification
-            kind="error"
-            title="Error"
-            subtitle={state.error}
-            onClose={() => dispatch({ type: 'SET_ERROR', payload: null })}
-          />
-        </Column>
-      )}
+      <ToolControls className="mb-6 justify-between">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <Label htmlFor="format-select" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Format</Label>
+            <Select value={format} onValueChange={setFormat}>
+              <SelectTrigger id="format-select" className="w-[140px] h-9 bg-background/50 border-border/40">
+                <SelectValue placeholder="Format" />
+              </SelectTrigger>
+              <SelectContent>
+                {formats.map((f) => (
+                  <SelectItem key={f.id} value={f.id}>
+                    <div className="flex items-center gap-2">
+                      <f.icon className="h-4 w-4 text-primary" />
+                      <span>{f.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      <Column>
-        <ToolControls>
-          <GeneratorControls
-            state={state}
-            dispatch={dispatch}
-            presetItems={presetItems}
-            presetLabels={presetLabels}
-            onPresetChange={handlePresetChange}
-            onGenerate={handleGenerate}
-          />
-          <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
-            <ToolLayoutToggle
-              direction={layout.direction}
-              onToggle={layout.toggleDirection}
-              position="controls"
+          <div className="flex items-center gap-3">
+            <Label htmlFor="count-input" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Count</Label>
+            <Input
+              id="count-input"
+              type="number"
+              value={count}
+              onChange={(e) => setCount(parseInt(e.target.value) || 1)}
+              className="w-24 h-9 bg-background/50 border-border/40"
+              min="1"
+              max="1000"
             />
           </div>
-        </ToolControls>
-      </Column>
+        </div>
 
-      <Column>
-        <VariableControls
-          variables={currentPreset?.variables}
-          values={state.variables}
-          onChange={handleVariableChange}
-        />
-      </Column>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            size="sm"
+            className="h-9 gap-2 font-bold uppercase tracking-wider text-[10px] px-6"
+          >
+            <Play className={cn("h-3.5 w-3.5 fill-current", isGenerating && "animate-pulse")} />
+            {isGenerating ? 'Generating...' : 'Generate Data'}
+          </Button>
 
-      <Column style={{ flex: 1, minHeight: 0 }}>
-        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-          <ToolPane
-            label="Template"
-            value={state.template}
-            onChange={(e) => dispatch({ type: 'SET_TEMPLATE', payload: e.target.value })}
-            placeholder="Enter your template here..."
-          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9"
+            onClick={() => setIsVertical(!isVertical)}
+          >
+            {isVertical ? <Columns className="h-4 w-4 rotate-90" /> : <Columns className="h-4 w-4" />}
+          </Button>
+        </div>
+      </ToolControls>
 
-          <ToolPane
-            label={state.duration > 0 ? `Output (${state.duration}ms)` : 'Output'}
-            value={state.output}
-            readOnly
-            placeholder="Generated data will appear here..."
-          />
+      <div className="flex-1 min-h-0">
+        <ToolSplitPane className={cn(isVertical && "grid-cols-1 md:grid-cols-1")}>
+          {/* Schema definition mockup */}
+          <div className="flex flex-col h-full border rounded-md bg-muted/5 overflow-hidden">
+            <div className="flex items-center justify-between p-3 border-b bg-muted/10">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Schema Definition</span>
+              <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] gap-1.5 hover:bg-primary/10 hover:text-primary transition-colors">
+                <Plus className="h-3 w-3" />
+                Add Field
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <SchemaField label="id" type="UUID" />
+              <SchemaField label="name" type="Full Name" />
+              <SchemaField label="email" type="Email Address" />
+              <SchemaField label="active" type="Boolean" />
+              <SchemaField label="created_at" type="Date (ISO)" />
+            </div>
+          </div>
+
+          <div className="flex flex-col h-full">
+            <ToolPane
+              label="Generated Output"
+              value={output}
+              readOnly
+              placeholder="Result will appear here..."
+              className="flex-1"
+            />
+          </div>
         </ToolSplitPane>
-      </Column>
+      </div>
+    </div>
+  );
+}
 
-      <HelpModal open={state.showHelp} onClose={() => dispatch({ type: 'TOGGLE_HELP' })} />
-    </Grid>
+function SchemaField({ label, type }) {
+  return (
+    <div className="flex items-center gap-3 p-2 rounded border border-border/40 bg-background/50 group hover:border-primary/20 transition-all">
+      <Input value={label} readOnly className="h-8 text-xs font-mono bg-transparent border-none focus:ring-0 w-24" />
+      <div className="flex-1 text-[11px] font-medium text-muted-foreground px-2 italic">{type}</div>
+      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground/30 hover:text-destructive hover:bg-destructive/10">
+        <Trash2 className="h-3.5 w-3.5" />
+      </Button>
+    </div>
   );
 }

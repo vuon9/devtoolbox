@@ -1,300 +1,137 @@
-import React, { useState, useCallback } from 'react';
-import { TextInput, Button, Tile, Grid, Column } from '@carbon/react';
-import { Copy, TrashCan, ChevronRight } from '@carbon/icons-react';
-import { ToolHeader } from '../../components/ToolUI';
-import { parseBinary, parseOctal, parseDecimal, parseHex, formatNumber } from './utils';
+import React, { useState, useEffect } from 'react';
+import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Binary, Hash, Layout, Columns, Copy, Check, Trash2 } from 'lucide-react';
+import { cn } from '../../utils/cn';
 
-/**
- * NumberConverter - Clean Single-Input Design
- *
- * One input field, all conversions displayed as results
- */
-const NumberConverter = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [inputBase, setInputBase] = useState('decimal');
-  const [error, setError] = useState('');
-  const [currentValue, setCurrentValue] = useState(0);
+export default function NumberConverter() {
+  const [input, setInput] = useState('42');
+  const [base, setBase] = useState(10);
+  const [results, setResults] = useState({
+    bin: '', oct: '', dec: '', hex: '', base64: ''
+  });
+
+  const convert = (val = input, currentBase = base) => {
+    try {
+      const num = parseInt(val, currentBase);
+      if (isNaN(num)) return;
+
+      setResults({
+        bin: num.toString(2),
+        oct: num.toString(8),
+        dec: num.toString(10),
+        hex: num.toString(16).toUpperCase(),
+        base64: btoa(num.toString(10))
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    convert();
+  }, [input, base]);
 
   const bases = [
-    { id: 'decimal', label: 'Decimal', base: 10, prefix: '', example: '255' },
-    { id: 'hex', label: 'Hex', base: 16, prefix: '0x', example: 'FF' },
-    { id: 'binary', label: 'Binary', base: 2, prefix: '0b', example: '11111111' },
-    { id: 'octal', label: 'Octal', base: 8, prefix: '0o', example: '377' },
+    { id: 'bin', label: 'Binary (Base 2)', value: 2, icon: Binary },
+    { id: 'oct', label: 'Octal (Base 8)', value: 8, icon: Hash },
+    { id: 'dec', label: 'Decimal (Base 10)', value: 10, icon: Hash },
+    { id: 'hex', label: 'Hex (Base 16)', value: 16, icon: Binary },
   ];
 
-  const parseFunctions = {
-    decimal: parseDecimal,
-    hex: parseHex,
-    binary: parseBinary,
-    octal: parseOctal,
-  };
-
-  const handleInputChange = (value) => {
-    setInputValue(value);
-
-    if (!value.trim()) {
-      setCurrentValue(0);
-      setError('');
-      return;
-    }
-
-    const result = parseFunctions[inputBase](value);
-
-    if (result.error) {
-      setError(result.error);
-    } else {
-      setCurrentValue(result.value);
-      setError('');
-    }
-  };
-
-  const handleBaseChange = (baseId) => {
-    setInputBase(baseId);
-    // Convert current value to new base format
-    const base = bases.find((b) => b.id === baseId)?.base || 10;
-    const newValue = formatNumber(currentValue, base);
-    setInputValue(newValue);
-    setError('');
-  };
-
-  const handleClear = () => {
-    setInputValue('');
-    setCurrentValue(0);
-    setError('');
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  const currentBase = bases.find((b) => b.id === inputBase);
-
   return (
-    <Grid
-      fullWidth
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
-    >
-      <Column>
-        <ToolHeader
-          title="Number Converter"
-          description="Enter a number and select its format. All conversions update instantly."
-        />
-      </Column>
+    <div className="flex flex-col h-full p-6 overflow-hidden bg-background">
+      <ToolHeader
+        title="Number Converter"
+        description="Seamlessly convert numbers between binary, octal, decimal, and hexadecimal bases. View bitwise representation and cross-base values instantly."
+      />
 
-      {/* Main Input Section */}
-      <Column>
-        <Tile style={{ padding: '1.5rem' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.32px',
-                color: 'var(--cds-text-secondary)',
-                marginBottom: '0.5rem',
-              }}
+      <ToolControls className="mb-6">
+        <div className="flex gap-1 bg-muted/30 p-1 rounded-lg border border-border/40">
+          {bases.map((b) => (
+            <button
+              key={b.id}
+              onClick={() => setBase(b.value)}
+              className={cn(
+                "flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all",
+                base === b.value
+                  ? "bg-background text-primary shadow-sm ring-1 ring-border/50"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
             >
-              Enter Number
-            </label>
-
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              {bases.map((base) => (
-                <Button
-                  key={base.id}
-                  kind={inputBase === base.id ? 'primary' : 'tertiary'}
-                  size="sm"
-                  onClick={() => handleBaseChange(base.id)}
-                >
-                  {base.label}
-                </Button>
-              ))}
-            </div>
-
-            <TextInput
-              id="main-input"
-              labelText="Number"
-              hideLabel
-              value={inputValue}
-              onChange={(e) => handleInputChange(e.target.value)}
-              placeholder={`Enter ${currentBase?.label.toLowerCase()} number...`}
-              invalid={!!error}
-              invalidText={error}
-              size="lg"
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-              }}
-            />
-          </div>
-
-          {inputValue && (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '0.75rem',
-                backgroundColor: 'var(--cds-layer-02)',
-                borderRadius: '4px',
-              }}
-            >
-              <span style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
-                Decimal value: <strong>{currentValue.toLocaleString()}</strong>
-              </span>
-              <Button kind="ghost" size="sm" renderIcon={TrashCan} onClick={handleClear}>
-                Clear
-              </Button>
-            </div>
-          )}
-        </Tile>
-      </Column>
-
-      {/* Results Grid */}
-      <Column>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '1rem',
-          }}
-        >
-          {bases.map((base) => {
-            if (base.id === inputBase) return null; // Skip current input base
-
-            const value = formatNumber(currentValue, base.base);
-            const displayValue = value || '-';
-
-            return (
-              <Tile
-                key={base.id}
-                style={{
-                  padding: '1rem',
-                  position: 'relative',
-                  opacity: inputValue ? 1 : 0.5,
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: '0.5rem',
-                  }}
-                >
-                  <div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        color: 'var(--cds-text-secondary)',
-                        letterSpacing: '0.32px',
-                      }}
-                    >
-                      {base.label}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: 'var(--cds-text-helper)',
-                      }}
-                    >
-                      Base {base.base}
-                    </div>
-                  </div>
-
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    renderIcon={Copy}
-                    iconDescription="Copy"
-                    onClick={() => copyToClipboard(value)}
-                    disabled={!value}
-                    hasIconOnly
-                  />
-                </div>
-
-                <div
-                  style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontSize: '1rem',
-                    fontWeight: 400,
-                    color: 'var(--cds-text-primary)',
-                    wordBreak: 'break-all',
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {base.prefix}
-                  {displayValue}
-                </div>
-
-                {!inputValue && (
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--cds-text-helper)',
-                      marginTop: '0.5rem',
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    e.g., {base.prefix}
-                    {base.example}
-                  </div>
-                )}
-              </Tile>
-            );
-          })}
+              <b.icon className="h-3.5 w-3.5" />
+              {b.label}
+            </button>
+          ))}
         </div>
-      </Column>
 
-      {/* Quick Tips */}
-      <Column>
-        <Tile style={{ padding: '1rem' }}>
-          <div
-            style={{
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              color: 'var(--cds-text-secondary)',
-              marginBottom: '0.75rem',
-              letterSpacing: '0.32px',
-            }}
-          >
-            Common Values
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setInput('')}
+          className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] ml-auto text-destructive hover:bg-destructive/10"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          Clear
+        </Button>
+      </ToolControls>
+
+      <div className="flex-1 min-h-0 space-y-6 overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ToolPane
+            label={`Input (Base ${base})`}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Enter value..."
+            className="flex-1"
+          />
+
+          <div className="grid grid-cols-1 gap-4">
+            <BaseCard label="Binary" value={results.bin} base={2} />
+            <BaseCard label="Decimal" value={results.dec} base={10} />
+            <BaseCard label="Hexadecimal" value={results.hex} base={16} />
           </div>
+        </div>
 
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.5rem',
-            }}
-          >
-            {[
-              { dec: '255', hex: 'FF', bin: '11111111' },
-              { dec: '256', hex: '100', bin: '100000000' },
-              { dec: '1024', hex: '400', bin: '10000000000' },
-              { dec: '4096', hex: '1000', bin: '1000000000000' },
-            ].map((row, idx) => (
-              <Button
-                key={idx}
-                kind="ghost"
-                size="sm"
-                onClick={() => {
-                  setInputBase('decimal');
-                  handleInputChange(row.dec);
-                }}
-                style={{ fontFamily: "'IBM Plex Mono', monospace" }}
-              >
-                {row.dec} <ChevronRight size={14} /> 0x{row.hex}
-              </Button>
+        {/* Bit Grid */}
+        <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-4">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
+            Bit Representation (Binary 32-bit)
+          </div>
+          <div className="grid grid-cols-8 sm:grid-cols-16 gap-1 md:gap-2">
+            {results.bin.padStart(32, '0').split('').map((bit, i) => (
+              <div key={i} className={cn(
+                "h-8 flex items-center justify-center rounded border font-mono text-xs transition-colors",
+                bit === '1' ? "bg-primary/20 border-primary/40 text-primary font-bold shadow-inner" : "bg-background/40 border-border/20 text-muted-foreground/30"
+              )}>
+                {bit}
+              </div>
             ))}
           </div>
-        </Tile>
-      </Column>
-    </Grid>
+        </div>
+      </div>
+    </div>
   );
-};
+}
 
-export default NumberConverter;
+function BaseCard({ label, value, base }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="p-4 rounded-lg bg-muted/30 border border-border/40 group hover:border-primary/30 transition-all cursor-pointer" onClick={handleCopy}>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{label}</span>
+        {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />}
+      </div>
+      <div className="text-xl font-mono font-bold text-foreground truncate select-all">{value || '0'}</div>
+    </div>
+  );
+}

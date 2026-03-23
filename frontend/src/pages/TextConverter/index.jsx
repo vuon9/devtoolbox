@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Grid, Column } from '@carbon/react';
-import { ToolHeader, ToolPane, ToolSplitPane } from '../../components/ToolUI';
-import useLayoutToggle from '../../hooks/useLayoutToggle';
+import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
+import { Button } from '../../components/ui/button';
+import { Switch } from '../../components/ui/switch';
+import { Label } from '../../components/ui/label';
+import { Play, Plus, Columns, Layout } from 'lucide-react';
 import ConversionControls from './components/ConversionControls';
 import ConfigurationPane from './components/ConfigurationPane';
 import MultiHashOutput from './components/MultiHashOutput';
@@ -19,7 +21,8 @@ import {
   PLACEHOLDERS,
   LAYOUT,
 } from './strings';
-import { Convert } from '../../generated/http/conversionService';
+import { Convert } from '../../generated/wails/conversionService';
+import { cn } from '../../utils/cn';
 
 export default function TextBasedConverter() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,22 +49,10 @@ export default function TextBasedConverter() {
     () => localStorage.getItem(STORAGE_KEYS.SUBMODE) || DEFAULTS.SUBMODE
   );
 
-  // React to URL preset changes even when already mounted
-  useEffect(() => {
-    if (urlCategory && validCategories.includes(urlCategory)) {
-      setCategory(urlCategory);
-      const methodsForCategory = CONVERTER_MAP[urlCategory] || [];
-      if (urlMethod && methodsForCategory.includes(urlMethod)) {
-        setMethod(urlMethod);
-      }
-      // Clear URL params after using preset
-      setSearchParams({}, { replace: true });
-    }
-  }, [urlCategory, urlMethod, setSearchParams, validCategories]);
-
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
+  const [isVertical, setIsVertical] = useState(() => localStorage.getItem('text-converter-layout') === 'vertical');
 
   // Custom tags state with localStorage persistence
   const [customTags, setCustomTags] = useState(() => {
@@ -81,12 +72,9 @@ export default function TextBasedConverter() {
     }
   });
 
-  const layout = useLayoutToggle({
-    toolKey: LAYOUT.TOOL_KEY,
-    defaultDirection: LAYOUT.DEFAULT_DIRECTION,
-    showToggle: true,
-    persist: true,
-  });
+  useEffect(() => {
+    localStorage.setItem('text-converter-layout', isVertical ? 'vertical' : 'horizontal');
+  }, [isVertical]);
 
   // Check if showing all hashes
   const isAllHashes = category === 'Hash' && method === 'All';
@@ -114,7 +102,6 @@ export default function TextBasedConverter() {
     [customTags]
   );
 
-  // Check if current selection is in quick actions
   const isCurrentInQuickActions = useCallback(() => {
     const isInDefault = DEFAULT_COMMON_TAGS.some(
       (tag) => tag.category === category && tag.method === method
@@ -123,7 +110,6 @@ export default function TextBasedConverter() {
     return isInDefault || isInCustom;
   }, [category, method, customTags]);
 
-  // Add current selection to quick actions
   const addCurrentToQuickActions = useCallback(() => {
     if (isCurrentInQuickActions()) return;
 
@@ -144,14 +130,12 @@ export default function TextBasedConverter() {
       return;
     }
 
-    // For All Hashes, we compute even with empty input (show empty results)
     if (!text && cat === 'Hash' && meth === 'All') {
       setOutput('');
       setError('');
       return;
     }
 
-    // If input is a data URI (base64 image), display it directly
     if (text && text.trim().startsWith('data:image/')) {
       setOutput(text.trim());
       setError('');
@@ -159,7 +143,6 @@ export default function TextBasedConverter() {
     }
 
     try {
-      // Include subMode in backend request
       const backendConfig = { ...cfg, subMode: sub };
       const result = await Convert(text, cat, meth, backendConfig);
       setOutput(result);
@@ -172,7 +155,6 @@ export default function TextBasedConverter() {
     }
   }, []);
 
-  // Auto-run trigger
   useEffect(() => {
     if (config.autoRun) {
       performConversion(input, category, method, subMode, config);
@@ -185,34 +167,24 @@ export default function TextBasedConverter() {
 
   const updateConfig = (newCfg) => setConfig((prev) => ({ ...prev, ...newCfg }));
 
-  // Determine if Key/IV pane should be shown
   const showConfig = category === 'Encrypt - Decrypt' || method === 'HMAC';
-
-  // Check if output is a base64 image
   const isImageOutput = !isAllHashes && isBase64Image(output);
 
   return (
-    <Grid
-      fullWidth
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
-    >
-      <Column>
-        <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
-      </Column>
+    <div className="flex flex-col h-full p-6 overflow-hidden">
+      <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
 
-      <Column>
-        <CommonTags
-          currentCategory={category}
-          currentMethod={method}
-          onTagSelect={(cat, meth) => {
-            setCategory(cat);
-            setMethod(meth);
-          }}
-          customTags={customTags}
-        />
-      </Column>
+      <CommonTags
+        currentCategory={category}
+        currentMethod={method}
+        onTagSelect={(cat, meth) => {
+          setCategory(cat);
+          setMethod(meth);
+        }}
+        customTags={customTags}
+      />
 
-      <Column>
+      <ToolControls className="justify-between">
         <ConversionControls
           category={category}
           setCategory={(c) => {
@@ -223,24 +195,58 @@ export default function TextBasedConverter() {
           setMethod={setMethod}
           subMode={subMode}
           setSubMode={setSubMode}
-          layout={layout}
-          autoRun={config.autoRun}
-          setAutoRun={(val) => updateConfig({ autoRun: val })}
-          onConvert={handleConvert}
-          isAllHashes={isAllHashes}
-          onAddQuickAction={addCurrentToQuickActions}
-          isCurrentInQuickActions={isCurrentInQuickActions()}
         />
-      </Column>
+
+        <div className="flex items-center gap-4 border-l pl-4 ml-auto">
+          <Button
+            onClick={handleConvert}
+            disabled={config.autoRun}
+            size="sm"
+            className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px]"
+          >
+            <Play className="h-3 w-3 fill-current" />
+            Convert
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={isCurrentInQuickActions()}
+            onClick={addCurrentToQuickActions}
+            className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px]"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Added
+          </Button>
+
+          <div className="flex items-center gap-2">
+            <Switch
+              id="auto-run"
+              checked={config.autoRun}
+              onCheckedChange={(val) => updateConfig({ autoRun: val })}
+            />
+            <Label htmlFor="auto-run" className="text-[10px] font-bold uppercase tracking-wider opacity-70">Auto-run</Label>
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsVertical(!isVertical)}
+          >
+            {isVertical ? <Columns className="h-4 w-4 rotate-90" /> : <Columns className="h-4 w-4" />}
+          </Button>
+        </div>
+      </ToolControls>
 
       {showConfig && (
-        <Column>
+        <div className="mb-4">
           <ConfigurationPane config={config} updateConfig={updateConfig} method={method} />
-        </Column>
+        </div>
       )}
 
-      <Column style={{ flex: 1, minHeight: 0 }}>
-        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
+      <div className="flex-1 min-h-0">
+        <ToolSplitPane className={cn(isVertical && "grid-cols-1 md:grid-cols-1")}>
           <ToolPane
             label={LABELS.INPUT(category, subMode, method)}
             value={input}
@@ -249,73 +255,29 @@ export default function TextBasedConverter() {
           />
 
           {isAllHashes ? (
-            <div
-              className="pane"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                minHeight: 0,
-                flex: 1,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  minHeight: '30px',
-                }}
-              >
-                <label
-                  style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 400,
-                    lineHeight: 1.5,
-                    letterSpacing: '0.32px',
-                    color: 'var(--cds-text-secondary)',
-                    textTransform: 'uppercase',
-                  }}
-                >
+            <div className="flex flex-col h-full min-h-0 border rounded-md bg-muted/5">
+              <div className="flex items-center justify-between mb-1.5 px-3 pt-3">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
                   {LABELS.OUTPUT}
                 </label>
               </div>
-              <div
-                style={{
-                  flex: 1,
-                  overflowY: 'auto',
-                  padding: '0.75rem',
-                  backgroundColor: 'var(--cds-layer)',
-                }}
-              >
+              <div className="flex-1 overflow-y-auto p-3">
                 <MultiHashOutput value={output} error={error} />
               </div>
             </div>
           ) : isImageOutput ? (
-            <div
-              className="pane"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                minHeight: 0,
-                flex: 1,
-              }}
-            >
-              <ImageOutput value={output} />
-            </div>
+            <ImageOutput value={output} />
           ) : (
             <ToolPane
               label={LABELS.OUTPUT}
               value={output}
               readOnly
               placeholder={PLACEHOLDERS.OUTPUT}
-              invalid={!!error}
-              invalidText={error}
+              className={error ? "border-destructive/50" : ""}
             />
           )}
         </ToolSplitPane>
-      </Column>
-    </Grid>
+      </div>
+    </div>
   );
 }

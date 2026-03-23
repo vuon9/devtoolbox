@@ -1,92 +1,29 @@
 import React from 'react';
+import { cn } from '../../utils/cn';
 
-/**
- * Enhanced tab bar component with improved styling
- *
- * @param {Object} props
- * @param {string[]} props.tabs - Tab labels
- * @param {number} props.activeTab - Index of active tab
- * @param {Function} props.onChange - Callback when tab changes
- * @param {Object} [props.style={}] - Additional styles
- */
-export default function ToolTabBar({ tabs, activeTab, onChange, style = {} }) {
+export function ToolTabBar({ tabs, activeTab, onTabChange, className }) {
   return (
-    <div
-      className="tool-tab-bar"
-      style={{
-        display: 'flex',
-        gap: '0.25rem',
-        padding: '0.25rem',
-        backgroundColor: 'var(--cds-layer-02)',
-        ...style,
-      }}
-    >
-      {tabs.map((tab, idx) => (
+    <div className={cn("flex border-b mb-4 bg-muted/20 rounded-t-lg overflow-hidden", className)}>
+      {tabs.map((tab) => (
         <button
-          key={idx}
-          onClick={() => onChange(idx)}
-          style={{
-            padding: '0.5rem 1rem',
-            background: activeTab === idx ? 'var(--cds-layer)' : 'transparent',
-            border: 'none',
-            color: activeTab === idx ? 'var(--cds-text-primary)' : 'var(--cds-text-secondary)',
-            fontSize: '0.875rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            boxShadow: activeTab === idx ? '0 1px 3px rgba(0, 0, 0, 0.12)' : 'none',
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            minWidth: '80px',
-            justifyContent: 'center',
-          }}
-          onMouseEnter={(e) => {
-            if (activeTab !== idx) {
-              e.currentTarget.style.backgroundColor = 'var(--cds-layer-hover)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (activeTab !== idx) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }
-          }}
+          key={tab.id}
+          onClick={() => onTabChange(tab.id)}
+          className={cn(
+            "px-4 py-2 text-xs font-medium transition-all relative",
+            "hover:bg-background/50",
+            activeTab === tab.id
+              ? "bg-background text-primary"
+              : "text-muted-foreground"
+          )}
         >
-          {/* Optional icon based on tab label */}
-          {tab === 'JSON' && (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
-              <path d="M14 2v6h6" />
-              <path d="m10 12-2 2 2 2" />
-              <path d="m14 12 2 2-2 2" />
-            </svg>
+          {tab.label}
+          {activeTab === tab.id && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
           )}
-          {tab === 'Claims' && (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M8 6h8" />
-              <path d="M8 12h8" />
-              <path d="M8 18h8" />
-              <rect width="18" height="18" x="3" y="3" rx="2" />
-            </svg>
-          )}
-          {tab}
         </button>
       ))}
     </div>
   );
 }
+
+export default ToolTabBar;
