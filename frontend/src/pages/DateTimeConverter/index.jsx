@@ -20,7 +20,7 @@ export default function DateTimeConverter() {
 
   const handleConvert = async (val = input) => {
     try {
-      const res = await Convert(val);
+      const res = await Convert({ value: val });
       setResults(res);
     } catch (err) {
       console.error(err);

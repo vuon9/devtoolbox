@@ -41,7 +41,8 @@ export default function CodeFormatter() {
     setIsFormatting(true);
     setError('');
     try {
-      const result = await Format(input, language);
+      // Assuming Format expects a request object
+      const result = await Format({ content: input, language: language });
       setOutput(result);
     } catch (err) {
       setError(err.message || 'Formatting failed. Please check your code syntax.');

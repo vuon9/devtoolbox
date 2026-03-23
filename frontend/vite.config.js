@@ -1,11 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import wails from '@wailsio/runtime/plugins/vite';
+import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), wails('./bindings')],
+  plugins: [react(), tailwindcss(), wails('./bindings')],
   server: {
     port: 3000,
     historyApiFallback: true,
@@ -44,8 +45,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'frontend/index.html'),
-        spotlight: path.resolve(__dirname, 'frontend/spotlight.html'),
+        main: path.resolve(__dirname, 'index.html'),
+        spotlight: path.resolve(__dirname, 'spotlight.html'),
       },
     },
   },

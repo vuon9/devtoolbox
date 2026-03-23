@@ -40,7 +40,8 @@ export default function JwtDebugger() {
 
   const handleEncode = async () => {
     try {
-      const res = await Encode(JSON.parse(header), JSON.parse(payload));
+      // Assuming algorithm and secret are needed or provided elsewhere
+      const res = await Encode(header, payload, 'HS256', 'your-256-bit-secret');
       setJwt(res);
       setError('');
     } catch (err) {
@@ -49,8 +50,8 @@ export default function JwtDebugger() {
   };
 
   useEffect(() => {
-    if (jwt) handleDecode(jwt);
-  }, [jwt]);
+    if (jwt && activeMode === 'decode') handleDecode(jwt);
+  }, [jwt, activeMode]);
 
   const modes = [
     { id: 'decode', label: 'Decode', icon: Hash },

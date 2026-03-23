@@ -21,7 +21,7 @@ import {
   Layout,
   Trash2,
 } from 'lucide-react';
-import { Generate } from '../generated/wails/barcodeService';
+import { GenerateBarcode } from '../generated/wails/barcodeService';
 import { cn } from '../utils/cn';
 
 const types = [
@@ -44,9 +44,11 @@ export default function BarcodeGenerator() {
   }, [isVertical]);
 
   const handleGenerate = async () => {
+    if (!input) return;
     setIsGenerating(true);
     try {
-      const res = await Generate(input, type);
+      // Assuming it expects an object matching BarcodeRequest in backend
+      const res = await GenerateBarcode({ content: input, standard: type });
       setOutput(res);
     } catch (err) {
       console.error(err);

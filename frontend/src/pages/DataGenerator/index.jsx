@@ -46,7 +46,7 @@ export default function DataGenerator() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const res = await Generate(format, count);
+      const res = await Generate({ format, count });
       setOutput(res);
     } catch (err) {
       console.error(err);
