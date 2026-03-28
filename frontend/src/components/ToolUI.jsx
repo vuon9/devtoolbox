@@ -1,6 +1,6 @@
 import React from 'react';
 import { Copy } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from './ui/Button';
 import { ToolTextArea } from './inputs/ToolTextArea';
 
 // Re-export new layout components
