@@ -878,29 +878,47 @@ export default function DataGenerator() {
             style={{
               flex: 1,
               minHeight: 0,
-              overflow: 'auto',
-              padding: '12px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '8px',
               backgroundColor: '#18181b',
               border: '1px solid #27272a',
               borderRadius: '8px',
+              overflow: 'hidden',
             }}
           >
-            <Button size="sm" onClick={addField} style={{ width: '100%', justifyContent: 'center' }}>
-              <Plus style={{ width: '14px', height: '14px' }} />
-              Add Field
-            </Button>
-            {schema.map((field, idx) => (
-              <SchemaField
-                key={idx}
-                field={field}
-                index={idx}
-                onUpdate={updateField}
-                onRemove={removeField}
-              />
-            ))}
+            <div
+              style={{
+                padding: '12px',
+                borderBottom: '1px solid #27272a',
+                backgroundColor: '#1c1917',
+              }}
+            >
+              <Button size="sm" onClick={addField} style={{ width: '100%', justifyContent: 'center' }}>
+                <Plus style={{ width: '14px', height: '14px' }} />
+                Add Field
+              </Button>
+            </div>
+            <div
+              style={{
+                flex: 1,
+                minHeight: 0,
+                overflow: 'auto',
+                padding: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}
+            >
+              {schema.map((field, idx) => (
+                <SchemaField
+                  key={idx}
+                  field={field}
+                  index={idx}
+                  onUpdate={updateField}
+                  onRemove={removeField}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
