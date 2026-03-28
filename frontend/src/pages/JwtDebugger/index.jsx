@@ -443,18 +443,21 @@ export default function JwtDebugger() {
   const handleDecode = async (token = jwt) => {
     if (!token.trim()) return;
     try {
+      // Always decode to get header and payload
+      const decodeRes = await Decode(token);
+      setPayload(JSON.stringify(decodeRes.payload, null, 2));
+      setHeader(JSON.stringify(decodeRes.header, null, 2));
+      
       // If secret is provided, verify the signature
       if (verifySecret.trim()) {
-        const res = await Verify(token, verifySecret, verifyEncoding);
-        setPayload(JSON.stringify(res.payload, null, 2));
-        setHeader(JSON.stringify(res.header, null, 2));
-        setIsValid(res.valid);
-        setError('');
+        const verifyRes = await Verify(token, verifySecret, verifyEncoding);
+        setIsValid(verifyRes.valid || verifyRes.isValid);
+        if (verifyRes.error) {
+          setError(verifyRes.error);
+        } else {
+          setError('');
+        }
       } else {
-        // Just decode without verification
-        const res = await Decode(token);
-        setPayload(JSON.stringify(res.payload, null, 2));
-        setHeader(JSON.stringify(res.header, null, 2));
         setIsValid(null); // Can't verify without secret
         setError('');
       }
