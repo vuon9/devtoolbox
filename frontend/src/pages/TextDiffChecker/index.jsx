@@ -27,11 +27,30 @@ function ToolPane({ label, value, onChange, placeholder, indicator, indicatorCol
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '200px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '30px', marginBottom: '8px' }}>
-        <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          {label}
-        </label>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '200px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            {label}
+          </label>
+          {indicator && (
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: indicatorColor === 'green' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+              color: indicatorColor === 'green' ? '#22c55e' : '#3b82f6',
+            }}>
+              {indicator}
+            </span>
+          )}
+        </div>
         <button
           onClick={handleCopy}
           title="Copy to clipboard"
@@ -73,7 +92,7 @@ function ToolPane({ label, value, onChange, placeholder, indicator, indicatorCol
         style={{
           flex: 1,
           width: '100%',
-          height: '100%',
+          minHeight: '400px',
           padding: '12px',
           fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
           fontSize: '14px',
@@ -86,31 +105,6 @@ function ToolPane({ label, value, onChange, placeholder, indicator, indicatorCol
           outline: 'none',
         }}
       />
-      {indicator && (
-        <div style={{
-          marginTop: '12px',
-          padding: '12px',
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '10px',
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-          backgroundColor: indicatorColor === 'green' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-          border: indicatorColor === 'green' ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(59, 130, 246, 0.2)',
-          color: indicatorColor === 'green' ? '#22c55e' : '#3b82f6',
-        }}>
-          <div style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: indicatorColor === 'green' ? '#22c55e' : '#3b82f6',
-          }} />
-          {indicator}
-        </div>
-      )}
     </div>
   );
 }
@@ -121,9 +115,8 @@ function ToolSplitPane({ children }) {
       display: 'grid',
       gridTemplateColumns: '1fr 1fr',
       gap: '16px',
-      flex: 1,
-      minHeight: 0,
-      overflow: 'hidden',
+      minHeight: '400px',
+      flex: '1 1 50%',
     }}>
       {children}
     </div>
@@ -189,23 +182,7 @@ function DiffModeToggle({ activeMode, onChange }) {
 
 function DiffResult({ diff, viewMode }) {
   if (!diff || diff.length === 0) {
-    return (
-      <div style={{
-        marginTop: '24px',
-        padding: '16px',
-        borderRadius: '8px',
-        backgroundColor: '#1c1917',
-        border: '1px solid #27272a',
-        minHeight: '100px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#71717a',
-        fontSize: '14px',
-      }}>
-        Enter text in both panes to see differences
-      </div>
-    );
+    return null;
   }
 
   // Stats
@@ -217,29 +194,28 @@ function DiffResult({ diff, viewMode }) {
 
   return (
     <div style={{
-      marginTop: '24px',
-      padding: '16px',
+      marginTop: '16px',
+      padding: '12px 16px',
       borderRadius: '8px',
       backgroundColor: '#1c1917',
       border: '1px solid #27272a',
-      minHeight: '100px',
-      maxHeight: '300px',
+      maxHeight: '250px',
       overflow: 'auto',
     }}>
       {/* Stats */}
       <div style={{
         display: 'flex',
         gap: '16px',
-        marginBottom: '12px',
-        paddingBottom: '12px',
+        marginBottom: '8px',
+        paddingBottom: '8px',
         borderBottom: '1px solid #27272a',
       }}>
-        <span style={{ fontSize: '12px', color: '#22c55e' }}>+{added} added</span>
-        <span style={{ fontSize: '12px', color: '#ef4444' }}>-{removed} removed</span>
+        <span style={{ fontSize: '12px', color: '#22c55e', fontWeight: 500 }}>+{added} added</span>
+        <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: 500 }}>-{removed} removed</span>
       </div>
 
       {/* Diff content */}
-      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
         {diff.map((part, index) => {
           if (part.added) {
             return (
@@ -247,8 +223,8 @@ function DiffResult({ diff, viewMode }) {
                 backgroundColor: 'rgba(34, 197, 94, 0.15)',
                 color: '#22c55e',
                 borderLeft: '3px solid #22c55e',
-                padding: '2px 8px',
-                margin: '2px 0',
+                padding: '1px 8px',
+                margin: '1px 0',
               }}>
                 <span style={{ opacity: 0.5, marginRight: '8px' }}>+</span>
                 {part.value}
@@ -261,8 +237,8 @@ function DiffResult({ diff, viewMode }) {
                 backgroundColor: 'rgba(239, 68, 68, 0.15)',
                 color: '#ef4444',
                 borderLeft: '3px solid #ef4444',
-                padding: '2px 8px',
-                margin: '2px 0',
+                padding: '1px 8px',
+                margin: '1px 0',
                 textDecoration: 'line-through',
                 opacity: 0.7,
               }}>
@@ -369,7 +345,7 @@ export default function TextDiffChecker() {
         </Button>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: '1 1 50%', minHeight: '400px' }}>
         <ToolSplitPane>
           <ToolPane
             label="Original Text"
@@ -390,7 +366,9 @@ export default function TextDiffChecker() {
         </ToolSplitPane>
       </div>
 
-      <DiffResult diff={diffResult} viewMode={activeMode} />
+      <div style={{ flex: '0 0 auto', minHeight: 0 }}>
+        <DiffResult diff={diffResult} viewMode={activeMode} />
+      </div>
     </div>
   );
 }
