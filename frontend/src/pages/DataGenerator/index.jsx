@@ -127,31 +127,102 @@ function ToolSplitPane({ children, isVertical }) {
   );
 }
 
-function Select({ label, value, onChange, options, style }) {
+// Inline styled Select dropdown (like TextConverter)
+function SelectDropdown({ label, value, onChange, options }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption = options.find(o => o.id === value);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', ...style }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         {label}
       </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{
-          padding: '8px 12px',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
-          borderRadius: '6px',
-          color: '#f4f4f5',
-          fontSize: '14px',
-          outline: 'none',
-          minWidth: '140px',
-          cursor: 'pointer',
-        }}
-      >
-        {options.map((opt) => (
-          <option key={opt.id} value={opt.id}>{opt.label}</option>
-        ))}
-      </select>
+      <div style={{ position: 'relative' }}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '160px',
+            height: '32px',
+            padding: '0 12px',
+            backgroundColor: isOpen ? '#27272a' : '#18181b',
+            border: '1px solid #3f3f46',
+            borderRadius: '6px',
+            color: '#f4f4f5',
+            fontSize: '14px',
+            cursor: 'pointer',
+            outline: 'none',
+          }}
+          onMouseEnter={(e) => {
+            if (!isOpen) {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.borderColor = '#52525b';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isOpen) {
+              e.currentTarget.style.backgroundColor = '#18181b';
+              e.currentTarget.style.borderColor = '#3f3f46';
+            }
+          }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {selectedOption?.label || value}
+          </span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: '8px', opacity: 0.7, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        {isOpen && (
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            marginTop: '4px',
+            backgroundColor: '#1c1917',
+            border: '1px solid #27272a',
+            borderRadius: '6px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+            zIndex: 50,
+            maxHeight: '200px',
+            overflowY: 'auto',
+          }}>
+            {options.map((opt) => {
+              const Icon = opt.icon;
+              return (
+                <div
+                  key={opt.id}
+                  onClick={() => { onChange(opt.id); setIsOpen(false); }}
+                  style={{
+                    padding: '8px 12px',
+                    fontSize: '14px',
+                    color: value === opt.id ? '#f4f4f5' : '#a1a1aa',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#27272a';
+                    e.currentTarget.style.color = '#f4f4f5';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = value === opt.id ? '#f4f4f5' : '#a1a1aa';
+                  }}
+                >
+                  {Icon && <Icon style={{ width: '16px', height: '16px' }} />}
+                  {opt.label}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -358,7 +429,7 @@ export default function DataGenerator() {
 
       <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          <Select label="Format" value={format} onChange={setFormat} options={formats} />
+          <SelectDropdown label="Format" value={format} onChange={setFormat} options={formats} />
           <Input label="Count" type="number" value={count} onChange={(e) => setCount(parseInt(e.target.value) || 10)} min={10} max={1000} />
         </div>
 
