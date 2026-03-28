@@ -380,29 +380,31 @@ export default function DataGenerator() {
   ];
 
   // Map schema types to gofakeit template functions
+  // Strings need to be quoted for valid JSON output
   const typeToTemplate = {
-    'UUID': '{{UUID}}',
-    'Name': '{{Name}}',
-    'FirstName': '{{FirstName}}',
-    'LastName': '{{LastName}}',
-    'Email': '{{Email}}',
-    'Phone': '{{Phone}}',
-    'Date': '{{Recent}}',
-    'DateTime': '{{Recent}}',
-    'Past': '{{Past}}',
-    'Future': '{{Future}}',
-    'Recent': '{{Recent}}',
-    'Birthday': '{{Birthday}}',
+    'UUID': '"{{UUID}}"',
+    'Name': '"{{Name}}"',
+    'FirstName': '"{{FirstName}}"',
+    'LastName': '"{{LastName}}"',
+    'Email': '"{{Email}}"',
+    'Phone': '"{{Phone}}"',
+    'Date': '"{{Recent}}"',
+    'DateTime': '"{{Recent}}"',
+    'Past': '"{{Past}}"',
+    'Future': '"{{Future}}"',
+    'Recent': '"{{Recent}}"',
+    'Birthday': '"{{Birthday}}"',
+    'URL': '"{{URL}}"',
+    'Address': '"{{Address}}"',
+    'City': '"{{City}}"',
+    'Country': '"{{Country}}"',
+    'Company': '"{{Company}}"',
+    'JobTitle': '"{{JobTitle}}"',
+    'String': '"{{LoremSentence 5}}"',
+    // Non-string types don't need quotes
     'Boolean': '{{Boolean}}',
     'Int': '{{Int 1 100}}',
     'Float': '{{Float 1.0 100.0}}',
-    'String': '{{LoremSentence 5}}',
-    'URL': '{{URL}}',
-    'Address': '{{Address}}',
-    'City': '{{City}}',
-    'Country': '{{Country}}',
-    'Company': '{{Company}}',
-    'JobTitle': '{{JobTitle}}',
     'Price': '{{Price 1.0 100.0}}',
   };
 
@@ -421,23 +423,17 @@ export default function DataGenerator() {
     try {
       const template = buildTemplate(defaultSchema, format);
       const res = await Generate({ format, count, template });
-      console.log('DataGenerator response:', res);
       
       if (res && res.output) {
         try {
           const parsed = JSON.parse(res.output);
-          console.log('Parsed type:', typeof parsed, Array.isArray(parsed));
-          console.log('First element type:', typeof parsed[0], parsed[0]);
           
-          // If it's an array of strings, parse each string
+          // If it's an array of strings, parse each one
           if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
-            console.log('Parsing string elements...');
-            const objects = parsed.map((str, i) => {
-              console.log(`String ${i}:`, str.substring(0, 50));
+            const objects = parsed.map(str => {
               try {
                 return JSON.parse(str);
-              } catch (e) {
-                console.error(`Failed to parse string ${i}:`, e);
+              } catch {
                 return { raw: str };
               }
             });
@@ -445,8 +441,7 @@ export default function DataGenerator() {
           } else {
             setOutput(JSON.stringify(parsed, null, 2));
           }
-        } catch (parseErr) {
-          console.error('Parse error:', parseErr);
+        } catch {
           setOutput(res.output);
         }
       } else if (res && res.error) {
