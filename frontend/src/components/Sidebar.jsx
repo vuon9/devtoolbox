@@ -345,7 +345,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                     label={tool.name}
                     icon={TOOL_ICONS[tool.id] || Box}
                     disabled={
-                      !['text-converter', 'string-utilities', 'diff', 'jwt', 'barcode'].includes(
+                      !['text-converter', 'string-utilities', 'diff', 'jwt', 'barcode', 'data-generator'].includes(
                         tool.id
                       )
                     }
