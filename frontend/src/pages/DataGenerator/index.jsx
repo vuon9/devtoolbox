@@ -32,6 +32,7 @@ const fieldTypes = [
 ];
 
 // Map schema types to gofakeit template functions
+// Note: Int/Float/Boolean don't need quotes (non-string values)
 const typeToTemplate = {
   'UUID': '"{{UUID}}"',
   'Name': '"{{Name}}"',
@@ -39,8 +40,8 @@ const typeToTemplate = {
   'LastName': '"{{LastName}}"',
   'Email': '"{{Email}}"',
   'Phone': '"{{Phone}}"',
-  'Date': '"{{Recent}}"',
-  'DateTime': '"{{Recent}}"',
+  'Date': '"{{Date}}"',
+  'DateTime': '"{{DateTime}}"',
   'Past': '"{{Past}}"',
   'Future': '"{{Future}}"',
   'Recent': '"{{Recent}}"',
@@ -51,8 +52,8 @@ const typeToTemplate = {
   'Country': '"{{Country}}"',
   'Company': '"{{Company}}"',
   'JobTitle': '"{{JobTitle}}"',
-  'String': '"{{LoremSentence 5}}"',
-  'RandomInt': '{{RandomInt 1 1000}}',
+  'String': '"{{Sentence 5}}"',
+  'RandomInt': '{{Int 1 1000}}',
   'Boolean': '{{Boolean}}',
   'Int': '{{Int 1 100}}',
   'Float': '{{Float 1.0 100.0}}',
