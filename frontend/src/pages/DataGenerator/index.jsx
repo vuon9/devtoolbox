@@ -23,16 +23,16 @@ const formats = [
   { id: 'yaml', label: 'YAML', icon: FileType },
 ];
 
-// Schema field types
+// Schema field types available in gofakeit
 const fieldTypes = [
   'UUID', 'Name', 'FirstName', 'LastName', 'Email', 'Phone',
-  'Date', 'DateTime', 'Past', 'Future', 'Recent', 'Birthday',
+  'Recent', 'Past', 'Future', 'Birthday',
   'Boolean', 'Int', 'Float', 'String', 'URL', 'Address',
-  'City', 'Country', 'Company', 'JobTitle', 'Price', 'RandomInt',
+  'City', 'Country', 'Company', 'JobTitle', 'Price',
 ];
 
 // Map schema types to gofakeit template functions
-// Note: Int/Float/Boolean don't need quotes (non-string values)
+// Strings need quotes, numbers/booleans don't
 const typeToTemplate = {
   'UUID': '"{{UUID}}"',
   'Name': '"{{Name}}"',
@@ -40,11 +40,9 @@ const typeToTemplate = {
   'LastName': '"{{LastName}}"',
   'Email': '"{{Email}}"',
   'Phone': '"{{Phone}}"',
-  'Date': '"{{Date}}"',
-  'DateTime': '"{{DateTime}}"',
+  'Recent': '"{{Recent}}"',
   'Past': '"{{Past}}"',
   'Future': '"{{Future}}"',
-  'Recent': '"{{Recent}}"',
   'Birthday': '"{{Birthday}}"',
   'URL': '"{{URL}}"',
   'Address': '"{{Address}}"',
@@ -53,7 +51,6 @@ const typeToTemplate = {
   'Company': '"{{Company}}"',
   'JobTitle': '"{{JobTitle}}"',
   'String': '"{{Sentence 5}}"',
-  'RandomInt': '{{Int 1 1000}}',
   'Boolean': '{{Boolean}}',
   'Int': '{{Int 1 100}}',
   'Float': '{{Float 1.0 100.0}}',
@@ -66,7 +63,7 @@ const defaultSchemaFields = [
   { label: 'name', type: 'Name' },
   { label: 'email', type: 'Email' },
   { label: 'phone', type: 'Phone' },
-  { label: 'created_at', type: 'Date' },
+  { label: 'created_at', type: 'Recent' },
 ];
 
 // Inline styled components
