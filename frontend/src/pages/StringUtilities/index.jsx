@@ -7,6 +7,7 @@ import {
   Trash2,
   Undo2,
 } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 import CaseConverterPane from './components/CaseConverterPane';
 import SortDedupePane from './components/SortDedupePane';
 import InspectorPane from './components/InspectorPane';
@@ -189,95 +190,19 @@ export default function StringUtilities() {
         <ModeTabBar modes={modes} activeMode={activeMode} onModeChange={setActiveMode} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button
-            onClick={handleTrim}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 12px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: 'transparent',
-              color: '#a1a1aa',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#a1a1aa';
-            }}
-          >
+          <Button variant="ghost" size="sm" onClick={handleTrim}>
             <AlignLeft style={{ width: '14px', height: '14px' }} />
             Trim Lines
-          </button>
-          <button
-            onClick={handleRemoveEmpty}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 12px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: 'transparent',
-              color: '#a1a1aa',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#a1a1aa';
-            }}
-          >
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleRemoveEmpty}>
             <Trash2 style={{ width: '14px', height: '14px' }} />
             Clear Empty
-          </button>
+          </Button>
           <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }} />
-          <button
-            onClick={handleReset}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 12px',
-              fontSize: '12px',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: 'transparent',
-              color: '#ef4444',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
+          <Button variant="destructive" size="sm" onClick={handleReset}>
             <Undo2 style={{ width: '14px', height: '14px' }} />
             Reset
-          </button>
+          </Button>
         </div>
       </div>
 
