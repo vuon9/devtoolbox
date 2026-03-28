@@ -192,6 +192,64 @@ function DiffResult({ diff, viewMode }) {
     if (part.removed) removed += part.count || 0;
   });
 
+  // Render diff parts - each on its own line for line-based diff
+  const renderDiff = () => {
+    const lines = [];
+    
+    diff.forEach((part, index) => {
+      const partLines = part.value.split('\n');
+      
+      partLines.forEach((line, lineIndex) => {
+        // Skip empty lines at the end
+        if (lineIndex === partLines.length - 1 && line === '') return;
+        
+        if (part.added) {
+          lines.push(
+            <div key={`${index}-${lineIndex}`} style={{
+              backgroundColor: 'rgba(34, 197, 94, 0.15)',
+              color: '#22c55e',
+              borderLeft: '3px solid #22c55e',
+              padding: '2px 8px 2px 24px',
+              margin: '1px 0',
+              position: 'relative',
+            }}>
+              <span style={{ position: 'absolute', left: '8px', opacity: 0.6 }}>+</span>
+              {line || '\u00A0'}
+            </div>
+          );
+        } else if (part.removed) {
+          lines.push(
+            <div key={`${index}-${lineIndex}`} style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.15)',
+              color: '#ef4444',
+              borderLeft: '3px solid #ef4444',
+              padding: '2px 8px 2px 24px',
+              margin: '1px 0',
+              position: 'relative',
+            }}>
+              <span style={{ position: 'absolute', left: '8px', opacity: 0.6 }}>-</span>
+              {line || '\u00A0'}
+            </div>
+          );
+        } else {
+          lines.push(
+            <div key={`${index}-${lineIndex}`} style={{
+              color: '#71717a',
+              padding: '2px 8px 2px 24px',
+              margin: '1px 0',
+              position: 'relative',
+            }}>
+              <span style={{ position: 'absolute', left: '8px', opacity: 0.4 }}> </span>
+              {line || '\u00A0'}
+            </div>
+          );
+        }
+      });
+    });
+    
+    return lines;
+  };
+
   return (
     <div style={{
       marginTop: '16px',
@@ -215,44 +273,8 @@ function DiffResult({ diff, viewMode }) {
       </div>
 
       {/* Diff content */}
-      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-        {diff.map((part, index) => {
-          if (part.added) {
-            return (
-              <div key={index} style={{
-                backgroundColor: 'rgba(34, 197, 94, 0.15)',
-                color: '#22c55e',
-                borderLeft: '3px solid #22c55e',
-                padding: '1px 8px',
-                margin: '1px 0',
-              }}>
-                <span style={{ opacity: 0.5, marginRight: '8px' }}>+</span>
-                {part.value}
-              </div>
-            );
-          }
-          if (part.removed) {
-            return (
-              <div key={index} style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                color: '#ef4444',
-                borderLeft: '3px solid #ef4444',
-                padding: '1px 8px',
-                margin: '1px 0',
-                textDecoration: 'line-through',
-                opacity: 0.7,
-              }}>
-                <span style={{ opacity: 0.5, marginRight: '8px' }}>-</span>
-                {part.value}
-              </div>
-            );
-          }
-          return (
-            <span key={index} style={{ color: '#a1a1aa' }}>
-              {part.value}
-            </span>
-          );
-        })}
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', lineHeight: 1.6 }}>
+        {renderDiff()}
       </div>
     </div>
   );
