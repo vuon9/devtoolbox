@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
-import { Key, ShieldCheck, Lock, CheckCircle2, AlertCircle, Hash, Binary } from 'lucide-react';
-import { Decode, Encode } from '../../generated/wails/jWTService';
+import {
+  Key,
+  ShieldCheck,
+  Lock,
+  CheckCircle2,
+  AlertCircle,
+  Hash,
+  Binary,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
+import { Decode, Encode, Verify } from '../../generated/wails/jWTService';
 
 // Inline-styled components
 function ToolHeader({ title, description }) {
@@ -254,6 +264,25 @@ function SecretInput({ label, value, onChange, placeholder }) {
             outline: 'none',
           }}
         />
+        <button
+          onClick={() => setShowSecret(!showSecret)}
+          style={{
+            padding: '8px',
+            backgroundColor: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: '6px',
+            color: '#71717a',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = '#f4f4f5')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = '#71717a')}
+        >
+          {showSecret ? (
+            <EyeOff style={{ width: '16px', height: '16px' }} />
+          ) : (
+            <Eye style={{ width: '16px', height: '16px' }} />
+          )}
+        </button>
       </div>
     </div>
   );
@@ -306,15 +335,27 @@ export default function JwtDebugger() {
   const [activeMode, setActiveMode] = useState('decode');
   const [secret, setSecret] = useState('');
   const [algorithm, setAlgorithm] = useState('HS256');
+  const [verifySecret, setVerifySecret] = useState('');
+  const [verifyEncoding, setVerifyEncoding] = useState('base64');
 
   const handleDecode = async (token = jwt) => {
     if (!token.trim()) return;
     try {
-      const res = await Decode(token);
-      setPayload(JSON.stringify(res.payload, null, 2));
-      setHeader(JSON.stringify(res.header, null, 2));
-      setIsValid(res.valid);
-      setError('');
+      // If secret is provided, verify the signature
+      if (verifySecret.trim()) {
+        const res = await Verify(token, verifySecret, verifyEncoding);
+        setPayload(JSON.stringify(res.payload, null, 2));
+        setHeader(JSON.stringify(res.header, null, 2));
+        setIsValid(res.valid);
+        setError('');
+      } else {
+        // Just decode without verification
+        const res = await Decode(token);
+        setPayload(JSON.stringify(res.payload, null, 2));
+        setHeader(JSON.stringify(res.header, null, 2));
+        setIsValid(null); // Can't verify without secret
+        setError('');
+      }
     } catch (err) {
       setError(err.message || 'Invalid JWT format.');
       setPayload('');
@@ -335,7 +376,7 @@ export default function JwtDebugger() {
 
   useEffect(() => {
     if (jwt && activeMode === 'decode') handleDecode(jwt);
-  }, [jwt, activeMode]);
+  }, [jwt, activeMode, verifySecret, verifyEncoding]);
 
   const modes = [
     { id: 'decode', label: 'Decode', icon: Hash },
@@ -387,6 +428,54 @@ export default function JwtDebugger() {
               onChange={(e) => setJwt(e.target.value)}
               placeholder="Paste encoded JWT here..."
             />
+
+            <div
+              style={{
+                padding: '16px',
+                backgroundColor: '#1c1917',
+                border: '1px solid #27272a',
+                borderRadius: '8px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '12px',
+                }}
+              >
+                <Key style={{ width: '14px', height: '14px', color: '#71717a' }} />
+                <span
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: '#f4f4f5',
+                  }}
+                >
+                  Signature Verification (Optional)
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                <Select
+                  label="Encoding"
+                  value={verifyEncoding}
+                  onChange={(e) => setVerifyEncoding(e.target.value)}
+                  options={[
+                    { value: 'base64', label: 'Base64' },
+                    { value: 'hex', label: 'Hex' },
+                    { value: 'raw', label: 'Raw' },
+                  ]}
+                />
+              </div>
+              <SecretInput
+                label="Secret"
+                value={verifySecret}
+                onChange={(e) => setVerifySecret(e.target.value)}
+                placeholder="Enter secret to verify signature..."
+              />
+            </div>
+
             {isValid !== null && (
               <StatusMessage type={isValid ? 'success' : 'error'}>
                 {isValid ? (
