@@ -422,16 +422,28 @@ export default function DataGenerator() {
       const template = buildTemplate(defaultSchema, format);
       const res = await Generate({ format, count, template });
       if (res && res.output) {
-        // Parse the output - it might be an array of JSON strings or actual JSON
+        // Parse the output
         try {
-          const parsed = JSON.parse(res.output);
+          let outputStr = res.output;
           
-          // If it's an array of strings (escaped JSON), parse each one
-          if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
-            const objects = parsed.map(str => JSON.parse(str));
-            setOutput(JSON.stringify(objects, null, 2));
-          } else {
-            setOutput(JSON.stringify(parsed, null, 2));
+          // Try direct parse first
+          try {
+            const parsed = JSON.parse(outputStr);
+            
+            // If it's an array of strings (escaped JSON), parse each one
+            if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
+              const objects = parsed.map(str => {
+                // Replace literal \n with actual newlines for valid JSON
+                const normalized = str.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                return JSON.parse(normalized);
+              });
+              setOutput(JSON.stringify(objects, null, 2));
+            } else {
+              setOutput(JSON.stringify(parsed, null, 2));
+            }
+          } catch {
+            // If direct parse fails, it might be raw output
+            setOutput(outputStr);
           }
         } catch {
           setOutput(res.output);
