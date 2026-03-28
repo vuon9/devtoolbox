@@ -27,6 +27,8 @@ func (f *Formatter) Format(data []string, format string, separator string) (stri
 		return f.formatXML(data)
 	case "csv":
 		return f.formatCSV(data)
+	case "tsv":
+		return f.formatTSV(data)
 	case "yaml":
 		return f.formatYAML(data)
 	case "raw", "":
@@ -137,6 +139,57 @@ func (f *Formatter) formatCSV(data []string) (string, error) {
 
 	writer.Flush()
 	return buf.String(), nil
+}
+
+// formatTSV formats data as TSV (tab-separated values) with headers
+func (f *Formatter) formatTSV(data []string) (string, error) {
+	if len(data) == 0 {
+		return "", nil
+	}
+
+	// Parse first item to get headers
+	var firstItem map[string]interface{}
+	if err := json.Unmarshal([]byte(data[0]), &firstItem); err != nil {
+		// If not valid JSON, fall back to single column
+		var result strings.Builder
+		for _, item := range data {
+			result.WriteString(item)
+			result.WriteString("\n")
+		}
+		return result.String(), nil
+	}
+
+	// Extract headers in order
+	headers := make([]string, 0, len(firstItem))
+	for key := range firstItem {
+		headers = append(headers, key)
+	}
+
+	var result strings.Builder
+
+	// Write headers
+	result.WriteString(strings.Join(headers, "\t"))
+	result.WriteString("\n")
+
+	// Write data rows
+	for _, item := range data {
+		var obj map[string]interface{}
+		if err := json.Unmarshal([]byte(item), &obj); err != nil {
+			return "", fmt.Errorf("failed to parse JSON for TSV: %w", err)
+		}
+
+		row := make([]string, len(headers))
+		for i, key := range headers {
+			if val, ok := obj[key]; ok {
+				row[i] = fmt.Sprintf("%v", val)
+			}
+		}
+
+		result.WriteString(strings.Join(row, "\t"))
+		result.WriteString("\n")
+	}
+
+	return result.String(), nil
 }
 
 // formatYAML formats data as YAML

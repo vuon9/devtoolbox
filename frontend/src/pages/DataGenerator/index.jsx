@@ -18,7 +18,7 @@ import { HELP_CONTENT } from './constants';
 const formats = [
   { id: 'json', label: 'JSON', icon: FileJson },
   { id: 'csv', label: 'CSV', icon: FileType },
-  { id: 'raw', label: 'Raw', icon: FileCode },
+  { id: 'tsv', label: 'TSV', icon: FileType },
   { id: 'xml', label: 'XML', icon: FileCode },
   { id: 'yaml', label: 'YAML', icon: FileType },
 ];
