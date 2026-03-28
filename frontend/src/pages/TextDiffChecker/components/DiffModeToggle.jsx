@@ -1,10 +1,10 @@
 import React from 'react';
-import { TextAlignLeft, TextAlignCenter, LetterAa } from '@carbon/icons-react';
+import { AlignLeft, AlignCenter, CaseSensitive } from 'lucide-react';
 
 const modes = [
-  { label: 'Lines', icon: TextAlignLeft },
-  { label: 'Words', icon: TextAlignCenter },
-  { label: 'Chars', icon: LetterAa },
+  { label: 'Lines', icon: AlignLeft },
+  { label: 'Words', icon: AlignCenter },
+  { label: 'Chars', icon: CaseSensitive },
 ];
 
 export default function DiffModeToggle({ activeMode, onChange }) {
@@ -13,12 +13,10 @@ export default function DiffModeToggle({ activeMode, onChange }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: 'var(--cds-layer-02)',
-        borderRadius: '20px',
+        backgroundColor: '#1c1917',
+        borderRadius: '8px',
         padding: '4px',
-        width: 'fit-content',
-        minHeight: '40px',
-        boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #27272a',
       }}
     >
       {modes.map((mode, idx) => {
@@ -33,30 +31,31 @@ export default function DiffModeToggle({ activeMode, onChange }) {
               alignItems: 'center',
               gap: '8px',
               padding: '8px 16px',
-              background: isActive ? 'var(--cds-layer)' : 'transparent',
+              backgroundColor: isActive ? '#27272a' : 'transparent',
               border: 'none',
-              borderRadius: '16px',
-              color: isActive ? 'var(--cds-text-primary)' : 'var(--cds-text-secondary)',
-              fontSize: '0.875rem',
-              fontWeight: 600,
+              borderRadius: '6px',
+              color: isActive ? '#f4f4f5' : '#71717a',
+              fontSize: '13px',
+              fontWeight: 500,
               cursor: 'pointer',
-              transition: 'all 0.2s',
-              boxShadow: isActive ? '0 2px 4px rgba(0, 0, 0, 0.15)' : 'none',
+              transition: 'all 0.15s ease',
               minWidth: '100px',
               justifyContent: 'center',
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = 'var(--cds-layer-hover)';
+                e.currentTarget.style.backgroundColor = '#27272a';
+                e.currentTarget.style.color = '#a1a1aa';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
                 e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#71717a';
               }
             }}
           >
-            <Icon size={16} />
+            <Icon style={{ width: '16px', height: '16px' }} />
             {mode.label}
           </button>
         );
