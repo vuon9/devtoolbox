@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CopyButton, TextInput } from '@carbon/react';
+import { Copy, Check } from 'lucide-react';
 
 const HASH_DISPLAY_ORDER = [
   'MD5',
@@ -19,6 +19,39 @@ const HASH_DISPLAY_ORDER = [
   'FNV-1a',
 ];
 
+function CopyBtn({ onCopy, copied }) {
+  return (
+    <button
+      onClick={onCopy}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '32px',
+        height: '32px',
+        padding: '6px',
+        backgroundColor: 'transparent',
+        border: '1px solid #3f3f46',
+        borderRadius: '4px',
+        color: '#a1a1aa',
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+      }}
+      title={copied ? 'Copied!' : 'Copy to clipboard'}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#27272a';
+        e.currentTarget.style.color = '#f4f4f5';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+        e.currentTarget.style.color = '#a1a1aa';
+      }}
+    >
+      {copied ? <Check style={{ width: '16px', height: '16px' }} /> : <Copy style={{ width: '16px', height: '16px' }} />}
+    </button>
+  );
+}
+
 export default function MultiHashOutput({ value, error, onCopy }) {
   const [copiedHash, setCopiedHash] = useState(null);
 
@@ -26,9 +59,10 @@ export default function MultiHashOutput({ value, error, onCopy }) {
     return (
       <div
         style={{
-          padding: '1rem',
-          color: 'var(--cds-text-error)',
-          backgroundColor: 'var(--cds-layer)',
+          padding: '16px',
+          color: '#ef4444',
+          backgroundColor: '#1c1917',
+          borderRadius: '8px',
         }}
       >
         {error}
@@ -37,7 +71,7 @@ export default function MultiHashOutput({ value, error, onCopy }) {
   }
 
   if (!value) {
-    return <div style={{}}></div>;
+    return null;
   }
 
   let hashes;
@@ -47,9 +81,10 @@ export default function MultiHashOutput({ value, error, onCopy }) {
     return (
       <div
         style={{
-          padding: '1rem',
-          color: 'var(--cds-text-error)',
-          backgroundColor: 'var(--cds-layer)',
+          padding: '16px',
+          color: '#ef4444',
+          backgroundColor: '#1c1917',
+          borderRadius: '8px',
         }}
       >
         Error parsing hash results: {e.message}
@@ -69,7 +104,7 @@ export default function MultiHashOutput({ value, error, onCopy }) {
       style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-        gap: '0.75rem',
+        gap: '12px',
         maxHeight: '80vh',
         overflowY: 'auto',
       }}
@@ -87,35 +122,37 @@ export default function MultiHashOutput({ value, error, onCopy }) {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                marginBottom: '4px',
               }}
             >
               <span
                 style={{
-                  fontWeight: '600',
-                  fontSize: '0.875rem',
-                  color: 'var(--cds-text-primary)',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  color: '#f4f4f5',
                 }}
               >
                 {hashName}
               </span>
-              <CopyButton
-                onClick={() => handleCopy(hashName, hashValue)}
-                feedback={copiedHash === hashName ? 'Copied!' : 'Copy'}
-                feedbackTimeout={2000}
+              <CopyBtn
+                onCopy={() => handleCopy(hashName, hashValue)}
+                copied={copiedHash === hashName}
               />
             </div>
-            <TextInput
-              id={`hash-${hashName}`}
-              labelText={hashName}
-              hideLabel
-              value={hashValue}
+            <input
+              type="text"
               readOnly
+              value={hashValue}
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                width: '100%',
+                padding: '8px 12px',
+                fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
                 fontSize: '12px',
-                backgroundColor: 'var(--cds-field)',
-                border: '1px solid var(--cds-border-subtle)',
-                color: isError ? 'var(--cds-text-error)' : 'var(--cds-text-primary)',
+                backgroundColor: '#18181b',
+                border: '1px solid #27272a',
+                borderRadius: '4px',
+                color: isError ? '#ef4444' : '#f4f4f5',
+                outline: 'none',
               }}
             />
           </div>

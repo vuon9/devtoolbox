@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@carbon/react';
-import { Download, Copy, Warning } from '@carbon/icons-react';
+import { Download, Copy, AlertTriangle } from 'lucide-react';
 
 export function isBase64Image(str) {
   if (!str || typeof str !== 'string') return false;
@@ -116,7 +115,7 @@ export default function ImageOutput({ value, onCopy }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'var(--cds-text-secondary)',
+          color: '#71717a',
           fontStyle: 'italic',
         }}
       >
@@ -169,33 +168,64 @@ export default function ImageOutput({ value, onCopy }) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '0 0 0.5rem 0',
-          borderBottom: '1px solid var(--cds-border-subtle)',
-          marginBottom: '0.5rem',
+          padding: '0 0 8px 0',
+          borderBottom: '1px solid #27272a',
+          marginBottom: '8px',
         }}
       >
         <span
           style={{
-            fontSize: '0.75rem',
-            color: 'var(--cds-text-secondary)',
+            fontSize: '12px',
+            color: '#71717a',
             textTransform: 'uppercase',
+            letterSpacing: '0.05em',
           }}
         >
           Image Preview
         </span>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Button kind="ghost" size="sm" renderIcon={Copy} onClick={handleCopy}>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={handleCopy}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              fontSize: '12px',
+              fontWeight: 500,
+              backgroundColor: 'transparent',
+              border: '1px solid #3f3f46',
+              borderRadius: '4px',
+              color: '#a1a1aa',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Copy style={{ width: '14px', height: '14px' }} />
             {copyFeedback}
-          </Button>
-          <Button
-            kind="primary"
-            size="sm"
-            renderIcon={Download}
+          </button>
+          <button
             onClick={handleDownload}
             disabled={loadError}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              fontSize: '12px',
+              fontWeight: 500,
+              backgroundColor: '#2563eb',
+              border: 'none',
+              borderRadius: '4px',
+              color: '#ffffff',
+              cursor: loadError ? 'not-allowed' : 'pointer',
+              opacity: loadError ? 0.5 : 1,
+              transition: 'all 0.15s ease',
+            }}
           >
+            <Download style={{ width: '14px', height: '14px' }} />
             Download
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -207,9 +237,9 @@ export default function ImageOutput({ value, onCopy }) {
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'auto',
-          backgroundColor: 'var(--cds-field)',
+          backgroundColor: '#18181b',
           borderRadius: '4px',
-          padding: '1rem',
+          padding: '16px',
         }}
       >
         {!validation.valid ? (
@@ -218,14 +248,14 @@ export default function ImageOutput({ value, onCopy }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '0.5rem',
-              color: 'var(--cds-text-error)',
+              gap: '8px',
+              color: '#ef4444',
               textAlign: 'center',
             }}
           >
-            <Warning size={32} />
+            <AlertTriangle style={{ width: '32px', height: '32px' }} />
             <div>Invalid Base64 Data</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>
+            <div style={{ fontSize: '12px', color: '#71717a' }}>
               {validation.error}
             </div>
           </div>
@@ -235,25 +265,25 @@ export default function ImageOutput({ value, onCopy }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '0.5rem',
-              color: 'var(--cds-text-error)',
+              gap: '8px',
+              color: '#ef4444',
               textAlign: 'center',
             }}
           >
-            <Warning size={32} />
+            <AlertTriangle style={{ width: '32px', height: '32px' }} />
             <div>Failed to load image</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>
+            <div style={{ fontSize: '12px', color: '#71717a' }}>
               The base64 data may be corrupted or not an image
             </div>
             <div
               style={{
-                fontSize: '0.625rem',
-                color: 'var(--cds-text-secondary)',
+                fontSize: '10px',
+                color: '#71717a',
                 maxWidth: '300px',
                 wordBreak: 'break-all',
-                marginTop: '0.5rem',
-                padding: '0.5rem',
-                backgroundColor: 'var(--cds-layer)',
+                marginTop: '8px',
+                padding: '8px',
+                backgroundColor: '#27272a',
                 borderRadius: '4px',
               }}
             >
@@ -269,7 +299,7 @@ export default function ImageOutput({ value, onCopy }) {
               maxHeight: '100%',
               objectFit: 'contain',
               borderRadius: '4px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
               display: loadError ? 'none' : 'block',
             }}
             onError={() => {
@@ -282,17 +312,17 @@ export default function ImageOutput({ value, onCopy }) {
       {/* Data info */}
       <div
         style={{
-          marginTop: '0.5rem',
-          padding: '0.5rem',
-          backgroundColor: 'var(--cds-layer)',
+          marginTop: '8px',
+          padding: '8px',
+          backgroundColor: '#1c1917',
           borderRadius: '4px',
-          fontSize: '0.75rem',
-          color: 'var(--cds-text-secondary)',
+          fontSize: '12px',
+          color: '#71717a',
         }}
       >
         Data length: {value.length.toLocaleString()} characters
         {validation.valid && (
-          <span style={{ marginLeft: '1rem', color: 'var(--cds-text-success)' }}>Valid Base64</span>
+          <span style={{ marginLeft: '16px', color: '#22c55e' }}>Valid Base64</span>
         )}
       </div>
     </div>
