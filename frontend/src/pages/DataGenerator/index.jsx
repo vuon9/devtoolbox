@@ -861,7 +861,7 @@ export default function DataGenerator() {
       </div>
 
       <ToolSplitPane isVertical={isVertical}>
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
           <label
             style={{
               fontSize: '11px',
@@ -877,6 +877,7 @@ export default function DataGenerator() {
           <div
             style={{
               flex: 1,
+              minHeight: 0,
               overflow: 'auto',
               padding: '12px',
               display: 'flex',
