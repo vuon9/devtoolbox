@@ -421,31 +421,32 @@ export default function DataGenerator() {
     try {
       const template = buildTemplate(defaultSchema, format);
       const res = await Generate({ format, count, template });
+      console.log('DataGenerator response:', res);
+      
       if (res && res.output) {
-        // Parse the output
         try {
-          let outputStr = res.output;
+          const parsed = JSON.parse(res.output);
+          console.log('Parsed type:', typeof parsed, Array.isArray(parsed));
+          console.log('First element type:', typeof parsed[0], parsed[0]);
           
-          // Try direct parse first
-          try {
-            const parsed = JSON.parse(outputStr);
-            
-            // If it's an array of strings (escaped JSON), parse each one
-            if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
-              const objects = parsed.map(str => {
-                // Replace literal \n with actual newlines for valid JSON
-                const normalized = str.replace(/\\n/g, '\n').replace(/\\"/g, '"');
-                return JSON.parse(normalized);
-              });
-              setOutput(JSON.stringify(objects, null, 2));
-            } else {
-              setOutput(JSON.stringify(parsed, null, 2));
-            }
-          } catch {
-            // If direct parse fails, it might be raw output
-            setOutput(outputStr);
+          // If it's an array of strings, parse each string
+          if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
+            console.log('Parsing string elements...');
+            const objects = parsed.map((str, i) => {
+              console.log(`String ${i}:`, str.substring(0, 50));
+              try {
+                return JSON.parse(str);
+              } catch (e) {
+                console.error(`Failed to parse string ${i}:`, e);
+                return { raw: str };
+              }
+            });
+            setOutput(JSON.stringify(objects, null, 2));
+          } else {
+            setOutput(JSON.stringify(parsed, null, 2));
           }
-        } catch {
+        } catch (parseErr) {
+          console.error('Parse error:', parseErr);
           setOutput(res.output);
         }
       } else if (res && res.error) {
