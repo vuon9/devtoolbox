@@ -12,9 +12,9 @@ function ToggleButton({ label, active, onClick }) {
         padding: '8px 14px',
         fontSize: '13px',
         fontWeight: 500,
-        backgroundColor: active ? '#2563eb' : 'transparent',
+        backgroundColor: active ? '#2563eb' : '#27272a',
         color: active ? '#ffffff' : '#a1a1aa',
-        border: active ? '1px solid #2563eb' : '1px solid #27272a',
+        border: active ? '1px solid #2563eb' : '1px solid #3f3f46',
         borderRadius: '6px',
         cursor: 'pointer',
         transition: 'all 0.15s ease',
@@ -22,16 +22,16 @@ function ToggleButton({ label, active, onClick }) {
       }}
       onMouseEnter={(e) => {
         if (!active) {
-          e.currentTarget.style.backgroundColor = '#27272a';
+          e.currentTarget.style.backgroundColor = '#3f3f46';
           e.currentTarget.style.color = '#f4f4f5';
-          e.currentTarget.style.borderColor = '#3f3f46';
+          e.currentTarget.style.borderColor = '#52525b';
         }
       }}
       onMouseLeave={(e) => {
         if (!active) {
-          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.backgroundColor = '#27272a';
           e.currentTarget.style.color = '#a1a1aa';
-          e.currentTarget.style.borderColor = '#27272a';
+          e.currentTarget.style.borderColor = '#3f3f46';
         }
       }}
     >
