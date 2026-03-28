@@ -157,26 +157,16 @@ export default function ConversionControls({
   setCategory,
   method,
   setMethod,
-  subMode,
-  setSubMode,
+  showModeToggle = true,
 }) {
   const categories = Object.keys(CONVERTER_MAP);
   const methods = CONVERTER_MAP[category] || [];
 
-  const showModeToggle = ['Encrypt - Decrypt', 'Encode - Decode', 'Escape'].includes(category);
-  const modeLabels =
-    category === 'Encrypt - Decrypt'
-      ? { left: 'Encrypt', right: 'Decrypt' }
-      : category === 'Escape'
-        ? { left: 'Escape', right: 'Unescape' }
-        : { left: 'Encode', right: 'Decode' };
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '16px' }}>
-        <div style={{ width: '180px' }}>
-          <Label>Category</Label>
-          <Select
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px' }}>
+      <div style={{ width: '180px' }}>
+        <Label>Category</Label>
+        <Select
             value={category}
             onValueChange={(value) => {
               setCategory(value);
@@ -212,59 +202,6 @@ export default function ConversionControls({
           </Select>
         </div>
       </div>
-
-      {showModeToggle && (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              height: '32px',
-              borderRadius: '6px',
-              backgroundColor: '#1c1917',
-              border: '1px solid #27272a',
-              padding: '4px',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setSubMode(modeLabels.left)}
-              style={{
-                padding: '4px 12px',
-                fontSize: '12px',
-                fontWeight: 500,
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                backgroundColor: subMode === modeLabels.left ? '#27272a' : 'transparent',
-                color: subMode === modeLabels.left ? '#f4f4f5' : '#71717a',
-                boxShadow: subMode === modeLabels.left ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
-              }}
-            >
-              {modeLabels.left}
-            </button>
-            <button
-              type="button"
-              onClick={() => setSubMode(modeLabels.right)}
-              style={{
-                padding: '4px 12px',
-                fontSize: '12px',
-                fontWeight: 500,
-                borderRadius: '4px',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                backgroundColor: subMode === modeLabels.right ? '#27272a' : 'transparent',
-                color: subMode === modeLabels.right ? '#f4f4f5' : '#71717a',
-                boxShadow: subMode === modeLabels.right ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
-              }}
-            >
-              {modeLabels.right}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

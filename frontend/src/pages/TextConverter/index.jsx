@@ -18,6 +18,62 @@ import {
 } from './strings';
 import { Convert } from '../../generated/wails/conversionService';
 
+// Mode toggle component for Encode/Decode, Encrypt/Decrypt, etc.
+function ModeToggle({ mode, modeLabels, onChange }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          height: '32px',
+          borderRadius: '6px',
+          backgroundColor: '#1c1917',
+          border: '1px solid #27272a',
+          padding: '4px',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => onChange(modeLabels.left)}
+          style={{
+            padding: '4px 12px',
+            fontSize: '12px',
+            fontWeight: 500,
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            backgroundColor: mode === modeLabels.left ? '#27272a' : 'transparent',
+            color: mode === modeLabels.left ? '#f4f4f5' : '#71717a',
+            boxShadow: mode === modeLabels.left ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
+          }}
+        >
+          {modeLabels.left}
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange(modeLabels.right)}
+          style={{
+            padding: '4px 12px',
+            fontSize: '12px',
+            fontWeight: 500,
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            backgroundColor: mode === modeLabels.right ? '#27272a' : 'transparent',
+            color: mode === modeLabels.right ? '#f4f4f5' : '#71717a',
+            boxShadow: mode === modeLabels.right ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
+          }}
+        >
+          {modeLabels.right}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // Inline-styled components
 function ToolHeader({ title, description }) {
   return (
@@ -397,6 +453,14 @@ export default function TextBasedConverter() {
   const isAllHashes = category === 'Hash' && method === 'All';
   const isImageOutput = !isAllHashes && isBase64Image(output);
 
+  const showModeToggle = ['Encrypt - Decrypt', 'Encode - Decode', 'Escape'].includes(category);
+  const modeLabels =
+    category === 'Encrypt - Decrypt'
+      ? { left: 'Encrypt', right: 'Decrypt' }
+      : category === 'Escape'
+        ? { left: 'Escape', right: 'Unescape' }
+        : { left: 'Encode', right: 'Decode' };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden' }}>
       <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
@@ -410,7 +474,8 @@ export default function TextBasedConverter() {
         }}
       />
 
-      <ToolControls style={{ justifyContent: 'space-between' }}>
+      {/* First row: Dropdowns + Buttons */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px' }}>
         <ConversionControls
           category={category}
           setCategory={(c) => {
@@ -419,11 +484,10 @@ export default function TextBasedConverter() {
           }}
           method={method}
           setMethod={setMethod}
-          subMode={subMode}
-          setSubMode={setSubMode}
+          showModeToggle={false}
         />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderLeft: '1px solid #27272a', paddingLeft: '16px', marginLeft: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto' }}>
           <Button onClick={handleConvert} disabled={config.autoRun} size="sm">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
               <polygon points="5,3 19,12 5,21"></polygon>
@@ -439,7 +503,7 @@ export default function TextBasedConverter() {
             Added
           </Button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '12px', borderLeft: '1px solid #27272a' }}>
             <Switch
               id="auto-run"
               checked={config.autoRun}
@@ -452,7 +516,18 @@ export default function TextBasedConverter() {
             <Columns style={{ width: '16px', height: '16px', transform: isVertical ? 'rotate(90deg)' : 'none' }} />
           </Button>
         </div>
-      </ToolControls>
+      </div>
+
+      {/* Second row: Mode toggle (Encode/Decode) */}
+      {showModeToggle && (
+        <div style={{ marginBottom: '12px' }}>
+          <ModeToggle
+            mode={subMode}
+            modeLabels={modeLabels}
+            onChange={setSubMode}
+          />
+        </div>
+      )}
 
       {showConfig && (
         <div style={{ marginBottom: '16px' }}>
