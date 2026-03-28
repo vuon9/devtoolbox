@@ -10,8 +10,16 @@ import {
   Binary,
   Eye,
   EyeOff,
+  FileText,
 } from 'lucide-react';
 import { Decode, Encode, Verify } from '../../generated/wails/jWTService';
+
+// Sample data for testing
+const SAMPLE_JWT =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+const SAMPLE_HEADER = '{"alg": "HS256", "typ": "JWT"}';
+const SAMPLE_PAYLOAD = '{"sub": "1234567890", "name": "John Doe", "iat": 1516239022}';
+const SAMPLE_SECRET = 'your-256-bit-secret';
 
 // Inline-styled components
 function ToolHeader({ title, description }) {
@@ -338,6 +346,17 @@ export default function JwtDebugger() {
   const [verifySecret, setVerifySecret] = useState('');
   const [verifyEncoding, setVerifyEncoding] = useState('base64');
 
+  const fillSample = () => {
+    if (activeMode === 'decode') {
+      setJwt(SAMPLE_JWT);
+      setVerifySecret(SAMPLE_SECRET);
+    } else {
+      setHeader(SAMPLE_HEADER);
+      setPayload(SAMPLE_PAYLOAD);
+      setSecret(SAMPLE_SECRET);
+    }
+  };
+
   const handleDecode = async (token = jwt) => {
     if (!token.trim()) return;
     try {
@@ -409,7 +428,13 @@ export default function JwtDebugger() {
           paddingBottom: '16px',
         }}
       >
-        <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />
+          <Button variant="ghost" onClick={fillSample} size="sm">
+            <FileText style={{ width: '14px', height: '14px' }} />
+            Sample
+          </Button>
+        </div>
 
         {activeMode === 'encode' && (
           <Button onClick={handleEncode} size="sm">
