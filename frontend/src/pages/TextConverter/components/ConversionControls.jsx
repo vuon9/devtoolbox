@@ -4,7 +4,6 @@ import { CONVERTER_MAP } from '../constants';
 // Inline-styled Select component
 function Select({ value, onValueChange, children }) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const triggerRef = React.useRef(null);
 
   return (
     <div style={{ position: 'relative' }}>
@@ -13,7 +12,6 @@ function Select({ value, onValueChange, children }) {
           return React.cloneElement(child, {
             isOpen,
             onClick: () => setIsOpen(!isOpen),
-            ref: triggerRef,
           });
         }
         if (child.type === SelectContent) {
@@ -30,7 +28,7 @@ function Select({ value, onValueChange, children }) {
   );
 }
 
-function SelectTrigger({ children, isOpen, onClick, placeholder }) {
+function SelectTrigger({ children, isOpen, onClick }) {
   return (
     <button
       onClick={onClick}
@@ -79,8 +77,8 @@ function SelectTrigger({ children, isOpen, onClick, placeholder }) {
   );
 }
 
-function SelectValue({ placeholder, children }) {
-  return <>{children || placeholder}</>;
+function SelectValue({ children }) {
+  return <>{children}</>;
 }
 
 function SelectContent({ children, onSelect }) {
@@ -157,51 +155,49 @@ export default function ConversionControls({
   setCategory,
   method,
   setMethod,
-  showModeToggle = true,
 }) {
   const categories = Object.keys(CONVERTER_MAP);
   const methods = CONVERTER_MAP[category] || [];
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px' }}>
+    <>
       <div style={{ width: '180px' }}>
         <Label>Category</Label>
         <Select
-            value={category}
-            onValueChange={(value) => {
-              setCategory(value);
-              setMethod(CONVERTER_MAP[value][0]);
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue>{category}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div style={{ width: '280px' }}>
-          <Label>Algorithm / Method</Label>
-          <Select value={method} onValueChange={setMethod}>
-            <SelectTrigger>
-              <SelectValue>{method}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {methods.map((meth) => (
-                <SelectItem key={meth} value={meth}>
-                  {meth}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          value={category}
+          onValueChange={(value) => {
+            setCategory(value);
+            setMethod(CONVERTER_MAP[value][0]);
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue>{category}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-    </div>
+
+      <div style={{ width: '280px' }}>
+        <Label>Algorithm / Method</Label>
+        <Select value={method} onValueChange={setMethod}>
+          <SelectTrigger>
+            <SelectValue>{method}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {methods.map((meth) => (
+              <SelectItem key={meth} value={meth}>
+                {meth}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </>
   );
 }
