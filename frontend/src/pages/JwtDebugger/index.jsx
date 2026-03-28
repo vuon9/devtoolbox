@@ -12,7 +12,7 @@ import {
   EyeOff,
   FileText,
 } from 'lucide-react';
-import { Decode, Encode, Verify } from '../../generated/wails/jWTService';
+import { Decode, Encode, Verify } from '../../services/jwtService';
 
 // Sample data for testing
 const SAMPLE_JWT =
