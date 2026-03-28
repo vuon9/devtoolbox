@@ -11,11 +11,11 @@ import {
 import { GenerateBarcode } from '../services/barcodeService';
 
 const types = [
-  { id: 'QR', label: 'QR Code', icon: QrCode },
-  { id: 'Code128', label: 'Code 128', icon: ScanBarcode },
-  { id: 'Code39', label: 'Code 39', icon: ScanBarcode },
-  { id: 'EAN-13', label: 'EAN-13', icon: Hash },
-  { id: 'EAN-8', label: 'EAN-8', icon: Hash },
+  { id: 'QR', label: 'QR Code', icon: QrCode, placeholder: 'Enter text or URL to encode...', defaultInput: 'https://github.com/wailsapp/wails' },
+  { id: 'Code128', label: 'Code 128', icon: ScanBarcode, placeholder: 'Enter alphanumeric text...', defaultInput: 'HELLO-2024' },
+  { id: 'Code39', label: 'Code 39', icon: ScanBarcode, placeholder: 'Enter uppercase letters, digits, - . $ / + % space', defaultInput: 'CODE39TEST' },
+  { id: 'EAN-13', label: 'EAN-13', icon: Hash, placeholder: 'Enter 12-13 digits (e.g., product barcode)', defaultInput: '5901234123457' },
+  { id: 'EAN-8', label: 'EAN-8', icon: Hash, placeholder: 'Enter 7-8 digits (e.g., small product barcode)', defaultInput: '12345670' },
 ];
 
 // Size for barcode generation
@@ -141,9 +141,21 @@ export default function BarcodeGenerator() {
     () => localStorage.getItem('barcode-layout') === 'vertical'
   );
 
+  // Get current type config
+  const currentType = types.find(t => t.id === type) || types[0];
+
   useEffect(() => {
     localStorage.setItem('barcode-layout', isVertical ? 'vertical' : 'horizontal');
   }, [isVertical]);
+
+  // Handle type change - update input with appropriate default
+  const handleTypeChange = (newType) => {
+    const typeConfig = types.find(t => t.id === newType);
+    setType(newType);
+    setInput(typeConfig?.defaultInput || '');
+    setOutput('');
+    setError('');
+  };
 
   const handleGenerate = async () => {
     if (!input) return;
@@ -196,7 +208,7 @@ export default function BarcodeGenerator() {
       />
 
       <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <TypeToggle types={types} value={type} onChange={setType} />
+        <TypeToggle types={types} value={type} onChange={handleTypeChange} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Button variant="ghost" size="sm" onClick={() => setInput('')}>
@@ -222,7 +234,7 @@ export default function BarcodeGenerator() {
             label="Input Content"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter text or URL to encode..."
+            placeholder={currentType.placeholder}
           />
         </div>
 
