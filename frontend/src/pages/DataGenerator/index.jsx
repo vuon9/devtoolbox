@@ -364,10 +364,59 @@ export default function DataGenerator() {
     localStorage.setItem('datagen-layout', isVertical ? 'vertical' : 'horizontal');
   }, [isVertical]);
 
+  const handleCopy = () => {
+    if (output) {
+      navigator.clipboard.writeText(output);
+    }
+  };
+
+  // Default schema fields
+  const defaultSchema = [
+    { label: 'id', type: 'UUID' },
+    { label: 'name', type: 'Name' },
+    { label: 'email', type: 'Email' },
+    { label: 'phone', type: 'Phone' },
+    { label: 'created_at', type: 'Date' },
+  ];
+
+  // Map schema types to gofakeit template functions
+  const typeToTemplate = {
+    'UUID': '{{UUID}}',
+    'Name': '{{Name}}',
+    'FirstName': '{{FirstName}}',
+    'LastName': '{{LastName}}',
+    'Email': '{{Email}}',
+    'Phone': '{{Phone}}',
+    'Date': '{{Date}}',
+    'DateTime': '{{DateTime}}',
+    'Boolean': '{{Boolean}}',
+    'Int': '{{Int 1 100}}',
+    'Float': '{{Float 1.0 100.0}}',
+    'String': '{{LoremSentence 5}}',
+    'URL': '{{URL}}',
+    'Address': '{{Address}}',
+    'City': '{{City}}',
+    'Country': '{{Country}}',
+    'Company': '{{Company}}',
+    'JobTitle': '{{JobTitle}}',
+    'Price': '{{Price 1.0 100.0}}',
+  };
+
+  // Build template from schema
+  const buildTemplate = (schema, format) => {
+    const fields = schema.map(field => {
+      const template = typeToTemplate[field.type] || '{{UUID}}';
+      return `  "${field.label}": ${template}`;
+    }).join(',\n');
+    
+    return `{\n${fields}\n}`;
+  };
+
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const res = await Generate({ format, count });
+      const template = buildTemplate(defaultSchema, format);
+      const res = await Generate({ format, count, template });
       if (res && res.output) {
         setOutput(res.output);
       } else if (res && res.error) {
@@ -382,20 +431,6 @@ export default function DataGenerator() {
       setIsGenerating(false);
     }
   };
-
-  const handleCopy = () => {
-    if (output) {
-      navigator.clipboard.writeText(output);
-    }
-  };
-
-  const defaultSchema = [
-    { label: 'id', type: 'UUID' },
-    { label: 'name', type: 'Name' },
-    { label: 'email', type: 'Email' },
-    { label: 'phone', type: 'Phone' },
-    { label: 'created_at', type: 'Date' },
-  ];
 
   return (
     <div
