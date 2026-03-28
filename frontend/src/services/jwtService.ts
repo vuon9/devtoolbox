@@ -21,12 +21,17 @@ const httpCall = async (
   methodName: string,
   args: Record<string, any>
 ): Promise<any> => {
-  // Convert service name to kebab-case (JWTService -> jwt-service)
-  const kebabService = serviceName
-    .replace(/([A-Z])/g, '-$1')
-    .toLowerCase()
-    .replace(/^-/, '');
-  // Convert method name to kebab-case (Decode -> decode)
+  // JWTService -> jwt-service (simple mapping)
+  const serviceMap: Record<string, string> = {
+    'JWTService': 'jwt-service',
+    'BarcodeService': 'barcode-service',
+    'DataGeneratorService': 'data-generator-service',
+  };
+  const kebabService = serviceMap[serviceName] || serviceName
+    .replace(/Service$/, '-service')
+    .toLowerCase();
+  
+  // Decode -> decode
   const kebabMethod = methodName
     .replace(/([A-Z])/g, '-$1')
     .toLowerCase()
@@ -55,7 +60,8 @@ export async function Decode(token: string): Promise<any> {
     return WailsDecode(token);
   }
 
-  return httpCall('JWTService', 'Decode', { token });
+  // Single parameter uses "value" field
+  return httpCall('JWTService', 'Decode', { value: token });
 }
 
 export async function Verify(token: string, secret: string, encoding: string): Promise<any> {
@@ -63,7 +69,7 @@ export async function Verify(token: string, secret: string, encoding: string): P
     return WailsVerify(token, secret, encoding);
   }
 
-  return httpCall('JWTService', 'Verify', { token, secret, encoding });
+  return httpCall('JWTService', 'Verify', { arg0: token, arg1: secret, arg2: encoding });
 }
 
 export async function Encode(
@@ -76,5 +82,5 @@ export async function Encode(
     return WailsEncode(headerJSON, payloadJSON, algorithm, secret);
   }
 
-  return httpCall('JWTService', 'Encode', { headerJSON, payloadJSON, algorithm, secret });
+  return httpCall('JWTService', 'Encode', { arg0: headerJSON, arg1: payloadJSON, arg2: algorithm, arg3: secret });
 }
