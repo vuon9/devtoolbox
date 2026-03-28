@@ -481,7 +481,22 @@ export default function JwtDebugger() {
 
   useEffect(() => {
     if (jwt && activeMode === 'decode') handleDecode(jwt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jwt, activeMode, verifySecret, verifyEncoding]);
+
+  // Auto-encode when inputs change in encode mode (with debounce)
+  useEffect(() => {
+    if (activeMode !== 'encode') return;
+    
+    const timeoutId = setTimeout(() => {
+      if (header.trim() && payload.trim()) {
+        handleEncode();
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [header, payload, algorithm, secret, activeMode]);
 
   const modes = [
     { id: 'decode', label: 'Decode', icon: Hash },
