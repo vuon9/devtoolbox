@@ -8,7 +8,7 @@ import {
   Columns,
   Trash2,
 } from 'lucide-react';
-import { GenerateBarcode } from '../generated/wails/barcodeService';
+import { GenerateBarcode } from '../services/barcodeService';
 
 const types = [
   { id: 'qr', label: 'QR Code', icon: QrCode },
