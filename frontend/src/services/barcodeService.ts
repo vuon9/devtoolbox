@@ -42,7 +42,11 @@ export async function GenerateBarcode(req: { content: string; standard: string }
   }
   
   // Use HTTP API for browser mode
-  return httpCall('BarcodeService', 'GenerateBarcode', { arg0: req });
+  // The API expects { arg0: { content, standard } } for struct parameter
+  console.log('GenerateBarcode request:', req);
+  const result = await httpCall('BarcodeService', 'GenerateBarcode', { content: req.content, standard: req.standard });
+  console.log('GenerateBarcode response:', result);
+  return result;
 }
 
 export async function GetBarcodeStandards(): Promise<any> {

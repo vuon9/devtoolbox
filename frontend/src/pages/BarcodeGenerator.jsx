@@ -143,9 +143,13 @@ export default function BarcodeGenerator() {
     setIsGenerating(true);
     try {
       const res = await GenerateBarcode({ content: input, standard: type });
-      setOutput(res);
+      console.log('Barcode response:', res);
+      // Handle different response formats
+      const svgContent = typeof res === 'string' ? res : res?.svg || res?.image || res?.data || JSON.stringify(res);
+      setOutput(svgContent);
     } catch (err) {
-      console.error(err);
+      console.error('Barcode error:', err);
+      setOutput('');
     } finally {
       setIsGenerating(false);
     }
