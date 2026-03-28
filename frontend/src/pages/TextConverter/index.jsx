@@ -12,6 +12,7 @@ import {
   TOOL_DESCRIPTION,
   STORAGE_KEYS,
   DEFAULTS,
+  DEFAULT_COMMON_TAGS,
   LABELS,
   PLACEHOLDERS,
 } from './strings';
