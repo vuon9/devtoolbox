@@ -15,7 +15,9 @@ import {
   Regex,
   FileDiff,
   Box,
-  LayoutGrid
+  LayoutGrid,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
 import { Input } from './ui/input';
@@ -114,7 +116,7 @@ function SidebarHeader({ title, icon: Icon }) {
   );
 }
 
-export function Sidebar({ isVisible, onOpenSettings }) {
+export function Sidebar({ isVisible, onOpenSettings, onToggle }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites] = useState(() => {
     try {
@@ -159,7 +161,16 @@ export function Sidebar({ isVisible, onOpenSettings }) {
 
   const categories = Object.keys(toolsByCategory).sort();
 
-  if (!isVisible) return null;
+  // Collapsed state (only show icons)
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+    if (onToggle) onToggle(!isCollapsed);
+  };
+
+  // When collapsed, don't show anything if not visible
+  if (!isVisible && !isCollapsed) return null;
 
   return (
     <aside style={{

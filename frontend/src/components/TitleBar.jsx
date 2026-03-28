@@ -1,9 +1,14 @@
 import React from 'react';
-import { Menu, Settings, Minus, Square, X, Sidebar as SidebarIcon } from 'lucide-react';
+import { Menu, Settings, Minus, Square, X } from 'lucide-react';
 
-export function TitleBar({ isSidebarOpen, toggleSidebar, appName = 'DevToolbox', onOpenSettings }) {
+export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
   // Detect if running in desktop mode (Wails)
   const isDesktop = typeof window !== 'undefined' && window.go?.devtoolbox?.service?.WindowControls;
+
+  // Don't render TitleBar in web browser mode
+  if (!isDesktop) {
+    return null;
+  }
 
   // Detect platform
   const userAgent = navigator.userAgent.toLowerCase();
@@ -45,23 +50,8 @@ export function TitleBar({ isSidebarOpen, toggleSidebar, appName = 'DevToolbox',
         userSelect: 'none',
       }}
     >
-      {/* Left section */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', WebkitAppRegion: 'no-drag' }}>
-        <button
-          onClick={toggleSidebar}
-          style={buttonStyle}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#27272a';
-            e.currentTarget.style.color = '#f4f4f5';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#a1a1aa';
-          }}
-        >
-          {isSidebarOpen ? <SidebarIcon style={{ width: '16px', height: '16px' }} /> : <Menu style={{ width: '16px', height: '16px' }} />}
-        </button>
-      </div>
+      {/* Left section - Mac traffic light space */}
+      {isMac && <div style={{ width: '80px' }} />}
 
       {/* Center section */}
       <div style={{
@@ -101,7 +91,7 @@ export function TitleBar({ isSidebarOpen, toggleSidebar, appName = 'DevToolbox',
           <Settings style={{ width: '16px', height: '16px' }} />
         </button>
 
-        {isDesktop && !isMac && (
+        {!isMac && (
           <div style={{ display: 'flex', alignItems: 'center', marginLeft: '8px', paddingLeft: '8px', borderLeft: '1px solid #27272a', gap: '2px' }}>
             <button
               onClick={handleMinimize}
