@@ -411,7 +411,7 @@ export default function TextDiffChecker() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden', backgroundColor: '#09090b' }}>
       <ToolHeader
-        title="Text Diff Checker"
+        title="Text Diff"
         description="Compare two pieces of text and visualize differences instantly. Supports line, word, and character-level diffs."
       />
 

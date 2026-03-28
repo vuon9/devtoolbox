@@ -121,7 +121,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
     { id: 'color-converter', name: 'Color Converter', category: 'Developer' },
     { id: 'cron', name: 'Cron Job Parser', category: 'Developer' },
     { id: 'regexp', name: 'RegExp Tester', category: 'Developer' },
-    { id: 'diff', name: 'Text Diff Checker', category: 'Text' },
+    { id: 'diff', name: 'Text Diff', category: 'Text' },
   ];
 
   const filteredTools = useMemo(() => {
