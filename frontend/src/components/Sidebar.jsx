@@ -299,7 +299,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                     to={`/tool/${tool.id}`}
                     label={tool.name}
                     icon={TOOL_ICONS[tool.id] || Box}
-                    disabled={!['text-converter', 'string-utilities', 'diff', 'jwt'].includes(tool.id)}
+                    disabled={!['text-converter', 'string-utilities', 'diff', 'jwt', 'barcode'].includes(tool.id)}
                     collapsed={isCollapsed}
                   />
                 ))}

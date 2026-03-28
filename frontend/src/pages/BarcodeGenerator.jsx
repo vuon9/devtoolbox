@@ -1,34 +1,129 @@
 import React, { useState, useEffect } from 'react';
-import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../components/ToolUI';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../components/ui/select';
+import { Button } from '../components/ui/Button';
 import {
   ScanBarcode,
-  Play,
   Download,
-  Settings,
   QrCode,
   Hash,
   Columns,
-  Layout,
   Trash2,
 } from 'lucide-react';
 import { GenerateBarcode } from '../generated/wails/barcodeService';
-import { cn } from '../utils/cn';
 
 const types = [
   { id: 'qr', label: 'QR Code', icon: QrCode },
   { id: 'code128', label: 'Code 128', icon: ScanBarcode },
   { id: 'ean13', label: 'EAN-13', icon: Hash },
 ];
+
+function ToolHeader({ title, description }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}>
+        {title}
+      </h2>
+      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+    </div>
+  );
+}
+
+function ToolTextArea({ label, value, onChange, placeholder }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+        {label}
+      </label>
+      <textarea
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{
+          flex: 1,
+          width: '100%',
+          minHeight: '200px',
+          padding: '12px',
+          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontSize: '14px',
+          lineHeight: 1.5,
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          color: '#f4f4f5',
+          resize: 'none',
+          outline: 'none',
+        }}
+      />
+    </div>
+  );
+}
+
+function ToolSplitPane({ children, isVertical }) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: isVertical ? '1fr' : '1fr 1fr',
+      gap: '16px',
+      flex: 1,
+      minHeight: 0,
+      overflow: 'hidden',
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function TypeToggle({ types, value, onChange }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      backgroundColor: '#1c1917',
+      borderRadius: '8px',
+      padding: '4px',
+      border: '1px solid #27272a',
+    }}>
+      {types.map((t) => {
+        const Icon = t.icon;
+        const isActive = value === t.id;
+        return (
+          <button
+            key={t.id}
+            onClick={() => onChange(t.id)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              backgroundColor: isActive ? '#27272a' : 'transparent',
+              border: 'none',
+              borderRadius: '6px',
+              color: isActive ? '#f4f4f5' : '#71717a',
+              fontSize: '13px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = '#27272a';
+                e.currentTarget.style.color = '#a1a1aa';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#71717a';
+              }
+            }}
+          >
+            <Icon style={{ width: '16px', height: '16px' }} />
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function BarcodeGenerator() {
   const [input, setInput] = useState('https://github.com/wailsapp/wails');
@@ -47,7 +142,6 @@ export default function BarcodeGenerator() {
     if (!input) return;
     setIsGenerating(true);
     try {
-      // Assuming it expects an object matching BarcodeRequest in backend
       const res = await GenerateBarcode({ content: input, standard: type });
       setOutput(res);
     } catch (err) {
@@ -61,119 +155,81 @@ export default function BarcodeGenerator() {
     if (input) handleGenerate();
   }, [input, type]);
 
+  const handleDownloadSVG = () => {
+    if (!output) return;
+    const blob = new Blob([output], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `barcode.${type}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="flex flex-col h-full p-6 overflow-hidden bg-background">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden', backgroundColor: '#09090b' }}>
       <ToolHeader
         title="Barcode / QR Code"
         description="Generate high-quality QR codes and barcodes for various standards. Customize appearance and download directly as SVG or PNG."
       />
 
-      <ToolControls className="mb-6 justify-between">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <Label
-              htmlFor="type-select"
-              className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
-            >
-              Type
-            </Label>
-            <Select value={type} onValueChange={setType}>
-              <SelectTrigger
-                id="type-select"
-                className="w-[160px] h-9 bg-background/50 border-border/40"
-              >
-                <SelectValue placeholder="Code Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {types.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    <div className="flex items-center gap-2">
-                      <t.icon className="h-4 w-4 text-primary" />
-                      <span>{t.label}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px' }}>
+        <TypeToggle types={types} value={type} onChange={setType} />
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setInput('')}
-            className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Button variant="ghost" size="sm" onClick={() => setInput('')}>
+            <Trash2 style={{ width: '14px', height: '14px' }} />
             Clear
           </Button>
-          <div className="w-px h-4 bg-border mx-2" />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9"
-            onClick={() => setIsVertical(!isVertical)}
-          >
-            {isVertical ? (
-              <Columns className="h-4 w-4 rotate-90" />
-            ) : (
-              <Columns className="h-4 w-4" />
-            )}
+          <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }} />
+          <Button variant="ghost" size="sm" onClick={() => setIsVertical(!isVertical)}>
+            <Columns style={{ width: '14px', height: '14px', transform: isVertical ? 'rotate(90deg)' : 'none' }} />
           </Button>
         </div>
-      </ToolControls>
+      </div>
 
-      <div className="flex-1 min-h-0">
-        <ToolSplitPane className={cn(isVertical && 'grid-cols-1 md:grid-cols-1')}>
-          <div className="flex flex-col h-full">
-            <ToolPane
-              label="Input Content"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Enter text or URL to encode..."
-              className="flex-1"
-            />
+      <ToolSplitPane isVertical={isVertical}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <ToolTextArea
+            label="Input Content"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Enter text or URL to encode..."
+          />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', border: '1px solid #27272a', borderRadius: '8px', backgroundColor: '#18181b', padding: '48px', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: '12px', left: '12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#52525b' }}>
+            Preview
           </div>
 
-          <div className="flex flex-col h-full items-center justify-center border rounded-lg bg-muted/5 relative group p-12">
-            <div className="absolute top-3 left-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-1 pr-3">
-              Preview
-            </div>
+          <div style={{ backgroundColor: '#09090b', padding: '32px', borderRadius: '12px', border: '4px solid rgba(59, 130, 246, 0.2)' }}>
+            {output ? (
+              <div dangerouslySetInnerHTML={{ __html: output }} style={{ height: '256px', width: '256px' }} />
+            ) : (
+              <div style={{ height: '256px', width: '256px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#18181b', borderRadius: '8px' }}>
+                <QrCode style={{ width: '64px', height: '64px', opacity: 0.1, animation: 'pulse 2s infinite' }} />
+                <span style={{ fontSize: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.3, marginTop: '16px' }}>
+                  Generating...
+                </span>
+              </div>
+            )}
+          </div>
 
-            <div className="bg-card p-8 rounded-xl shadow-2xl transition-transform group-hover:scale-[1.02] border-4 border-primary/20">
-              {output ? (
-                <div dangerouslySetInnerHTML={{ __html: output }} className="h-64 w-64" />
-              ) : (
-                <div className="h-64 w-64 flex flex-col items-center justify-center text-muted-foreground gap-4 bg-muted/10 rounded-lg">
-                  <QrCode className="h-16 w-16 opacity-10 animate-pulse" />
-                  <span className="text-xs font-medium uppercase tracking-widest opacity-30">
-                    Generating...
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="absolute bottom-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                size="sm"
-                className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] shadow-lg"
-              >
-                <Download className="h-3.5 w-3.5" />
+          {output && (
+            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+              <Button size="sm" onClick={handleDownloadSVG}>
+                <Download style={{ width: '14px', height: '14px' }} />
                 Download SVG
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] bg-background/80 backdrop-blur-sm"
-              >
-                <Download className="h-3.5 w-3.5" />
+              <Button variant="outline" size="sm" onClick={handleDownloadSVG}>
+                <Download style={{ width: '14px', height: '14px' }} />
                 Download PNG
               </Button>
             </div>
-          </div>
-        </ToolSplitPane>
-      </div>
+          )}
+        </div>
+      </ToolSplitPane>
     </div>
   );
 }
