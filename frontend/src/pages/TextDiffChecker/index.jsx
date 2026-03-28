@@ -297,36 +297,40 @@ function DiffSplitView({ leftLines, rightLines }) {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flex: 1, minHeight: 0 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0', flex: 1, minHeight: 0 }}>
       {/* Left pane - Original */}
-      <div style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', overflow: 'hidden' }}>
-        <div style={{ padding: '8px 12px', borderBottom: '1px solid #27272a', fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#18181b', border: '1px solid #27272a', borderRight: 'none', borderRadius: '8px 0 0 8px', overflow: 'hidden' }}>
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid #27272a', backgroundColor: '#09090b', fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Original
         </div>
         <div
           ref={leftRef}
           onScroll={() => handleScroll(leftRef, rightRef)}
-          style={{ flex: 1, overflow: 'auto', padding: '8px 0' }}
+          style={{ flex: 1, overflow: 'auto' }}
         >
-          {leftLines.map((item, idx) => (
-            <DiffLine key={idx} item={item} />
-          ))}
+          <div style={{ padding: '0' }}>
+            {leftLines.map((item, idx) => (
+              <DiffLine key={idx} item={item} />
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Right pane - Modified */}
-      <div style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', overflow: 'hidden' }}>
-        <div style={{ padding: '8px 12px', borderBottom: '1px solid #27272a', fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '0 8px 8px 0', overflow: 'hidden' }}>
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid #27272a', backgroundColor: '#09090b', fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Modified
         </div>
         <div
           ref={rightRef}
           onScroll={() => handleScroll(rightRef, leftRef)}
-          style={{ flex: 1, overflow: 'auto', padding: '8px 0' }}
+          style={{ flex: 1, overflow: 'auto' }}
         >
-          {rightLines.map((item, idx) => (
-            <DiffLine key={idx} item={item} />
-          ))}
+          <div style={{ padding: '0' }}>
+            {rightLines.map((item, idx) => (
+              <DiffLine key={idx} item={item} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
