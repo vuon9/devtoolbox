@@ -160,15 +160,17 @@ function ToolSplitPane({ children, isVertical }) {
 }
 
 // Inline styled Select dropdown (like TextConverter)
-function SelectDropdown({ label, value, onChange, options }) {
+function SelectDropdown({ label, value, onChange, options, width = '160px' }) {
   const [isOpen, setIsOpen] = useState(false);
-  const selectedOption = options.find(o => o.id === value);
+  const selectedOption = options.find(o => o.id === value || o.value === value);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        {label}
-      </label>
+      {label && (
+        <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          {label}
+        </label>
+      )}
       <div style={{ position: 'relative' }}>
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -176,7 +178,7 @@ function SelectDropdown({ label, value, onChange, options }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            width: '160px',
+            width: width,
             height: '32px',
             padding: '0 12px',
             backgroundColor: isOpen ? '#27272a' : '#18181b',
@@ -201,7 +203,7 @@ function SelectDropdown({ label, value, onChange, options }) {
           }}
         >
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {selectedOption?.label || value}
+            {selectedOption?.label || selectedOption?.id || value}
           </span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: '8px', opacity: 0.7, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>
             <path d="M6 9l6 6 6-6" />
@@ -219,19 +221,19 @@ function SelectDropdown({ label, value, onChange, options }) {
             borderRadius: '6px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
             zIndex: 50,
-            maxHeight: '200px',
+            maxHeight: '300px',
             overflowY: 'auto',
           }}>
             {options.map((opt) => {
               const Icon = opt.icon;
               return (
                 <div
-                  key={opt.id}
-                  onClick={() => { onChange(opt.id); setIsOpen(false); }}
+                  key={opt.id || opt.value}
+                  onClick={() => { onChange(opt.id || opt.value); setIsOpen(false); }}
                   style={{
                     padding: '8px 12px',
                     fontSize: '14px',
-                    color: value === opt.id ? '#f4f4f5' : '#a1a1aa',
+                    color: (value === opt.id || value === opt.value) ? '#f4f4f5' : '#a1a1aa',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                     display: 'flex',
@@ -244,7 +246,7 @@ function SelectDropdown({ label, value, onChange, options }) {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = value === opt.id ? '#f4f4f5' : '#a1a1aa';
+                    e.currentTarget.style.color = (value === opt.id || value === opt.value) ? '#f4f4f5' : '#a1a1aa';
                   }}
                 >
                   {Icon && <Icon style={{ width: '16px', height: '16px' }} />}
@@ -258,6 +260,133 @@ function SelectDropdown({ label, value, onChange, options }) {
     </div>
   );
 }
+
+// Grouped select dropdown for field types
+function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px' }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  // Find current value across all groups
+  const allOptions = groups.flatMap(g => g.items);
+  const selectedOption = allOptions.find(o => o === value);
+  
+  // Find group name for selected value
+  const selectedGroup = groups.find(g => g.items.includes(value));
+
+  return (
+    <div style={{ position: 'relative', width }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          height: '32px',
+          padding: '0 8px',
+          backgroundColor: isOpen ? '#27272a' : '#18181b',
+          border: '1px solid #3f3f46',
+          borderRadius: '4px',
+          color: '#f4f4f5',
+          fontSize: '13px',
+          cursor: 'pointer',
+          outline: 'none',
+        }}
+        onMouseEnter={(e) => {
+          if (!isOpen) {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.borderColor = '#52525b';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isOpen) {
+            e.currentTarget.style.backgroundColor = '#18181b';
+            e.currentTarget.style.borderColor = '#3f3f46';
+          }
+        }}
+      >
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '13px', fontFamily: "'IBM Plex Mono', monospace" }}>
+          {value || 'Select type'}
+        </span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: '4px', opacity: 0.6, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          marginTop: '4px',
+          backgroundColor: '#1c1917',
+          border: '1px solid #27272a',
+          borderRadius: '6px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+          zIndex: 50,
+          maxHeight: '300px',
+          overflowY: 'auto',
+        }}>
+          {groups.map((group) => (
+            <div key={group.name}>
+              <div style={{
+                padding: '6px 10px',
+                fontSize: '10px',
+                fontWeight: 600,
+                color: '#52525b',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                borderBottom: '1px solid #27272a',
+                backgroundColor: '#09090b',
+              }}>
+                {group.name}
+              </div>
+              {group.items.map((item) => (
+                <div
+                  key={item}
+                  onClick={() => { onChange(item); setIsOpen(false); }}
+                  style={{
+                    padding: '6px 10px',
+                    fontSize: '13px',
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    color: value === item ? '#22c55e' : '#a1a1aa',
+                    cursor: 'pointer',
+                    transition: 'all 0.1s ease',
+                    backgroundColor: value === item ? 'rgba(34, 197, 94, 0.1)' : 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (value !== item) {
+                      e.currentTarget.style.backgroundColor = '#27272a';
+                      e.currentTarget.style.color = '#f4f4f5';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (value !== item) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#a1a1aa';
+                    }
+                  }}
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Field type groups for grouped dropdown
+const fieldTypeGroups = [
+  { name: 'Identity', items: ['UUID', 'ULID'] },
+  { name: 'Profile', items: ['FirstName', 'LastName', 'Name', 'Gender', 'Email', 'Phone', 'JobTitle', 'Company'] },
+  { name: 'Location', items: ['Street', 'City', 'State', 'Zip', 'Country', 'Latitude', 'Longitude'] },
+  { name: 'Web', items: ['URL', 'Domain', 'IP', 'Username', 'Password'] },
+  { name: 'Dates', items: ['Past', 'Future', 'Recent', 'Birthday'] },
+  { name: 'Numbers', items: ['Int', 'Float', 'Price', 'Bool'] },
+  { name: 'Text', items: ['Word', 'Sentence', 'Paragraph'] },
+];
 
 function Input({ label, type, value, onChange, placeholder, min, max, style }) {
   return (
@@ -273,14 +402,15 @@ function Input({ label, type, value, onChange, placeholder, min, max, style }) {
         min={min}
         max={max}
         style={{
-          padding: '8px 12px',
+          padding: '0 12px',
+          height: '32px',
+          width: '80px',
           backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          border: '1px solid #3f3f46',
           borderRadius: '6px',
           color: '#f4f4f5',
           fontSize: '14px',
           outline: 'none',
-          width: '100px',
         }}
       />
     </div>
@@ -296,24 +426,12 @@ function SchemaField({ field, index, onUpdate, onRemove }) {
         placeholder="Field name"
         style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', background: 'transparent', border: 'none', color: '#f4f4f5', width: '120px', outline: 'none' }}
       />
-      <select
+      <GroupedSelectDropdown
         value={field.type}
-        onChange={(e) => onUpdate(index, 'type', e.target.value)}
-        style={{
-          flex: 1,
-          padding: '4px 8px',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
-          borderRadius: '4px',
-          color: '#a1a1aa',
-          fontSize: '12px',
-          outline: 'none',
-        }}
-      >
-        {fieldTypes.map((t) => (
-          <option key={t} value={t}>{t}</option>
-        ))}
-      </select>
+        onChange={(val) => onUpdate(index, 'type', val)}
+        groups={fieldTypeGroups}
+        width="160px"
+      />
       <button
         onClick={() => onRemove(index)}
         style={{ background: 'transparent', border: 'none', color: '#71717a', cursor: 'pointer', padding: '4px' }}
