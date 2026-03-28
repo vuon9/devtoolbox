@@ -472,7 +472,7 @@ export default function JwtDebugger() {
   const handleEncode = async () => {
     try {
       const res = await Encode(header, payload, algorithm, secret || 'your-256-bit-secret');
-      setJwt(res);
+      setJwt(res.token || res);
       setError('');
     } catch (err) {
       setError(err.message || 'Encoding failed. Check JSON format.');
