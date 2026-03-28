@@ -891,9 +891,9 @@ export default function DataGenerator() {
                 letterSpacing: '0.05em',
               }}
             >
-              Schema Definition ({schema.length} fields)
+              Schema Definition
             </span>
-            <Button variant="ghost" size="sm" onClick={addField}>
+            <Button size="sm" onClick={addField}>
               <Plus style={{ width: '14px', height: '14px' }} />
               Add Field
             </Button>
