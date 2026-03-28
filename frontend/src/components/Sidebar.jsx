@@ -311,27 +311,59 @@ export function Sidebar({ isVisible, onOpenSettings, onToggle }) {
         </div>
       </ScrollArea>
 
-      {/* Settings */}
+      {/* Settings and Collapse */}
       <div style={{ padding: '16px', borderTop: '1px solid #27272a' }}>
-        <button
-          onClick={onOpenSettings}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            width: '100%',
-            padding: '10px 16px',
-            fontSize: '14px',
-            color: '#a1a1aa',
-            backgroundColor: 'transparent',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-          }}
-        >
-          <Settings style={{ width: '16px', height: '16px' }} />
-          <span>Settings</span>
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={onOpenSettings}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              flex: 1,
+              padding: '10px 12px',
+              fontSize: '14px',
+              color: '#a1a1aa',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+            }}
+          >
+            <Settings style={{ width: '16px', height: '16px' }} />
+            <span>Settings</span>
+          </button>
+          <button
+            onClick={handleToggleCollapse}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              padding: '6px',
+              fontSize: '14px',
+              color: '#71717a',
+              backgroundColor: 'transparent',
+              border: '1px solid #27272a',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              flexShrink: 0,
+            }}
+            title="Collapse sidebar"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.color = '#f4f4f5';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#71717a';
+            }}
+          >
+            <ChevronLeft style={{ width: '16px', height: '16px' }} />
+          </button>
+        </div>
       </div>
     </aside>
   );
