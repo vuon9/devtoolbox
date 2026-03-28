@@ -196,8 +196,23 @@ export default function BarcodeGenerator() {
     if (!output) return;
     const a = document.createElement('a');
     a.href = output;
-    a.download = `barcode.${type.toLowerCase()}.png`;
+    a.download = `${type.toLowerCase().replace('-', '')}.png`;
     a.click();
+  };
+
+  const handleDownloadSVG = () => {
+    if (!output) return;
+    // Convert PNG data URL to SVG with embedded image
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+      <image href="${output}" width="512" height="512"/>
+    </svg>`;
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${type.toLowerCase().replace('-', '')}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -257,10 +272,14 @@ export default function BarcodeGenerator() {
           </div>
 
           {output && (
-            <div style={{ marginTop: '24px' }}>
+            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
               <Button onClick={handleDownloadPNG}>
                 <Download style={{ width: '14px', height: '14px' }} />
                 Download PNG
+              </Button>
+              <Button variant="outline" onClick={handleDownloadSVG}>
+                <Download style={{ width: '14px', height: '14px' }} />
+                Download SVG
               </Button>
             </div>
           )}
