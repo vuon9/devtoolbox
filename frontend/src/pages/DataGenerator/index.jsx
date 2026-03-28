@@ -861,28 +861,16 @@ export default function DataGenerator() {
       </div>
 
       <ToolSplitPane isVertical={isVertical}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            border: '1px solid #27272a',
-            borderRadius: '8px',
-            backgroundColor: '#18181b',
-            overflow: 'hidden',
-          }}
-        >
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '12px 16px',
-              borderBottom: '1px solid #27272a',
-              backgroundColor: '#1c1917',
+              marginBottom: '8px',
             }}
           >
-            <span
+            <label
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
@@ -892,7 +880,7 @@ export default function DataGenerator() {
               }}
             >
               Schema Definition
-            </span>
+            </label>
             <Button size="sm" onClick={addField}>
               <Plus style={{ width: '14px', height: '14px' }} />
               Add Field
@@ -902,10 +890,13 @@ export default function DataGenerator() {
             style={{
               flex: 1,
               overflow: 'auto',
-              padding: '16px',
+              padding: '12px',
               display: 'flex',
               flexDirection: 'column',
               gap: '8px',
+              backgroundColor: '#18181b',
+              border: '1px solid #27272a',
+              borderRadius: '8px',
             }}
           >
             {schema.map((field, idx) => (
