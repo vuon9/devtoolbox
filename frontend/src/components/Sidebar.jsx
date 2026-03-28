@@ -152,7 +152,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
 
   return (
     <aside style={{
-      width: isCollapsed ? '64px' : '256px',
+      width: isCollapsed ? '72px' : '256px',
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
@@ -316,73 +316,78 @@ export function Sidebar({ isVisible, onOpenSettings }) {
       </ScrollArea>
 
       {/* Settings and Collapse */}
-      <div style={{ padding: '16px', borderTop: '1px solid #27272a' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={onOpenSettings}
-            title={isCollapsed ? 'Settings' : undefined}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isCollapsed ? 'center' : 'flex-start',
-              gap: '10px',
-              flex: 1,
-              padding: isCollapsed ? '10px' : '10px 12px',
-              fontSize: '14px',
-              color: '#a1a1aa',
-              backgroundColor: 'transparent',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#a1a1aa';
-            }}
-          >
-            <Settings style={{ width: '16px', height: '16px', flexShrink: 0 }} />
-            {!isCollapsed && <span>Settings</span>}
-          </button>
-          <button
-            onClick={handleToggleCollapse}
-            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '36px',
-              height: '36px',
-              padding: '6px',
-              fontSize: '14px',
-              color: '#71717a',
-              backgroundColor: 'transparent',
-              border: '1px solid #27272a',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-              flexShrink: 0,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#71717a';
-            }}
-          >
-            {isCollapsed ? (
-              <ChevronRight style={{ width: '16px', height: '16px' }} />
-            ) : (
-              <ChevronLeft style={{ width: '16px', height: '16px' }} />
-            )}
-          </button>
-        </div>
+      <div style={{ 
+        padding: isCollapsed ? '8px' : '16px', 
+        borderTop: '1px solid #27272a',
+        display: 'flex',
+        flexDirection: isCollapsed ? 'column' : 'row',
+        gap: isCollapsed ? '4px' : '8px',
+      }}>
+        <button
+          onClick={onOpenSettings}
+          title={isCollapsed ? 'Settings' : undefined}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            width: isCollapsed ? '48px' : 'auto',
+            flex: isCollapsed ? 'none' : 1,
+            padding: isCollapsed ? '10px' : '10px 12px',
+            fontSize: '14px',
+            color: '#a1a1aa',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#a1a1aa';
+          }}
+        >
+          <Settings style={{ width: '16px', height: '16px', flexShrink: 0 }} />
+          {!isCollapsed && <span>Settings</span>}
+        </button>
+        <button
+          onClick={handleToggleCollapse}
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: isCollapsed ? '48px' : '36px',
+            height: '36px',
+            padding: '6px',
+            fontSize: '14px',
+            color: '#71717a',
+            backgroundColor: 'transparent',
+            border: '1px solid #27272a',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#71717a';
+          }}
+        >
+          {isCollapsed ? (
+            <ChevronRight style={{ width: '16px', height: '16px' }} />
+          ) : (
+            <ChevronLeft style={{ width: '16px', height: '16px' }} />
+          )}
+        </button>
       </div>
     </aside>
   );
