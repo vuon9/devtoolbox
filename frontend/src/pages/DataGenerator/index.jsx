@@ -25,36 +25,71 @@ const formats = [
 
 // Schema field types available in gofakeit
 const fieldTypes = [
-  'UUID', 'Name', 'FirstName', 'LastName', 'Email', 'Phone',
-  'Recent', 'Past', 'Future', 'Birthday',
-  'Boolean', 'Int', 'Float', 'String', 'URL', 'Address',
-  'City', 'Country', 'Company', 'JobTitle', 'Price',
+  // UUID & IDs
+  'UUID', 'ULID',
+  // Person
+  'FirstName', 'LastName', 'Name', 'Gender', 'Email', 'Phone',
+  // Internet
+  'Username', 'URL', 'Domain', 'IP', 'Password',
+  // Address
+  'Street', 'City', 'State', 'Zip', 'Country', 'Latitude', 'Longitude',
+  // Company & Job
+  'Company', 'JobTitle',
+  // Date
+  'Past', 'Future', 'Recent', 'Birthday',
+  // Number
+  'Int', 'Float', 'Price',
+  // Lorem
+  'Word', 'Sentence', 'Paragraph',
+  // Other
+  'Bool',
 ];
 
 // Map schema types to gofakeit template functions
-// Strings need quotes, numbers/booleans don't
+// Strings need quotes, numbers/bools don't
 const typeToTemplate = {
+  // UUID & IDs
   'UUID': '"{{UUID}}"',
-  'Name': '"{{Name}}"',
+  'ULID': '"{{ULID}}"',
+  // Person
   'FirstName': '"{{FirstName}}"',
   'LastName': '"{{LastName}}"',
+  'Name': '"{{Name}}"',
+  'Gender': '"{{Gender}}"',
   'Email': '"{{Email}}"',
   'Phone': '"{{Phone}}"',
-  'Recent': '"{{Recent}}"',
-  'Past': '"{{Past}}"',
-  'Future': '"{{Future}}"',
-  'Birthday': '"{{Birthday}}"',
+  // Internet
+  'Username': '"{{Username}}"',
   'URL': '"{{URL}}"',
-  'Address': '"{{Address}}"',
+  'Domain': '"{{Domain}}"',
+  'IP': '"{{IP}}"',
+  'Password': '"{{Password}}"',
+  // Address
+  'Street': '"{{Street}}"',
   'City': '"{{City}}"',
+  'State': '"{{State}}"',
+  'Zip': '"{{Zip}}"',
   'Country': '"{{Country}}"',
+  'Latitude': '{{Latitude}}',
+  'Longitude': '{{Longitude}}',
+  // Company & Job
   'Company': '"{{Company}}"',
   'JobTitle': '"{{JobTitle}}"',
-  'String': '"{{Sentence 5}}"',
-  'Boolean': '{{Boolean}}',
+  // Date
+  'Past': '"{{Past}}"',
+  'Future': '"{{Future}}"',
+  'Recent': '"{{Recent}}"',
+  'Birthday': '"{{Birthday}}"',
+  // Number (no quotes for non-strings)
   'Int': '{{Int 1 100}}',
   'Float': '{{Float 1.0 100.0}}',
   'Price': '{{Price 1.0 100.0}}',
+  // Lorem
+  'Word': '"{{Word}}"',
+  'Sentence': '"{{Sentence}}"',
+  'Paragraph': '"{{Paragraph}}"',
+  // Other
+  'Bool': '{{Bool}}',
 };
 
 // Default schema fields
