@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '../../components/ui/Button';
 import {
-  Trash2,
   Undo2,
   Split,
   Rows,
 } from 'lucide-react';
-import DiffModeToggle from './components/DiffModeToggle';
+import { computeDiffResult } from './diffUtils';
 
 // Inline-styled components
 function ToolHeader({ title, description }) {
@@ -131,7 +130,91 @@ function ToolSplitPane({ children }) {
   );
 }
 
-function DiffResultMock() {
+function DiffModeToggle({ activeMode, onChange }) {
+  const modes = [
+    { label: 'Lines', value: 'lines' },
+    { label: 'Words', value: 'words' },
+    { label: 'Chars', value: 'chars' },
+  ];
+
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      backgroundColor: '#1c1917',
+      borderRadius: '8px',
+      padding: '4px',
+      border: '1px solid #27272a',
+    }}>
+      {modes.map((mode) => {
+        const isActive = activeMode === mode.value;
+        return (
+          <button
+            key={mode.value}
+            onClick={() => onChange(mode.value)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              backgroundColor: isActive ? '#27272a' : 'transparent',
+              border: 'none',
+              borderRadius: '6px',
+              color: isActive ? '#f4f4f5' : '#71717a',
+              fontSize: '13px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = '#27272a';
+                e.currentTarget.style.color = '#a1a1aa';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#71717a';
+              }
+            }}
+          >
+            {mode.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function DiffResult({ diff, viewMode }) {
+  if (!diff || diff.length === 0) {
+    return (
+      <div style={{
+        marginTop: '24px',
+        padding: '16px',
+        borderRadius: '8px',
+        backgroundColor: '#1c1917',
+        border: '1px solid #27272a',
+        minHeight: '100px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#71717a',
+        fontSize: '14px',
+      }}>
+        Enter text in both panes to see differences
+      </div>
+    );
+  }
+
+  // Stats
+  let added = 0, removed = 0;
+  diff.forEach(part => {
+    if (part.added) added += part.count || 0;
+    if (part.removed) removed += part.count || 0;
+  });
+
   return (
     <div style={{
       marginTop: '24px',
@@ -140,63 +223,61 @@ function DiffResultMock() {
       backgroundColor: '#1c1917',
       border: '1px solid #27272a',
       minHeight: '100px',
-      overflow: 'hidden',
+      maxHeight: '300px',
+      overflow: 'auto',
     }}>
+      {/* Stats */}
       <div style={{
-        fontSize: '10px',
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        color: '#52525b',
-        borderBottom: '1px solid #27272a',
-        paddingBottom: '8px',
+        display: 'flex',
+        gap: '16px',
         marginBottom: '12px',
+        paddingBottom: '12px',
+        borderBottom: '1px solid #27272a',
       }}>
-        Diff Result (Mockup)
+        <span style={{ fontSize: '12px', color: '#22c55e' }}>+{added} added</span>
+        <span style={{ fontSize: '12px', color: '#ef4444' }}>-{removed} removed</span>
       </div>
-      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '14px', lineHeight: 1.6 }}>
-        <DiffLine type="common" lineNum="1" text="This line is common to both versions." />
-        <DiffLine type="removed" lineNum="-" text="This line was removed in the modified version." />
-        <DiffLine type="added" lineNum="+" text="This line was added in the modified version." />
-        <DiffLine type="common" lineNum="2" text="Another common line here." />
+
+      {/* Diff content */}
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+        {diff.map((part, index) => {
+          if (part.added) {
+            return (
+              <div key={index} style={{
+                backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                color: '#22c55e',
+                borderLeft: '3px solid #22c55e',
+                padding: '2px 8px',
+                margin: '2px 0',
+              }}>
+                <span style={{ opacity: 0.5, marginRight: '8px' }}>+</span>
+                {part.value}
+              </div>
+            );
+          }
+          if (part.removed) {
+            return (
+              <div key={index} style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                color: '#ef4444',
+                borderLeft: '3px solid #ef4444',
+                padding: '2px 8px',
+                margin: '2px 0',
+                textDecoration: 'line-through',
+                opacity: 0.7,
+              }}>
+                <span style={{ opacity: 0.5, marginRight: '8px' }}>-</span>
+                {part.value}
+              </div>
+            );
+          }
+          return (
+            <span key={index} style={{ color: '#a1a1aa' }}>
+              {part.value}
+            </span>
+          );
+        })}
       </div>
-    </div>
-  );
-}
-
-function DiffLine({ type, lineNum, text }) {
-  const styles = {
-    common: {
-      backgroundColor: 'transparent',
-      color: '#a1a1aa',
-      borderLeft: 'none',
-    },
-    removed: {
-      backgroundColor: 'rgba(239, 68, 68, 0.1)',
-      color: '#ef4444',
-      borderLeft: '2px solid #ef4444',
-    },
-    added: {
-      backgroundColor: 'rgba(34, 197, 94, 0.1)',
-      color: '#22c55e',
-      borderLeft: '2px solid #22c55e',
-    },
-  };
-
-  const style = styles[type] || styles.common;
-
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '16px',
-      padding: '4px 8px',
-      marginLeft: '-8px',
-      marginRight: '-8px',
-      ...style,
-    }}>
-      <span style={{ width: '32px', fontSize: '10px', color: '#52525b', textAlign: 'right' }}>{lineNum}</span>
-      <span>{text}</span>
     </div>
   );
 }
@@ -207,7 +288,7 @@ export default function TextDiffChecker() {
   const [activeMode, setActiveMode] = useState(
     () => localStorage.getItem('diff-mode') || 'side-by-side'
   );
-  const [diffMode, setDiffMode] = useState(0); // 0: Lines, 1: Words, 2: Chars
+  const [diffMode, setDiffMode] = useState('lines');
 
   useEffect(() => {
     localStorage.setItem('diff-mode', activeMode);
@@ -218,6 +299,12 @@ export default function TextDiffChecker() {
     setModified('');
   };
 
+  // Compute diff
+  const diffResult = useMemo(() => {
+    if (!original && !modified) return null;
+    return computeDiffResult(original, modified, diffMode, false);
+  }, [original, modified, diffMode]);
+
   const diffModes = [
     { id: 'side-by-side', label: 'Side-by-Side', icon: Split },
     { id: 'unified', label: 'Unified View', icon: Rows },
@@ -227,7 +314,7 @@ export default function TextDiffChecker() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden', backgroundColor: '#09090b' }}>
       <ToolHeader
         title="Text Diff Checker"
-        description="Compare two pieces of text and visualize differences instantly. Supports side-by-side and unified views with character-level granularity."
+        description="Compare two pieces of text and visualize differences instantly. Supports line, word, and character-level diffs."
       />
 
       <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px' }}>
@@ -303,7 +390,7 @@ export default function TextDiffChecker() {
         </ToolSplitPane>
       </div>
 
-      <DiffResultMock />
+      <DiffResult diff={diffResult} viewMode={activeMode} />
     </div>
   );
 }
