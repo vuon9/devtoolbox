@@ -53,7 +53,7 @@ export async function Generate(req: {
   const request = {
     template: req.template || '{{UUID}}', // Default template
     variables: {},
-    batchCount: Math.max(10, Math.min(1000, req.count || 10)), // Clamp between 10-1000
+    batchCount: Math.max(1, Math.min(1000, req.count || 10)), // Clamp between 1-1000
     outputFormat: req.format || 'json',
     separator: 'newline',
   };

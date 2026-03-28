@@ -831,8 +831,8 @@ export default function DataGenerator() {
             label="Count"
             type="number"
             value={count}
-            onChange={(e) => setCount(parseInt(e.target.value) || 10)}
-            min={10}
+            onChange={(e) => setCount(parseInt(e.target.value) || 1)}
+            min={1}
             max={1000}
           />
         </div>
