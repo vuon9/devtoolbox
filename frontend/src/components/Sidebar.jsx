@@ -44,17 +44,24 @@ const TOOL_ICONS = {
   'diff': FileDiff,
 };
 
-function SidebarItem({ to, icon: Icon, label, onClick, disabled }) {
+function SidebarItem({ to, icon: Icon, label, disabled }) {
+  const baseStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '10px 16px',
+    margin: '0 8px',
+    fontSize: '14px',
+    borderRadius: '8px',
+    transition: 'all 0.15s ease',
+  };
+
   if (disabled) {
     return (
-      <div
-        className={cn(
-          'flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-600 cursor-not-allowed'
-        )}
-      >
-        {Icon && <Icon className="h-4 w-4 shrink-0 opacity-40" />}
-        <span className="truncate">{label}</span>
-        <span className="text-[10px] uppercase tracking-wider text-zinc-700 ml-auto">
+      <div style={{ ...baseStyle, color: '#52525b', cursor: 'not-allowed' }}>
+        {Icon && <Icon style={{ width: '16px', height: '16px', flexShrink: 0, opacity: 0.4 }} />}
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+        <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#3f3f46', marginLeft: 'auto' }}>
           disabled
         </span>
       </div>
@@ -64,27 +71,44 @@ function SidebarItem({ to, icon: Icon, label, onClick, disabled }) {
   return (
     <NavLink
       to={to}
-      onClick={onClick}
-      className={({ isActive }) =>
-        cn(
-          'flex items-center gap-2.5 px-3 py-2 text-sm font-medium rounded-md transition-all',
-          'hover:bg-zinc-800/80 hover:text-zinc-100',
-          isActive
-            ? 'bg-zinc-800 text-zinc-100 border-l-2 border-blue-500 pl-[10px]'
-            : 'text-zinc-400'
-        )
-      }
+      style={({ isActive }) => ({
+        ...baseStyle,
+        color: isActive ? '#ffffff' : '#a1a1aa',
+        backgroundColor: isActive ? '#27272a' : 'transparent',
+      })}
+      onMouseEnter={(e) => {
+        if (!e.currentTarget.classList.contains('active')) {
+          e.currentTarget.style.backgroundColor = 'rgba(39, 39, 42, 0.5)';
+          e.currentTarget.style.color = '#e4e4e7';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!e.currentTarget.classList.contains('active')) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.color = '#a1a1aa';
+        }
+      }}
     >
-      {Icon && <Icon className="h-4 w-4 shrink-0 opacity-70 group-hover:opacity-100 transition-opacity" />}
-      <span className="truncate">{label}</span>
+      {Icon && <Icon style={{ width: '16px', height: '16px', flexShrink: 0 }} />}
+      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
     </NavLink>
   );
 }
 
 function SidebarHeader({ title, icon: Icon }) {
   return (
-    <div className="flex items-center gap-1.5 px-3 py-2 mt-3 mb-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
-      {Icon && <Icon className="h-3.5 w-3.5" />}
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '12px 16px 8px',
+      fontSize: '11px',
+      fontWeight: 600,
+      color: '#71717a',
+      textTransform: 'uppercase',
+      letterSpacing: '0.05em',
+    }}>
+      {Icon && <Icon style={{ width: '14px', height: '14px' }} />}
       <span>{title}</span>
     </div>
   );
@@ -92,7 +116,7 @@ function SidebarHeader({ title, icon: Icon }) {
 
 export function Sidebar({ isVisible, onOpenSettings }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [favorites, setFavorites] = useState(() => {
+  const [favorites] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('favoriteTools')) || [];
     } catch {
@@ -117,15 +141,14 @@ export function Sidebar({ isVisible, onOpenSettings }) {
 
   const filteredTools = useMemo(() => {
     if (!searchQuery) return tools;
-    return tools.filter(tool => 
+    return tools.filter(tool =>
       tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery, tools]);
 
   const favoriteTools = tools.filter(t => favorites.includes(t.id));
-  
-  // Group filtered tools by category
+
   const toolsByCategory = useMemo(() => {
     return filteredTools.reduce((acc, tool) => {
       if (!acc[tool.category]) acc[tool.category] = [];
@@ -139,76 +162,123 @@ export function Sidebar({ isVisible, onOpenSettings }) {
   if (!isVisible) return null;
 
   return (
-    <aside className="w-64 border-r border-zinc-800 bg-zinc-900/95 flex flex-col h-full transition-all duration-300">
-      {/* Header & Logo */}
-      <div className="px-4 pb-3">
-        <div className="flex items-center gap-2.5 py-3">
-          <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-            <Box className="h-4 w-4 text-white" />
+    <aside style={{
+      width: '256px',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      backgroundColor: '#18181b',
+      borderRight: '1px solid #27272a',
+    }}>
+      {/* Logo */}
+      <div style={{ padding: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+          }}>
+            <Box style={{ width: '20px', height: '20px', color: 'white' }} />
           </div>
-          <span className="font-bold text-lg text-zinc-100 tracking-tight">DevToolbox</span>
+          <span style={{ fontWeight: 700, fontSize: '18px', color: '#f4f4f5' }}>DevToolbox</span>
         </div>
-        
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-          <Input
+      </div>
+
+      {/* Search */}
+      <div style={{ padding: '0 16px 16px' }}>
+        <div style={{ position: 'relative' }}>
+          <Search style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '16px',
+            height: '16px',
+            color: '#71717a',
+          }} />
+          <input
             placeholder="Search tools..."
-            className="pl-9 bg-zinc-800/50 border-zinc-700 text-zinc-200 placeholder:text-zinc-500 focus-visible:ring-zinc-600"
+            style={{
+              width: '100%',
+              height: '40px',
+              padding: '0 12px 0 36px',
+              backgroundColor: '#27272a',
+              border: '1px solid #3f3f46',
+              borderRadius: '8px',
+              color: '#f4f4f5',
+              fontSize: '14px',
+              outline: 'none',
+            }}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="px-3 pb-6">
+      <ScrollArea style={{ flex: 1, overflow: 'hidden' }}>
+        <div style={{ paddingBottom: '24px' }}>
           {/* Quick Access */}
           {!searchQuery && (
             <>
               <NavLink
                 to="/tool/text-converter"
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-400 rounded-md',
-                    'hover:bg-zinc-800/80 hover:text-zinc-200'
-                  )
-                }
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '10px 16px',
+                  margin: '0 8px',
+                  fontSize: '14px',
+                  color: '#a1a1aa',
+                  borderRadius: '8px',
+                }}
               >
-                <History className="h-4 w-4 shrink-0 opacity-70" />
+                <History style={{ width: '16px', height: '16px' }} />
                 <span>Recent</span>
               </NavLink>
 
               {favoriteTools.length > 0 && (
                 <>
-                  <div className="h-px bg-zinc-800 my-2 mx-1" />
-                  <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
-                    <Star className="h-3.5 w-3.5" />
+                  <div style={{ height: '1px', background: '#27272a', margin: '12px 16px' }} />
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#71717a',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}>
+                    <Star style={{ width: '14px', height: '14px' }} />
                     <span>Favorites</span>
                   </div>
-                  <div className="space-y-0.5">
-                    {favoriteTools.map(tool => (
-                      <SidebarItem
-                        key={tool.id}
-                        to={`/tool/${tool.id}`}
-                        label={tool.name}
-                        icon={TOOL_ICONS[tool.id] || Box}
-                      />
-                    ))}
-                  </div>
+                  {favoriteTools.map(tool => (
+                    <SidebarItem
+                      key={tool.id}
+                      to={`/tool/${tool.id}`}
+                      label={tool.name}
+                      icon={TOOL_ICONS[tool.id] || Box}
+                    />
+                  ))}
                 </>
               )}
+
+              <div style={{ height: '1px', background: '#27272a', margin: '16px' }} />
             </>
           )}
 
-          {/* Divider */}
-          {!searchQuery && <div className="h-px bg-zinc-800 mx-1 my-2" />}
-
           {/* Categories */}
           {categories.map(category => (
-            <div key={category} className="mt-1">
+            <div key={category} style={{ marginTop: '8px' }}>
               <SidebarHeader title={category} icon={CATEGORY_ICONS[category]} />
-              <div className="space-y-0.5">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {toolsByCategory[category].map(tool => (
                   <SidebarItem
                     key={tool.id}
@@ -223,23 +293,32 @@ export function Sidebar({ isVisible, onOpenSettings }) {
           ))}
 
           {categories.length === 0 && (
-             <div className="px-3 py-8 text-center text-sm text-zinc-500">
-               No tools found.
-             </div>
+            <div style={{ padding: '32px 16px', textAlign: 'center', fontSize: '14px', color: '#71717a' }}>
+              No tools found.
+            </div>
           )}
         </div>
       </ScrollArea>
 
-      {/* Footer / Settings */}
-      <div className="p-3 border-t border-zinc-800">
+      {/* Settings */}
+      <div style={{ padding: '16px', borderTop: '1px solid #27272a' }}>
         <button
           onClick={onOpenSettings}
-          className={cn(
-            'flex w-full items-center gap-2.5 px-3 py-2 text-sm text-zinc-400 rounded-md',
-            'hover:bg-zinc-800 hover:text-zinc-200'
-          )}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            width: '100%',
+            padding: '10px 16px',
+            fontSize: '14px',
+            color: '#a1a1aa',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
         >
-          <Settings className="h-4 w-4 shrink-0 opacity-70" />
+          <Settings style={{ width: '16px', height: '16px' }} />
           <span>Settings</span>
         </button>
       </div>

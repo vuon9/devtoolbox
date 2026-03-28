@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* Tailwind CSS v4 - explicit content sources relative to this file */
+@source "./**/*.jsx";
+@source "./**/*.js";
+@source "./**/*.tsx";
+@source "./**/*.ts";
+@source "../index.html";
