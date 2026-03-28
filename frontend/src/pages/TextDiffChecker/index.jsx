@@ -233,24 +233,24 @@ function DiffLine({ item, showLineNum = true }) {
       color: '#ef4444',
     },
     gap: {
-      backgroundColor: 'rgba(39, 39, 42, 0.5)',
+      backgroundColor: 'rgba(39, 39, 42, 0.3)',
       borderLeft: '3px solid transparent',
       color: 'transparent',
-      minHeight: '22px',
     },
   };
 
   const style = styles[item.type] || styles.unchanged;
   const prefix = item.type === 'added' ? '+' : item.type === 'removed' ? '-' : ' ';
+  const lineHeight = 22; // Fixed line height in pixels for alignment
 
   return (
     <div style={{
       display: 'flex',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       ...style,
       fontFamily: "'IBM Plex Mono', monospace",
       fontSize: '13px',
-      lineHeight: 1.6,
+      height: `${lineHeight}px`,
       paddingLeft: '8px',
     }}>
       {showLineNum && (
@@ -266,9 +266,16 @@ function DiffLine({ item, showLineNum = true }) {
         </span>
       )}
       <span style={{ minWidth: '16px', color: item.type === 'gap' ? 'transparent' : style.color, opacity: 0.6 }}>
-        {item.type === 'gap' ? ' ' : prefix}
+        {item.type === 'gap' ? '\u00A0' : prefix}
       </span>
-      <span style={{ color: style.color, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+      <span style={{ 
+        color: style.color, 
+        whiteSpace: 'pre-wrap', 
+        wordBreak: 'break-word',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}>
         {item.content || (item.type === 'gap' ? '\u00A0' : '')}
       </span>
     </div>
