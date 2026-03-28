@@ -1,7 +1,5 @@
 import React from 'react';
 import { Menu, Settings, Minus, Square, X, Sidebar as SidebarIcon } from 'lucide-react';
-import { Button } from './ui/button';
-import { cn } from '../utils/cn';
 
 export function TitleBar({ isSidebarOpen, toggleSidebar, appName = 'DevToolbox', onOpenSettings }) {
   // Detect if running in desktop mode (Wails)
@@ -16,59 +14,133 @@ export function TitleBar({ isSidebarOpen, toggleSidebar, appName = 'DevToolbox',
   const handleMaximize = () => window.runtime?.WindowToggleMaximise?.();
   const handleClose = () => window.runtime?.WindowQuit?.();
 
+  const buttonStyle = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    padding: '6px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    borderRadius: '4px',
+    color: '#a1a1aa',
+    cursor: 'pointer',
+    transition: 'background-color 0.15s ease, color 0.15s ease',
+    WebkitAppRegion: 'no-drag',
+  };
+
   return (
     <header
-      className={cn(
-        'h-10 border-b bg-background flex items-center justify-between px-3 select-none drag-region',
-        isMac && 'pl-20' // Space for Mac traffic lights
-      )}
+      style={{
+        height: '40px',
+        borderBottom: '1px solid #27272a',
+        backgroundColor: '#18181b',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingLeft: isMac ? '80px' : '12px',
+        paddingRight: '12px',
+        WebkitAppRegion: 'drag',
+        userSelect: 'none',
+      }}
     >
       {/* Left section */}
-      <div className="flex items-center gap-2 no-drag">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-7 w-7">
-          {isSidebarOpen ? <SidebarIcon className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </Button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', WebkitAppRegion: 'no-drag' }}>
+        <button
+          onClick={toggleSidebar}
+          style={buttonStyle}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#a1a1aa';
+          }}
+        >
+          {isSidebarOpen ? <SidebarIcon style={{ width: '16px', height: '16px' }} /> : <Menu style={{ width: '16px', height: '16px' }} />}
+        </button>
       </div>
 
       {/* Center section */}
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-none">
-        <span className="text-xs font-semibold tracking-tight text-muted-foreground uppercase">
+      <div style={{
+        position: 'absolute',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        pointerEvents: 'none',
+      }}>
+        <span style={{
+          fontSize: '12px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: '#71717a',
+          textTransform: 'uppercase',
+        }}>
           {appName}
         </span>
       </div>
 
       {/* Right section */}
-      <div className="flex items-center gap-1 no-drag">
-        <Button variant="ghost" size="icon" onClick={onOpenSettings} className="h-7 w-7">
-          <Settings className="h-4 w-4" />
-        </Button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', WebkitAppRegion: 'no-drag' }}>
+        <button
+          onClick={onOpenSettings}
+          style={buttonStyle}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#a1a1aa';
+          }}
+        >
+          <Settings style={{ width: '16px', height: '16px' }} />
+        </button>
 
         {isDesktop && !isMac && (
-          <div className="flex items-center ml-2 border-l pl-2 gap-0.5">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 hover:bg-accent"
+          <div style={{ display: 'flex', alignItems: 'center', marginLeft: '8px', paddingLeft: '8px', borderLeft: '1px solid #27272a', gap: '2px' }}>
+            <button
               onClick={handleMinimize}
+              style={buttonStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#27272a';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              <Minus className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 hover:bg-accent"
+              <Minus style={{ width: '12px', height: '12px' }} />
+            </button>
+            <button
               onClick={handleMaximize}
+              style={buttonStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#27272a';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              <Square className="h-2.5 w-2.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 hover:bg-destructive hover:text-destructive-foreground"
+              <Square style={{ width: '10px', height: '10px' }} />
+            </button>
+            <button
               onClick={handleClose}
+              style={{ ...buttonStyle, color: '#ef4444' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#dc2626';
+                e.currentTarget.style.color = '#ffffff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#ef4444';
+              }}
             >
-              <X className="h-4 w-4" />
-            </Button>
+              <X style={{ width: '16px', height: '16px' }} />
+            </button>
           </div>
         )}
       </div>

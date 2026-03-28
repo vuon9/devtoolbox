@@ -27,17 +27,35 @@ function App() {
   }, [themeMode]);
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        width: '100vw',
+        backgroundColor: '#09090b',
+        color: '#fafafa',
+        overflow: 'hidden',
+      }}
+    >
       <TitleBar
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
         onOpenSettings={openSettings}
       />
 
-      <div className="flex flex-1 min-h-0 overflow-hidden">
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <Sidebar isVisible={isSidebarOpen} onOpenSettings={openSettings} />
 
-        <main className="flex-1 flex flex-col min-w-0 bg-background relative overflow-hidden">
+        <main style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          backgroundColor: '#09090b',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
           <Routes>
             <Route path="/" element={<Navigate to="/tool/text-converter" replace />} />
             <Route path="/tool/:toolId/*" element={<ToolRouter />} />
