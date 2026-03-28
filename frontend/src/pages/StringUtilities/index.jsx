@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
-import { Button } from '../../components/ui/button';
-import { cn } from '../../utils/cn';
 import {
   Type,
   Hash,
   ListOrdered,
   AlignLeft,
   Trash2,
-  ArrowDownAz,
   Undo2,
-  Trash,
 } from 'lucide-react';
 import CaseConverterPane from './components/CaseConverterPane';
 import SortDedupePane from './components/SortDedupePane';
@@ -24,6 +19,120 @@ import {
   trimLines,
   removeEmptyLines,
 } from './strings';
+
+// Inline-styled components
+function ToolHeader({ title, description }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}>
+        {title}
+      </h2>
+      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+    </div>
+  );
+}
+
+function ToolPane({ label, value, onChange, readOnly, placeholder, style = {} }) {
+  const handleCopy = () => {
+    if (value) {
+      navigator.clipboard.writeText(value);
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '200px', ...style }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '30px', marginBottom: '8px' }}>
+        <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          {label}
+        </label>
+        {!readOnly && (
+          <button
+            onClick={handleCopy}
+            title="Copy to clipboard"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              padding: '6px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderRadius: '4px',
+              color: '#a1a1aa',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.color = '#f4f4f5';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#a1a1aa';
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        )}
+      </div>
+      <div style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <textarea
+          value={value}
+          onChange={onChange}
+          readOnly={readOnly}
+          placeholder={placeholder}
+          style={{
+            flex: 1,
+            width: '100%',
+            height: '100%',
+            padding: '12px',
+            fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+            fontSize: '14px',
+            lineHeight: 1.5,
+            backgroundColor: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: '8px',
+            color: '#f4f4f5',
+            resize: 'none',
+            outline: 'none',
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ToolSplitPane({ children, columnCount = 2 }) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: columnCount === 1 ? '1fr' : '1fr 1fr',
+      gap: '16px',
+      flex: 1,
+      minHeight: 0,
+      overflow: 'hidden',
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function StatItem({ label, value }) {
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#71717a', marginBottom: '2px' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '18px', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, color: '#f4f4f5' }}>
+        {value}
+      </div>
+    </div>
+  );
+}
 
 export default function StringUtilities() {
   const [input, setInput] = useState('');
@@ -70,78 +179,137 @@ export default function StringUtilities() {
   ];
 
   return (
-    <div className="flex flex-col h-full p-6 overflow-hidden bg-background">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden', backgroundColor: '#09090b' }}>
       <ToolHeader
         title="String Utilities"
         description="All-in-one text processing toolkit. Convert between cases, sort lines, remove duplicates, and inspect text properties."
       />
 
-      <div className="mb-6 flex items-center justify-between border-b pb-4">
+      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px' }}>
         <ModeTabBar modes={modes} activeMode={activeMode} onModeChange={setActiveMode} />
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
             onClick={handleTrim}
-            className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px]"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 12px',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: 'transparent',
+              color: '#a1a1aa',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.color = '#f4f4f5';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#a1a1aa';
+            }}
           >
-            <AlignLeft className="h-3.5 w-3.5" />
+            <AlignLeft style={{ width: '14px', height: '14px' }} />
             Trim Lines
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
+          </button>
+          <button
             onClick={handleRemoveEmpty}
-            className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px]"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 12px',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: 'transparent',
+              color: '#a1a1aa',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.color = '#f4f4f5';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#a1a1aa';
+            }}
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 style={{ width: '14px', height: '14px' }} />
             Clear Empty
-          </Button>
-          <div className="w-px h-4 bg-border mx-2" />
-          <Button
-            variant="ghost"
-            size="sm"
+          </button>
+          <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }} />
+          <button
             onClick={handleReset}
-            className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] text-destructive hover:bg-destructive/10 hover:text-destructive"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 12px',
+              fontSize: '12px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: 'transparent',
+              color: '#ef4444',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
           >
-            <Undo2 className="h-3.5 w-3.5" />
+            <Undo2 style={{ width: '14px', height: '14px' }} />
             Reset
-          </Button>
+          </button>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
+      <div style={{ flex: 1, minHeight: 0 }}>
         {activeMode === 'inspector' ? (
           <InspectorPane input={input} setInput={setInput} stats={stats} />
         ) : (
           <ToolSplitPane>
-            <div className="flex flex-col h-full space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
               <ToolPane
                 label="Input Text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Paste or type text here..."
-                className="flex-1"
               />
-              <div className="p-4 rounded-lg bg-muted/20 border border-border/40">
+              <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#1c1917', border: '1px solid #27272a' }}>
                 {activeMode === 'case' ? (
-                  <CaseConverterPane onConvert={handleCaseChange} />
+                  <CaseConverterPane input={input} />
                 ) : (
                   <SortDedupePane onSort={handleSort} onDedupe={handleDedupe} />
                 )}
               </div>
             </div>
 
-            <div className="flex flex-col h-full space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
               <ToolPane
                 label="Result"
                 value={output}
                 readOnly
                 placeholder="Transformed text will appear here..."
-                className="flex-1"
               />
-              <div className="p-4 rounded-lg bg-muted/20 border border-border/40 flex justify-around text-center">
+              <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#1c1917', border: '1px solid #27272a', display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
                 <StatItem label="Lines" value={stats.lines} />
                 <StatItem label="Words" value={stats.words} />
                 <StatItem label="Chars" value={stats.chars} />
@@ -150,17 +318,6 @@ export default function StringUtilities() {
           </ToolSplitPane>
         )}
       </div>
-    </div>
-  );
-}
-
-function StatItem({ label, value }) {
-  return (
-    <div>
-      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
-        {label}
-      </div>
-      <div className="text-lg font-mono font-semibold text-primary">{value}</div>
     </div>
   );
 }

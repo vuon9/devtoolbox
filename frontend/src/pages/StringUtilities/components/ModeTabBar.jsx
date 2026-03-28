@@ -1,65 +1,65 @@
 import React from 'react';
-import { DataEnrichment, CharacterUpperCase, ChartBar } from '@carbon/icons-react';
+import { CaseSensitive, Type, BarChart3 } from 'lucide-react';
 
-const ModeTabBar = ({ activeMode, onChange }) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      backgroundColor: 'var(--cds-layer-02)',
-      borderRadius: '20px',
-      padding: '4px',
-      width: 'fit-content',
-      minHeight: '40px',
-      boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)',
-    }}
-  >
-    {[
-      { label: 'Sort / Dedupe', icon: DataEnrichment },
-      { label: 'Case Converter', icon: CharacterUpperCase },
-      { label: 'Inspector', icon: ChartBar },
-    ].map((tab, idx) => {
-      const isActive = activeMode === idx;
-      const Icon = tab.icon;
-      return (
-        <button
-          key={idx}
-          onClick={() => onChange(idx)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 20px',
-            background: isActive ? 'var(--cds-layer)' : 'transparent',
-            border: 'none',
-            borderRadius: '16px',
-            color: isActive ? 'var(--cds-text-primary)' : 'var(--cds-text-secondary)',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            boxShadow: isActive ? '0 2px 4px rgba(0, 0, 0, 0.15)' : 'none',
-            minWidth: '140px',
-            justifyContent: 'center',
-            position: 'relative',
-          }}
-          onMouseEnter={(e) => {
-            if (!isActive) {
-              e.currentTarget.style.backgroundColor = 'var(--cds-layer-hover)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isActive) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }
-          }}
-        >
-          <Icon size={16} />
-          {tab.label}
-        </button>
-      );
-    })}
-  </div>
-);
+const icons = {
+  case: Type,
+  sort: BarChart3,
+  inspector: CaseSensitive,
+};
 
-export default ModeTabBar;
+export default function ModeTabBar({ modes, activeMode, onModeChange }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        backgroundColor: '#1c1917',
+        borderRadius: '8px',
+        padding: '4px',
+        border: '1px solid #27272a',
+      }}
+    >
+      {modes.map((tab) => {
+        const Icon = icons[tab.id] || Type;
+        const isActive = activeMode === tab.id;
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onModeChange(tab.id)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              backgroundColor: isActive ? '#27272a' : 'transparent',
+              border: 'none',
+              borderRadius: '6px',
+              color: isActive ? '#f4f4f5' : '#71717a',
+              fontSize: '13px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              minWidth: '120px',
+              justifyContent: 'center',
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = '#27272a';
+                e.currentTarget.style.color = '#a1a1aa';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#71717a';
+              }
+            }}
+          >
+            <Icon style={{ width: '16px', height: '16px' }} />
+            {tab.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
