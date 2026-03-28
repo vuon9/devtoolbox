@@ -319,7 +319,6 @@ function DiffLine({ item, showLineNum = true }) {
           wordBreak: 'break-word',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
         }}
       >
         {item.content || (item.type === 'gap' ? '\u00A0' : '')}
