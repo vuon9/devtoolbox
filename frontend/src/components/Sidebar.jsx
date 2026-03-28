@@ -285,7 +285,10 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                 }}>
-                  {CATEGORY_ICONS[category] && <CATEGORY_ICONS[category] style={{ width: '14px', height: '14px' }} />}
+                  {(() => {
+                    const IconComponent = CATEGORY_ICONS[category];
+                    return IconComponent ? <IconComponent style={{ width: '14px', height: '14px' }} /> : null;
+                  })()}
                   <span>{category}</span>
                 </div>
               )}
