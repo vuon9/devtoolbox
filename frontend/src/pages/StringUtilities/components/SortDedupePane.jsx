@@ -1,40 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-// Inline-styled checkbox component
-function Checkbox({ id, label, checked, onChange }) {
+// Inline-styled toggle button
+function ToggleButton({ label, active, onClick }) {
   return (
-    <label
-      htmlFor={id}
+    <button
+      onClick={onClick}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '8px',
+        gap: '6px',
+        padding: '8px 14px',
+        fontSize: '13px',
+        fontWeight: 500,
+        backgroundColor: active ? '#2563eb' : 'transparent',
+        color: active ? '#ffffff' : '#a1a1aa',
+        border: active ? '1px solid #2563eb' : '1px solid #27272a',
+        borderRadius: '6px',
         cursor: 'pointer',
-        userSelect: 'none',
-        fontSize: '14px',
-        color: '#a1a1aa',
-        marginRight: '16px',
+        transition: 'all 0.15s ease',
+        whiteSpace: 'nowrap',
+      }}
+      onMouseEnter={(e) => {
+        if (!active) {
+          e.currentTarget.style.backgroundColor = '#27272a';
+          e.currentTarget.style.color = '#f4f4f5';
+          e.currentTarget.style.borderColor = '#3f3f46';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!active) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.color = '#a1a1aa';
+          e.currentTarget.style.borderColor = '#27272a';
+        }
       }}
     >
-      <input
-        id={id}
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        style={{
-          width: '16px',
-          height: '16px',
-          accentColor: '#2563eb',
-          cursor: 'pointer',
-        }}
-      />
       {label}
-    </label>
+    </button>
   );
 }
 
 export default function SortDedupePane({ onSort, onDedupe }) {
-  const [options, setOptions] = useState({
+  const [options, setOptions] = React.useState({
     sort: true,
     dedupe: true,
     reverse: false,
@@ -42,43 +49,38 @@ export default function SortDedupePane({ onSort, onDedupe }) {
     ignoreEmpty: true,
   });
 
-  const handleOptionChange = (key, value) => {
-    const newOptions = { ...options, [key]: value };
+  const handleToggle = (key) => {
+    const newOptions = { ...options, [key]: !options[key] };
     setOptions(newOptions);
     onSort(newOptions);
   };
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-      <Checkbox
-        id="chk-sort"
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+      <ToggleButton
         label="Sort"
-        checked={options.sort}
-        onChange={(val) => handleOptionChange('sort', val)}
+        active={options.sort}
+        onClick={() => handleToggle('sort')}
       />
-      <Checkbox
-        id="chk-dedupe"
+      <ToggleButton
         label="Deduplicate"
-        checked={options.dedupe}
-        onChange={(val) => handleOptionChange('dedupe', val)}
+        active={options.dedupe}
+        onClick={() => handleToggle('dedupe')}
       />
-      <Checkbox
-        id="chk-reverse"
+      <ToggleButton
         label="Reverse"
-        checked={options.reverse}
-        onChange={(val) => handleOptionChange('reverse', val)}
+        active={options.reverse}
+        onClick={() => handleToggle('reverse')}
       />
-      <Checkbox
-        id="chk-trim"
+      <ToggleButton
         label="Trim Lines"
-        checked={options.trim}
-        onChange={(val) => handleOptionChange('trim', val)}
+        active={options.trim}
+        onClick={() => handleToggle('trim')}
       />
-      <Checkbox
-        id="chk-empty"
+      <ToggleButton
         label="Remove Empty"
-        checked={options.ignoreEmpty}
-        onChange={(val) => handleOptionChange('ignoreEmpty', val)}
+        active={options.ignoreEmpty}
+        onClick={() => handleToggle('ignoreEmpty')}
       />
     </div>
   );
