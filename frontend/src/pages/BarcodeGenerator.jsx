@@ -11,9 +11,11 @@ import {
 import { GenerateBarcode } from '../services/barcodeService';
 
 const types = [
-  { id: 'qr', label: 'QR Code', icon: QrCode },
-  { id: 'code128', label: 'Code 128', icon: ScanBarcode },
-  { id: 'ean13', label: 'EAN-13', icon: Hash },
+  { id: 'QR', label: 'QR Code', icon: QrCode },
+  { id: 'Code128', label: 'Code 128', icon: ScanBarcode },
+  { id: 'Code39', label: 'Code 39', icon: ScanBarcode },
+  { id: 'EAN-13', label: 'EAN-13', icon: Hash },
+  { id: 'EAN-8', label: 'EAN-8', icon: Hash },
 ];
 
 function ToolHeader({ title, description }) {
@@ -81,6 +83,7 @@ function TypeToggle({ types, value, onChange }) {
       borderRadius: '8px',
       padding: '4px',
       border: '1px solid #27272a',
+      flexWrap: 'wrap',
     }}>
       {types.map((t) => {
         const Icon = t.icon;
@@ -127,8 +130,9 @@ function TypeToggle({ types, value, onChange }) {
 
 export default function BarcodeGenerator() {
   const [input, setInput] = useState('https://github.com/wailsapp/wails');
-  const [type, setType] = useState('qr');
+  const [type, setType] = useState('QR');
   const [output, setOutput] = useState('');
+  const [error, setError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isVertical, setIsVertical] = useState(
     () => localStorage.getItem('barcode-layout') === 'vertical'
@@ -141,14 +145,22 @@ export default function BarcodeGenerator() {
   const handleGenerate = async () => {
     if (!input) return;
     setIsGenerating(true);
+    setError('');
     try {
       const res = await GenerateBarcode({ content: input, standard: type });
-      console.log('Barcode response:', res);
-      // Handle different response formats
-      const svgContent = typeof res === 'string' ? res : res?.svg || res?.image || res?.data || JSON.stringify(res);
-      setOutput(svgContent);
+      if (res.error) {
+        setError(res.error);
+        setOutput('');
+      } else if (res.dataUrl) {
+        setOutput(res.dataUrl);
+        setError('');
+      } else {
+        setError('Unexpected response format');
+        setOutput('');
+      }
     } catch (err) {
       console.error('Barcode error:', err);
+      setError(err.message || 'Failed to generate barcode');
       setOutput('');
     } finally {
       setIsGenerating(false);
@@ -159,25 +171,22 @@ export default function BarcodeGenerator() {
     if (input) handleGenerate();
   }, [input, type]);
 
-  const handleDownloadSVG = () => {
+  const handleDownloadPNG = () => {
     if (!output) return;
-    const blob = new Blob([output], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `barcode.${type}.svg`;
+    a.href = output;
+    a.download = `barcode.${type.toLowerCase()}.png`;
     a.click();
-    URL.revokeObjectURL(url);
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden', backgroundColor: '#09090b' }}>
       <ToolHeader
         title="Barcode / QR Code"
-        description="Generate high-quality QR codes and barcodes for various standards. Customize appearance and download directly as SVG or PNG."
+        description="Generate high-quality QR codes and barcodes for various standards. Customize appearance and download directly as PNG."
       />
 
-      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px' }}>
+      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <TypeToggle types={types} value={type} onChange={setType} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -191,6 +200,12 @@ export default function BarcodeGenerator() {
           </Button>
         </div>
       </div>
+
+      {error && (
+        <div style={{ marginBottom: '16px', padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontSize: '14px' }}>
+          {error}
+        </div>
+      )}
 
       <ToolSplitPane isVertical={isVertical}>
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -209,24 +224,20 @@ export default function BarcodeGenerator() {
 
           <div style={{ backgroundColor: '#09090b', padding: '32px', borderRadius: '12px', border: '4px solid rgba(59, 130, 246, 0.2)' }}>
             {output ? (
-              <div dangerouslySetInnerHTML={{ __html: output }} style={{ height: '256px', width: '256px' }} />
+              <img src={output} alt="Barcode" style={{ height: '256px', width: '256px', objectFit: 'contain' }} />
             ) : (
               <div style={{ height: '256px', width: '256px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#18181b', borderRadius: '8px' }}>
-                <QrCode style={{ width: '64px', height: '64px', opacity: 0.1, animation: 'pulse 2s infinite' }} />
+                <QrCode style={{ width: '64px', height: '64px', opacity: 0.2 }} />
                 <span style={{ fontSize: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.3, marginTop: '16px' }}>
-                  Generating...
+                  {isGenerating ? 'Generating...' : 'Enter content'}
                 </span>
               </div>
             )}
           </div>
 
           {output && (
-            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-              <Button size="sm" onClick={handleDownloadSVG}>
-                <Download style={{ width: '14px', height: '14px' }} />
-                Download SVG
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDownloadSVG}>
+            <div style={{ marginTop: '24px' }}>
+              <Button onClick={handleDownloadPNG}>
                 <Download style={{ width: '14px', height: '14px' }} />
                 Download PNG
               </Button>
