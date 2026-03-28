@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../components/ui/Button';
 import {
   Select,
   SelectContent,

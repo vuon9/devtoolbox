@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Palette, Pipette, Hash, Copy, Check, History, Trash2, Sliders } from 'lucide-react';
