@@ -329,97 +329,95 @@ export default function BarcodeGenerator() {
           />
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1px solid #27272a',
-            borderRadius: '8px',
-            backgroundColor: '#18181b',
-            padding: '48px',
-            position: 'relative',
-          }}
-        >
-          <div
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <label
             style={{
-              position: 'absolute',
-              top: '12px',
-              left: '12px',
-              fontSize: '10px',
-              fontWeight: 700,
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
-              color: '#52525b',
+              marginBottom: '8px',
             }}
           >
             Preview
-          </div>
-
+          </label>
           <div
             style={{
-              backgroundColor: '#09090b',
-              padding: '32px',
-              borderRadius: '12px',
-              border: '4px solid rgba(59, 130, 246, 0.2)',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #27272a',
+              borderRadius: '8px',
+              backgroundColor: '#18181b',
+              padding: '24px',
             }}
           >
-            {output ? (
-              <img
-                src={output}
-                alt="Barcode"
-                style={{
-                  height: 'auto',
-                  width: '100%',
-                  maxWidth: '400px',
-                  objectFit: 'contain',
-                  imageRendering: type === 'QR' ? 'auto' : 'pixelated',
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  height: '256px',
-                  width: '256px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: '#18181b',
-                  borderRadius: '8px',
-                }}
-              >
-                <QrCode style={{ width: '64px', height: '64px', opacity: 0.2 }} />
-                <span
+            <div
+              style={{
+                backgroundColor: '#09090b',
+                padding: '24px',
+                borderRadius: '12px',
+                border: '4px solid rgba(59, 130, 246, 0.2)',
+              }}
+            >
+              {output ? (
+                <img
+                  src={output}
+                  alt="Barcode"
                   style={{
-                    fontSize: '12px',
-                    fontWeight: 500,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    opacity: 0.3,
-                    marginTop: '16px',
+                    height: 'auto',
+                    width: '100%',
+                    maxWidth: '300px',
+                    objectFit: 'contain',
+                    imageRendering: type === 'QR' ? 'auto' : 'pixelated',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    height: '200px',
+                    width: '200px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#18181b',
+                    borderRadius: '8px',
                   }}
                 >
-                  {isGenerating ? 'Generating...' : 'Enter content'}
-                </span>
+                  <QrCode style={{ width: '48px', height: '48px', opacity: 0.2 }} />
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      opacity: 0.3,
+                      marginTop: '12px',
+                    }}
+                  >
+                    {isGenerating ? 'Generating...' : 'Enter content'}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {output && (
+              <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+                <Button onClick={handleDownloadPNG}>
+                  <Download style={{ width: '14px', height: '14px' }} />
+                  PNG
+                </Button>
+                <Button variant="ghost" onClick={handleDownloadSVG}>
+                  <Download style={{ width: '14px', height: '14px' }} />
+                  SVG
+                </Button>
               </div>
             )}
           </div>
-
-          {output && (
-            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-              <Button onClick={handleDownloadPNG}>
-                <Download style={{ width: '14px', height: '14px' }} />
-                Download PNG
-              </Button>
-              <Button variant="outline" onClick={handleDownloadSVG}>
-                <Download style={{ width: '14px', height: '14px' }} />
-                Download SVG
-              </Button>
-            </div>
-          )}
         </div>
       </ToolSplitPane>
     </div>
