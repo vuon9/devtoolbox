@@ -3,7 +3,6 @@ package datagenerator
 import (
 	"encoding/csv"
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
 	"strings"
 
@@ -31,8 +30,8 @@ func (f *Formatter) Format(data []string, format string, separator string) (stri
 		return f.formatTSV(data)
 	case "yaml":
 		return f.formatYAML(data)
-	case "raw", "":
-		return f.formatRaw(data, separator)
+	case "raw":
+		return f.formatRaw(data)
 	default:
 		return "", ErrInvalidFormat
 	}
@@ -60,29 +59,37 @@ func (f *Formatter) formatJSON(data []string) (string, error) {
 	return string(result), nil
 }
 
-// formatXML formats data as XML
+// formatXML formats data as XML with proper elements
 func (f *Formatter) formatXML(data []string) (string, error) {
-	type Item struct {
-		Value string `xml:",cdata"`
-	}
-	type Items struct {
-		XMLName xml.Name `xml:"items"`
-		Item    []Item   `xml:"item"`
+	if len(data) == 0 {
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<items></items>", nil
 	}
 
-	items := Items{
-		Item: make([]Item, len(data)),
-	}
-	for i, d := range data {
-		items.Item[i] = Item{Value: d}
+	var buf strings.Builder
+	buf.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<items>\n")
+
+	for _, item := range data {
+		var obj map[string]interface{}
+		if err := json.Unmarshal([]byte(item), &obj); err != nil {
+			return "", fmt.Errorf("failed to parse JSON for XML: %w", err)
+		}
+
+		buf.WriteString("  <item>\n")
+		for key, val := range obj {
+			// Escape XML special characters
+			strVal := fmt.Sprintf("%v", val)
+			strVal = strings.ReplaceAll(strVal, "&", "&amp;")
+			strVal = strings.ReplaceAll(strVal, "<", "&lt;")
+			strVal = strings.ReplaceAll(strVal, ">", "&gt;")
+			strVal = strings.ReplaceAll(strVal, "\"", "&quot;")
+			strVal = strings.ReplaceAll(strVal, "'", "&apos;")
+			buf.WriteString(fmt.Sprintf("    <%s>%s</%s>\n", key, strVal, key))
+		}
+		buf.WriteString("  </item>\n")
 	}
 
-	result, err := xml.MarshalIndent(items, "", "  ")
-	if err != nil {
-		return "", fmt.Errorf("failed to format XML: %w", err)
-	}
-
-	return xml.Header + string(result), nil
+	buf.WriteString("</items>")
+	return buf.String(), nil
 }
 
 // formatCSV formats data as CSV with headers
@@ -194,7 +201,17 @@ func (f *Formatter) formatTSV(data []string) (string, error) {
 
 // formatYAML formats data as YAML
 func (f *Formatter) formatYAML(data []string) (string, error) {
-	result, err := yaml.Marshal(data)
+	// Parse each JSON string into a map and convert to proper YAML
+	var items []map[string]interface{}
+	for _, item := range data {
+		var obj map[string]interface{}
+		if err := json.Unmarshal([]byte(item), &obj); err != nil {
+			return "", fmt.Errorf("failed to parse JSON for YAML: %w", err)
+		}
+		items = append(items, obj)
+	}
+
+	result, err := yaml.Marshal(items)
 	if err != nil {
 		return "", fmt.Errorf("failed to format YAML: %w", err)
 	}
@@ -202,23 +219,37 @@ func (f *Formatter) formatYAML(data []string) (string, error) {
 	return string(result), nil
 }
 
-// formatRaw returns data as-is, joined by separator
-func (f *Formatter) formatRaw(data []string, separator string) (string, error) {
-	var sep string
-	switch separator {
-	case "comma":
-		sep = ","
-	case "tab":
-		sep = "\t"
-	case "none":
-		sep = ""
-	case "newline":
-		sep = "\n"
-	default:
-		// Custom separator (can be any string like " | " or ";;")
-		sep = separator
+// formatRaw formats data as "key: value" lines, one record per block
+func (f *Formatter) formatRaw(data []string) (string, error) {
+	if len(data) == 0 {
+		return "", nil
 	}
-	return strings.Join(data, sep), nil
+
+	var buf strings.Builder
+
+	for i, item := range data {
+		var obj map[string]interface{}
+		if err := json.Unmarshal([]byte(item), &obj); err != nil {
+			// If not valid JSON, just output the string
+			buf.WriteString(item)
+			if i < len(data)-1 {
+				buf.WriteString("\n\n")
+			}
+			continue
+		}
+
+		// Output as "key: value" format
+		for key, val := range obj {
+			buf.WriteString(fmt.Sprintf("%s: %v\n", key, val))
+		}
+
+		// Add blank line between records
+		if i < len(data)-1 {
+			buf.WriteString("\n")
+		}
+	}
+
+	return buf.String(), nil
 }
 
 // PrettyPrint attempts to pretty print the data if it's valid JSON
