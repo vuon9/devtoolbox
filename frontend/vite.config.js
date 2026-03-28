@@ -24,24 +24,11 @@ export default defineConfig({
           'mixed-decls',
           'color-functions',
         ],
-        // Handle ~@ibm/plex/... imports from Carbon
-        importer: [
-          (url) => {
-            if (url.startsWith('~')) {
-              return { file: url.substring(1) };
-            }
-            return null;
-          },
-        ],
+
       },
     },
   },
-  resolve: {
-    alias: {
-      // Ensure @ibm/plex can be resolved
-      '@ibm/plex': path.resolve(__dirname, 'node_modules/@ibm/plex'),
-    },
-  },
+
   build: {
     rollupOptions: {
       input: {

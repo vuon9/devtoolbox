@@ -141,7 +141,7 @@ export default function BarcodeGenerator() {
               Preview
             </div>
 
-            <div className="bg-white p-8 rounded-xl shadow-2xl transition-transform group-hover:scale-[1.02] border-4 border-primary/20">
+            <div className="bg-card p-8 rounded-xl shadow-2xl transition-transform group-hover:scale-[1.02] border-4 border-primary/20">
               {output ? (
                 <div dangerouslySetInnerHTML={{ __html: output }} className="h-64 w-64" />
               ) : (

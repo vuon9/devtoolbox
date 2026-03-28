@@ -1,13 +1,13 @@
 import React from 'react';
-import { TextArea, Button } from '@carbon/react';
-import { Copy } from '@carbon/icons-react';
+import { Copy } from 'lucide-react';
+import { Button } from './ui/button';
+import { ToolTextArea } from './inputs/ToolTextArea';
 
 // Re-export new layout components
 export { ToolLayout, ToolLayoutToggle, ToolVerticalSplit } from './layout';
 export { LAYOUT_DIRECTIONS, TOGGLE_POSITIONS } from './layout/constants';
 export {
   ToolCopyButton,
-  ToolTextArea,
   ToolInput,
   ToolInputGroup,
   ToolTabBar,
@@ -16,36 +16,26 @@ export {
   EditorToggle,
 } from './inputs';
 
+export { ToolTextArea };
+
 export function ToolHeader({ title, description }) {
   return (
-    <div className="tool-header">
-      <h2 className="tool-title">{title}</h2>
-      <p className="tool-desc">{description}</p>
+    <div className="mb-4">
+      <h2 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h2>
+      <p className="text-muted-foreground mt-1">{description}</p>
     </div>
   );
 }
 
-export function ToolControls({ children, style = {} }) {
+export function ToolControls({ children, className = '' }) {
   return (
-    <div
-      className="controls"
-      style={{
-        display: 'flex',
-        gap: '1rem',
-        flexWrap: 'wrap',
-        marginBottom: '1rem',
-        padding: 0,
-        border: 'none',
-        background: 'transparent',
-        ...style,
-      }}
-    >
+    <div className={`flex items-center gap-4 mb-6 ${className}`}>
       {children}
     </div>
   );
 }
 
-export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, ...props }) {
+export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, className, ...props }) {
   const handleCopy = () => {
     if (onCopy) {
       onCopy();
@@ -55,63 +45,28 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
   };
 
   return (
-    <div
-      className="pane"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        minHeight: '50vh',
-        flex: 1,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          minHeight: '30px',
-        }}
-      >
-        <label
-          style={{
-            fontSize: '0.75rem',
-            fontWeight: 400,
-            lineHeight: 1.5,
-            letterSpacing: '0.32px',
-            color: 'var(--cds-text-secondary)',
-            textTransform: 'uppercase',
-          }}
-        >
+    <div className={`flex flex-col h-full min-h-[50vh] ${className}`}>
+      <div className="flex justify-between items-center min-h-[30px] mb-2">
+        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           {label}
         </label>
         <Button
-          hasIconOnly
-          renderIcon={Copy}
-          kind="ghost"
-          size="sm"
-          iconDescription="Copy to clipboard"
-          tooltipPosition="left"
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
           onClick={handleCopy}
           disabled={!value}
-        />
+        >
+          <Copy className="h-4 w-4" />
+        </Button>
       </div>
-      <div style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column' }}>
-        <TextArea
-          id="tool-textarea"
+      <div className="flex-1 relative flex flex-col">
+        <ToolTextArea
           value={value}
           onChange={onChange}
           readOnly={readOnly}
           placeholder={placeholder}
-          rows={10}
-          style={{
-            height: '100%',
-            resize: 'none',
-            fontFamily: "'IBM Plex Mono', monospace",
-            border: '1px solid var(--cds-border-strong)',
-          }}
-          labelText={label || 'Text Area'}
-          hideLabel
+          className="flex-1 h-full"
           {...props}
         />
       </div>
@@ -119,20 +74,10 @@ export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy
   );
 }
 
-export function ToolSplitPane({ children, columnCount = 2 }) {
-  const gridColumns = columnCount === 1 ? '1fr' : `repeat(${columnCount}, minmax(0, 1fr))`;
+export function ToolSplitPane({ children, columnCount = 2, className = '' }) {
+  const gridCols = columnCount === 1 ? 'grid-cols-1' : `grid-cols-${columnCount}`;
   return (
-    <div
-      className="split-pane"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: gridColumns,
-        gap: '16px',
-        flex: 1,
-        minHeight: 0,
-        overflow: 'hidden',
-      }}
-    >
+    <div className={`grid ${gridCols} gap-4 flex-1 min-h-0 overflow-hidden ${className}`}>
       {children}
     </div>
   );
