@@ -18,6 +18,9 @@ const types = [
   { id: 'EAN-8', label: 'EAN-8', icon: Hash },
 ];
 
+// Size for barcode generation
+const BARCODE_SIZE = 512;
+
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
@@ -147,7 +150,13 @@ export default function BarcodeGenerator() {
     setIsGenerating(true);
     setError('');
     try {
-      const res = await GenerateBarcode({ content: input, standard: type });
+      // For 1D barcodes, we need a larger size to meet the minimum requirement
+      const size = type === 'QR' ? BARCODE_SIZE : 512;
+      const res = await GenerateBarcode({ 
+        content: input, 
+        standard: type, 
+        size: size 
+      });
       if (res.error) {
         setError(res.error);
         setOutput('');
@@ -224,7 +233,7 @@ export default function BarcodeGenerator() {
 
           <div style={{ backgroundColor: '#09090b', padding: '32px', borderRadius: '12px', border: '4px solid rgba(59, 130, 246, 0.2)' }}>
             {output ? (
-              <img src={output} alt="Barcode" style={{ height: '256px', width: '256px', objectFit: 'contain' }} />
+              <img src={output} alt="Barcode" style={{ height: 'auto', width: '100%', maxWidth: '400px', objectFit: 'contain', imageRendering: type === 'QR' ? 'auto' : 'pixelated' }} />
             ) : (
               <div style={{ height: '256px', width: '256px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#18181b', borderRadius: '8px' }}>
                 <QrCode style={{ width: '64px', height: '64px', opacity: 0.2 }} />

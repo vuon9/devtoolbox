@@ -36,15 +36,19 @@ const httpCall = async (serviceName: string, methodName: string, args: Record<st
   return response.json();
 };
 
-export async function GenerateBarcode(req: { content: string; standard: string }): Promise<any> {
+export async function GenerateBarcode(req: { content: string; standard: string; size?: number }): Promise<any> {
   if (isWailsDesktop) {
     return WailsGenerateBarcode(req);
   }
   
   // Use HTTP API for browser mode
-  // The API expects { arg0: { content, standard } } for struct parameter
+  // The API expects { content, standard, size } parameters
   console.log('GenerateBarcode request:', req);
-  const result = await httpCall('BarcodeService', 'GenerateBarcode', { content: req.content, standard: req.standard });
+  const result = await httpCall('BarcodeService', 'GenerateBarcode', { 
+    content: req.content, 
+    standard: req.standard,
+    size: req.size || 256 
+  });
   console.log('GenerateBarcode response:', result);
   return result;
 }
