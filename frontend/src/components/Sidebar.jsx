@@ -34,14 +34,14 @@ const TOOL_ICONS = {
   'string-utilities': Type,
   'number-converter': Binary,
   'datetime-converter': Clock,
-  'jwt': ShieldCheck,
-  'barcode': QrCode,
+  jwt: ShieldCheck,
+  barcode: QrCode,
   'data-generator': LayoutGrid,
   'code-formatter': Wrench,
   'color-converter': Palette,
-  'cron': Clock,
-  'regexp': Regex,
-  'diff': FileDiff,
+  cron: Clock,
+  regexp: Regex,
+  diff: FileDiff,
 };
 
 function SidebarItem({ to, icon: Icon, label, disabled, collapsed }) {
@@ -59,12 +59,25 @@ function SidebarItem({ to, icon: Icon, label, disabled, collapsed }) {
 
   if (disabled) {
     return (
-      <div style={{ ...baseStyle, color: '#52525b', cursor: 'not-allowed' }} title={collapsed ? label : undefined}>
+      <div
+        style={{ ...baseStyle, color: '#52525b', cursor: 'not-allowed' }}
+        title={collapsed ? label : undefined}
+      >
         {Icon && <Icon style={{ width: '16px', height: '16px', flexShrink: 0, opacity: 0.4 }} />}
         {!collapsed && (
           <>
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
-            <span style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#3f3f46', marginLeft: 'auto' }}>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {label}
+            </span>
+            <span
+              style={{
+                fontSize: '10px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#3f3f46',
+                marginLeft: 'auto',
+              }}
+            >
               disabled
             </span>
           </>
@@ -93,7 +106,11 @@ function SidebarItem({ to, icon: Icon, label, disabled, collapsed }) {
       }}
     >
       {Icon && <Icon style={{ width: '16px', height: '16px', flexShrink: 0 }} />}
-      {!collapsed && <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>}
+      {!collapsed && (
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {label}
+        </span>
+      )}
     </NavLink>
   );
 }
@@ -126,13 +143,14 @@ export function Sidebar({ isVisible, onOpenSettings }) {
 
   const filteredTools = useMemo(() => {
     if (!searchQuery) return tools;
-    return tools.filter(tool =>
-      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tool.category.toLowerCase().includes(searchQuery.toLowerCase())
+    return tools.filter(
+      (tool) =>
+        tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery, tools]);
 
-  const favoriteTools = tools.filter(t => favorites.includes(t.id));
+  const favoriteTools = tools.filter((t) => favorites.includes(t.id));
 
   const toolsByCategory = useMemo(() => {
     return filteredTools.reduce((acc, tool) => {
@@ -151,32 +169,51 @@ export function Sidebar({ isVisible, onOpenSettings }) {
   if (!isVisible) return null;
 
   return (
-    <aside style={{
-      width: isCollapsed ? '72px' : '256px',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      backgroundColor: '#18181b',
-      borderRight: '1px solid #27272a',
-      transition: 'width 0.2s ease',
-    }}>
+    <aside
+      style={{
+        width: isCollapsed ? '72px' : '256px',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#18181b',
+        borderRight: '1px solid #27272a',
+        transition: 'width 0.2s ease',
+      }}
+    >
       {/* Logo */}
-      <div style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'flex-start' }}>
-        <div style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '8px',
-          background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+      <div
+        style={{
+          padding: '16px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
-          flexShrink: 0,
-        }}>
+          justifyContent: isCollapsed ? 'center' : 'flex-start',
+        }}
+      >
+        <div
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+            flexShrink: 0,
+          }}
+        >
           <Box style={{ width: '20px', height: '20px', color: 'white' }} />
         </div>
         {!isCollapsed && (
-          <span style={{ fontWeight: 700, fontSize: '18px', color: '#f4f4f5', marginLeft: '12px', whiteSpace: 'nowrap' }}>
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: '18px',
+              color: '#f4f4f5',
+              marginLeft: '12px',
+              whiteSpace: 'nowrap',
+            }}
+          >
             DevToolbox
           </span>
         )}
@@ -186,15 +223,17 @@ export function Sidebar({ isVisible, onOpenSettings }) {
       {!isCollapsed && (
         <div style={{ padding: '0 16px 16px' }}>
           <div style={{ position: 'relative' }}>
-            <Search style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              width: '16px',
-              height: '16px',
-              color: '#71717a',
-            }} />
+            <Search
+              style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '16px',
+                height: '16px',
+                color: '#71717a',
+              }}
+            />
             <input
               placeholder="Search tools..."
               style={{
@@ -240,21 +279,23 @@ export function Sidebar({ isVisible, onOpenSettings }) {
               {favoriteTools.length > 0 && (
                 <>
                   <div style={{ height: '1px', background: '#27272a', margin: '12px 16px' }} />
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#71717a',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                  }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 16px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: '#71717a',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
                     <Star style={{ width: '14px', height: '14px' }} />
                     <span>Favorites</span>
                   </div>
-                  {favoriteTools.map(tool => (
+                  {favoriteTools.map((tool) => (
                     <SidebarItem
                       key={tool.id}
                       to={`/tool/${tool.id}`}
@@ -271,35 +312,43 @@ export function Sidebar({ isVisible, onOpenSettings }) {
           )}
 
           {/* Categories */}
-          {categories.map(category => (
+          {categories.map((category) => (
             <div key={category}>
               {!isCollapsed && (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px 16px 8px',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: '#71717a',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 16px 8px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#71717a',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
                   {(() => {
                     const IconComponent = CATEGORY_ICONS[category];
-                    return IconComponent ? <IconComponent style={{ width: '14px', height: '14px' }} /> : null;
+                    return IconComponent ? (
+                      <IconComponent style={{ width: '14px', height: '14px' }} />
+                    ) : null;
                   })()}
                   <span>{category}</span>
                 </div>
               )}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {toolsByCategory[category].map(tool => (
+                {toolsByCategory[category].map((tool) => (
                   <SidebarItem
                     key={tool.id}
                     to={`/tool/${tool.id}`}
                     label={tool.name}
                     icon={TOOL_ICONS[tool.id] || Box}
-                    disabled={!['text-converter', 'string-utilities', 'diff', 'jwt', 'barcode'].includes(tool.id)}
+                    disabled={
+                      !['text-converter', 'string-utilities', 'diff', 'jwt', 'barcode'].includes(
+                        tool.id
+                      )
+                    }
                     collapsed={isCollapsed}
                   />
                 ))}
@@ -308,7 +357,14 @@ export function Sidebar({ isVisible, onOpenSettings }) {
           ))}
 
           {!isCollapsed && categories.length === 0 && (
-            <div style={{ padding: '32px 16px', textAlign: 'center', fontSize: '14px', color: '#71717a' }}>
+            <div
+              style={{
+                padding: '32px 16px',
+                textAlign: 'center',
+                fontSize: '14px',
+                color: '#71717a',
+              }}
+            >
               No tools found.
             </div>
           )}
@@ -316,13 +372,15 @@ export function Sidebar({ isVisible, onOpenSettings }) {
       </ScrollArea>
 
       {/* Settings and Collapse */}
-      <div style={{ 
-        padding: isCollapsed ? '8px' : '16px', 
-        borderTop: '1px solid #27272a',
-        display: 'flex',
-        flexDirection: isCollapsed ? 'column' : 'row',
-        gap: isCollapsed ? '4px' : '8px',
-      }}>
+      <div
+        style={{
+          padding: isCollapsed ? '8px' : '16px',
+          borderTop: '1px solid #27272a',
+          display: 'flex',
+          flexDirection: isCollapsed ? 'column' : 'row',
+          gap: isCollapsed ? '4px' : '8px',
+        }}
+      >
         <button
           onClick={onOpenSettings}
           title={isCollapsed ? 'Settings' : undefined}

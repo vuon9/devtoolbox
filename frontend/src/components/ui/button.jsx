@@ -2,14 +2,14 @@ import React from 'react';
 
 // Reusable Button component with inline styles
 // Matches the Convert button style from TextConverter
-export function Button({ 
-  children, 
-  onClick, 
-  disabled, 
-  variant = 'default', 
+export function Button({
+  children,
+  onClick,
+  disabled,
+  variant = 'default',
   size = 'default',
   active,
-  style = {} 
+  style = {},
 }) {
   const baseStyle = {
     display: 'inline-flex',

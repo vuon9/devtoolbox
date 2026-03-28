@@ -54,28 +54,34 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
       {isMac && <div style={{ width: '80px' }} />}
 
       {/* Center section */}
-      <div style={{
-        position: 'absolute',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        pointerEvents: 'none',
-      }}>
-        <span style={{
-          fontSize: '12px',
-          fontWeight: 600,
-          letterSpacing: '-0.025em',
-          color: '#71717a',
-          textTransform: 'uppercase',
-        }}>
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          pointerEvents: 'none',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            letterSpacing: '-0.025em',
+            color: '#71717a',
+            textTransform: 'uppercase',
+          }}
+        >
           {appName}
         </span>
       </div>
 
       {/* Right section */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', WebkitAppRegion: 'no-drag' }}>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: '4px', WebkitAppRegion: 'no-drag' }}
+      >
         <button
           onClick={onOpenSettings}
           style={buttonStyle}
@@ -92,7 +98,16 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
         </button>
 
         {!isMac && (
-          <div style={{ display: 'flex', alignItems: 'center', marginLeft: '8px', paddingLeft: '8px', borderLeft: '1px solid #27272a', gap: '2px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginLeft: '8px',
+              paddingLeft: '8px',
+              borderLeft: '1px solid #27272a',
+              gap: '2px',
+            }}
+          >
             <button
               onClick={handleMinimize}
               style={buttonStyle}

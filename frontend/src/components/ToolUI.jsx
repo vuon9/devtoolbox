@@ -28,14 +28,19 @@ export function ToolHeader({ title, description }) {
 }
 
 export function ToolControls({ children, className = '' }) {
-  return (
-    <div className={`flex items-center gap-4 mb-6 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`flex items-center gap-4 mb-6 ${className}`}>{children}</div>;
 }
 
-export function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, className, ...props }) {
+export function ToolPane({
+  label,
+  value,
+  onChange,
+  readOnly,
+  placeholder,
+  onCopy,
+  className,
+  ...props
+}) {
   const handleCopy = () => {
     if (onCopy) {
       onCopy();

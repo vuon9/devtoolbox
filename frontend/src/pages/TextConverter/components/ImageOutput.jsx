@@ -255,9 +255,7 @@ export default function ImageOutput({ value, onCopy }) {
           >
             <AlertTriangle style={{ width: '32px', height: '32px' }} />
             <div>Invalid Base64 Data</div>
-            <div style={{ fontSize: '12px', color: '#71717a' }}>
-              {validation.error}
-            </div>
+            <div style={{ fontSize: '12px', color: '#71717a' }}>{validation.error}</div>
           </div>
         ) : loadError ? (
           <div

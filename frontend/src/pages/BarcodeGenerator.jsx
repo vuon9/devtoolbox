@@ -1,21 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
-import {
-  ScanBarcode,
-  Download,
-  QrCode,
-  Hash,
-  Columns,
-  Trash2,
-} from 'lucide-react';
+import { ScanBarcode, Download, QrCode, Hash, Columns, Trash2 } from 'lucide-react';
 import { GenerateBarcode } from '../services/barcodeService';
 
 const types = [
-  { id: 'QR', label: 'QR Code', icon: QrCode, placeholder: 'Enter text or URL to encode...', defaultInput: 'https://github.com/wailsapp/wails' },
-  { id: 'Code128', label: 'Code 128', icon: ScanBarcode, placeholder: 'Enter alphanumeric text...', defaultInput: 'HELLO-2024' },
-  { id: 'Code39', label: 'Code 39', icon: ScanBarcode, placeholder: 'Enter uppercase letters, digits, - . $ / + % space', defaultInput: 'CODE39TEST' },
-  { id: 'EAN-13', label: 'EAN-13', icon: Hash, placeholder: 'Enter 12-13 digits (e.g., product barcode)', defaultInput: '5901234123457' },
-  { id: 'EAN-8', label: 'EAN-8', icon: Hash, placeholder: 'Enter 7-8 digits (e.g., small product barcode)', defaultInput: '12345670' },
+  {
+    id: 'QR',
+    label: 'QR Code',
+    icon: QrCode,
+    placeholder: 'Enter text or URL to encode...',
+    defaultInput: 'https://github.com/wailsapp/wails',
+  },
+  {
+    id: 'Code128',
+    label: 'Code 128',
+    icon: ScanBarcode,
+    placeholder: 'Enter alphanumeric text...',
+    defaultInput: 'HELLO-2024',
+  },
+  {
+    id: 'Code39',
+    label: 'Code 39',
+    icon: ScanBarcode,
+    placeholder: 'Enter uppercase letters, digits, - . $ / + % space',
+    defaultInput: 'CODE39TEST',
+  },
+  {
+    id: 'EAN-13',
+    label: 'EAN-13',
+    icon: Hash,
+    placeholder: 'Enter 12-13 digits (e.g., product barcode)',
+    defaultInput: '5901234123457',
+  },
+  {
+    id: 'EAN-8',
+    label: 'EAN-8',
+    icon: Hash,
+    placeholder: 'Enter 7-8 digits (e.g., small product barcode)',
+    defaultInput: '12345670',
+  },
 ];
 
 // Size for barcode generation
@@ -24,7 +47,9 @@ const BARCODE_SIZE = 512;
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
         {title}
       </h2>
       <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
@@ -35,7 +60,16 @@ function ToolHeader({ title, description }) {
 function ToolTextArea({ label, value, onChange, placeholder }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-      <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+      <label
+        style={{
+          fontSize: '11px',
+          fontWeight: 600,
+          color: '#71717a',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          marginBottom: '8px',
+        }}
+      >
         {label}
       </label>
       <textarea
@@ -64,14 +98,16 @@ function ToolTextArea({ label, value, onChange, placeholder }) {
 
 function ToolSplitPane({ children, isVertical }) {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: isVertical ? '1fr' : '1fr 1fr',
-      gap: '16px',
-      flex: 1,
-      minHeight: 0,
-      overflow: 'hidden',
-    }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: isVertical ? '1fr' : '1fr 1fr',
+        gap: '16px',
+        flex: 1,
+        minHeight: 0,
+        overflow: 'hidden',
+      }}
+    >
       {children}
     </div>
   );
@@ -79,15 +115,17 @@ function ToolSplitPane({ children, isVertical }) {
 
 function TypeToggle({ types, value, onChange }) {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      backgroundColor: '#1c1917',
-      borderRadius: '8px',
-      padding: '4px',
-      border: '1px solid #27272a',
-      flexWrap: 'wrap',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        backgroundColor: '#1c1917',
+        borderRadius: '8px',
+        padding: '4px',
+        border: '1px solid #27272a',
+        flexWrap: 'wrap',
+      }}
+    >
       {types.map((t) => {
         const Icon = t.icon;
         const isActive = value === t.id;
@@ -142,7 +180,7 @@ export default function BarcodeGenerator() {
   );
 
   // Get current type config
-  const currentType = types.find(t => t.id === type) || types[0];
+  const currentType = types.find((t) => t.id === type) || types[0];
 
   useEffect(() => {
     localStorage.setItem('barcode-layout', isVertical ? 'vertical' : 'horizontal');
@@ -150,7 +188,7 @@ export default function BarcodeGenerator() {
 
   // Handle type change - update input with appropriate default
   const handleTypeChange = (newType) => {
-    const typeConfig = types.find(t => t.id === newType);
+    const typeConfig = types.find((t) => t.id === newType);
     setType(newType);
     setInput(typeConfig?.defaultInput || '');
     setOutput('');
@@ -164,10 +202,10 @@ export default function BarcodeGenerator() {
     try {
       // For 1D barcodes, we need a larger size to meet the minimum requirement
       const size = type === 'QR' ? BARCODE_SIZE : 512;
-      const res = await GenerateBarcode({ 
-        content: input, 
-        standard: type, 
-        size: size 
+      const res = await GenerateBarcode({
+        content: input,
+        standard: type,
+        size: size,
       });
       if (res.error) {
         setError(res.error);
@@ -216,13 +254,33 @@ export default function BarcodeGenerator() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden', backgroundColor: '#09090b' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+        backgroundColor: '#09090b',
+      }}
+    >
       <ToolHeader
         title="Barcode / QR Code"
         description="Generate high-quality QR codes and barcodes for various standards. Customize appearance and download directly as PNG."
       />
 
-      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+      <div
+        style={{
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: '1px solid #27272a',
+          paddingBottom: '16px',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
         <TypeToggle types={types} value={type} onChange={handleTypeChange} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -230,15 +288,33 @@ export default function BarcodeGenerator() {
             <Trash2 style={{ width: '14px', height: '14px' }} />
             Clear
           </Button>
-          <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }} />
+          <div
+            style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }}
+          />
           <Button variant="ghost" size="sm" onClick={() => setIsVertical(!isVertical)}>
-            <Columns style={{ width: '14px', height: '14px', transform: isVertical ? 'rotate(90deg)' : 'none' }} />
+            <Columns
+              style={{
+                width: '14px',
+                height: '14px',
+                transform: isVertical ? 'rotate(90deg)' : 'none',
+              }}
+            />
           </Button>
         </div>
       </div>
 
       {error && (
-        <div style={{ marginBottom: '16px', padding: '12px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontSize: '14px' }}>
+        <div
+          style={{
+            marginBottom: '16px',
+            padding: '12px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#ef4444',
+            fontSize: '14px',
+          }}
+        >
           {error}
         </div>
       )}
@@ -253,18 +329,79 @@ export default function BarcodeGenerator() {
           />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', border: '1px solid #27272a', borderRadius: '8px', backgroundColor: '#18181b', padding: '48px', position: 'relative' }}>
-          <div style={{ position: 'absolute', top: '12px', left: '12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#52525b' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid #27272a',
+            borderRadius: '8px',
+            backgroundColor: '#18181b',
+            padding: '48px',
+            position: 'relative',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '12px',
+              left: '12px',
+              fontSize: '10px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: '#52525b',
+            }}
+          >
             Preview
           </div>
 
-          <div style={{ backgroundColor: '#09090b', padding: '32px', borderRadius: '12px', border: '4px solid rgba(59, 130, 246, 0.2)' }}>
+          <div
+            style={{
+              backgroundColor: '#09090b',
+              padding: '32px',
+              borderRadius: '12px',
+              border: '4px solid rgba(59, 130, 246, 0.2)',
+            }}
+          >
             {output ? (
-              <img src={output} alt="Barcode" style={{ height: 'auto', width: '100%', maxWidth: '400px', objectFit: 'contain', imageRendering: type === 'QR' ? 'auto' : 'pixelated' }} />
+              <img
+                src={output}
+                alt="Barcode"
+                style={{
+                  height: 'auto',
+                  width: '100%',
+                  maxWidth: '400px',
+                  objectFit: 'contain',
+                  imageRendering: type === 'QR' ? 'auto' : 'pixelated',
+                }}
+              />
             ) : (
-              <div style={{ height: '256px', width: '256px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#18181b', borderRadius: '8px' }}>
+              <div
+                style={{
+                  height: '256px',
+                  width: '256px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#18181b',
+                  borderRadius: '8px',
+                }}
+              >
                 <QrCode style={{ width: '64px', height: '64px', opacity: 0.2 }} />
-                <span style={{ fontSize: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.3, marginTop: '16px' }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    opacity: 0.3,
+                    marginTop: '16px',
+                  }}
+                >
                   {isGenerating ? 'Generating...' : 'Enter content'}
                 </span>
               </div>

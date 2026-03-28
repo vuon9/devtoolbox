@@ -12,8 +12,24 @@ export default function InspectorPane({ input, setInput, stats }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', height: '100%' }}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '30px', marginBottom: '8px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            minHeight: '30px',
+            marginBottom: '8px',
+          }}
+        >
+          <label
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
             Input Text
           </label>
         </div>
@@ -39,12 +55,37 @@ export default function InspectorPane({ input, setInput, stats }) {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '30px', marginBottom: '8px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            minHeight: '30px',
+            marginBottom: '8px',
+          }}
+        >
+          <label
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
             Statistics
           </label>
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px', backgroundColor: '#1c1917', border: '1px solid #27272a', borderRadius: '8px' }}>
+        <div
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '12px',
+            backgroundColor: '#1c1917',
+            border: '1px solid #27272a',
+            borderRadius: '8px',
+          }}
+        >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {items.map((item, i) => (
               <div
@@ -59,7 +100,14 @@ export default function InspectorPane({ input, setInput, stats }) {
                 }}
               >
                 <span style={{ color: '#71717a', fontSize: '14px' }}>{item.label}</span>
-                <span style={{ fontWeight: 600, fontSize: '18px', color: '#f4f4f5', fontFamily: "'IBM Plex Mono', monospace" }}>
+                <span
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '18px',
+                    color: '#f4f4f5',
+                    fontFamily: "'IBM Plex Mono', monospace",
+                  }}
+                >
                   {item.value.toLocaleString()}
                 </span>
               </div>

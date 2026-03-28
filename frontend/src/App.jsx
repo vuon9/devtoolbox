@@ -47,15 +47,17 @@ function App() {
       <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <Sidebar isVisible={isSidebarOpen} onOpenSettings={openSettings} />
 
-        <main style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          minWidth: 0,
-          backgroundColor: '#09090b',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
+        <main
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minWidth: 0,
+            backgroundColor: '#09090b',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
           <Routes>
             <Route path="/" element={<Navigate to="/tool/text-converter" replace />} />
             <Route path="/tool/:toolId/*" element={<ToolRouter />} />

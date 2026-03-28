@@ -24,7 +24,6 @@ export default defineConfig({
           'mixed-decls',
           'color-functions',
         ],
-
       },
     },
   },

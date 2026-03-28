@@ -10,7 +10,10 @@ export default function ConfigurationPane({ config, updateConfig }) {
   return (
     <div className="flex flex-wrap gap-4 p-4 bg-muted/30 border rounded-md">
       <div className="flex-1 min-w-[250px] space-y-2">
-        <Label htmlFor="config-key" className="text-[10px] font-bold uppercase tracking-wider opacity-70">
+        <Label
+          htmlFor="config-key"
+          className="text-[10px] font-bold uppercase tracking-wider opacity-70"
+        >
           Secret Key
         </Label>
         <div className="relative">
@@ -36,7 +39,10 @@ export default function ConfigurationPane({ config, updateConfig }) {
       </div>
 
       <div className="flex-1 min-w-[250px] space-y-2">
-        <Label htmlFor="config-iv" className="text-[10px] font-bold uppercase tracking-wider opacity-70">
+        <Label
+          htmlFor="config-iv"
+          className="text-[10px] font-bold uppercase tracking-wider opacity-70"
+        >
           IV (Initialization Vector)
         </Label>
         <Input

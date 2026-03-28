@@ -15,12 +15,14 @@ function Select({ value, onValueChange, children }) {
           });
         }
         if (child.type === SelectContent) {
-          return isOpen ? React.cloneElement(child, {
-            onSelect: (val) => {
-              onValueChange(val);
-              setIsOpen(false);
-            },
-          }) : null;
+          return isOpen
+            ? React.cloneElement(child, {
+                onSelect: (val) => {
+                  onValueChange(val);
+                  setIsOpen(false);
+                },
+              })
+            : null;
         }
         return child;
       })}
@@ -69,7 +71,12 @@ function SelectTrigger({ children, isOpen, onClick }) {
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
-        style={{ marginLeft: '8px', opacity: 0.7, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}
+        style={{
+          marginLeft: '8px',
+          opacity: 0.7,
+          transform: isOpen ? 'rotate(180deg)' : 'none',
+          transition: 'transform 0.15s ease',
+        }}
       >
         <path d="M6 9l6 6 6-6" />
       </svg>
@@ -99,9 +106,7 @@ function SelectContent({ children, onSelect }) {
         overflowY: 'auto',
       }}
     >
-      {React.Children.map(children, (child) =>
-        React.cloneElement(child, { onSelect })
-      )}
+      {React.Children.map(children, (child) => React.cloneElement(child, { onSelect }))}
     </div>
   );
 }
@@ -150,12 +155,7 @@ function Label({ children, style = {} }) {
   );
 }
 
-export default function ConversionControls({
-  category,
-  setCategory,
-  method,
-  setMethod,
-}) {
+export default function ConversionControls({ category, setCategory, method, setMethod }) {
   const categories = Object.keys(CONVERTER_MAP);
   const methods = CONVERTER_MAP[category] || [];
 

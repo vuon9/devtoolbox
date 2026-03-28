@@ -47,7 +47,11 @@ function CopyBtn({ onCopy, copied }) {
         e.currentTarget.style.color = '#a1a1aa';
       }}
     >
-      {copied ? <Check style={{ width: '16px', height: '16px' }} /> : <Copy style={{ width: '16px', height: '16px' }} />}
+      {copied ? (
+        <Check style={{ width: '16px', height: '16px' }} />
+      ) : (
+        <Copy style={{ width: '16px', height: '16px' }} />
+      )}
     </button>
   );
 }

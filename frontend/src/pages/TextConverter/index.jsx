@@ -78,7 +78,9 @@ function ModeToggle({ mode, modeLabels, onChange }) {
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
         {title}
       </h2>
       <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
@@ -88,7 +90,9 @@ function ToolHeader({ title, description }) {
 
 function ToolControls({ children, style = {} }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', ...style }}>
+    <div
+      style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', ...style }}
+    >
       {children}
     </div>
   );
@@ -104,9 +108,33 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, style
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '50vh', ...style }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '30px', marginBottom: '8px' }}>
-        <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        minHeight: '50vh',
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          minHeight: '30px',
+          marginBottom: '8px',
+        }}
+      >
+        <label
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#71717a',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
           {label}
         </label>
         <button
@@ -138,13 +166,30 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, style
             e.currentTarget.style.color = value ? '#a1a1aa' : '#3f3f46';
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
         </button>
       </div>
-      <div style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <div
+        style={{
+          flex: 1,
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+        }}
+      >
         <textarea
           value={value}
           onChange={onChange}
@@ -173,21 +218,30 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, style
 
 function ToolSplitPane({ children, isVertical = false }) {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: isVertical ? '1fr' : '1fr 1fr',
-      gap: '16px',
-      flex: 1,
-      minHeight: 0,
-      overflow: 'hidden',
-    }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: isVertical ? '1fr' : '1fr 1fr',
+        gap: '16px',
+        flex: 1,
+        minHeight: 0,
+        overflow: 'hidden',
+      }}
+    >
       {children}
     </div>
   );
 }
 
 // Button component with inline styles
-function Button({ children, onClick, disabled, variant = 'default', size = 'default', style = {} }) {
+function Button({
+  children,
+  onClick,
+  disabled,
+  variant = 'default',
+  size = 'default',
+  style = {},
+}) {
   const baseStyle = {
     display: 'inline-flex',
     alignItems: 'center',
@@ -462,7 +516,15 @@ export default function TextBasedConverter() {
         : { left: 'Encode', right: 'Decode' };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+      }}
+    >
       <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
 
       <CommonTags
@@ -495,15 +557,35 @@ export default function TextBasedConverter() {
             Convert
           </Button>
 
-          <Button variant="ghost" size="sm" disabled={isCurrentInQuickActions()} onClick={addCurrentToQuickActions}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={isCurrentInQuickActions()}
+            onClick={addCurrentToQuickActions}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
             Added
           </Button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '12px', borderLeft: '1px solid #27272a' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              paddingLeft: '12px',
+              borderLeft: '1px solid #27272a',
+            }}
+          >
             <Switch
               id="auto-run"
               checked={config.autoRun}
@@ -513,7 +595,13 @@ export default function TextBasedConverter() {
           </div>
 
           <Button variant="ghost" size="icon" onClick={() => setIsVertical(!isVertical)}>
-            <Columns style={{ width: '16px', height: '16px', transform: isVertical ? 'rotate(90deg)' : 'none' }} />
+            <Columns
+              style={{
+                width: '16px',
+                height: '16px',
+                transform: isVertical ? 'rotate(90deg)' : 'none',
+              }}
+            />
           </Button>
         </div>
       </div>
@@ -521,11 +609,7 @@ export default function TextBasedConverter() {
       {/* Second row: Mode toggle (Encode/Decode) */}
       {showModeToggle && (
         <div style={{ marginBottom: '12px' }}>
-          <ModeToggle
-            mode={subMode}
-            modeLabels={modeLabels}
-            onChange={setSubMode}
-          />
+          <ModeToggle mode={subMode} modeLabels={modeLabels} onChange={setSubMode} />
         </div>
       )}
 
@@ -545,9 +629,35 @@ export default function TextBasedConverter() {
           />
 
           {isAllHashes ? (
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, border: '1px solid #27272a', borderRadius: '8px', backgroundColor: '#18181b' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', padding: '12px 12px 0' }}>
-                <label style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#71717a' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                minHeight: 0,
+                border: '1px solid #27272a',
+                borderRadius: '8px',
+                backgroundColor: '#18181b',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '6px',
+                  padding: '12px 12px 0',
+                }}
+              >
+                <label
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#71717a',
+                  }}
+                >
                   {LABELS.OUTPUT}
                 </label>
               </div>

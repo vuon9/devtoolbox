@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
-import {
-  Key,
-  ShieldCheck,
-  Lock,
-  CheckCircle2,
-  AlertCircle,
-  Hash,
-  Binary,
-} from 'lucide-react';
+import { Key, ShieldCheck, Lock, CheckCircle2, AlertCircle, Hash, Binary } from 'lucide-react';
 import { Decode, Encode } from '../../generated/wails/jWTService';
 
 // Inline-styled components
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
         {title}
       </h2>
       <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
@@ -32,8 +26,23 @@ function ToolTextArea({ label, value, onChange, placeholder, readOnly, style = {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, ...style }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '8px',
+        }}
+      >
+        <label
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#71717a',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
           {label}
         </label>
         <button
@@ -64,7 +73,16 @@ function ToolTextArea({ label, value, onChange, placeholder, readOnly, style = {
             e.currentTarget.style.color = value ? '#a1a1aa' : '#3f3f46';
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
@@ -97,14 +115,16 @@ function ToolTextArea({ label, value, onChange, placeholder, readOnly, style = {
 
 function ToolSplitPane({ children }) {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '16px',
-      flex: 1,
-      minHeight: 0,
-      overflow: 'hidden',
-    }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '16px',
+        flex: 1,
+        minHeight: 0,
+        overflow: 'hidden',
+      }}
+    >
       {children}
     </div>
   );
@@ -112,14 +132,16 @@ function ToolSplitPane({ children }) {
 
 function ToggleGroup({ options, value, onChange }) {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      backgroundColor: '#1c1917',
-      borderRadius: '8px',
-      padding: '4px',
-      border: '1px solid #27272a',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        backgroundColor: '#1c1917',
+        borderRadius: '8px',
+        padding: '4px',
+        border: '1px solid #27272a',
+      }}
+    >
       {options.map((option) => {
         const isActive = value === option.id;
         const Icon = option.icon;
@@ -176,22 +198,24 @@ function StatusMessage({ type, children }) {
       color: '#ef4444',
     },
   };
-  
+
   const style = styles[type] || styles.error;
-  
+
   return (
-    <div style={{
-      padding: '12px',
-      borderRadius: '8px',
-      border: `1px solid ${style.borderColor}`,
-      backgroundColor: style.backgroundColor,
-      color: style.color,
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      fontSize: '12px',
-      fontWeight: 600,
-    }}>
+    <div
+      style={{
+        padding: '12px',
+        borderRadius: '8px',
+        border: `1px solid ${style.borderColor}`,
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '12px',
+        fontWeight: 600,
+      }}
+    >
       {children}
     </div>
   );
@@ -199,10 +223,18 @@ function StatusMessage({ type, children }) {
 
 function SecretInput({ label, value, onChange, placeholder }) {
   const [showSecret, setShowSecret] = useState(false);
-  
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <label
+        style={{
+          fontSize: '11px',
+          fontWeight: 600,
+          color: '#71717a',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+        }}
+      >
         {label}
       </label>
       <div style={{ display: 'flex', gap: '8px' }}>
@@ -230,7 +262,15 @@ function SecretInput({ label, value, onChange, placeholder }) {
 function Select({ label, value, onChange, options }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label style={{ fontSize: '11px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <label
+        style={{
+          fontSize: '11px',
+          fontWeight: 600,
+          color: '#71717a',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+        }}
+      >
         {label}
       </label>
       <select
@@ -248,7 +288,9 @@ function Select({ label, value, onChange, options }) {
         }}
       >
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
         ))}
       </select>
     </div>
@@ -301,13 +343,31 @@ export default function JwtDebugger() {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden', backgroundColor: '#09090b' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+        backgroundColor: '#09090b',
+      }}
+    >
       <ToolHeader
         title="JWT Debugger"
         description="Inspect, decode, and encode JSON Web Tokens. Verify signatures and visualize payload contents with ease."
       />
 
-      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #27272a', paddingBottom: '16px' }}>
+      <div
+        style={{
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: '1px solid #27272a',
+          paddingBottom: '16px',
+        }}
+      >
         <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />
 
         {activeMode === 'encode' && (
@@ -342,9 +402,7 @@ export default function JwtDebugger() {
                 )}
               </StatusMessage>
             )}
-            {error && !isValid && (
-              <StatusMessage type="error">{error}</StatusMessage>
-            )}
+            {error && !isValid && <StatusMessage type="error">{error}</StatusMessage>}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -377,9 +435,23 @@ export default function JwtDebugger() {
               onChange={(e) => setPayload(e.target.value)}
               placeholder='{"sub": "1234567890", "name": "John Doe"}'
             />
-            
-            <div style={{ padding: '16px', backgroundColor: '#1c1917', border: '1px solid #27272a', borderRadius: '8px' }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#f4f4f5', marginBottom: '12px' }}>
+
+            <div
+              style={{
+                padding: '16px',
+                backgroundColor: '#1c1917',
+                border: '1px solid #27272a',
+                borderRadius: '8px',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#f4f4f5',
+                  marginBottom: '12px',
+                }}
+              >
                 Signing Configuration
               </h3>
               <div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}>
@@ -411,9 +483,7 @@ export default function JwtDebugger() {
               readOnly
               placeholder="Encoded JWT will appear here..."
             />
-            {error && (
-              <StatusMessage type="error">{error}</StatusMessage>
-            )}
+            {error && <StatusMessage type="error">{error}</StatusMessage>}
           </div>
         </ToolSplitPane>
       )}
