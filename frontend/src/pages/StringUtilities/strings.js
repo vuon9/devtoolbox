@@ -87,10 +87,13 @@ export const removeEmptyLines = (input) => {
 };
 
 export const getTextStats = (input) => {
-  if (!input) return { lines: 0, words: 0, chars: 0 };
-  return {
-    lines: input.split('\n').length,
-    words: input.trim() ? input.trim().split(/\s+/).length : 0,
-    chars: input.length,
-  };
+  if (!input) return { lines: 0, words: 0, chars: 0, bytes: 0, sentences: 0 };
+  
+  const chars = input.length;
+  const words = input.trim() ? input.trim().split(/\s+/).length : 0;
+  const lines = input ? input.split('\n').length : 0;
+  const bytes = new Blob([input]).size;
+  const sentences = input.trim() ? input.split(/[.!?]+/).filter((x) => x.trim()).length : 0;
+  
+  return { lines, words, chars, bytes, sentences };
 };
