@@ -296,40 +296,122 @@ function SecretInput({ label, value, onChange, placeholder }) {
   );
 }
 
-function Select({ label, value, onChange, options }) {
+function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption = options.find((o) => o.value === value);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label
-        style={{
-          fontSize: '11px',
-          fontWeight: 600,
-          color: '#71717a',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-        }}
-      >
-        {label}
-      </label>
-      <select
-        value={value}
-        onChange={onChange}
-        style={{
-          padding: '8px 12px',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
-          borderRadius: '6px',
-          color: '#f4f4f5',
-          fontSize: '14px',
-          outline: 'none',
-          cursor: 'pointer',
-        }}
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      {label && (
+        <label
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#71717a',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
+          {label}
+        </label>
+      )}
+      <div style={{ position: 'relative' }}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: width,
+            height: '32px',
+            padding: '0 12px',
+            backgroundColor: isOpen ? '#27272a' : '#18181b',
+            border: '1px solid #3f3f46',
+            borderRadius: '6px',
+            color: '#f4f4f5',
+            fontSize: '14px',
+            cursor: 'pointer',
+            outline: 'none',
+          }}
+          onMouseEnter={(e) => {
+            if (!isOpen) {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.borderColor = '#52525b';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isOpen) {
+              e.currentTarget.style.backgroundColor = '#18181b';
+              e.currentTarget.style.borderColor = '#3f3f46';
+            }
+          }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {selectedOption?.label || value}
+          </span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            style={{
+              marginLeft: '8px',
+              opacity: 0.7,
+              transform: isOpen ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.15s ease',
+            }}
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        {isOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              marginTop: '4px',
+              backgroundColor: '#1c1917',
+              border: '1px solid #27272a',
+              borderRadius: '6px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+              zIndex: 50,
+              maxHeight: '200px',
+              overflowY: 'auto',
+            }}
+          >
+            {options.map((opt) => (
+              <div
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+                style={{
+                  padding: '8px 12px',
+                  fontSize: '14px',
+                  color: value === opt.value ? '#f4f4f5' : '#a1a1aa',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#27272a';
+                  e.currentTarget.style.color = '#f4f4f5';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = value === opt.value ? '#f4f4f5' : '#a1a1aa';
+                }}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -344,12 +426,13 @@ export default function JwtDebugger() {
   const [secret, setSecret] = useState('');
   const [algorithm, setAlgorithm] = useState('HS256');
   const [verifySecret, setVerifySecret] = useState('');
-  const [verifyEncoding, setVerifyEncoding] = useState('base64');
+  const [verifyEncoding, setVerifyEncoding] = useState('raw');
 
   const fillSample = () => {
     if (activeMode === 'decode') {
       setJwt(SAMPLE_JWT);
       setVerifySecret(SAMPLE_SECRET);
+      setVerifyEncoding('raw');
     } else {
       setHeader(SAMPLE_HEADER);
       setPayload(SAMPLE_PAYLOAD);
@@ -428,20 +511,20 @@ export default function JwtDebugger() {
           paddingBottom: '16px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />
-          <Button variant="ghost" onClick={fillSample} size="sm">
+        <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Button variant="ghost" onClick={fillSample}>
             <FileText style={{ width: '14px', height: '14px' }} />
             Sample
           </Button>
+          {activeMode === 'encode' && (
+            <Button onClick={handleEncode}>
+              <Lock style={{ width: '14px', height: '14px' }} />
+              Sign & Encode
+            </Button>
+          )}
         </div>
-
-        {activeMode === 'encode' && (
-          <Button onClick={handleEncode} size="sm">
-            <Lock style={{ width: '14px', height: '14px' }} />
-            Sign & Encode
-          </Button>
-        )}
       </div>
 
       {activeMode === 'decode' ? (
@@ -482,15 +565,16 @@ export default function JwtDebugger() {
                 </span>
               </div>
               <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                <Select
+                <SelectDropdown
                   label="Encoding"
                   value={verifyEncoding}
-                  onChange={(e) => setVerifyEncoding(e.target.value)}
+                  onChange={setVerifyEncoding}
                   options={[
                     { value: 'base64', label: 'Base64' },
                     { value: 'hex', label: 'Hex' },
                     { value: 'raw', label: 'Raw' },
                   ]}
+                  width="120px"
                 />
               </div>
               <SecretInput
@@ -558,35 +642,45 @@ export default function JwtDebugger() {
                 borderRadius: '8px',
               }}
             >
-              <h3
+              <div
                 style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#f4f4f5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                   marginBottom: '12px',
                 }}
               >
-                Signing Configuration
-              </h3>
-              <div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}>
-                <Select
-                  label="Algorithm"
-                  value={algorithm}
-                  onChange={(e) => setAlgorithm(e.target.value)}
-                  options={[
-                    { value: 'HS256', label: 'HS256' },
-                    { value: 'HS384', label: 'HS384' },
-                    { value: 'HS512', label: 'HS512' },
-                    { value: 'RS256', label: 'RS256' },
-                  ]}
+                <Key style={{ width: '14px', height: '14px', color: '#71717a' }} />
+                <span
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: '#f4f4f5',
+                  }}
+                >
+                  Signing Configuration
+                </span>
+              </div>
+              <SelectDropdown
+                label="Algorithm"
+                value={algorithm}
+                onChange={setAlgorithm}
+                options={[
+                  { value: 'HS256', label: 'HS256' },
+                  { value: 'HS384', label: 'HS384' },
+                  { value: 'HS512', label: 'HS512' },
+                  { value: 'RS256', label: 'RS256' },
+                ]}
+                width="120px"
+              />
+              <div style={{ marginTop: '12px' }}>
+                <SecretInput
+                  label="Secret"
+                  value={secret}
+                  onChange={(e) => setSecret(e.target.value)}
+                  placeholder="Enter secret for signing..."
                 />
               </div>
-              <SecretInput
-                label="Secret"
-                value={secret}
-                onChange={(e) => setSecret(e.target.value)}
-                placeholder="Enter secret for signing..."
-              />
             </div>
           </div>
 
