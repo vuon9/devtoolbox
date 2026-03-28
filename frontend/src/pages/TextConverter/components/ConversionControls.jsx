@@ -214,7 +214,7 @@ export default function ConversionControls({
       </div>
 
       {showModeToggle && (
-        <div style={{ display: 'flex', alignItems: 'center', paddingLeft: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <div
             style={{
               display: 'inline-flex',
