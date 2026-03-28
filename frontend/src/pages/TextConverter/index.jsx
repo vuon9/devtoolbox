@@ -16,7 +16,7 @@ import {
   LABELS,
   PLACEHOLDERS,
 } from './strings';
-import { Convert } from '../../generated/wails/conversionService';
+import { Convert } from '../../services/conversionService';
 
 // Mode toggle component for Encode/Decode, Encrypt/Decrypt, etc.
 function ModeToggle({ mode, modeLabels, onChange }) {
