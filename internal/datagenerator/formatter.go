@@ -83,14 +83,55 @@ func (f *Formatter) formatXML(data []string) (string, error) {
 	return xml.Header + string(result), nil
 }
 
-// formatCSV formats data as CSV
+// formatCSV formats data as CSV with headers
 func (f *Formatter) formatCSV(data []string) (string, error) {
+	if len(data) == 0 {
+		return "", nil
+	}
+
 	var buf strings.Builder
 	writer := csv.NewWriter(&buf)
 
+	// Parse first item to get headers
+	var firstItem map[string]interface{}
+	if err := json.Unmarshal([]byte(data[0]), &firstItem); err != nil {
+		// If not valid JSON, fall back to single column
+		for _, item := range data {
+			if err := writer.Write([]string{item}); err != nil {
+				return "", fmt.Errorf("failed to format CSV: %w", err)
+			}
+		}
+		writer.Flush()
+		return buf.String(), nil
+	}
+
+	// Extract headers in order
+	headers := make([]string, 0, len(firstItem))
+	for key := range firstItem {
+		headers = append(headers, key)
+	}
+
+	// Write headers
+	if err := writer.Write(headers); err != nil {
+		return "", fmt.Errorf("failed to write CSV headers: %w", err)
+	}
+
+	// Write data rows
 	for _, item := range data {
-		if err := writer.Write([]string{item}); err != nil {
-			return "", fmt.Errorf("failed to format CSV: %w", err)
+		var obj map[string]interface{}
+		if err := json.Unmarshal([]byte(item), &obj); err != nil {
+			return "", fmt.Errorf("failed to parse JSON for CSV: %w", err)
+		}
+
+		row := make([]string, len(headers))
+		for i, key := range headers {
+			if val, ok := obj[key]; ok {
+				row[i] = fmt.Sprintf("%v", val)
+			}
+		}
+
+		if err := writer.Write(row); err != nil {
+			return "", fmt.Errorf("failed to write CSV row: %w", err)
 		}
 	}
 
