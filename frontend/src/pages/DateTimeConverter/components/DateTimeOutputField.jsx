@@ -1,5 +1,7 @@
 import React from 'react';
-import { Tile, CopyButton } from '@carbon/react';
+import { Button } from '../../../components/ui/Button';
+import { Tile } from '@carbon/react';
+import { Copy } from 'lucide-react';
 import { getMonospaceFontFamily, getDataFontSize } from '../../../utils/inputUtils';
 
 /**
@@ -46,7 +48,13 @@ export default function DateTimeOutputField({ label, value, className, style }) 
         >
           {value}
         </span>
-        <CopyButton onClick={() => navigator.clipboard.writeText(value)} size="sm" />
+        <Button
+          variant="secondary"
+          onClick={() => navigator.clipboard.writeText(value)}
+          style={{ padding: '4px' }}
+        >
+          <Copy size={14} />
+        </Button>
       </div>
     </Tile>
   );

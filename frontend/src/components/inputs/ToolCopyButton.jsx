@@ -1,27 +1,18 @@
 import React, { useState, useCallback } from 'react';
-import { Button } from '@carbon/react';
-import { Copy, Checkmark } from '@carbon/icons-react';
+import { Copy, Check } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { cn } from '../../utils/cn';
 
 /**
  * Standardized copy button component with success feedback
- *
- * @param {Object} props
- * @param {string} props.text - Text to copy
- * @param {Function} [props.onCopy] - Custom copy handler (receives text as argument)
- * @param {string} [props.tooltipPosition='left'] - Tooltip position
- * @param {boolean} [props.disabled] - Whether button is disabled (defaults to !text)
- * @param {string} [props.kind='ghost'] - Carbon Button kind
- * @param {string} [props.size='sm'] - Button size
- * @param {Object} [props.style={}] - Additional styles
  */
-export default function ToolCopyButton({
+export function ToolCopyButton({
   text,
   onCopy,
-  tooltipPosition = 'left',
   disabled,
-  kind = 'ghost',
+  variant = 'ghost',
   size = 'sm',
-  style = {},
+  className,
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -45,23 +36,18 @@ export default function ToolCopyButton({
     }
   }, [text, onCopy, isDisabled]);
 
-  const icon = copied ? Checkmark : Copy;
-  const label = copied ? 'Copied!' : 'Copy to clipboard';
-  const iconDescription = copied ? 'Copied' : 'Copy';
-
   return (
     <Button
-      hasIconOnly
-      renderIcon={icon}
-      kind={kind}
+      variant={variant}
       size={size}
-      iconDescription={iconDescription}
-      tooltipPosition={tooltipPosition}
       onClick={handleCopy}
       disabled={isDisabled}
-      style={style}
+      className={cn('h-7 gap-1.5 text-[10px] font-bold uppercase tracking-wider', className)}
     >
-      {label}
+      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+      {copied ? 'Copied' : 'Copy'}
     </Button>
   );
 }
+
+export default ToolCopyButton;

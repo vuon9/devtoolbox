@@ -1,156 +1,447 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
-import { IconButton } from '@carbon/react';
-import { Settings } from '@carbon/icons-react';
+import {
+  Search,
+  Settings,
+  Star,
+  History,
+  Type,
+  Binary,
+  ShieldCheck,
+  QrCode,
+  Wrench,
+  Palette,
+  Clock,
+  Regex,
+  FileDiff,
+  Box,
+  LayoutGrid,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
+import { ScrollArea } from './ui/scroll-area';
+
+const CATEGORY_ICONS = {
+  Text: Type,
+  Data: Binary,
+  Security: ShieldCheck,
+  Generator: QrCode,
+  Developer: Wrench,
+};
+
+const TOOL_ICONS = {
+  'text-converter': Type,
+  'string-utilities': Type,
+  'number-converter': Binary,
+  'datetime-converter': Clock,
+  jwt: ShieldCheck,
+  barcode: QrCode,
+  'data-generator': LayoutGrid,
+  'code-formatter': Wrench,
+  'color-converter': Palette,
+  cron: Clock,
+  regexp: Regex,
+  diff: FileDiff,
+};
+
+function SidebarItem({ to, icon: Icon, label, disabled, collapsed }) {
+  const baseStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: collapsed ? '0' : '10px',
+    padding: collapsed ? '10px' : '10px 16px',
+    margin: collapsed ? '4px' : '0 8px',
+    fontSize: '14px',
+    borderRadius: '8px',
+    transition: 'all 0.15s ease',
+    justifyContent: collapsed ? 'center' : 'flex-start',
+  };
+
+  if (disabled) {
+    return (
+      <div
+        style={{ ...baseStyle, color: '#52525b', cursor: 'not-allowed' }}
+        title={collapsed ? label : undefined}
+      >
+        {Icon && <Icon style={{ width: '16px', height: '16px', flexShrink: 0, opacity: 0.4 }} />}
+        {!collapsed && (
+          <>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {label}
+            </span>
+            <span
+              style={{
+                fontSize: '10px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#3f3f46',
+                marginLeft: 'auto',
+              }}
+            >
+              disabled
+            </span>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <NavLink
+      to={to}
+      title={collapsed ? label : undefined}
+      style={({ isActive }) => ({
+        ...baseStyle,
+        color: isActive ? '#ffffff' : '#a1a1aa',
+        backgroundColor: isActive ? '#27272a' : 'transparent',
+      })}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(39, 39, 42, 0.5)';
+        e.currentTarget.style.color = '#e4e4e7';
+      }}
+      onMouseLeave={(e) => {
+        const isActive = e.currentTarget.classList.contains('active');
+        e.currentTarget.style.backgroundColor = isActive ? '#27272a' : 'transparent';
+        e.currentTarget.style.color = isActive ? '#ffffff' : '#a1a1aa';
+      }}
+    >
+      {Icon && <Icon style={{ width: '16px', height: '16px', flexShrink: 0 }} />}
+      {!collapsed && (
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {label}
+        </span>
+      )}
+    </NavLink>
+  );
+}
 
 export function Sidebar({ isVisible, onOpenSettings }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [pinned, setPinned] = useState(() => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [favorites] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('pinnedTools')) || [];
+      return JSON.parse(localStorage.getItem('favoriteTools')) || [];
     } catch {
       return [];
     }
   });
 
-  useEffect(() => {
-    localStorage.setItem('pinnedTools', JSON.stringify(pinned));
-  }, [pinned]);
-
   const tools = [
-    { id: 'text-converter', name: 'Text Converter', icon: '🔄' },
-    { id: 'string-utilities', name: 'String Utilities', icon: '🧵' },
-    { id: 'number-converter', name: 'Number Converter', icon: '🔢' },
-    { id: 'datetime-converter', name: 'DateTime Converter', icon: '🕒' },
-    { id: 'jwt', name: 'JWT Debugger', icon: '🛡️' },
-    { id: 'barcode', name: 'Barcode / QR Code', icon: '▣' },
-    { id: 'data-generator', name: 'Data Generator', icon: '📊' },
-    { id: 'code-formatter', name: 'Code Formatter', icon: '📝' },
-    { id: 'color-converter', name: 'Color Converter', icon: '🎨' },
-    { id: 'cron', name: 'Cron Job Parser', icon: '⏳' },
-    { id: 'regexp', name: 'RegExp Tester', icon: '.*' },
-    { id: 'diff', name: 'Text Diff Checker', icon: '⚖️' },
+    { id: 'text-converter', name: 'Text Converter', category: 'Text' },
+    { id: 'string-utilities', name: 'String Utilities', category: 'Text' },
+    { id: 'number-converter', name: 'Number Converter', category: 'Data' },
+    { id: 'datetime-converter', name: 'DateTime Converter', category: 'Data' },
+    { id: 'jwt', name: 'JWT Debugger', category: 'Security' },
+    { id: 'barcode', name: 'Barcode / QR Code', category: 'Generator' },
+    { id: 'data-generator', name: 'Data Generator', category: 'Generator' },
+    { id: 'code-formatter', name: 'Code Formatter', category: 'Developer' },
+    { id: 'color-converter', name: 'Color Converter', category: 'Developer' },
+    { id: 'cron', name: 'Cron Job Parser', category: 'Developer' },
+    { id: 'regexp', name: 'RegExp Tester', category: 'Developer' },
+    { id: 'diff', name: 'Text Diff', category: 'Text' },
   ];
 
-  const togglePin = (e, id) => {
-    e.stopPropagation();
-    if (pinned.includes(id)) {
-      setPinned(pinned.filter((p) => p !== id));
-    } else {
-      setPinned([...pinned, id]);
-    }
+  const filteredTools = useMemo(() => {
+    if (!searchQuery) return tools;
+    return tools.filter(
+      (tool) =>
+        tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, tools]);
+
+  const favoriteTools = tools.filter((t) => favorites.includes(t.id));
+
+  const toolsByCategory = useMemo(() => {
+    return filteredTools.reduce((acc, tool) => {
+      if (!acc[tool.category]) acc[tool.category] = [];
+      acc[tool.category].push(tool);
+      return acc;
+    }, {});
+  }, [filteredTools]);
+
+  const categories = Object.keys(toolsByCategory).sort();
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
   };
 
-  // Filtering
-  let displayTools = tools.filter((t) => t.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
-  // Split into Pinned and Regular
-  const pinnedTools = displayTools.filter((t) => pinned.includes(t.id));
-  const regularTools = displayTools.filter((t) => !pinned.includes(t.id));
-
-  // Sort Alphabetically
-  pinnedTools.sort((a, b) => a.name.localeCompare(b.name));
-  regularTools.sort((a, b) => a.name.localeCompare(b.name));
+  if (!isVisible) return null;
 
   return (
-    <div className={`sidebar ${!isVisible ? 'hidden' : ''}`}>
-      {/* Search bar at the top */}
-      <div style={{ padding: '12px 12px 8px' }}>
-        <input
-          type="text"
-          placeholder="Search tools... (cmd+k for palette)"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+    <aside
+      style={{
+        width: isCollapsed ? '72px' : '256px',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#18181b',
+        borderRight: '1px solid #27272a',
+        transition: 'width 0.2s ease',
+      }}
+    >
+      {/* Logo */}
+      <div
+        style={{
+          padding: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: isCollapsed ? 'center' : 'flex-start',
+        }}
+      >
+        <div
           style={{
-            width: '100%',
-            padding: '8px 12px',
-            fontSize: '13px',
-            backgroundColor: 'var(--cds-field)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '4px',
-            color: 'var(--cds-text-primary)',
+            width: '36px',
+            height: '36px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+            flexShrink: 0,
           }}
-        />
-      </div>
-
-      <div className="nav-scroll-area">
-        {pinnedTools.length > 0 && (
-          <>
-            <div className="sidebar-section-header">
-              <span>📌</span>
-              <span>Pinned</span>
-            </div>
-            <ul className="nav-list">
-              {pinnedTools.map((tool) => (
-                <li key={tool.id} className="nav-item">
-                  <NavLink
-                    to={`/tool/${tool.id}`}
-                    className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
-                  >
-                    <div className="nav-content">
-                      <span className="nav-icon">{tool.icon}</span>
-                      <span className="nav-text">{tool.name}</span>
-                    </div>
-                    {/* Unpin action on hover */}
-                    <span
-                      className="nav-action"
-                      onClick={(e) => togglePin(e, tool.id)}
-                      title="Unpin"
-                    >
-                      ✕
-                    </span>
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-            {regularTools.length > 0 && <div className="sidebar-separator"></div>}
-          </>
-        )}
-
-        <ul className="nav-list">
-          {regularTools.map((tool) => (
-            <li key={tool.id} className="nav-item">
-              <NavLink
-                to={`/tool/${tool.id}`}
-                className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
-              >
-                <div className="nav-content">
-                  <span className="nav-icon">{tool.icon}</span>
-                  <span className="nav-text">{tool.name}</span>
-                </div>
-                {/* Pin action on hover */}
-                <span
-                  className="nav-action"
-                  onClick={(e) => togglePin(e, tool.id)}
-                  title="Pin to top"
-                >
-                  📌
-                </span>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-
-        {regularTools.length === 0 && pinnedTools.length === 0 && (
-          <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            No tools found
-          </div>
-        )}
-      </div>
-
-      {/* Settings button at bottom */}
-      <div className="sidebar-footer">
-        <IconButton
-          kind="ghost"
-          size="sm"
-          onClick={onOpenSettings}
-          label="Settings"
-          className="sidebar-settings-btn"
         >
-          <Settings size={20} />
-        </IconButton>
+          <Box style={{ width: '20px', height: '20px', color: 'white' }} />
+        </div>
+        {!isCollapsed && (
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: '18px',
+              color: '#f4f4f5',
+              marginLeft: '12px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            DevToolbox
+          </span>
+        )}
       </div>
-    </div>
+
+      {/* Search - only show when expanded */}
+      {!isCollapsed && (
+        <div style={{ padding: '0 16px 16px' }}>
+          <div style={{ position: 'relative' }}>
+            <Search
+              style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '16px',
+                height: '16px',
+                color: '#71717a',
+              }}
+            />
+            <input
+              placeholder="Search tools..."
+              style={{
+                width: '100%',
+                height: '40px',
+                padding: '0 12px 0 36px',
+                backgroundColor: '#27272a',
+                border: '1px solid #3f3f46',
+                borderRadius: '8px',
+                color: '#f4f4f5',
+                fontSize: '14px',
+                outline: 'none',
+              }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
+
+      <ScrollArea style={{ flex: 1, overflow: 'hidden' }}>
+        <div style={{ paddingBottom: '24px' }}>
+          {/* Quick Access - only show when expanded */}
+          {!isCollapsed && !searchQuery && (
+            <>
+              {favoriteTools.length > 0 && (
+                <>
+                  <div style={{ height: '1px', background: '#27272a', margin: '12px 16px' }} />
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 16px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: '#71717a',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    <Star style={{ width: '14px', height: '14px' }} />
+                    <span>Favorites</span>
+                  </div>
+                  {favoriteTools.map((tool) => (
+                    <SidebarItem
+                      key={tool.id}
+                      to={`/tool/${tool.id}`}
+                      label={tool.name}
+                      icon={TOOL_ICONS[tool.id] || Box}
+                      collapsed={isCollapsed}
+                    />
+                  ))}
+                </>
+              )}
+
+              <div style={{ height: '1px', background: '#27272a', margin: '16px' }} />
+            </>
+          )}
+
+          {/* Categories */}
+          {categories.map((category) => (
+            <div key={category}>
+              {!isCollapsed && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px 16px 8px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#71717a',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  {(() => {
+                    const IconComponent = CATEGORY_ICONS[category];
+                    return IconComponent ? (
+                      <IconComponent style={{ width: '14px', height: '14px' }} />
+                    ) : null;
+                  })()}
+                  <span>{category}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {toolsByCategory[category].map((tool) => (
+                  <SidebarItem
+                    key={tool.id}
+                    to={`/tool/${tool.id}`}
+                    label={tool.name}
+                    icon={TOOL_ICONS[tool.id] || Box}
+                    disabled={
+                      ![
+                        'text-converter',
+                        'string-utilities',
+                        'diff',
+                        'jwt',
+                        'barcode',
+                        'data-generator',
+                        'regexp',
+                        'cron',
+                        'code-formatter',
+                        'color-converter',
+                        'number-converter',
+                        'datetime-converter',
+                      ].includes(tool.id)
+                    }
+                    collapsed={isCollapsed}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {!isCollapsed && categories.length === 0 && (
+            <div
+              style={{
+                padding: '32px 16px',
+                textAlign: 'center',
+                fontSize: '14px',
+                color: '#71717a',
+              }}
+            >
+              No tools found.
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+
+      {/* Settings and Collapse */}
+      <div
+        style={{
+          padding: isCollapsed ? '8px' : '16px',
+          borderTop: '1px solid #27272a',
+          display: 'flex',
+          flexDirection: isCollapsed ? 'column' : 'row',
+          gap: isCollapsed ? '4px' : '8px',
+        }}
+      >
+        <button
+          onClick={onOpenSettings}
+          title={isCollapsed ? 'Settings' : undefined}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            width: isCollapsed ? '48px' : 'auto',
+            flex: isCollapsed ? 'none' : 1,
+            padding: isCollapsed ? '10px' : '10px 12px',
+            fontSize: '14px',
+            color: '#a1a1aa',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#a1a1aa';
+          }}
+        >
+          <Settings style={{ width: '16px', height: '16px', flexShrink: 0 }} />
+          {!isCollapsed && <span>Settings</span>}
+        </button>
+        <button
+          onClick={handleToggleCollapse}
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: isCollapsed ? '48px' : '36px',
+            height: '36px',
+            padding: '6px',
+            fontSize: '14px',
+            color: '#71717a',
+            backgroundColor: 'transparent',
+            border: '1px solid #27272a',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#71717a';
+          }}
+        >
+          {isCollapsed ? (
+            <ChevronRight style={{ width: '16px', height: '16px' }} />
+          ) : (
+            <ChevronLeft style={{ width: '16px', height: '16px' }} />
+          )}
+        </button>
+      </div>
+    </aside>
   );
 }
 

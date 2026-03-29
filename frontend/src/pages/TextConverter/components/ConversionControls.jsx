@@ -1,154 +1,203 @@
 import React from 'react';
-import { Button, Dropdown, Toggle, RadioButtonGroup, RadioButton } from '@carbon/react';
-import { ToolLayoutToggle } from '../../../components/ToolUI';
-import { ArrowsHorizontal, Play, Add, Checkmark } from '@carbon/icons-react';
 import { CONVERTER_MAP } from '../constants';
 
-export default function ConversionControls({
-  category,
-  setCategory,
-  method,
-  setMethod,
-  subMode,
-  setSubMode,
-  layout,
-  autoRun,
-  setAutoRun,
-  onConvert,
-  isAllHashes = false,
-  onAddQuickAction,
-  isCurrentInQuickActions = false,
-}) {
-  const categories = Object.keys(CONVERTER_MAP);
-  const methods = CONVERTER_MAP[category] || [];
+// Inline-styled Select component
+function Select({ value, onValueChange, children }) {
+  const [isOpen, setIsOpen] = React.useState(false);
 
-  const showModeToggle = ['Encrypt - Decrypt', 'Encode - Decode', 'Escape'].includes(category);
-  const modeLabels =
-    category === 'Encrypt - Decrypt'
-      ? { left: 'Encrypt', right: 'Decrypt' }
-      : category === 'Escape'
-        ? { left: 'Escape', right: 'Unescape' }
-        : { left: 'Encode', right: 'Decode' };
+  return (
+    <div style={{ position: 'relative' }}>
+      {React.Children.map(children, (child) => {
+        if (child.type === SelectTrigger) {
+          return React.cloneElement(child, {
+            isOpen,
+            onClick: () => setIsOpen(!isOpen),
+          });
+        }
+        if (child.type === SelectContent) {
+          return isOpen
+            ? React.cloneElement(child, {
+                onSelect: (val) => {
+                  onValueChange(val);
+                  setIsOpen(false);
+                },
+              })
+            : null;
+        }
+        return child;
+      })}
+    </div>
+  );
+}
 
+function SelectTrigger({ children, isOpen, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        height: '32px',
+        padding: '0 12px',
+        backgroundColor: isOpen ? '#27272a' : '#18181b',
+        border: '1px solid #3f3f46',
+        borderRadius: '6px',
+        color: '#f4f4f5',
+        fontSize: '14px',
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+        outline: 'none',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#27272a';
+        e.currentTarget.style.borderColor = '#52525b';
+      }}
+      onMouseLeave={(e) => {
+        if (!isOpen) {
+          e.currentTarget.style.backgroundColor = '#18181b';
+          e.currentTarget.style.borderColor = '#3f3f46';
+        }
+      }}
+    >
+      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {children}
+      </span>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        style={{
+          marginLeft: '8px',
+          opacity: 0.7,
+          transform: isOpen ? 'rotate(180deg)' : 'none',
+          transition: 'transform 0.15s ease',
+        }}
+      >
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </button>
+  );
+}
+
+function SelectValue({ children }) {
+  return <>{children}</>;
+}
+
+function SelectContent({ children, onSelect }) {
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        marginBottom: '0.5rem',
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        right: 0,
+        marginTop: '4px',
+        backgroundColor: '#1c1917',
+        border: '1px solid #27272a',
+        borderRadius: '6px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+        zIndex: 50,
+        maxHeight: '200px',
+        overflowY: 'auto',
       }}
     >
-      {/* Main Controls Row */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '1.5rem',
-          flexWrap: 'wrap',
-          alignItems: 'flex-end',
-        }}
-      >
-        {/* Primary Controls */}
-        <div style={{ width: '180px' }}>
-          <Dropdown
-            id="category-select"
-            titleText="Category"
-            label="Select category"
-            items={categories}
-            selectedItem={category}
-            onChange={({ selectedItem }) => setCategory(selectedItem)}
-          />
-        </div>
+      {React.Children.map(children, (child) => React.cloneElement(child, { onSelect }))}
+    </div>
+  );
+}
 
-        <div style={{ width: '280px' }}>
-          <Dropdown
-            id="method-select"
-            titleText="Algorithm / Method"
-            label="Select method"
-            items={methods}
-            selectedItem={method}
-            onChange={({ selectedItem }) => setMethod(selectedItem)}
-          />
-        </div>
+function SelectItem({ children, value, onSelect }) {
+  return (
+    <div
+      onClick={() => onSelect(value)}
+      style={{
+        padding: '8px 12px',
+        fontSize: '14px',
+        color: '#a1a1aa',
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#27272a';
+        e.currentTarget.style.color = '#f4f4f5';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+        e.currentTarget.style.color = '#a1a1aa';
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
-        {/* Convert Button - Always visible, disabled when auto-run is on */}
-        <div>
-          <Button kind="primary" size="md" renderIcon={Play} onClick={onConvert} disabled={autoRun}>
-            Convert
-          </Button>
-        </div>
+function Label({ children, style = {} }) {
+  return (
+    <label
+      style={{
+        fontSize: '10px',
+        fontWeight: 600,
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        color: '#71717a',
+        display: 'block',
+        marginBottom: '6px',
+        ...style,
+      }}
+    >
+      {children}
+    </label>
+  );
+}
 
-        {/* Quick Action + Button */}
-        <div>
-          <Button
-            kind={isCurrentInQuickActions ? 'ghost' : 'tertiary'}
-            size="md"
-            renderIcon={isCurrentInQuickActions ? Checkmark : Add}
-            onClick={onAddQuickAction}
-            disabled={isCurrentInQuickActions}
-            style={{
-              opacity: isCurrentInQuickActions ? 0.5 : 1,
-            }}
-          >
-            {isCurrentInQuickActions ? 'Added' : 'Quick Action'}
-          </Button>
-        </div>
+export default function ConversionControls({ category, setCategory, method, setMethod }) {
+  const categories = Object.keys(CONVERTER_MAP);
+  const methods = CONVERTER_MAP[category] || [];
 
-        {/* Auto-run Toggle */}
-        <div style={{ paddingBottom: '6px', minWidth: '120px' }}>
-          <Toggle
-            id="auto-run-toggle"
-            labelA="Manual"
-            labelB="Auto-run"
-            toggled={autoRun}
-            onToggle={setAutoRun}
-            size="md"
-          />
-        </div>
-
-        {/* Layout Toggle */}
-        {layout.showToggle && (
-          <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
-            <ToolLayoutToggle
-              direction={layout.direction}
-              onToggle={layout.toggleDirection}
-              position="controls"
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Mode Toggle Row - Only shown for Encrypt/Decrypt and Encode/Decode */}
-      {showModeToggle && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            paddingLeft: '12px',
+  return (
+    <>
+      <div style={{ width: '180px' }}>
+        <Label>Category</Label>
+        <Select
+          value={category}
+          onValueChange={(value) => {
+            setCategory(value);
+            setMethod(CONVERTER_MAP[value][0]);
           }}
         >
-          <RadioButtonGroup
-            legendText="Mode"
-            name="tbc-submode-group"
-            valueSelected={subMode}
-            onChange={(val) => setSubMode(val)}
-            orientation="horizontal"
-          >
-            <RadioButton
-              labelText={modeLabels.left}
-              value={modeLabels.left}
-              id={`mode-${modeLabels.left}`}
-              size="sm"
-            />
-            <RadioButton
-              labelText={modeLabels.right}
-              value={modeLabels.right}
-              id={`mode-${modeLabels.right}`}
-              size="sm"
-            />
-          </RadioButtonGroup>
-        </div>
-      )}
-    </div>
+          <SelectTrigger>
+            <SelectValue>{category}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div style={{ width: '280px' }}>
+        <Label>Algorithm / Method</Label>
+        <Select value={method} onValueChange={setMethod}>
+          <SelectTrigger>
+            <SelectValue>{method}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {methods.map((meth) => (
+              <SelectItem key={meth} value={meth}>
+                {meth}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </>
   );
 }

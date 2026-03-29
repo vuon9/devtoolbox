@@ -3,7 +3,6 @@ package codeformatter
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/itchyny/gojq"
@@ -49,12 +48,8 @@ func (s *codeFormatterService) Format(req FormatRequest) FormatResponse {
 		return s.formatXML(req)
 	case "html":
 		return s.formatHTML(req)
-	case "sql":
-		return s.formatSQL(req)
 	case "css":
 		return s.formatCSS(req)
-	case "javascript", "js":
-		return s.formatJavaScript(req)
 	default:
 		return FormatResponse{Error: fmt.Sprintf("unsupported format type: %s", req.FormatType)}
 	}
@@ -1156,51 +1151,6 @@ func minifyHTML(htmlStr string) (string, error) {
 	return minifyXML(buf.String())
 }
 
-// formatSQL formats SQL
-func (s *codeFormatterService) formatSQL(req FormatRequest) FormatResponse {
-	// Simple SQL formatting - in production, use a proper SQL parser
-	formatted := formatSQLSimple(req.Input, !req.Minify)
-	return FormatResponse{Output: formatted}
-}
-
-// formatSQLSimple performs basic SQL formatting
-func formatSQLSimple(sql string, pretty bool) string {
-	if !pretty {
-		// Minify: remove extra whitespace
-		return strings.Join(strings.Fields(sql), " ")
-	}
-
-	// Keywords to capitalize and put on new lines
-	keywords := []string{
-		"SELECT", "FROM", "WHERE", "AND", "OR", "INSERT", "UPDATE", "DELETE",
-		"JOIN", "LEFT", "RIGHT", "INNER", "OUTER", "ON", "GROUP", "BY",
-		"ORDER", "HAVING", "LIMIT", "OFFSET", "UNION", "ALL", "VALUES",
-		"SET", "CREATE", "TABLE", "ALTER", "DROP", "INDEX", "PRIMARY",
-		"KEY", "FOREIGN", "REFERENCES", "NOT", "NULL", "DEFAULT", "AUTO_INCREMENT",
-	}
-
-	result := sql
-
-	// Capitalize keywords
-	for _, kw := range keywords {
-		// Use regex for word boundaries
-		pattern := "\\b" + strings.ToLower(kw) + "\\b"
-		result = regexpReplaceAllString(result, pattern, kw)
-	}
-
-	// Add newlines after certain keywords
-	newlineKeywords := []string{"SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "HAVING", "JOIN", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN"}
-	for _, kw := range newlineKeywords {
-		result = strings.ReplaceAll(result, kw, "\n"+kw)
-	}
-
-	// Clean up multiple newlines
-	result = regexpReplaceAllString(result, "\n+", "\n")
-	result = strings.TrimSpace(result)
-
-	return result
-}
-
 // formatCSS formats CSS
 func (s *codeFormatterService) formatCSS(req FormatRequest) FormatResponse {
 	formatted := formatCSSSimple(req.Input, !req.Minify)
@@ -1280,129 +1230,4 @@ func minifyCSS(css string) string {
 	}
 
 	return strings.TrimSpace(result.String())
-}
-
-// formatJavaScript formats JavaScript
-func (s *codeFormatterService) formatJavaScript(req FormatRequest) FormatResponse {
-	// For JavaScript, we can use the JSON formatter for basic formatting
-	// In production, use a proper JS formatter like prettier or js-beautify
-
-	if req.Minify {
-		minified := minifyJS(req.Input)
-		return FormatResponse{Output: minified}
-	}
-
-	formatted := formatJSSimple(req.Input)
-	return FormatResponse{Output: formatted}
-}
-
-// formatJSSimple performs basic JavaScript formatting
-func formatJSSimple(js string) string {
-	var result strings.Builder
-	indent := 0
-
-	for i := 0; i < len(js); i++ {
-		ch := js[i]
-
-		switch ch {
-		case '{':
-			result.WriteByte(ch)
-			result.WriteByte('\n')
-			indent++
-			result.WriteString(strings.Repeat("  ", indent))
-		case '}':
-			result.WriteByte('\n')
-			indent--
-			result.WriteString(strings.Repeat("  ", indent))
-			result.WriteByte(ch)
-		case ';':
-			result.WriteByte(ch)
-			result.WriteByte('\n')
-			result.WriteString(strings.Repeat("  ", indent))
-		case '\n', '\t':
-			// Skip existing whitespace
-		case ' ':
-			if result.Len() > 0 {
-				lastChar := result.String()[result.Len()-1]
-				if lastChar != ' ' && lastChar != '\n' {
-					result.WriteByte(ch)
-				}
-			}
-		default:
-			result.WriteByte(ch)
-		}
-	}
-
-	return strings.TrimSpace(result.String())
-}
-
-// minifyJS removes whitespace from JavaScript
-func minifyJS(js string) string {
-	var result strings.Builder
-	lastWasSpace := false
-	inString := false
-	stringChar := byte(0)
-
-	for i := 0; i < len(js); i++ {
-		ch := js[i]
-
-		// Handle strings
-		if !inString && (ch == '"' || ch == '\'') {
-			inString = true
-			stringChar = ch
-			result.WriteByte(ch)
-			lastWasSpace = false
-			continue
-		}
-
-		if inString {
-			result.WriteByte(ch)
-			if ch == stringChar && (i == 0 || js[i-1] != '\\') {
-				inString = false
-			}
-			continue
-		}
-
-		// Handle comments
-		if ch == '/' && i+1 < len(js) {
-			if js[i+1] == '/' {
-				// Single line comment
-				for i < len(js) && js[i] != '\n' {
-					i++
-				}
-				continue
-			}
-			if js[i+1] == '*' {
-				// Multi-line comment
-				i += 2
-				for i < len(js)-1 && !(js[i] == '*' && js[i+1] == '/') {
-					i++
-				}
-				i++
-				continue
-			}
-		}
-
-		switch ch {
-		case ' ', '\t', '\n', '\r':
-			if !lastWasSpace {
-				result.WriteByte(' ')
-				lastWasSpace = true
-			}
-		default:
-			result.WriteByte(ch)
-			lastWasSpace = false
-		}
-	}
-
-	return strings.TrimSpace(result.String())
-}
-
-// regexpReplaceAllString is a helper for regex replacement
-func regexpReplaceAllString(s, pattern, replacement string) string {
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		return s
-	}
-	return re.ReplaceAllString(s, replacement)
 }

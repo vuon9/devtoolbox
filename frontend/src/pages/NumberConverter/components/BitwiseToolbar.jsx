@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ButtonSet } from '@carbon/react';
+import { Button } from '../../../components/ui/Button';
 import { BITWISE_OPERATIONS } from '../constants';
 
 /**
@@ -40,7 +40,7 @@ const BitwiseToolbar = ({ onOperation }) => {
         Bitwise Operations
       </div>
 
-      <ButtonSet
+      <div
         style={{
           display: 'flex',
           flexWrap: 'wrap',
@@ -50,15 +50,14 @@ const BitwiseToolbar = ({ onOperation }) => {
         {operations.map((op) => (
           <Button
             key={op.id}
-            kind="secondary"
-            size="sm"
+            variant="secondary"
             onClick={() => onOperation(op.id)}
             title={op.description}
           >
             {op.label}
           </Button>
         ))}
-      </ButtonSet>
+      </div>
     </div>
   );
 };

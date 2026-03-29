@@ -10,3 +10,5 @@ runtime.js
 .task/*
 /package.json
 .worktrees/
+.superpowers
+docs/plans/

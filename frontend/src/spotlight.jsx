@@ -1,22 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { Theme } from '@carbon/react';
-import { SpotlightPalette } from './components/SpotlightPalette';
-import './index.scss'; // Import global styles and Carbon tokens
+import { CommandPalette } from './components/CommandPalette';
+import './index.scss';
 import './spotlight.css';
 
-// Force g100 theme for Spotlight as per project guidelines
-const getInitialTheme = () => 'g100';
-
-function SpotlightApp() {
+// Command Palette (Global - Cmd+Shift+Space)
+function CommandPaletteApp() {
   return (
     <div
-      className="spotlight-app-wrapper"
+      className="command-palette-app-wrapper"
       style={{ height: '100%', width: '100%', background: 'transparent' }}
     >
       <BrowserRouter>
-        <SpotlightPalette />
+        <CommandPalette />
       </BrowserRouter>
     </div>
   );
@@ -25,6 +22,6 @@ function SpotlightApp() {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <SpotlightApp />
+    <CommandPaletteApp />
   </React.StrictMode>
 );

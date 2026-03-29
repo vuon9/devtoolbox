@@ -1,417 +1,481 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Grid, Column, Button, Select, SelectItem, TextInput, IconButton } from '@carbon/react';
-import { Code, TrashCan, Close } from '@carbon/icons-react';
-import {
-  ToolHeader,
-  ToolControls,
-  ToolPane,
-  ToolSplitPane,
-  ToolLayoutToggle,
-  CodeEditor,
-  EditorToggle,
-} from '../../components/ToolUI';
-import useLayoutToggle from '../../hooks/useLayoutToggle';
-import { Format } from '../../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FileText, Zap, Filter, Braces, Code2, Code } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-xml-doc';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-markup';
+import 'prismjs/themes/prism-tomorrow.css';
+import { Format } from '../../generated';
 
-const FORMATTERS = [
-  {
-    id: 'json',
-    name: 'JSON',
-    supportsFilter: true,
-    filterPlaceholder: '.users[] | select(.age > 18) | .name',
-    sample: '{"users":[{"name":"John","age":30},{"name":"Jane","age":25}],"count":2}',
-  },
-  {
-    id: 'xml',
-    name: 'XML',
-    supportsFilter: true,
-    filterPlaceholder: '//book[price<30]/title',
-    sample:
-      '<?xml version="1.0"?>\n<catalog>\n  <book id="bk101">\n    <author>Gambardella, Matthew</author>\n    <title>XML Developer\'s Guide</title>\n    <genre>Computer</genre>\n    <price>44.95</price>\n  </book>\n</catalog>',
-  },
-  {
-    id: 'html',
-    name: 'HTML',
-    supportsFilter: true,
-    filterPlaceholder: 'div.container > h1',
-    sample:
-      '<!DOCTYPE html>\n<html>\n<body>\n  <div class="container">\n    <h1>Hello World</h1>\n    <p>This is a paragraph.</p>\n  </div>\n</body>\n</html>',
-  },
-  {
-    id: 'sql',
-    name: 'SQL',
-    supportsFilter: false,
-    sample:
-      'SELECT u.id, u.name, o.order_date FROM users u JOIN orders o ON u.id = o.user_id WHERE u.active = 1 ORDER BY o.order_date DESC;',
-  },
-  {
-    id: 'css',
-    name: 'CSS',
-    supportsFilter: false,
-    sample:
-      '.container { display: flex; flex-direction: column; padding: 1rem; } .container h1 { color: blue; font-size: 2rem; }',
-  },
-  {
-    id: 'javascript',
-    name: 'JavaScript',
-    supportsFilter: false,
-    sample:
-      'function greet(name) { const message = `Hello, ${name}!`; console.log(message); return message; } greet("World");',
-  },
+const languages = [
+  { id: 'json', label: 'JSON', icon: Braces },
+  { id: 'xml', label: 'XML', icon: Code2 },
+  { id: 'html', label: 'HTML', icon: Code },
+  { id: 'css', label: 'CSS', icon: Code },
 ];
 
-const STORAGE_KEY = 'codeFormatterState';
+const sampleData = {
+  json: '{"users":[{"name":"Alice","age":30},{"name":"Bob","age":25}],"count":2}',
+  xml: '<?xml version="1.0"?><catalog><book id="1"><title>Example</title><author>John</author></book></catalog>',
+  html: '<!DOCTYPE html><html><head><title>Test</title></head><body><div class="header"><h1>Welcome</h1></div></body></html>',
+  css: '.container { display: flex; padding: 20px; } .header { background: #333; color: white; }',
+};
 
-export default function CodeFormatter() {
-  const [searchParams, setSearchParams] = useSearchParams();
+const filterPlaceholders = {
+  json: '.users[].name',
+  xml: '//book',
+  html: '.header',
+  css: '',
+};
 
-  // Load persisted state
-  const loadPersistedState = () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    } catch {
-      // ignore
-    }
-    return null;
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
   };
+}
 
-  const persisted = loadPersistedState();
+function ToolHeader({ title, description }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
+        {title}
+      </h2>
+      <p style={{ color: '#a1a1aa', marginTop: '4px', fontSize: '14px' }}>{description}</p>
+      <hr style={{ marginTop: '16px', border: 'none', borderTop: '1px solid #27272a' }} />
+    </div>
+  );
+}
 
-  // Check for format preset in URL params
-  const urlFormat = searchParams.get('format');
-  const validFormats = FORMATTERS.map((f) => f.id);
-  const initialFormatType = validFormats.includes(urlFormat)
-    ? urlFormat
-    : persisted?.formatType || 'json';
-
-  const [formatType, setFormatType] = useState(initialFormatType);
-  const [input, setInput] = useState(persisted?.input || '');
-  const [output, setOutput] = useState('');
-  const [formattedOutput, setFormattedOutput] = useState(''); // Store formatted output for filter source
-  const [filter, setFilter] = useState(persisted?.filter || '');
-  const [error, setError] = useState(null);
-  const [isMinified, setIsMinified] = useState(false);
-  const [highlightEnabled, setHighlightEnabled] = useState(() => {
-    try {
-      const saved = localStorage.getItem('codeFormatter-editor-highlight');
-      return saved ? JSON.parse(saved) : true; // Default: ON
-    } catch {
-      return true;
-    }
-  });
-
-  // React to URL format changes even when already mounted
-  useEffect(() => {
-    if (urlFormat && validFormats.includes(urlFormat)) {
-      setFormatType(urlFormat);
-      // Clear URL params after using preset to avoid re-triggering on reload
-      setSearchParams({}, { replace: true });
-    }
-  }, [urlFormat, setSearchParams, validFormats]);
-
-  // Cache for per-language inputs and filters (in memory only)
-  const inputCacheRef = useRef({});
-  const filterCacheRef = useRef({});
-  const prevFormatTypeRef = useRef(formatType);
-
-  const layout = useLayoutToggle({
-    toolKey: 'code-formatter-layout',
-    defaultDirection: 'horizontal',
-    showToggle: true,
-    persist: true,
-  });
-
-  // Persist state
-  useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        formatType,
-        input,
-        filter,
-      })
-    );
-  }, [formatType, input, filter]);
-
-  // Handle format type changes - cache current input/filter and restore cached for new type
-  useEffect(() => {
-    const prevType = prevFormatTypeRef.current;
-
-    if (formatType !== prevType) {
-      // Save current input and filter to cache for previous type
-      inputCacheRef.current[prevType] = input;
-      filterCacheRef.current[prevType] = filter;
-
-      // Load cached input and filter for new type, or empty string if not cached
-      const cachedInput = inputCacheRef.current[formatType];
-      const cachedFilter = filterCacheRef.current[formatType];
-      setInput(cachedInput !== undefined ? cachedInput : '');
-      setFilter(cachedFilter !== undefined ? cachedFilter : '');
-
-      // Clear output when switching languages
-      setOutput('');
-      setFormattedOutput('');
-      setError(null);
-
-      // Update ref
-      prevFormatTypeRef.current = formatType;
-    }
-  }, [formatType]);
-
-  const currentFormatter = FORMATTERS.find((f) => f.id === formatType);
-
-  const format = useCallback(async () => {
-    if (!input.trim()) {
-      setOutput('');
-      setFormattedOutput('');
-      setError(null);
-      return;
-    }
-
-    try {
-      const result = await Format({
-        input,
-        formatType,
-        filter: '',
-        minify: false,
-      });
-
-      if (result.error) {
-        setError(result.error);
-        setOutput('');
-        setFormattedOutput('');
-      } else {
-        setFormattedOutput(result.output);
-        setOutput(result.output);
-        setError(null);
-        setIsMinified(false);
-      }
-    } catch (err) {
-      setError(err.message);
-      setOutput('');
-      setFormattedOutput('');
-    }
-  }, [input, formatType]);
-
-  const minify = useCallback(async () => {
-    if (!input.trim()) {
-      setOutput('');
-      setFormattedOutput('');
-      setError(null);
-      return;
-    }
-
-    try {
-      const result = await Format({
-        input,
-        formatType,
-        filter: '',
-        minify: true,
-      });
-
-      if (result.error) {
-        setError(result.error);
-        setOutput('');
-        setFormattedOutput('');
-      } else {
-        setFormattedOutput(result.output);
-        setOutput(result.output);
-        setError(null);
-        setIsMinified(true);
-      }
-    } catch (err) {
-      setError(err.message);
-      setOutput('');
-      setFormattedOutput('');
-    }
-  }, [input, formatType]);
-
-  // Apply filter to formatted output (not the already-filtered output)
-  const applyFilter = useCallback(async () => {
-    if (!formattedOutput.trim() || !filter.trim()) {
-      // If filter is cleared, restore formatted output
-      if (!filter.trim()) {
-        setOutput(formattedOutput);
-      }
-      return;
-    }
-
-    try {
-      const result = await Format({
-        input: formattedOutput, // Always use formatted output as source
-        formatType,
-        filter: filter.trim(),
-        minify: false,
-      });
-
-      if (result.error) {
-        setError(result.error);
-      } else {
-        setOutput(result.output);
-        setError(null);
-      }
-    } catch (err) {
-      setError(err.message);
-    }
-  }, [formattedOutput, formatType, filter]);
-
-  const clearFilter = useCallback(() => {
-    setFilter('');
-    setError(null);
-  }, []);
-
-  const clear = useCallback(() => {
-    setInput('');
-    setOutput('');
-    setFormattedOutput('');
-    setFilter('');
-    setError(null);
-    setIsMinified(false);
-  }, []);
-
-  // Auto-format on input change (debounced) - only for formatting, not filter
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (input.trim()) {
-        format();
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [input, formatType]);
-
-  // Auto-apply filter when filter changes (debounced)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (formattedOutput.trim() && currentFormatter?.supportsFilter) {
-        applyFilter();
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [filter, formattedOutput]);
+function LanguageSelect({ value, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedLang = languages.find((l) => l.id === value) || languages[0];
 
   return (
-    <Grid
-      fullWidth
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
-    >
-      <Column>
-        <ToolHeader
-          title="Code Formatter"
-          description="Format, minify, and query JSON, XML, HTML, SQL, CSS, and JavaScript with filter support."
-        />
-      </Column>
+    <div style={{ position: 'relative' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          height: '36px',
+          padding: '0 12px',
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '6px',
+          color: '#f4f4f5',
+          fontSize: '14px',
+          cursor: 'pointer',
+          minWidth: '140px',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <selectedLang.icon style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
+          <span>{selectedLang.label}</span>
+        </div>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          style={{ opacity: 0.5 }}
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
 
-      <Column>
-        <ToolControls>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-            <Select
-              id="format-type"
-              labelText="Format Type"
-              value={formatType}
-              onChange={(e) => setFormatType(e.target.value)}
-              style={{ minWidth: '150px' }}
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            marginTop: '4px',
+            backgroundColor: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: '6px',
+            overflow: 'hidden',
+            zIndex: 10,
+          }}
+        >
+          {languages.map((lang) => (
+            <button
+              key={lang.id}
+              onClick={() => {
+                onChange(lang.id);
+                setIsOpen(false);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                width: '100%',
+                padding: '8px 12px',
+                backgroundColor: value === lang.id ? '#27272a' : 'transparent',
+                border: 'none',
+                color: '#f4f4f5',
+                fontSize: '14px',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
             >
-              {FORMATTERS.map((f) => (
-                <SelectItem key={f.id} value={f.id} text={f.name} />
-              ))}
-            </Select>
+              <lang.icon style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
+              <span>{lang.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
-            <Button onClick={format} renderIcon={Code} size="md">
-              Format
-            </Button>
-            <Button onClick={minify} kind="secondary" size="md">
-              Minify
-            </Button>
+function InputPane({ value, onChange, placeholder }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '6px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            color: '#71717a',
+            fontWeight: 600,
+            letterSpacing: '0.05em',
+          }}
+        >
+          Input
+        </span>
+      </div>
+      <textarea
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{
+          flex: 1,
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          padding: '8px',
+          color: '#f4f4f5',
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+          fontSize: '13px',
+          lineHeight: 1.5,
+          resize: 'none',
+          outline: 'none',
+        }}
+      />
+    </div>
+  );
+}
 
-            <EditorToggle
-              enabled={highlightEnabled}
-              onToggle={setHighlightEnabled}
-              toolKey="codeFormatter"
-            />
+function OutputPane({ content, language, error, filterComponent }) {
+  useEffect(() => {
+    if (content) {
+      Prism.highlightAll();
+    }
+  }, [content]);
 
-            {currentFormatter?.sample && (
-              <Button kind="tertiary" size="md" onClick={() => setInput(currentFormatter.sample)}>
-                Load Sample
-              </Button>
-            )}
+  const getPrismLanguage = (lang) => {
+    switch (lang) {
+      case 'json':
+        return 'json';
+      case 'xml':
+        return 'xml';
+      case 'html':
+        return 'markup';
+      case 'css':
+        return 'css';
+      default:
+        return 'text';
+    }
+  };
 
-            <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
-              <ToolLayoutToggle
-                direction={layout.direction}
-                onToggle={layout.toggleDirection}
-                position="controls"
-              />
-            </div>
-          </div>
-        </ToolControls>
-      </Column>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '6px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            color: '#71717a',
+            fontWeight: 600,
+            letterSpacing: '0.05em',
+          }}
+        >
+          Formatted Output
+        </span>
+      </div>
 
+      <div
+        style={{
+          flex: 1,
+          backgroundColor: '#18181b',
+          border: error ? '1px solid #ef4444' : '1px solid #27272a',
+          borderRadius: '8px',
+          padding: '0',
+          overflow: 'auto',
+          marginBottom: '8px',
+        }}
+      >
+        {content && (
+          <pre style={{ margin: 0, background: 'transparent' }}>
+            <code
+              className={`language-${getPrismLanguage(language)}`}
+              style={{
+                background: 'transparent',
+                padding: 0,
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                fontSize: '13px',
+                lineHeight: 1.5,
+              }}
+            >
+              {content}
+            </code>
+          </pre>
+        )}
+      </div>
+
+      {filterComponent}
+
+      {error && !error.toLowerCase().includes('filter') && (
+        <div
+          style={{
+            padding: '8px 12px',
+            borderRadius: '6px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            color: '#ef4444',
+            fontSize: '12px',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+          }}
+        >
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FilterBar({ value, onChange, placeholder, show, error }) {
+  if (!show) return null;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px',
+        padding: '8px 12px',
+        backgroundColor: error ? 'rgba(239, 68, 68, 0.1)' : '#27272a',
+        borderRadius: '6px',
+        border: error ? '1px solid #ef4444' : '1px solid #3f3f46',
+        marginBottom: '8px',
+      }}
+    >
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <Filter
+          style={{
+            width: '16px',
+            height: '16px',
+            color: error ? '#ef4444' : '#a1a1aa',
+            flexShrink: 0,
+          }}
+        />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          style={{
+            flex: 1,
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: error ? '#ef4444' : '#f4f4f5',
+            padding: '4px 0',
+            fontSize: '13px',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+            outline: 'none',
+          }}
+        />
+      </div>
       {error && (
-        <Column>
-          <div
+        <div
+          style={{
+            fontSize: '11px',
+            color: '#ef4444',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+          }}
+        >
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function CodeFormatter() {
+  const [input, setInput] = useState('');
+  const [output, setOutput] = useState('');
+  const [language, setLanguage] = useState(
+    () => localStorage.getItem('code-formatter-lang') || 'json'
+  );
+  const [filter, setFilter] = useState('');
+  const [minify, setMinify] = useState(false);
+  const [error, setError] = useState('');
+  const [isFormatting, setIsFormatting] = useState(false);
+
+  const debouncedFormat = useCallback(
+    debounce(async (content, lang, filterText, minifyMode) => {
+      if (!content.trim()) {
+        setOutput('');
+        setError('');
+        return;
+      }
+
+      setIsFormatting(true);
+      setError('');
+
+      try {
+        const result = await Format({
+          Input: content,
+          FormatType: lang,
+          Filter: filterText,
+          Minify: minifyMode,
+        });
+
+        if (result.error) {
+          setError(result.error);
+          setOutput('');
+        } else {
+          setOutput(result.output);
+        }
+      } catch (err) {
+        setError(err.message || 'Formatting failed');
+        setOutput('');
+      } finally {
+        setIsFormatting(false);
+      }
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    debouncedFormat(input, language, filter, minify);
+  }, [input, language, filter, minify, debouncedFormat]);
+
+  const handleLanguageChange = (newLang) => {
+    setLanguage(newLang);
+    localStorage.setItem('code-formatter-lang', newLang);
+    setFilter('');
+  };
+
+  const handleLoadSample = () => {
+    setInput(sampleData[language]);
+  };
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+        backgroundColor: '#09090b',
+      }}
+    >
+      <ToolHeader
+        title="Code Formatter"
+        description="Clean up and prettify your markup. Supports JSON, XML, HTML, and CSS with intelligent formatting and filtering."
+      />
+
+      {/* Top Controls */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span
             style={{
-              color: 'var(--cds-support-error)',
-              padding: '0.75rem',
-              backgroundColor: 'var(--cds-layer-hover)',
-              borderRadius: '4px',
-              fontSize: '0.875rem',
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
             }}
           >
-            {error}
-          </div>
-        </Column>
-      )}
+            Language
+          </span>
+          <LanguageSelect value={language} onChange={handleLanguageChange} />
+        </div>
 
-      <Column style={{ flex: 1, minHeight: 0 }}>
-        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-          <CodeEditor
-            label="Input"
-            language={formatType}
-            value={input}
-            onChange={setInput}
-            highlight={false}
-            placeholder={`Paste ${currentFormatter?.name || 'code'} here...`}
-            style={{ minHeight: '100%' }}
-          />
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '0.5rem' }}>
-            <CodeEditor
-              label={isMinified ? 'Output (Minified)' : 'Output (Formatted)'}
-              language={formatType.toLowerCase()}
-              value={output}
-              highlight={highlightEnabled}
-              readOnly
-              placeholder={`Formatted ${currentFormatter?.name || 'code'} will appear here...`}
-              style={{ flex: 1, minHeight: 0 }}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button variant="secondary" onClick={handleLoadSample} disabled={isFormatting}>
+            <FileText size={14} />
+            Load Sample
+          </Button>
+          <Button active={minify} onClick={() => setMinify(!minify)}>
+            <Zap size={14} />
+            Minify
+          </Button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: '16px' }}>
+        <InputPane
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={`Paste your ${language.toUpperCase()} here...`}
+        />
+
+        <OutputPane
+          content={output}
+          language={language}
+          error={error && !error.toLowerCase().includes('filter') ? error : ''}
+          filterComponent={
+            <FilterBar
+              value={filter}
+              onChange={setFilter}
+              placeholder={filterPlaceholders[language]}
+              show={language !== 'css'}
+              error={error && error.toLowerCase().includes('filter') ? error : ''}
             />
-            {currentFormatter?.supportsFilter && (
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '0.5rem',
-                  alignItems: 'flex-end',
-                  alignContent: 'flex-end',
-                }}
-              >
-                <TextInput
-                  id="filter-input"
-                  labelText="Filter"
-                  placeholder={currentFormatter.filterPlaceholder}
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  style={{ flex: 1 }}
-                />
-                <IconButton label="Clear filter" onClick={clearFilter} disabled={!filter} size="md">
-                  <Close />
-                </IconButton>
-              </div>
-            )}
-          </div>
-        </ToolSplitPane>
-      </Column>
-    </Grid>
+          }
+        />
+      </div>
+    </div>
   );
 }

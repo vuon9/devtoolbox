@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@carbon/react';
-import { Download, Copy, Warning } from '@carbon/icons-react';
+import { Download, Copy, AlertTriangle } from 'lucide-react';
 
 export function isBase64Image(str) {
   if (!str || typeof str !== 'string') return false;
@@ -112,15 +111,67 @@ export default function ImageOutput({ value, onCopy }) {
     return (
       <div
         style={{
-          height: '100%',
+          flex: 1,
+          minHeight: 0,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--cds-text-secondary)',
-          fontStyle: 'italic',
+          flexDirection: 'column',
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          overflow: 'hidden',
         }}
       >
-        Enter base64 image data...
+        <div
+          style={{
+            padding: '8px 12px',
+            borderBottom: '1px solid #27272a',
+            backgroundColor: '#09090b',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            Image Preview
+          </span>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+              color: '#3b82f6',
+            }}
+          >
+            Result
+          </span>
+        </div>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#52525b',
+            fontStyle: 'italic',
+          }}
+        >
+          Enter base64 image data...
+        </div>
       </div>
     );
   }
@@ -131,7 +182,6 @@ export default function ImageOutput({ value, onCopy }) {
     const link = document.createElement('a');
     link.href = imageSrc;
 
-    // Determine file extension from data
     let extension = 'png';
     if (value.includes('jpeg') || value.includes('jpg') || value.startsWith('/9j/')) {
       extension = 'jpg';
@@ -157,49 +207,115 @@ export default function ImageOutput({ value, onCopy }) {
   return (
     <div
       style={{
-        height: '100%',
+        flex: 1,
+        minHeight: 0,
         display: 'flex',
         flexDirection: 'column',
+        backgroundColor: '#18181b',
+        border: '1px solid #27272a',
+        borderRadius: '8px',
         overflow: 'hidden',
       }}
     >
-      {/* Header with actions */}
       <div
         style={{
+          padding: '8px 12px',
+          borderBottom: '1px solid #27272a',
+          backgroundColor: '#09090b',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '0 0 0.5rem 0',
-          borderBottom: '1px solid var(--cds-border-subtle)',
-          marginBottom: '0.5rem',
         }}
       >
         <span
           style={{
-            fontSize: '0.75rem',
-            color: 'var(--cds-text-secondary)',
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#71717a',
             textTransform: 'uppercase',
+            letterSpacing: '0.05em',
           }}
         >
           Image Preview
         </span>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Button kind="ghost" size="sm" renderIcon={Copy} onClick={handleCopy}>
-            {copyFeedback}
-          </Button>
-          <Button
-            kind="primary"
-            size="sm"
-            renderIcon={Download}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+              color: '#3b82f6',
+            }}
+          >
+            Result
+          </span>
+          <button
+            onClick={handleCopy}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              padding: '6px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderRadius: '4px',
+              color: '#a1a1aa',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.color = '#f4f4f5';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#a1a1aa';
+            }}
+          >
+            <Copy style={{ width: '16px', height: '16px' }} />
+          </button>
+          <button
             onClick={handleDownload}
             disabled={loadError}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              padding: '6px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderRadius: '4px',
+              color: loadError ? '#3f3f46' : '#a1a1aa',
+              cursor: loadError ? 'not-allowed' : 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              if (!loadError) {
+                e.currentTarget.style.backgroundColor = '#27272a';
+                e.currentTarget.style.color = '#f4f4f5';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = loadError ? '#3f3f46' : '#a1a1aa';
+            }}
           >
-            Download
-          </Button>
+            <Download style={{ width: '16px', height: '16px' }} />
+          </button>
         </div>
       </div>
 
-      {/* Image display */}
       <div
         style={{
           flex: 1,
@@ -207,9 +323,8 @@ export default function ImageOutput({ value, onCopy }) {
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'auto',
-          backgroundColor: 'var(--cds-field)',
-          borderRadius: '4px',
-          padding: '1rem',
+          padding: '16px',
+          minHeight: 0,
         }}
       >
         {!validation.valid ? (
@@ -218,16 +333,14 @@ export default function ImageOutput({ value, onCopy }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '0.5rem',
-              color: 'var(--cds-text-error)',
+              gap: '8px',
+              color: '#ef4444',
               textAlign: 'center',
             }}
           >
-            <Warning size={32} />
+            <AlertTriangle style={{ width: '32px', height: '32px' }} />
             <div>Invalid Base64 Data</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>
-              {validation.error}
-            </div>
+            <div style={{ fontSize: '12px', color: '#71717a' }}>{validation.error}</div>
           </div>
         ) : loadError ? (
           <div
@@ -235,29 +348,15 @@ export default function ImageOutput({ value, onCopy }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '0.5rem',
-              color: 'var(--cds-text-error)',
+              gap: '8px',
+              color: '#ef4444',
               textAlign: 'center',
             }}
           >
-            <Warning size={32} />
+            <AlertTriangle style={{ width: '32px', height: '32px' }} />
             <div>Failed to load image</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>
+            <div style={{ fontSize: '12px', color: '#71717a' }}>
               The base64 data may be corrupted or not an image
-            </div>
-            <div
-              style={{
-                fontSize: '0.625rem',
-                color: 'var(--cds-text-secondary)',
-                maxWidth: '300px',
-                wordBreak: 'break-all',
-                marginTop: '0.5rem',
-                padding: '0.5rem',
-                backgroundColor: 'var(--cds-layer)',
-                borderRadius: '4px',
-              }}
-            >
-              Preview: {value.substring(0, 50)}...
             </div>
           </div>
         ) : (
@@ -269,30 +368,12 @@ export default function ImageOutput({ value, onCopy }) {
               maxHeight: '100%',
               objectFit: 'contain',
               borderRadius: '4px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              display: loadError ? 'none' : 'block',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
             }}
             onError={() => {
               setLoadError(true);
             }}
           />
-        )}
-      </div>
-
-      {/* Data info */}
-      <div
-        style={{
-          marginTop: '0.5rem',
-          padding: '0.5rem',
-          backgroundColor: 'var(--cds-layer)',
-          borderRadius: '4px',
-          fontSize: '0.75rem',
-          color: 'var(--cds-text-secondary)',
-        }}
-      >
-        Data length: {value.length.toLocaleString()} characters
-        {validation.valid && (
-          <span style={{ marginLeft: '1rem', color: 'var(--cds-text-success)' }}>Valid Base64</span>
         )}
       </div>
     </div>

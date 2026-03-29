@@ -1,402 +1,1118 @@
-import React, { useState, useEffect, useCallback, useReducer, useMemo, useRef } from 'react';
-import {
-  Button,
-  Grid,
-  Column,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  Layer,
-  Checkbox,
-  TextInput,
-} from '@carbon/react';
-import { Eyedropper, ColorPalette, CircleStroke } from '@carbon/icons-react';
-import { ToolHeader } from '../../components/ToolUI';
-import { colorReducer, initialState, actions } from './colorReducer';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Pipette, Copy, Check, History, Trash2, Sliders, Zap, Sparkles } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
+import CopyableHex from '../../components/CopyableHex';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 import {
   hexToRgb,
   rgbToHex,
   rgbToHsl,
-  rgbToHsv,
+  hslToRgb,
   rgbToCmyk,
-  parseHex,
-  parseRgb,
-  parseHsl,
-  parseHsv,
-  parseCmyk,
-  generateCodeSnippetsForLanguage,
-} from './colorUtils';
-import ColorInputs from './components/ColorInputs';
-import ColorHistory from './components/ColorHistory';
-import CodeSnippetsPanel from './components/CodeSnippetsPanel';
+  cmykToRgb,
+  rgbToHsb,
+  hsbToRgb,
+  validateHex,
+} from '../../services/colorService';
+import { getShades, getTints, getTones } from '../../services/colorHarmonyService';
+
+const PALETTE_TYPES = ['shades', 'tints', 'tones'];
+const PALETTE_LABELS = { shades: 'Shades', tints: 'Tints', tones: 'Tones' };
+const CODE_FORMATS = ['css', 'tailwind', 'swift', 'android', 'react', 'json', 'raw'];
+
+// Color Swatch Component
+const ColorSwatch = ({ color, onClick, size = 40, showHex = true }) => (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '4px',
+      cursor: onClick ? 'pointer' : 'default',
+    }}
+  >
+    <div
+      onClick={onClick}
+      style={{
+        width: size,
+        height: size,
+        backgroundColor: color,
+        borderRadius: '6px',
+        border: '2px solid #27272a',
+      }}
+    />
+    {showHex && <CopyableHex hex={color} showColorPreview={false} style={{ fontSize: '10px' }} />}
+  </div>
+);
 
 export default function ColorConverter() {
-  const [state, dispatch] = useReducer(colorReducer, initialState);
-  const [eyedropperSupported, setEyedropperSupported] = useState(false);
-  const [isPicking, setIsPicking] = useState(false);
-  const colorPickerRef = useRef(null);
-  const historyTimeoutRef = useRef(null);
-  const throttleRef = useRef(null);
-  const pendingColorRef = useRef(null);
-  const snippetsCacheRef = useRef(new Map());
+  const [currentColor, setCurrentColor] = useState('#3B82F6');
+  const [recentColors, setRecentColors] = useLocalStorage('color-recent', []);
+  const [activePalette, setActivePalette] = useLocalStorage('color-active-palette', 'tints');
+  const [activeCodeFormat, setActiveCodeFormat] = useLocalStorage(
+    'color-active-code-format',
+    'css'
+  );
+  const [copiedFormat, setCopiedFormat] = useState(null);
+  const [copiedPaletteColor, setCopiedPaletteColor] = useState(null);
+  const [hexInput, setHexInput] = useState('#3B82F6');
+  const [rgbInput, setRgbInput] = useState({ r: 59, g: 130, b: 246 });
+  const [hslInput, setHslInput] = useState({ h: 217, s: 91, l: 60 });
+  const [cmykInput, setCmykInput] = useState({ c: 76, m: 47, y: 0, k: 4 });
+  const [hsbInput, setHsbInput] = useState({ h: 217, s: 76, b: 96 });
 
-  // Check for EyeDropper API support
+  // Sync inputs when currentColor changes
   useEffect(() => {
-    setEyedropperSupported('EyeDropper' in window);
-  }, []);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (historyTimeoutRef.current) {
-        clearTimeout(historyTimeoutRef.current);
-      }
-      if (throttleRef.current) {
-        clearTimeout(throttleRef.current);
-      }
-    };
-  }, []);
-
-  // Generate code snippets with caching - only generate for active tab
-  const codeSnippets = useMemo(() => {
-    const colorKey = `${state.rgb.r},${state.rgb.g},${state.rgb.b},${state.rgb.a}`;
-    const cacheKey = `${colorKey}-${state.selectedTab}`;
-
-    // Check cache first
-    if (snippetsCacheRef.current.has(cacheKey)) {
-      return snippetsCacheRef.current.get(cacheKey);
-    }
-
-    // Generate snippets for current tab only
-    const snippets = generateCodeSnippetsForLanguage(
-      state.selectedTab,
-      state.rgb.r,
-      state.rgb.g,
-      state.rgb.b,
-      state.rgb.a,
-      state.hsl,
-      state.hsv
-    );
-
-    // Cache the result
-    snippetsCacheRef.current.set(cacheKey, snippets);
-
-    // Limit cache size to prevent memory leaks (keep last 50 entries)
-    if (snippetsCacheRef.current.size > 50) {
-      const firstKey = snippetsCacheRef.current.keys().next().value;
-      snippetsCacheRef.current.delete(firstKey);
-    }
-
-    return snippets;
-  }, [state.selectedTab, state.rgb, state.hsl, state.hsv]);
-
-  // Debounced history recording
-  const debouncedAddToHistory = useCallback((hex, rgb) => {
-    if (historyTimeoutRef.current) {
-      clearTimeout(historyTimeoutRef.current);
-    }
-    historyTimeoutRef.current = setTimeout(() => {
-      dispatch(actions.addToHistory({ hex, rgb }));
-    }, 100);
-  }, []);
-
-  // Update all color formats from RGB
-  const updateFromRgb = useCallback(
-    (r, g, b, a = 1, skipHistory = false) => {
-      const hex = rgbToHex(r, g, b, a);
-      const hsl = rgbToHsl(r, g, b);
-      const hsv = rgbToHsv(r, g, b);
-      const cmyk = rgbToCmyk(r, g, b);
-
-      dispatch(actions.setColor({ hex, rgb: { r, g, b, a }, hsl, hsv, cmyk }));
-
-      if (!skipHistory) {
-        debouncedAddToHistory(hex, { r, g, b, a });
-      }
-    },
-    [debouncedAddToHistory]
-  );
-
-  // Handle color input changes
-  const handleColorInput = useCallback(
-    (type, value) => {
-      let result = null;
-
-      switch (type) {
-        case 'hex':
-          result = parseHex(value);
-          break;
-        case 'rgb':
-          result = parseRgb(value);
-          break;
-        case 'hsl':
-          result = parseHsl(value);
-          break;
-        case 'hsv':
-          result = parseHsv(value);
-          break;
-        case 'cmyk':
-          result = parseCmyk(value);
-          break;
-      }
-
-      if (result) {
-        updateFromRgb(result.r, result.g, result.b, result.a);
-      }
-    },
-    [updateFromRgb]
-  );
-
-  // Open native color picker
-  const openColorPicker = useCallback(() => {
-    if (colorPickerRef.current) {
-      colorPickerRef.current.click();
-    }
-  }, []);
-
-  // Handle native color picker change with throttling (60fps max)
-  const handleColorPickerChange = useCallback(
-    (e) => {
-      const rgb = hexToRgb(e.target.value);
-      if (!rgb) return;
-
-      // Store the pending color
-      pendingColorRef.current = rgb;
-
-      // If we're not already throttling, update immediately and start throttle
-      if (!throttleRef.current) {
-        updateFromRgb(rgb.r, rgb.g, rgb.b, rgb.a);
-
-        // Set throttle to prevent updates for 16ms (~60fps)
-        throttleRef.current = setTimeout(() => {
-          throttleRef.current = null;
-          // Apply any pending color that accumulated during throttle
-          if (pendingColorRef.current && pendingColorRef.current !== rgb) {
-            const pending = pendingColorRef.current;
-            updateFromRgb(pending.r, pending.g, pending.b, pending.a);
-          }
-          pendingColorRef.current = null;
-        }, 16);
-      }
-    },
-    [updateFromRgb]
-  );
-
-  // EyeDropper functionality
-  const openEyeDropper = useCallback(async () => {
-    if (!eyedropperSupported) return;
-
-    setIsPicking(true);
-    try {
-      const eyeDropper = new window.EyeDropper();
-      const result = await eyeDropper.open();
-      if (result.sRGBHex) {
-        const rgb = hexToRgb(result.sRGBHex);
-        if (rgb) {
-          updateFromRgb(rgb.r, rgb.g, rgb.b, rgb.a);
-        }
-      }
-    } catch (e) {
-      // User cancelled or error
-    } finally {
-      setIsPicking(false);
-    }
-  }, [eyedropperSupported, updateFromRgb]);
-
-  // Copy to clipboard
-  const copyToClipboard = useCallback((text) => {
-    navigator.clipboard.writeText(text);
-  }, []);
-
-  // Load color from history
-  const loadFromHistory = useCallback(
-    (item) => {
-      const rgb = hexToRgb(item.hex);
+    if (validateHex(currentColor)) {
+      setHexInput(currentColor);
+      const rgb = hexToRgb(currentColor);
       if (rgb) {
-        updateFromRgb(rgb.r, rgb.g, rgb.b, rgb.a, true);
+        setRgbInput(rgb);
+        setHslInput(rgbToHsl(rgb.r, rgb.g, rgb.b));
+        setCmykInput(rgbToCmyk(rgb.r, rgb.g, rgb.b));
+        setHsbInput(rgbToHsb(rgb.r, rgb.g, rgb.b));
       }
-    },
-    [updateFromRgb]
-  );
+    }
+  }, [currentColor]);
+
+  // Update recent colors when color changes
+  useEffect(() => {
+    if (validateHex(currentColor)) {
+      setRecentColors((prev) => {
+        const filtered = prev.filter((c) => c.toLowerCase() !== currentColor.toLowerCase());
+        return [currentColor, ...filtered].slice(0, 12);
+      });
+    }
+  }, [currentColor]);
+
+  // Helper: Handle hex change
+  const handleHexChange = (value) => {
+    setHexInput(value);
+    if (validateHex(value)) {
+      const normalized = value.startsWith('#') ? value : `#${value}`;
+      setCurrentColor(normalized.toLowerCase());
+    }
+  };
+
+  // Helper: Handle RGB change
+  const handleRgbChange = (newRgb) => {
+    setRgbInput(newRgb);
+    const { r, g, b } = newRgb;
+    if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255) {
+      const hex = rgbToHex(r, g, b);
+      setCurrentColor(hex);
+    }
+  };
+
+  // Helper: Handle HSL change
+  const handleHslChange = (newHsl) => {
+    setHslInput(newHsl);
+    const { h, s, l } = newHsl;
+    if (h >= 0 && h <= 360 && s >= 0 && s <= 100 && l >= 0 && l <= 100) {
+      const rgb = hslToRgb(h, s, l);
+      const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+      setCurrentColor(hex);
+    }
+  };
+
+  // Helper: Handle CMYK change
+  const handleCmykChange = (newCmyk) => {
+    setCmykInput(newCmyk);
+    const { c, m, y, k } = newCmyk;
+    if (c >= 0 && c <= 100 && m >= 0 && m <= 100 && y >= 0 && y <= 100 && k >= 0 && k <= 100) {
+      const rgb = cmykToRgb(c, m, y, k);
+      const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+      setCurrentColor(hex);
+    }
+  };
+
+  // Helper: Handle HSB change
+  const handleHsbChange = (newHsb) => {
+    setHsbInput(newHsb);
+    const { h, s, b } = newHsb;
+    if (h >= 0 && h <= 360 && s >= 0 && s <= 100 && b >= 0 && b <= 100) {
+      const rgb = hsbToRgb(h, s, b);
+      const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+      setCurrentColor(hex);
+    }
+  };
+
+  // Helper: Eyedropper
+  const handleEyedropper = async () => {
+    if ('EyeDropper' in window) {
+      try {
+        const eyeDropper = new window.EyeDropper();
+        const result = await eyeDropper.open();
+        if (result.sRGBHex) {
+          setCurrentColor(result.sRGBHex.toLowerCase());
+        }
+      } catch (e) {
+        // User cancelled
+      }
+    }
+  };
+
+  // Helper: Clear recent
+  const clearRecent = () => {
+    setRecentColors([]);
+  };
+
+  // Helper: Remove from recent
+  const removeFromRecent = (color) => {
+    setRecentColors((prev) => prev.filter((c) => c.toLowerCase() !== color.toLowerCase()));
+  };
+
+  // Helper: Copy to clipboard
+  const copyToClipboard = async (text, format) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedFormat(format);
+      setTimeout(() => setCopiedFormat(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  // Helper: Copy palette color
+  const copyPaletteColor = async (color) => {
+    try {
+      await navigator.clipboard.writeText(color);
+      setCopiedPaletteColor(color);
+      setTimeout(() => setCopiedPaletteColor(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   // Generate random color
-  const generateRandomColor = useCallback(() => {
+  const generateRandomColor = () => {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
-    updateFromRgb(r, g, b, 1);
-  }, [updateFromRgb]);
+    const hex = rgbToHex(r, g, b);
+    setCurrentColor(hex);
+  };
+
+  // Get palette colors
+  const paletteColors = useMemo(() => {
+    if (!validateHex(currentColor)) return [];
+    switch (activePalette) {
+      case 'shades':
+        return getShades(currentColor, 5);
+      case 'tints':
+        return getTints(currentColor, 5);
+      case 'tones':
+        return getTones(currentColor, 5);
+      default:
+        return [];
+    }
+  }, [currentColor, activePalette]);
+
+  // Get palette percentages
+  const palettePercentages = useMemo(() => {
+    return ['10%', '30%', '50%', '70%', '90%'];
+  }, []);
+
+  // Generate code output
+  const generateCodeOutput = useMemo(() => {
+    const rgb = hexToRgb(currentColor);
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+    const hsb = rgbToHsb(rgb.r, rgb.g, rgb.b);
+
+    switch (activeCodeFormat) {
+      case 'css':
+        return `/* CSS Color Values */
+:root {
+  --color-primary: ${currentColor};
+  --color-rgb: rgb(${rgb.r}, ${rgb.g}, ${rgb.b});
+  --color-hsl: hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%);
+}`;
+      case 'tailwind':
+        return `// tailwind.config.js
+colors: {
+  primary: '${currentColor}',
+  primaryRgb: '${rgb.r} ${rgb.g} ${rgb.b}',
+  primaryHsl: '${hsl.h} ${hsl.s}% ${hsl.l}%',
+}`;
+      case 'swift':
+        return `// Swift UIColor
+let color = UIColor(
+  red: ${(rgb.r / 255).toFixed(3)},
+  green: ${(rgb.g / 255).toFixed(3)},
+  blue: ${(rgb.b / 255).toFixed(3)},
+  alpha: 1.0
+)
+// Hex: ${currentColor}`;
+      case 'android':
+        return `<!-- Android Colors -->
+<color name="primary">${currentColor}</color>
+<!-- ARGB -->
+<integer name="primary_argb">0xFF${currentColor.replace('#', '').toUpperCase()}</int>`;
+      case 'react':
+        return `// React Native StyleSheet
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '${currentColor}',
+    // or
+    backgroundColor: 'rgb(${rgb.r}, ${rgb.g}, ${rgb.b})',
+    // or
+    backgroundColor: 'hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)',
+  },
+});`;
+      case 'json':
+        return JSON.stringify(
+          {
+            hex: currentColor,
+            rgb,
+            hsl,
+            cmyk,
+            hsb,
+          },
+          null,
+          2
+        );
+      case 'raw':
+        return `HEX: ${currentColor}
+RGB: ${rgb.r}, ${rgb.g}, ${rgb.b}
+HSL: ${hsl.h}, ${hsl.s}%, ${hsl.l}%
+CMYK: ${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%
+HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
+      default:
+        return '';
+    }
+  }, [currentColor, activeCodeFormat]);
+
+  // Number input style - compact
+  const numberInputStyle = {
+    width: '56px',
+    height: '28px',
+    padding: '0 6px',
+    fontSize: '12px',
+    backgroundColor: '#09090b',
+    border: '1px solid #27272a',
+    borderRadius: '4px',
+    color: '#f4f4f5',
+    textAlign: 'center',
+    outline: 'none',
+    fontFamily: 'monospace',
+  };
 
   return (
-    <Grid
-      fullWidth
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', height: '100%' }}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        backgroundColor: '#09090b',
+      }}
     >
-      <Column>
-        <ToolHeader
-          title="Color Converter"
-          description="Pick colors and generate code snippets for multiple programming languages."
-        />
-      </Column>
-
-      <Grid>
-        {/* Left Pane: Color Inputs & History */}
-        <Column sm={4} md={3} lg={6} style={{ minHeight: '30vh' }}>
-          {/* Controls */}
-          {/* Clickable Color Preview */}
-          <h4
+      {/* Sticky Header */}
+      <div
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          backgroundColor: '#09090b',
+          padding: '24px 24px 2px',
+        }}
+      >
+        <div>
+          <h2
             style={{
-              fontSize: '0.75rem',
-              fontWeight: 400,
-              lineHeight: 1.5,
-              color: 'var(--cds-text-secondary)',
-              textTransform: 'uppercase',
-              marginBottom: '0.5rem',
+              fontSize: '24px',
+              fontWeight: 600,
+              letterSpacing: '-0.025em',
+              color: '#f4f4f5',
             }}
           >
-            Color Picker
-          </h4>
+            Color Converter
+          </h2>
+          <p style={{ color: '#a1a1aa', marginTop: '2px', marginBottom: 0 }}>
+            Convert between Hex, RGB, HSL, CMYK, and HSB. Generate palettes and export code.
+          </p>
+        </div>
+        <div
+          style={{
+            marginTop: '16px',
+            marginLeft: '4px',
+            marginRight: '4px',
+            borderTop: '1px solid #27272a',
+          }}
+        />
+      </div>
+
+      {/* Scrollable Content */}
+      <div style={{ flex: 1, overflow: 'auto', padding: '8px 24px 24px' }}>
+        {/* Color Picker Bar with Action Buttons */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginTop: '16px',
+            marginBottom: '24px',
+          }}
+        >
+          <input
+            type="color"
+            value={currentColor}
+            onChange={(e) => setCurrentColor(e.target.value)}
+            style={{
+              width: '44px',
+              height: '36px',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              background: 'none',
+            }}
+          />
           <div
             style={{
+              flex: 1,
               display: 'flex',
               alignItems: 'center',
-              gap: '1rem',
-              marginBottom: '1rem',
-              flexWrap: 'wrap',
+              gap: '12px',
+              backgroundColor: '#18181b',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              border: '1px solid #27272a',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
+            onClick={() => copyToClipboard(currentColor.toUpperCase(), 'header')}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#27272a')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#18181b')}
           >
-            <div
-              onClick={openColorPicker}
+            <span
               style={{
-                width: '90px',
-                height: '90px',
-                borderRadius: '8px',
-                backgroundColor: state.hex,
-                border: '2px solid var(--cds-border-strong)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                cursor: 'pointer',
-                position: 'relative',
-                flexShrink: 0,
+                fontFamily: 'monospace',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: '#f4f4f5',
               }}
-              title="Click to open color picker"
             >
+              {currentColor.toUpperCase()}
+            </span>
+            <span
+              style={{
+                marginLeft: 'auto',
+                fontSize: '12px',
+                color: copiedFormat === 'header' ? '#22c55e' : '#71717a',
+              }}
+            >
+              {copiedFormat === 'header' ? 'Copied!' : 'Click to copy'}
+            </span>
+          </div>
+          <Button onClick={handleEyedropper} variant="secondary">
+            <Pipette style={{ width: '14px', height: '14px' }} />
+            Pick
+          </Button>
+          <Button onClick={generateRandomColor} variant="secondary">
+            <Sparkles style={{ width: '14px', height: '14px' }} />
+            Random
+          </Button>
+        </div>
+        {/* Main Grid: Two Columns with Stacked Sections */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          {/* Left Column - Stacked: Color Formats (top) | Recent Colors (bottom) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Color Formats - Top */}
+            <div>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#71717a',
+                  textTransform: 'uppercase',
+                  display: 'block',
+                  marginBottom: '16px',
+                }}
+              >
+                Color Formats
+              </span>
               <div
                 style={{
-                  position: 'absolute',
-                  bottom: '4px',
-                  right: '4px',
-                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                  borderRadius: '4px',
-                  padding: '3px',
+                  backgroundColor: '#18181b',
+                  border: '1px solid #27272a',
+                  borderRadius: '8px',
+                  padding: '8px',
                 }}
               >
-                <ColorPalette size={14} style={{ color: 'white' }} />
-              </div>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      <th
+                        style={{
+                          textAlign: 'left',
+                          padding: '6px 8px',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          color: '#71717a',
+                          textTransform: 'uppercase',
+                          borderBottom: '1px solid #27272a',
+                          width: '50px',
+                        }}
+                      >
+                        Format
+                      </th>
+                      <th
+                        style={{
+                          textAlign: 'left',
+                          padding: '6px 8px',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          color: '#71717a',
+                          textTransform: 'uppercase',
+                          borderBottom: '1px solid #27272a',
+                        }}
+                      >
+                        Value
+                      </th>
+                      <th
+                        style={{
+                          textAlign: 'center',
+                          padding: '6px 8px',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          color: '#71717a',
+                          textTransform: 'uppercase',
+                          borderBottom: '1px solid #27272a',
+                          width: '40px',
+                        }}
+                      >
+                        Copy
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* HEX Row */}
+                    <tr style={{ borderBottom: '1px solid #27272a' }}>
+                      <td style={{ padding: '8px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                          HEX
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px' }}>
+                        <input
+                          type="text"
+                          value={hexInput}
+                          onChange={(e) => handleHexChange(e.target.value)}
+                          style={{
+                            width: '100%',
+                            height: '28px',
+                            padding: '0 8px',
+                            fontSize: '12px',
+                            backgroundColor: '#09090b',
+                            border: '1px solid #27272a',
+                            borderRadius: '4px',
+                            color: '#f4f4f5',
+                            fontFamily: 'monospace',
+                            outline: 'none',
+                          }}
+                        />
+                      </td>
+                      <td style={{ padding: '8px', textAlign: 'center' }}>
+                        <button
+                          onClick={() => copyToClipboard(hexInput, 'hex')}
+                          style={{
+                            padding: '4px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: copiedFormat === 'hex' ? '#22c55e' : '#71717a',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          {copiedFormat === 'hex' ? (
+                            <Check style={{ width: '14px', height: '14px' }} />
+                          ) : (
+                            <Copy style={{ width: '14px', height: '14px' }} />
+                          )}
+                        </button>
+                      </td>
+                    </tr>
 
-              {/* Hidden native color picker */}
-              <input
-                ref={colorPickerRef}
-                type="color"
-                value={
-                  state.hex.startsWith('#') && state.hex.length === 9
-                    ? state.hex.slice(0, 7)
-                    : state.hex
-                }
-                onChange={handleColorPickerChange}
-                style={{
-                  // display: 'none'
-                  width: 0,
-                  height: 0,
-                  color: 'transparent',
-                  zIndex: -1,
-                  opacity: 0,
-                  position: 'absolute',
-                  marginTop: '90px',
-                }}
-              />
+                    {/* RGB Row */}
+                    <tr style={{ borderBottom: '1px solid #27272a' }}>
+                      <td style={{ padding: '8px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                          RGB
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px' }}>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <input
+                            type="number"
+                            min="0"
+                            max="255"
+                            value={rgbInput.r}
+                            onChange={(e) =>
+                              handleRgbChange({ ...rgbInput, r: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="255"
+                            value={rgbInput.g}
+                            onChange={(e) =>
+                              handleRgbChange({ ...rgbInput, g: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="255"
+                            value={rgbInput.b}
+                            onChange={(e) =>
+                              handleRgbChange({ ...rgbInput, b: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                        </div>
+                      </td>
+                      <td style={{ padding: '8px', textAlign: 'center' }}>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              `rgb(${rgbInput.r}, ${rgbInput.g}, ${rgbInput.b})`,
+                              'rgb'
+                            )
+                          }
+                          style={{
+                            padding: '4px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: copiedFormat === 'rgb' ? '#22c55e' : '#71717a',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          {copiedFormat === 'rgb' ? (
+                            <Check style={{ width: '14px', height: '14px' }} />
+                          ) : (
+                            <Copy style={{ width: '14px', height: '14px' }} />
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* HSL Row */}
+                    <tr style={{ borderBottom: '1px solid #27272a' }}>
+                      <td style={{ padding: '8px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                          HSL
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <input
+                            type="number"
+                            min="0"
+                            max="360"
+                            value={hslInput.h}
+                            onChange={(e) =>
+                              handleHslChange({ ...hslInput, h: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={hslInput.s}
+                            onChange={(e) =>
+                              handleHslChange({ ...hslInput, s: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={hslInput.l}
+                            onChange={(e) =>
+                              handleHslChange({ ...hslInput, l: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                        </div>
+                      </td>
+                      <td style={{ padding: '8px', textAlign: 'center' }}>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              `hsl(${hslInput.h}, ${hslInput.s}%, ${hslInput.l}%)`,
+                              'hsl'
+                            )
+                          }
+                          style={{
+                            padding: '4px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: copiedFormat === 'hsl' ? '#22c55e' : '#71717a',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          {copiedFormat === 'hsl' ? (
+                            <Check style={{ width: '14px', height: '14px' }} />
+                          ) : (
+                            <Copy style={{ width: '14px', height: '14px' }} />
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* CMYK Row */}
+                    <tr style={{ borderBottom: '1px solid #27272a' }}>
+                      <td style={{ padding: '8px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                          CMYK
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px' }}>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={cmykInput.c}
+                            onChange={(e) =>
+                              handleCmykChange({ ...cmykInput, c: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={cmykInput.m}
+                            onChange={(e) =>
+                              handleCmykChange({ ...cmykInput, m: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={cmykInput.y}
+                            onChange={(e) =>
+                              handleCmykChange({ ...cmykInput, y: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={cmykInput.k}
+                            onChange={(e) =>
+                              handleCmykChange({ ...cmykInput, k: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                        </div>
+                      </td>
+                      <td style={{ padding: '8px', textAlign: 'center' }}>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              `cmyk(${cmykInput.c}%, ${cmykInput.m}%, ${cmykInput.y}%, ${cmykInput.k}%)`,
+                              'cmyk'
+                            )
+                          }
+                          style={{
+                            padding: '4px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: copiedFormat === 'cmyk' ? '#22c55e' : '#71717a',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          {copiedFormat === 'cmyk' ? (
+                            <Check style={{ width: '14px', height: '14px' }} />
+                          ) : (
+                            <Copy style={{ width: '14px', height: '14px' }} />
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* HSB Row */}
+                    <tr>
+                      <td style={{ padding: '8px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                          HSB
+                        </span>
+                      </td>
+                      <td style={{ padding: '8px' }}>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <input
+                            type="number"
+                            min="0"
+                            max="360"
+                            value={hsbInput.h}
+                            onChange={(e) =>
+                              handleHsbChange({ ...hsbInput, h: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={hsbInput.s}
+                            onChange={(e) =>
+                              handleHsbChange({ ...hsbInput, s: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={hsbInput.b}
+                            onChange={(e) =>
+                              handleHsbChange({ ...hsbInput, b: parseInt(e.target.value) || 0 })
+                            }
+                            style={numberInputStyle}
+                          />
+                        </div>
+                      </td>
+                      <td style={{ padding: '8px', textAlign: 'center' }}>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              `hsb(${hsbInput.h}, ${hsbInput.s}%, ${hsbInput.b}%)`,
+                              'hsb'
+                            )
+                          }
+                          style={{
+                            padding: '4px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: copiedFormat === 'hsb' ? '#22c55e' : '#71717a',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          {copiedFormat === 'hsb' ? (
+                            <Check style={{ width: '14px', height: '14px' }} />
+                          ) : (
+                            <Copy style={{ width: '14px', height: '14px' }} />
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            {/* Action Buttons */}
-            <div
-              style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', flexDirection: 'column' }}
-            >
-              <Button
-                size="md"
-                kind="secondary"
-                renderIcon={CircleStroke}
-                onClick={generateRandomColor}
-                style={{ minWidth: '160px' }}
+            {/* Recent Colors - Bottom */}
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '16px',
+                }}
               >
-                Random
-              </Button>
-
-              {eyedropperSupported && (
-                <Button
-                  size="md"
-                  kind="primary"
-                  renderIcon={Eyedropper}
-                  onClick={openEyeDropper}
-                  disabled={isPicking}
-                  style={{ minWidth: '160px' }}
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#71717a',
+                    textTransform: 'uppercase',
+                  }}
                 >
-                  {isPicking ? 'Picking...' : 'Eye Dropper'}
-                </Button>
-              )}
+                  Recent Colors ({recentColors.length})
+                </span>
+                {recentColors.length > 0 && (
+                  <Button onClick={clearRecent} variant="danger">
+                    <Trash2 style={{ width: '14px', height: '14px' }} />
+                    Clear
+                  </Button>
+                )}
+              </div>
+              <div
+                style={{
+                  backgroundColor: '#18181b',
+                  border: '1px solid #27272a',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  minHeight: '120px',
+                }}
+              >
+                {recentColors.length === 0 ? (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: '88px',
+                      color: '#71717a',
+                      fontSize: '13px',
+                    }}
+                  >
+                    No recent colors
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(60px, 1fr))',
+                      gap: '12px',
+                    }}
+                  >
+                    {recentColors.map((color, i) => (
+                      <div key={i} style={{ position: 'relative' }}>
+                        <ColorSwatch
+                          color={color}
+                          onClick={() => setCurrentColor(color)}
+                          size={60}
+                        />
+                        <button
+                          onClick={() => removeFromRecent(color)}
+                          style={{
+                            position: 'absolute',
+                            top: '-4px',
+                            right: '-4px',
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '50%',
+                            backgroundColor: '#27272a',
+                            border: '1px solid #3f3f46',
+                            color: '#a1a1aa',
+                            fontSize: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            opacity: 0,
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.opacity = 1;
+                          }}
+                        >
+                          ×
+                        </button>
+                        <style>{`
+                        div:hover button { opacity: 1 !important; }
+                      `}</style>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Color values */}
-          <h4
-            style={{
-              fontSize: '0.75rem',
-              fontWeight: 400,
-              lineHeight: 1.5,
-              color: 'var(--cds-text-secondary)',
-              textTransform: 'uppercase',
-            }}
-          >
-            Color Values
-          </h4>
+          {/* Right Column - Stacked: Code Export (top) | Palette Variations (bottom) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Code Export - Top */}
+            <div>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#71717a',
+                  textTransform: 'uppercase',
+                  display: 'block',
+                  marginBottom: '16px',
+                }}
+              >
+                Code Export
+              </span>
+              <div
+                style={{
+                  backgroundColor: '#18181b',
+                  border: '1px solid #27272a',
+                  borderRadius: '8px',
+                  padding: '16px',
+                }}
+              >
+                {/* Tabs */}
+                <div
+                  style={{ display: 'flex', gap: '4px', marginBottom: '16px', flexWrap: 'wrap' }}
+                >
+                  {CODE_FORMATS.map((format) => (
+                    <Button
+                      key={format}
+                      active={activeCodeFormat === format}
+                      onClick={() => setActiveCodeFormat(format)}
+                    >
+                      {format.charAt(0).toUpperCase() + format.slice(1)}
+                    </Button>
+                  ))}
+                </div>
 
-          <ColorInputs
-            state={state}
-            onColorInput={handleColorInput}
-            onCopy={copyToClipboard}
-            style={{ marginBottom: '1.5rem' }}
-          />
+                {/* Code Block */}
+                <div style={{ position: 'relative' }}>
+                  <pre
+                    style={{
+                      backgroundColor: '#09090b',
+                      border: '1px solid #27272a',
+                      borderRadius: '6px',
+                      padding: '16px',
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                      color: '#a1a1aa',
+                      overflow: 'auto',
+                      maxHeight: '200px',
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                    }}
+                  >
+                    <code style={{ color: '#f4f4f5' }}>{generateCodeOutput}</code>
+                  </pre>
+                  <button
+                    onClick={() => copyToClipboard(generateCodeOutput, 'code')}
+                    style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      padding: '6px',
+                      backgroundColor: '#27272a',
+                      border: '1px solid #3f3f46',
+                      borderRadius: '4px',
+                      color: copiedFormat === 'code' ? '#22c55e' : '#a1a1aa',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {copiedFormat === 'code' ? (
+                      <Check style={{ width: '14px', height: '14px' }} />
+                    ) : (
+                      <Copy style={{ width: '14px', height: '14px' }} />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
 
-          <ColorHistory
-            history={state.history}
-            onLoadFromHistory={loadFromHistory}
-            onClearHistory={() => dispatch(actions.clearHistory())}
-          />
-        </Column>
+            {/* Palette Variations - Bottom */}
+            <div>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#71717a',
+                  textTransform: 'uppercase',
+                  display: 'block',
+                  marginBottom: '16px',
+                }}
+              >
+                Palette Variations
+              </span>
+              <div
+                style={{
+                  backgroundColor: '#18181b',
+                  border: '1px solid #27272a',
+                  borderRadius: '8px',
+                  padding: '16px',
+                }}
+              >
+                {/* Tabs */}
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
+                  {PALETTE_TYPES.map((type) => (
+                    <Button
+                      key={type}
+                      active={activePalette === type}
+                      onClick={() => setActivePalette(type)}
+                    >
+                      {PALETTE_LABELS[type]}
+                    </Button>
+                  ))}
+                </div>
 
-        {/* Right Pane: Code Snippets */}
-        <Column sm={4} md={5} lg={10}>
-          <h4
-            area-label="Code Snippets"
-            style={{
-              fontSize: '0.75rem',
-              lineHeight: 1.5,
-              color: 'var(--cds-text-secondary)',
-              textTransform: 'uppercase',
-              marginBottom: '.5rem',
-            }}
-          >
-            Code Snippets
-          </h4>
-
-          <CodeSnippetsPanel
-            codeSnippets={codeSnippets}
-            selectedTab={state.selectedTab}
-            onTabChange={(idx) => dispatch(actions.setSelectedTab(idx))}
-            onCopy={copyToClipboard}
-          />
-        </Column>
-      </Grid>
-    </Grid>
+                {/* Palette List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {paletteColors.map((color, i) => (
+                    <div
+                      key={i}
+                      onClick={() => setCurrentColor(color)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '8px 12px',
+                        backgroundColor: '#09090b',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#27272a';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#09090b';
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '4px',
+                          backgroundColor: color,
+                          border: '1px solid #27272a',
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: 'monospace',
+                          fontSize: '13px',
+                          color: '#f4f4f5',
+                          flex: 1,
+                        }}
+                      >
+                        {color.toUpperCase()}
+                      </span>
+                      <span style={{ fontSize: '11px', color: '#71717a' }}>
+                        {palettePercentages[i]}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyPaletteColor(color);
+                        }}
+                        style={{
+                          padding: '4px',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          color: copiedPaletteColor === color ? '#22c55e' : '#71717a',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        {copiedPaletteColor === color ? (
+                          <Check style={{ width: '14px', height: '14px' }} />
+                        ) : (
+                          <Copy style={{ width: '14px', height: '14px' }} />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

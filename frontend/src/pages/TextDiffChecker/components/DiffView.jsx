@@ -83,7 +83,7 @@ export default function DiffView({ diffs }) {
           border: '1px solid var(--cds-border-strong)',
           color: 'var(--cds-text-primary)',
           whiteSpace: 'pre-wrap',
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '0.875rem',
           lineHeight: '1.5',
         }}

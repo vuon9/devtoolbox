@@ -217,7 +217,7 @@ export default function HighlightedCode({
         <div style={{ flex: 1, padding: '1rem', overflow: 'auto' }}>
           <pre
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
               fontSize: '0.875rem',
               margin: 0,
               whiteSpace: 'pre-wrap',

@@ -1,7 +1,5 @@
 import React from 'react';
-import { Button } from '@carbon/react';
-import { Copy } from '@carbon/icons-react';
-import { ToolPane, ToolSplitPane } from '../../../components/ToolUI';
+import { Copy } from 'lucide-react';
 
 const cases = [
   { id: 'camel', label: 'camelCase' },
@@ -53,23 +51,33 @@ const convertCase = (input, type) => {
 };
 
 function CaseResult({ label, value }) {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = () => {
+    if (value) {
+      navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '0.75rem',
-        padding: '0.75rem',
-        backgroundColor: 'var(--cds-layer)',
+        gap: '8px',
+        padding: '6px 8px',
+        backgroundColor: '#18181b',
         borderRadius: '4px',
-        marginBottom: '0.5rem',
+        marginBottom: '4px',
       }}
     >
       <div
         style={{
-          fontSize: '0.75rem',
-          color: 'var(--cds-text-secondary)',
-          minWidth: '120px',
+          fontSize: '11px',
+          color: '#71717a',
+          minWidth: '90px',
           fontWeight: 600,
         }}
       >
@@ -78,9 +86,9 @@ function CaseResult({ label, value }) {
       <div
         style={{
           flex: 1,
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '0.875rem',
-          color: 'var(--cds-text-primary)',
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+          fontSize: '13px',
+          color: '#f4f4f5',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -88,79 +96,54 @@ function CaseResult({ label, value }) {
       >
         {value || '<empty>'}
       </div>
-      <Button
-        hasIconOnly
-        renderIcon={Copy}
-        kind="ghost"
-        size="sm"
-        iconDescription="Copy"
-        tooltipPosition="left"
-        onClick={() => navigator.clipboard.writeText(value)}
+      <button
+        onClick={handleCopy}
         disabled={!value}
-      />
+        title={copied ? 'Copied!' : 'Copy to clipboard'}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '24px',
+          height: '24px',
+          padding: '4px',
+          backgroundColor: copied ? '#2563eb' : 'transparent',
+          border: 'none',
+          borderRadius: '4px',
+          color: value ? (copied ? '#ffffff' : '#71717a') : '#3f3f46',
+          cursor: value ? 'pointer' : 'not-allowed',
+          transition: 'all 0.15s ease',
+          flexShrink: 0,
+        }}
+        onMouseEnter={(e) => {
+          if (value && !copied) {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!copied) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = value ? '#71717a' : '#3f3f46';
+          }
+        }}
+      >
+        <Copy style={{ width: '12px', height: '12px' }} />
+      </button>
     </div>
   );
 }
 
-export default function CaseConverterPane({ input, setInput, layout }) {
+export default function CaseConverterPane({ input }) {
   return (
-    <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-      <ToolPane
-        label="Input Text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Enter text to convert..."
-      />
-      <div
-        className="pane"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          minHeight: 0,
-          flex: 1,
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            minHeight: '30px',
-            marginBottom: '0.5rem',
-          }}
-        >
-          <label
-            style={{
-              fontSize: '0.75rem',
-              fontWeight: 400,
-              lineHeight: 1.5,
-              letterSpacing: '0.32px',
-              color: 'var(--cds-text-secondary)',
-              textTransform: 'uppercase',
-            }}
-          >
-            Case Conversions
-          </label>
-        </div>
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '0.5rem',
-            backgroundColor: 'var(--cds-layer)',
-            border: '1px solid var(--cds-border-strong)',
-          }}
-        >
-          {cases.map((caseItem) => (
-            <CaseResult
-              key={caseItem.id}
-              label={caseItem.label}
-              value={convertCase(input, caseItem.id)}
-            />
-          ))}
-        </div>
-      </div>
-    </ToolSplitPane>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+      {cases.map((caseItem) => (
+        <CaseResult
+          key={caseItem.id}
+          label={caseItem.label}
+          value={convertCase(input, caseItem.id)}
+        />
+      ))}
+    </div>
   );
 }

@@ -1,131 +1,155 @@
-import React, { useState } from 'react';
-import { IconButton } from '@carbon/react';
-import { Menu, Close, Subtract, Maximize, Settings } from '@carbon/icons-react';
-import { SettingsModal } from './SettingsModal';
-import { Minimise, Maximise, Close as WindowClose } from '../generated';
+import React from 'react';
+import { Menu, Settings, Minus, Square, X } from 'lucide-react';
 
-export function TitleBar({
-  isSidebarOpen,
-  toggleSidebar,
-  appName = 'DevToolbox',
-  themeMode,
-  setThemeMode,
-}) {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  // Detect if running in desktop mode
+export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
+  // Detect if running in desktop mode (Wails)
   const isDesktop = typeof window !== 'undefined' && window.go?.devtoolbox?.service?.WindowControls;
+
+  // Don't render TitleBar in web browser mode
+  if (!isDesktop) {
+    return null;
+  }
 
   // Detect platform
   const userAgent = navigator.userAgent.toLowerCase();
   const isMac =
     userAgent.includes('mac') && !userAgent.includes('iphone') && !userAgent.includes('ipad');
 
-  // Don't render in browser mode
-  if (!isDesktop) {
-    return null;
-  }
+  const handleMinimize = () => window.runtime?.WindowMinimise?.();
+  const handleMaximize = () => window.runtime?.WindowToggleMaximise?.();
+  const handleClose = () => window.runtime?.WindowQuit?.();
 
-  // Window control handlers for non-macOS platforms
-  const handleMinimize = async () => {
-    try {
-      await Minimise();
-    } catch (err) {
-      console.error('Failed to minimise window:', err);
-    }
-  };
-
-  const handleMaximize = async () => {
-    try {
-      await Maximise();
-    } catch (err) {
-      console.error('Failed to maximise window:', err);
-    }
-  };
-
-  const handleClose = async () => {
-    try {
-      await WindowClose();
-    } catch (err) {
-      console.error('Failed to close window:', err);
-    }
+  const buttonStyle = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    padding: '6px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    borderRadius: '4px',
+    color: '#a1a1aa',
+    cursor: 'pointer',
+    transition: 'background-color 0.15s ease, color 0.15s ease',
+    WebkitAppRegion: 'no-drag',
   };
 
   return (
-    <div className={`titlebar ${isMac ? 'macos' : 'other-platform'}`}>
-      {/* Left section - Sidebar toggle (always visible on desktop) */}
-      <div className="titlebar-left">
-        <IconButton
-          kind="ghost"
-          size="sm"
-          onClick={toggleSidebar}
-          label={isSidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
-          align="bottom"
-          className="titlebar-sidebar-toggle"
+    <header
+      style={{
+        height: '40px',
+        borderBottom: '1px solid #27272a',
+        backgroundColor: '#18181b',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingLeft: isMac ? '80px' : '12px',
+        paddingRight: '12px',
+        WebkitAppRegion: 'drag',
+        userSelect: 'none',
+      }}
+    >
+      {/* Left section - Mac traffic light space */}
+      {isMac && <div style={{ width: '80px' }} />}
+
+      {/* Center section */}
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          pointerEvents: 'none',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            letterSpacing: '-0.025em',
+            color: '#71717a',
+            textTransform: 'uppercase',
+          }}
         >
-          <Menu size={16} />
-        </IconButton>
+          {appName}
+        </span>
       </div>
 
-      {/* Center section - App name */}
-      <div className="titlebar-center">
-        <span className="titlebar-appname">{appName}</span>
-      </div>
-
-      {/* Right section - Settings + Window controls */}
-      <div className="titlebar-right">
-        {/* Settings button */}
-        <IconButton
-          kind="ghost"
-          size="sm"
-          onClick={() => setIsSettingsOpen(true)}
-          label="Settings"
-          className="titlebar-settings"
+      {/* Right section */}
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: '4px', WebkitAppRegion: 'no-drag' }}
+      >
+        <button
+          onClick={onOpenSettings}
+          style={buttonStyle}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#a1a1aa';
+          }}
         >
-          <Settings size={16} />
-        </IconButton>
+          <Settings style={{ width: '16px', height: '16px' }} />
+        </button>
 
-        {/* Window controls for non-macOS platforms */}
         {!isMac && (
-          <div className="window-controls">
-            <IconButton
-              kind="ghost"
-              size="sm"
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginLeft: '8px',
+              paddingLeft: '8px',
+              borderLeft: '1px solid #27272a',
+              gap: '2px',
+            }}
+          >
+            <button
               onClick={handleMinimize}
-              label="Minimize"
-              className="window-control-btn minimize"
+              style={buttonStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#27272a';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              <Subtract size={16} />
-            </IconButton>
-            <IconButton
-              kind="ghost"
-              size="sm"
+              <Minus style={{ width: '12px', height: '12px' }} />
+            </button>
+            <button
               onClick={handleMaximize}
-              label="Maximize"
-              className="window-control-btn maximize"
+              style={buttonStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#27272a';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              <Maximize size={16} />
-            </IconButton>
-            <IconButton
-              kind="ghost"
-              size="sm"
+              <Square style={{ width: '10px', height: '10px' }} />
+            </button>
+            <button
               onClick={handleClose}
-              label="Close"
-              className="window-control-btn close"
+              style={{ ...buttonStyle, color: '#ef4444' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#dc2626';
+                e.currentTarget.style.color = '#ffffff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#ef4444';
+              }}
             >
-              <Close size={16} />
-            </IconButton>
+              <X style={{ width: '16px', height: '16px' }} />
+            </button>
           </div>
         )}
-
-        {/* Settings Modal */}
-        <SettingsModal
-          isOpen={isSettingsOpen}
-          onClose={() => setIsSettingsOpen(false)}
-          themeMode={themeMode}
-          setThemeMode={setThemeMode}
-        />
       </div>
-    </div>
+    </header>
   );
 }
 

@@ -1,17 +1,28 @@
 @use '@carbon/styles/scss/config' with (
-  $use-flexbox-grid: true
+  $use-flexbox-grid: true,
+  $font-path: ''
 );
 @use '@carbon/styles/scss/themes';
 @use '@carbon/styles/scss/theme';
-@use '@carbon/styles';
+// Import only core styles without fonts
+@use '@carbon/styles/scss/components';
+@use '@carbon/styles/scss/utilities';
 
-// Apply Carbon's background to body to avoid white flashes
+/* Tailwind CSS is automatically injected by @tailwindcss/vite plugin */
+
+// Body styling - now handled by Tailwind CSS
+// Remove Carbon overrides to let Tailwind control colors
 body {
-  background-color: var(--cds-background);
-  color: var(--cds-text-primary);
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   margin: 0;
-  transition: background-color 0.3s;
 }
 
 // Global variable mapping must happen where the Carbon Custom Properties exist.
@@ -29,7 +40,7 @@ body {
   --accent-hover: var(--cds-primary-hover);
   --error-color: var(--cds-support-error);
   --success-color: var(--cds-support-success);
-  --font-family: 'IBM Plex Sans', sans-serif;
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 // Force Carbon TextArea to fill height (Definitive Fix)
@@ -98,7 +109,8 @@ body {
   color: var(--cds-text-primary);
   border: none;
   border-bottom: 1px solid var(--cds-border-strong);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 0.875rem;
   padding: 1rem;
   width: 100%;

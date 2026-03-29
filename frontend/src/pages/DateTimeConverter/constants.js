@@ -1,4 +1,4 @@
-import { Time, Sun, Moon, Sunrise, SendToBack, Calendar } from '@carbon/icons-react';
+import { Clock, Sun, Moon, Sunrise, ArrowLeft, Calendar } from 'lucide-react';
 
 // Helper for presets
 const toSQLFormat = (d) => {
@@ -16,7 +16,7 @@ export const OUTPUT_FORMATS = [
 ];
 
 export const PRESETS = [
-  { id: 'now', label: 'Now', getValue: () => toSQLFormat(new Date()), icon: Time },
+  { id: 'now', label: 'Now', getValue: () => toSQLFormat(new Date()), icon: Clock },
   {
     id: 'startofday',
     label: 'Start of Day',
@@ -47,7 +47,7 @@ export const PRESETS = [
     id: 'yesterday',
     label: 'Yesterday',
     getValue: () => toSQLFormat(new Date(Date.now() - 86400000)),
-    icon: SendToBack,
+    icon: ArrowLeft,
   },
   {
     id: 'nextweek',

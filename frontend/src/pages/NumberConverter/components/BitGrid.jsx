@@ -44,7 +44,7 @@ const BitGrid = ({ value, onToggleBit, layout = 'horizontal' }) => {
                 marginRight: '12px',
                 fontSize: '0.75rem',
                 color: 'var(--cds-text-secondary)',
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '2px',
@@ -93,7 +93,7 @@ const BitGrid = ({ value, onToggleBit, layout = 'horizontal' }) => {
                             ? 'var(--cds-text-primary)'
                             : 'var(--cds-text-secondary)',
                         marginTop: '2px',
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         transition: 'color 0.15s ease',
                       }}
                     >
@@ -122,7 +122,7 @@ const BitGrid = ({ value, onToggleBit, layout = 'horizontal' }) => {
         }}
       >
         <span>MSB (31) ← → LSB (0)</span>
-        <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+        <span style={{ fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace" }}>
           {`Value: 0x${(value >>> 0).toString(16).toUpperCase().padStart(8, '0')}`}
         </span>
       </div>

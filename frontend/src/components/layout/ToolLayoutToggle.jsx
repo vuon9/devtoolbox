@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button } from '@carbon/react';
-import { SplitScreen, VerticalView } from '@carbon/icons-react';
+import { Columns, Rows } from 'lucide-react';
 import { TOGGLE_POSITIONS } from './constants';
 
 /**
@@ -31,16 +30,16 @@ export default function ToolLayoutToggle({
       zIndex: 10,
     },
     controls: {
-      marginLeft: 'auto', // Pushes to end of flex container
+      marginLeft: 'auto',
     },
     floating: {
       position: 'absolute',
-      top: '0.5rem',
-      right: '0.5rem',
+      top: '8px',
+      right: '8px',
       zIndex: 10,
-      backgroundColor: 'var(--cds-layer)',
+      backgroundColor: '#1c1917',
       borderRadius: '4px',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
     },
   };
 
@@ -51,16 +50,41 @@ export default function ToolLayoutToggle({
 
   return (
     <div style={containerStyle}>
-      <Button
-        kind="ghost"
-        size="sm"
-        renderIcon={isHorizontal ? VerticalView : SplitScreen}
-        iconDescription={isHorizontal ? 'Vertical layout' : 'Horizontal layout'}
-        hasIconOnly
-        disabled={disabled}
+      <button
         onClick={onToggle}
+        disabled={disabled}
         title={isHorizontal ? 'Switch to vertical layout' : 'Switch to horizontal layout'}
-      />
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '32px',
+          height: '32px',
+          padding: '6px',
+          backgroundColor: 'transparent',
+          border: 'none',
+          borderRadius: '4px',
+          color: disabled ? '#3f3f46' : '#a1a1aa',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          transition: 'all 0.15s ease',
+        }}
+        onMouseEnter={(e) => {
+          if (!disabled) {
+            e.currentTarget.style.backgroundColor = '#27272a';
+            e.currentTarget.style.color = '#f4f4f5';
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.color = disabled ? '#3f3f46' : '#a1a1aa';
+        }}
+      >
+        {isHorizontal ? (
+          <Rows style={{ width: '16px', height: '16px' }} />
+        ) : (
+          <Columns style={{ width: '16px', height: '16px' }} />
+        )}
+      </button>
     </div>
   );
 }

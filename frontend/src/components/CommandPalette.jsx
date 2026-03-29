@@ -1,47 +1,77 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Close, Application, Moon, Power } from '@carbon/icons-react';
-import { TextInput, ComposedModal, ModalHeader, ModalBody } from '@carbon/react';
+import {
+  Search,
+  X,
+  Moon,
+  Monitor,
+  Type,
+  Binary,
+  ShieldCheck,
+  QrCode,
+  Wrench,
+  Palette,
+  Clock,
+  Regex,
+  FileDiff,
+  LayoutGrid,
+} from 'lucide-react';
+import { Events } from '@wailsio/runtime';
 import './CommandPalette.css';
 
-// Command definitions with tool presets
+// Icon mapping matching the sidebar
+const TOOL_ICONS = {
+  'text-converter': Type,
+  'string-utilities': Type,
+  'number-converter': Binary,
+  'datetime-converter': Clock,
+  jwt: ShieldCheck,
+  barcode: QrCode,
+  'data-generator': LayoutGrid,
+  'code-formatter': Wrench,
+  'color-converter': Palette,
+  cron: Clock,
+  regexp: Regex,
+  diff: FileDiff,
+};
+
+// Helper to get icon for a command
+const getIconForCommand = (command) => {
+  // System commands have explicit icons
+  if (command.icon) return command.icon;
+
+  // Extract tool ID from path
+  const pathMatch = command.path?.match(/\/tool\/([^/?]+)/);
+  if (pathMatch) {
+    const toolId = pathMatch[1];
+    return TOOL_ICONS[toolId] || Wrench;
+  }
+
+  return Wrench;
+};
+
+// Command definitions with tool presets matching the main app
 const COMMANDS = [
   // Code Formatter presets
   {
     id: 'formatter-json',
     label: 'Code Formatter > JSON',
     path: '/tool/code-formatter?format=json',
-    category: 'Formatter',
   },
   {
     id: 'formatter-xml',
     label: 'Code Formatter > XML',
     path: '/tool/code-formatter?format=xml',
-    category: 'Formatter',
   },
   {
     id: 'formatter-html',
     label: 'Code Formatter > HTML',
     path: '/tool/code-formatter?format=html',
-    category: 'Formatter',
-  },
-  {
-    id: 'formatter-sql',
-    label: 'Code Formatter > SQL',
-    path: '/tool/code-formatter?format=sql',
-    category: 'Formatter',
   },
   {
     id: 'formatter-css',
     label: 'Code Formatter > CSS',
     path: '/tool/code-formatter?format=css',
-    category: 'Formatter',
-  },
-  {
-    id: 'formatter-js',
-    label: 'Code Formatter > JavaScript',
-    path: '/tool/code-formatter?format=javascript',
-    category: 'Formatter',
   },
 
   // Text Converter - Encoding
@@ -49,25 +79,21 @@ const COMMANDS = [
     id: 'converter-base64',
     label: 'Text Converter > Base64',
     path: '/tool/text-converter?category=Encode%20-%20Decode&method=Base64',
-    category: 'Converter',
   },
   {
     id: 'converter-url',
     label: 'Text Converter > URL Encode',
     path: '/tool/text-converter?category=Encode%20-%20Decode&method=URL',
-    category: 'Converter',
   },
   {
     id: 'converter-hex',
     label: 'Text Converter > Hex',
     path: '/tool/text-converter?category=Encode%20-%20Decode&method=Base16%20(Hex)',
-    category: 'Converter',
   },
   {
     id: 'converter-html',
     label: 'Text Converter > HTML Entities',
     path: '/tool/text-converter?category=Encode%20-%20Decode&method=HTML%20Entities',
-    category: 'Converter',
   },
 
   // Text Converter - Hashing
@@ -75,25 +101,16 @@ const COMMANDS = [
     id: 'converter-md5',
     label: 'Text Converter > MD5',
     path: '/tool/text-converter?category=Hash&method=MD5',
-    category: 'Converter',
   },
   {
     id: 'converter-sha256',
     label: 'Text Converter > SHA-256',
     path: '/tool/text-converter?category=Hash&method=SHA-256',
-    category: 'Converter',
-  },
-  {
-    id: 'converter-sha512',
-    label: 'Text Converter > SHA-512',
-    path: '/tool/text-converter?category=Hash&method=SHA-512',
-    category: 'Converter',
   },
   {
     id: 'converter-all-hashes',
     label: 'Text Converter > All Hashes',
     path: '/tool/text-converter?category=Hash&method=All',
-    category: 'Converter',
   },
 
   // Text Converter - Conversions
@@ -101,62 +118,54 @@ const COMMANDS = [
     id: 'converter-json-yaml',
     label: 'Text Converter > JSON ↔ YAML',
     path: '/tool/text-converter?category=Convert&method=JSON%20%E2%86%94%20YAML',
-    category: 'Converter',
   },
   {
     id: 'converter-json-xml',
     label: 'Text Converter > JSON ↔ XML',
     path: '/tool/text-converter?category=Convert&method=JSON%20%E2%86%94%20XML',
-    category: 'Converter',
   },
   {
     id: 'converter-markdown-html',
     label: 'Text Converter > Markdown ↔ HTML',
     path: '/tool/text-converter?category=Convert&method=Markdown%20%E2%86%94%20HTML',
-    category: 'Converter',
   },
   {
     id: 'converter-csv-tsv',
     label: 'Text Converter > CSV ↔ TSV',
     path: '/tool/text-converter?category=Convert&method=CSV%20%E2%86%94%20TSV',
-    category: 'Converter',
   },
   {
     id: 'converter-case-swap',
     label: 'Text Converter > Case Swap',
     path: '/tool/text-converter?category=Convert&method=Case%20Swapping',
-    category: 'Converter',
   },
 
-  // Direct navigation - no presets
-  { id: 'jwt', label: 'JWT Debugger', path: '/tool/jwt', category: 'Tools' },
-  { id: 'barcode', label: 'Barcode Generator', path: '/tool/barcode', category: 'Tools' },
-  { id: 'regexp', label: 'RegExp Tester', path: '/tool/regexp', category: 'Tools' },
-  { id: 'cron', label: 'Cron Job Parser', path: '/tool/cron', category: 'Tools' },
-  { id: 'diff', label: 'Text Diff Checker', path: '/tool/diff', category: 'Tools' },
-  { id: 'number', label: 'Number Converter', path: '/tool/number-converter', category: 'Tools' },
-  { id: 'color', label: 'Color Converter', path: '/tool/color-converter', category: 'Tools' },
-  { id: 'string', label: 'String Utilities', path: '/tool/string-utilities', category: 'Tools' },
+  // Direct navigation
+  { id: 'jwt', label: 'JWT Debugger', path: '/tool/jwt' },
+  { id: 'barcode', label: 'Barcode Generator', path: '/tool/barcode' },
+  { id: 'regexp', label: 'RegExp Tester', path: '/tool/regexp' },
+  { id: 'cron', label: 'Cron Job Parser', path: '/tool/cron' },
+  { id: 'diff', label: 'Text Diff Checker', path: '/tool/diff' },
+  { id: 'number', label: 'Number Converter', path: '/tool/number-converter' },
+  { id: 'color', label: 'Color Converter', path: '/tool/color-converter' },
+  { id: 'string', label: 'String Utilities', path: '/tool/string-utilities' },
   {
     id: 'datetime',
     label: 'DateTime Converter',
     path: '/tool/datetime-converter',
-    category: 'Tools',
   },
-  { id: 'text', label: 'Text Converter', path: '/tool/text-converter', category: 'Tools' },
+  { id: 'text', label: 'Text Converter', path: '/tool/text-converter' },
 
-  // Data Generator presets (these will be populated dynamically)
+  // Data Generator
   {
     id: 'data-user',
     label: 'Data Generator > User',
     path: '/tool/data-generator?preset=User',
-    category: 'Generator',
   },
   {
     id: 'data-address',
     label: 'Data Generator > Address',
     path: '/tool/data-generator?preset=Address',
-    category: 'Generator',
   },
 
   // System commands
@@ -164,28 +173,20 @@ const COMMANDS = [
     id: 'theme-toggle',
     label: 'Toggle Dark Mode',
     action: 'toggle-theme',
-    category: 'System',
     icon: Moon,
   },
   {
     id: 'window-toggle',
-    label: 'Show/Hide Window',
+    label: 'Show/Hide Main Window',
     action: 'toggle-window',
-    category: 'System',
-    icon: Application,
+    icon: Monitor,
   },
-  { id: 'app-quit', label: 'Quit DevToolbox', action: 'quit', category: 'System', icon: Power },
 ];
 
-export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
-  const navigate = useNavigate();
+export function CommandPalette() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [commands, setCommands] = useState(COMMANDS);
-  const inputRef = useRef(null);
-  const listRef = useRef(null);
-
-  // Load recent commands from localStorage
   const [recentCommands, setRecentCommands] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('commandPaletteRecent')) || [];
@@ -193,109 +194,56 @@ export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
       return [];
     }
   });
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
 
-  // Fuzzy match function - checks if query characters appear in order in target
-  const fuzzyMatch = (target, query) => {
-    if (!query) return true;
-
-    const targetLower = target.toLowerCase();
-    const queryLower = query.toLowerCase();
-    let targetIndex = 0;
-    let queryIndex = 0;
-
-    while (targetIndex < targetLower.length && queryIndex < queryLower.length) {
-      if (targetLower[targetIndex] === queryLower[queryIndex]) {
-        queryIndex++;
-      }
-      targetIndex++;
-    }
-
-    return queryIndex === queryLower.length;
-  };
-
-  // Calculate fuzzy match score (lower is better)
+  // Calculate fuzzy match score
   const fuzzyScore = (target, query) => {
     if (!query) return 0;
-
     const targetLower = target.toLowerCase();
     const queryLower = query.toLowerCase();
-
-    // Exact match gets highest priority
     if (targetLower === queryLower) return -1000;
-
-    // Starts with query gets high priority
     if (targetLower.startsWith(queryLower)) return -100;
-
-    // Word boundary match gets medium priority
     const words = targetLower.split(/[\s>]/);
-    for (let word of words) {
-      if (word.startsWith(queryLower)) return -50;
-    }
-
-    // Calculate distance score for fuzzy match
-    let targetIndex = 0;
-    let queryIndex = 0;
-    let score = 0;
-    let lastMatchIndex = -1;
-
-    while (targetIndex < targetLower.length && queryIndex < queryLower.length) {
-      if (targetLower[targetIndex] === queryLower[queryIndex]) {
-        if (lastMatchIndex !== -1) {
-          // Penalize gaps between matches
-          score += targetIndex - lastMatchIndex - 1;
-        }
-        lastMatchIndex = targetIndex;
-        queryIndex++;
-      }
-      targetIndex++;
-    }
-
-    // If didn't match all query characters, return high score (bad match)
-    if (queryIndex < queryLower.length) return 9999;
-
-    return score;
+    if (words.some((w) => w.startsWith(queryLower))) return -50;
+    if (targetLower.includes(queryLower)) return -10;
+    return 1000;
   };
 
-  // Filter commands based on search query
+  // Filter and sort commands
   useEffect(() => {
     if (!searchQuery.trim()) {
-      // Show recent commands first when no search query
+      // Show recent commands first, then all commands
       const recentIds = new Set(recentCommands);
-      const sortedCommands = [...COMMANDS].sort((a, b) => {
-        const aRecent = recentIds.has(a.id) ? 1 : 0;
-        const bRecent = recentIds.has(b.id) ? 1 : 0;
-        return bRecent - aRecent;
-      });
-      setCommands(sortedCommands);
+      const recent = COMMANDS.filter((c) => recentIds.has(c.id)).sort(
+        (a, b) => recentCommands.indexOf(a.id) - recentCommands.indexOf(b.id)
+      );
+      const others = COMMANDS.filter((c) => !recentIds.has(c.id));
+      setCommands([...recent.slice(0, 5), ...others]);
+      setSelectedIndex(0);
       return;
     }
 
     const query = searchQuery.toLowerCase();
+    const filtered = COMMANDS.filter((cmd) => cmd.label.toLowerCase().includes(query)).sort(
+      (a, b) => fuzzyScore(a.label, query) - fuzzyScore(b.label, query)
+    );
 
-    // Filter and score commands
-    const scored = COMMANDS.map((cmd) => {
-      const labelScore = fuzzyScore(cmd.label, query);
-      const categoryScore = fuzzyScore(cmd.category, query);
-      const bestScore = Math.min(labelScore, categoryScore);
-      return { cmd, score: bestScore };
-    }).filter((item) => item.score < 9999);
-
-    // Sort by score (lower is better)
-    scored.sort((a, b) => a.score - b.score);
-
-    setCommands(scored.map((item) => item.cmd));
+    setCommands(filtered);
     setSelectedIndex(0);
   }, [searchQuery, recentCommands]);
 
-  // Reset selection when opening
+  // Listen for command palette opened event
   useEffect(() => {
-    if (isOpen) {
+    const unsubscribe = window.runtime?.EventsOn?.('command-palette:opened', () => {
       setSearchQuery('');
       setSelectedIndex(0);
-      // Focus input after modal opens
       setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [isOpen]);
+    });
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
 
   // Save recent command
   const saveRecentCommand = useCallback((commandId) => {
@@ -314,28 +262,30 @@ export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
       if (command.action) {
         switch (command.action) {
           case 'toggle-theme':
-            setThemeMode(themeMode === 'dark' ? 'light' : 'dark');
+            try {
+              Events.Emit('spotlight:theme:toggle');
+            } catch (e) {}
             break;
           case 'toggle-window':
-            if (window.wails?.WindowHide) {
-              window.wails.WindowHide();
-            }
-            break;
-          case 'quit':
-            if (window.wails?.Quit) {
-              window.wails.Quit();
-            }
+            try {
+              Events.Emit('window:toggle');
+            } catch (e) {}
             break;
           default:
             break;
         }
       } else if (command.path) {
-        navigate(command.path);
+        console.log('[CommandPalette] Selected path command:', command.id, command.path);
+        const path = command.path;
+        try {
+          Events.Emit('spotlight:command-selected', path);
+          console.log('[CommandPalette] Emitted spotlight:command-selected with path:', path);
+        } catch (err) {
+          console.error('[CommandPalette] Failed to emit event:', err);
+        }
       }
-
-      onClose();
     },
-    [navigate, onClose, themeMode, setThemeMode, saveRecentCommand]
+    [saveRecentCommand]
   );
 
   // Handle keyboard navigation
@@ -354,10 +304,15 @@ export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
         }
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        console.log('[CommandPalette] Escape pressed, closing...');
+        try {
+          Events.Emit('command-palette:close');
+        } catch (err) {
+          console.error('Failed to emit command-palette:close', err);
+        }
       }
     },
-    [commands, selectedIndex, executeCommand, onClose]
+    [commands, selectedIndex, executeCommand]
   );
 
   // Scroll selected item into view
@@ -369,43 +324,46 @@ export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
   }, [selectedIndex]);
 
   return (
-    <ComposedModal
-      open={isOpen}
-      onClose={onClose}
-      size="sm"
-      className="command-palette-modal"
-      onKeyDown={handleKeyDown}
-    >
-      <ModalHeader className="command-palette-header">
+    <div className="command-palette-container">
+      <div className="command-palette-search-box">
         <Search size={20} className="command-palette-search-icon" />
-        <TextInput
+        <input
           ref={inputRef}
-          id="command-palette-input"
-          labelText="Search commands"
-          placeholder="Search tools or commands... (cmd+k)"
+          type="text"
+          className="command-palette-input"
+          placeholder="Search tools..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          hideLabel
-          className="command-palette-input"
-          autoComplete="off"
+          onKeyDown={handleKeyDown}
+          autoFocus
         />
-        <div className="command-palette-shortcuts">
-          <kbd>↑↓</kbd>
-          <kbd>Enter</kbd>
-          <kbd>Esc</kbd>
-        </div>
-      </ModalHeader>
-      <ModalBody className="command-palette-body">
+        {searchQuery && (
+          <button
+            className="command-palette-clear-btn"
+            onClick={() => {
+              setSearchQuery('');
+              inputRef.current?.focus();
+            }}
+          >
+            <X size={16} />
+          </button>
+        )}
+      </div>
+
+      <div className="command-palette-results">
         {commands.length === 0 ? (
           <div className="command-palette-empty">No commands found matching "{searchQuery}"</div>
         ) : (
           <div ref={listRef} className="command-palette-list">
             {commands.map((command, index) => {
-              const Icon = command.icon || null;
+              const Icon = getIconForCommand(command);
+              const isSelected = index === selectedIndex;
+              const isRecent = recentCommands.includes(command.id);
+
               return (
                 <div
                   key={command.id}
-                  className={`command-palette-item ${index === selectedIndex ? 'selected' : ''}`}
+                  className={`command-palette-item ${isSelected ? 'selected' : ''} ${isRecent ? 'recent' : ''}`}
                   onClick={() => executeCommand(command)}
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
@@ -413,13 +371,12 @@ export function CommandPalette({ isOpen, onClose, themeMode, setThemeMode }) {
                     {Icon && <Icon size={16} className="command-palette-item-icon" />}
                     <span className="command-palette-item-label">{command.label}</span>
                   </div>
-                  <span className="command-palette-item-category">{command.category}</span>
                 </div>
               );
             })}
           </div>
         )}
-      </ModalBody>
-    </ComposedModal>
+      </div>
+    </div>
   );
 }

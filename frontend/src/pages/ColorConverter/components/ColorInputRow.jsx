@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, CopyButton, TextInput } from '@carbon/react';
-import { Copy } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { TextInput } from '@carbon/react';
+import { Copy } from 'lucide-react';
 
 export default function ColorInputRow({ label, value, onChange, copyValue, onCopy, placeholder }) {
   const [localValue, setLocalValue] = useState(value);
@@ -66,7 +67,7 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         style={{
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           border: 'none',
           background: 'transparent',
           padding: '0.5rem',
@@ -75,7 +76,9 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
         size="md"
       />
 
-      <CopyButton autoAlign onClick={() => onCopy(copyValue)} />
+      <Button variant="secondary" onClick={() => onCopy(copyValue)} style={{ padding: '4px' }}>
+        <Copy size={14} />
+      </Button>
     </div>
   );
 }

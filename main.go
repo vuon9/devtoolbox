@@ -99,6 +99,7 @@ func main() {
 	app.RegisterService(application.NewService(service.NewBarcodeService(app)))
 	app.RegisterService(application.NewService(service.NewDataGeneratorService(app)))
 	app.RegisterService(application.NewService(service.NewCodeFormatterService(app)))
+	app.RegisterService(application.NewService(service.NewNumberConverterService(app)))
 	app.RegisterService(application.NewService(service.NewSettingsService(app, settingsManager)))
 
 	// Create and register spotlight service

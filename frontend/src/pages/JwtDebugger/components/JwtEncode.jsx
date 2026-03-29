@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Select, SelectItem } from '@carbon/react';
-import { Code } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { Select, SelectItem } from '@carbon/react';
+import { Play } from 'lucide-react';
 import {
   ToolLayout,
   ToolTextArea,
@@ -126,7 +127,8 @@ export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
             </div>
           </div>
           <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-start' }}>
-            <Button kind="primary" size="md" renderIcon={Code} onClick={encodeJWT}>
+            <Button variant="default" onClick={encodeJWT}>
+              <Play size={14} />
               Encode JWT
             </Button>
           </div>

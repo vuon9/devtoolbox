@@ -10,8 +10,8 @@ import {
 
 describe('inputUtils', () => {
   describe('getMonospaceFontFamily', () => {
-    it('should return IBM Plex Mono font family', () => {
-      expect(getMonospaceFontFamily()).toBe("'IBM Plex Mono', monospace");
+    it('should return monospace font family', () => {
+      expect(getMonospaceFontFamily()).toBe("'Menlo', 'Monaco', 'Courier New', monospace");
     });
   });
 

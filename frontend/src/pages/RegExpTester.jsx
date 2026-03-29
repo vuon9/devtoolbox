@@ -1,105 +1,173 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Grid, Column, TextInput, CopyButton } from '@carbon/react';
-import { ChevronDown } from '@carbon/icons-react';
-import { ToolHeader, ToolSplitPane } from '../components/ToolUI';
-import useLayoutToggle from '../hooks/useLayoutToggle';
+import { Regex, Copy, Info } from 'lucide-react';
+import { Button } from '../components/ui/Button';
 
-const FLAG_OPTIONS = [
-  { flag: 'g', label: 'Global', desc: 'Find all matches' },
-  { flag: 'i', label: 'Ignore Case', desc: 'Case-insensitive' },
-  { flag: 'm', label: 'Multiline', desc: '^ and $ match start/end of line' },
-  { flag: 's', label: 'Dot All', desc: '. matches newlines' },
-  { flag: 'u', label: 'Unicode', desc: 'Unicode support' },
-  { flag: 'y', label: 'Sticky', desc: 'Match from lastIndex' },
-];
-
-// Escape HTML special characters to prevent XSS and rendering issues
+// Escape HTML special characters
 const escapeHtml = (text) => {
   if (!text) return '';
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
 
+// Group colors for highlighting
 const GROUP_COLORS = [
-  {
-    bg: 'rgba(66, 190, 101, 0.15)',
-    border: 'rgba(66, 190, 101, 0.3)',
-    text: 'var(--cds-text-primary)',
-  }, // Green (full match)
-  {
-    bg: 'rgba(69, 137, 245, 0.15)',
-    border: 'rgba(69, 137, 245, 0.3)',
-    text: 'var(--cds-text-primary)',
-  }, // Blue
-  {
-    bg: 'rgba(241, 194, 27, 0.15)',
-    border: 'rgba(241, 194, 27, 0.3)',
-    text: 'var(--cds-text-primary)',
-  }, // Yellow
-  {
-    bg: 'rgba(218, 30, 40, 0.15)',
-    border: 'rgba(218, 30, 40, 0.3)',
-    text: 'var(--cds-text-primary)',
-  }, // Red
-  {
-    bg: 'rgba(165, 110, 255, 0.15)',
-    border: 'rgba(165, 110, 255, 0.3)',
-    text: 'var(--cds-text-primary)',
-  }, // Purple
-  {
-    bg: 'rgba(0, 189, 186, 0.15)',
-    border: 'rgba(0, 189, 186, 0.3)',
-    text: 'var(--cds-text-primary)',
-  }, // Teal
-  {
-    bg: 'rgba(255, 118, 178, 0.15)',
-    border: 'rgba(255, 118, 178, 0.3)',
-    text: 'var(--cds-text-primary)',
-  }, // Pink
-  {
-    bg: 'rgba(255, 140, 0, 0.15)',
-    border: 'rgba(255, 140, 0, 0.3)',
-    text: 'var(--cds-text-primary)',
-  }, // Orange
+  { bg: 'rgba(34, 197, 94, 0.5)', text: '#22c55e' }, // Green (full match)
+  { bg: 'rgba(59, 130, 246, 0.5)', text: '#3b82f6' }, // Blue
+  { bg: 'rgba(234, 179, 8, 0.5)', text: '#eab308' }, // Yellow
+  { bg: 'rgba(239, 68, 68, 0.5)', text: '#ef4444' }, // Red
+  { bg: 'rgba(168, 85, 247, 0.5)', text: '#a855f7' }, // Purple
+  { bg: 'rgba(20, 184, 166, 0.5)', text: '#14b8a6' }, // Teal
+  { bg: 'rgba(236, 72, 153, 0.5)', text: '#ec4899' }, // Pink
+  { bg: 'rgba(249, 115, 22, 0.5)', text: '#f97316' }, // Orange
 ];
 
-// Premium Regex Syntax Highlighter
-const highlightRegex = (regexStr) => {
-  if (!regexStr) return '';
+// Highlight regex pattern with group colors (tracks actual capturing group numbers)
+const highlightRegexPattern = (pattern) => {
+  if (!pattern) return '';
 
-  // 1: escaped, 2: charClass, 3: group, 4: quantifier, 5: operator
-  const tokenRegex =
-    /(\\.)|(\[(?:\\.|[^\]])*\])|(\((?:\\.|[^\)])*\))|([\*\+\?]\??|\{\d+(?:,\d*)?\}\??)|([\^$\|])/g;
-
-  let lastIndex = 0;
   let result = '';
-  let match;
+  let capturingGroupNum = 0; // Only counts capturing groups (match[1], match[2], etc.)
+  let groupStack = []; // Stack of { isCapturing: bool, groupNum: int }
+  let i = 0;
+  let escaped = false;
+  let charClass = false;
 
-  while ((match = tokenRegex.exec(regexStr)) !== null) {
-    // Add text before match
-    result += escapeHtml(regexStr.slice(lastIndex, match.index));
+  while (i < pattern.length) {
+    const char = pattern[i];
 
-    const [full, escaped, charClass, group, quantifier, operator] = match;
-
+    // Handle escape sequences
     if (escaped) {
-      result += `<span style="color: #ff7eb6;">${escapeHtml(full)}</span>`;
-    } else if (charClass) {
-      result += `<span style="color: #78a9ff;">${escapeHtml(full)}</span>`;
-    } else if (group) {
-      result += `<span style="color: #42be65;">${escapeHtml(full)}</span>`;
-    } else if (quantifier) {
-      result += `<span style="color: #33b1ff;">${escapeHtml(full)}</span>`;
-    } else if (operator) {
-      result += `<span style="color: #be95ff; font-weight: bold;">${escapeHtml(full)}</span>`;
+      result += escapeHtml('\\' + char);
+      escaped = false;
+      i++;
+      continue;
     }
 
-    lastIndex = tokenRegex.lastIndex;
+    if (char === '\\' && !charClass) {
+      escaped = true;
+      i++;
+      continue;
+    }
+
+    // Handle character class
+    if (char === '[' && !charClass) {
+      charClass = true;
+      result += escapeHtml(char);
+      i++;
+      continue;
+    }
+
+    if (char === ']' && charClass) {
+      charClass = false;
+      result += escapeHtml(char);
+      i++;
+      continue;
+    }
+
+    if (charClass) {
+      result += escapeHtml(char);
+      i++;
+      continue;
+    }
+
+    // Handle groups
+    if (char === '(') {
+      let isCapturing = true;
+      let groupPrefix = '';
+
+      // Check for non-capturing, lookaheads, etc.
+      if (pattern[i + 1] === '?') {
+        isCapturing = false;
+        groupPrefix = '?';
+        i += 2;
+        if (pattern[i] === ':' || pattern[i] === '=' || pattern[i] === '!' || pattern[i] === '<') {
+          if (pattern[i] === '<') {
+            groupPrefix += pattern[i];
+            i++;
+            if (pattern[i] === '=' || pattern[i] === '!') {
+              groupPrefix += pattern[i];
+              i++;
+            }
+          } else {
+            groupPrefix += pattern[i];
+            i++;
+          }
+        }
+      } else {
+        i++;
+      }
+
+      // For capturing groups, use the next group number
+      const groupNum = isCapturing ? ++capturingGroupNum : 0;
+      const colorIndex = groupNum % GROUP_COLORS.length;
+      const color = GROUP_COLORS[colorIndex];
+
+      groupStack.push({ isCapturing, groupNum });
+
+      result += `<span style="background-color: ${color.bg}; color: #f4f4f5; border-radius: 2px; font-weight: 600;">(${groupPrefix}`;
+      continue;
+    }
+
+    if (char === ')') {
+      const groupInfo = groupStack.pop() || { isCapturing: false, groupNum: 0 };
+      const colorIndex = groupInfo.groupNum % GROUP_COLORS.length;
+      const color = GROUP_COLORS[colorIndex];
+      result += `)</span>`;
+      i++;
+      continue;
+    }
+
+    // Handle quantifiers
+    if (char === '*' || char === '+' || char === '?') {
+      result += `<span style="color: #a78bfa; font-weight: 600;">${escapeHtml(char)}</span>`;
+      i++;
+      continue;
+    }
+
+    if (char === '{') {
+      let quantifier = '{';
+      i++;
+      while (i < pattern.length && pattern[i] !== '}') {
+        quantifier += pattern[i];
+        i++;
+      }
+      if (pattern[i] === '}') {
+        quantifier += '}';
+        i++;
+      }
+      result += `<span style="color: #a78bfa; font-weight: 600;">${escapeHtml(quantifier)}</span>`;
+      continue;
+    }
+
+    // Handle anchors and boundaries
+    if (char === '^' || char === '$') {
+      result += `<span style="color: #f472b6; font-weight: 600;">${escapeHtml(char)}</span>`;
+      i++;
+      continue;
+    }
+
+    // Handle alternation
+    if (char === '|') {
+      result += `<span style="color: #fbbf24; font-weight: 600;">|</span>`;
+      i++;
+      continue;
+    }
+
+    // Handle dot
+    if (char === '.') {
+      result += `<span style="color: #38bdf8; font-weight: 600;">.</span>`;
+      i++;
+      continue;
+    }
+
+    // Regular character
+    result += escapeHtml(char);
+    i++;
   }
 
-  result += escapeHtml(regexStr.slice(lastIndex));
   return result;
 };
 
-// Generate highlighted HTML with match data attributes for tooltips and group colors
+// Generate highlighted HTML with match data
 const generateHighlightedHtml = (text, regex, flags) => {
   if (!regex || !text) return escapeHtml(text);
 
@@ -111,7 +179,6 @@ const generateHighlightedHtml = (text, regex, flags) => {
     let matchCount = 0;
 
     while ((match = re.exec(text)) !== null) {
-      // Add text before match
       if (match.index > lastIndex) {
         result += escapeHtml(text.slice(lastIndex, match.index));
       }
@@ -120,29 +187,16 @@ const generateHighlightedHtml = (text, regex, flags) => {
       const matchIndex = match.index;
       const fullMatchText = match[0];
 
-      // Build tooltip data
       let tooltipData = `Match #${matchCount} at index ${matchIndex}`;
-      if (match.groups && Object.keys(match.groups).length > 0) {
-        const groups = Object.entries(match.groups)
-          .map(([k, v]) => `${k}: "${escapeHtml(v || '')}"`)
+      if (match.length > 1) {
+        const groups = match
+          .slice(1)
+          .map((g, i) => `${i + 1}: "${g || ''}"`)
           .join('\n');
         tooltipData += `\nGroups:\n${groups}`;
       }
-      if (match.length > 1) {
-        const unnamedGroups = match
-          .slice(1)
-          .filter((g, idx) => !match.groups || !Object.values(match.groups).includes(g));
-        if (unnamedGroups.length > 0) {
-          const groups = unnamedGroups
-            .map((g, i) => `${i + 1}: "${escapeHtml(g || '')}"`)
-            .join('\n');
-          tooltipData += `\nCaptures:\n${groups}`;
-        }
-      }
 
-      // If there are capture groups, render them with different colors
       if (match.length > 1) {
-        // Find all group positions in the match
         const groupPositions = [];
         let currentPos = 0;
 
@@ -161,51 +215,42 @@ const generateHighlightedHtml = (text, regex, flags) => {
           }
         }
 
-        // Sort by position
         groupPositions.sort((a, b) => a.index - b.index);
 
-        // Build the highlighted match with different colors for groups
         let matchResult = '';
         let matchPos = 0;
         const fullMatchColor = GROUP_COLORS[0];
 
-        // Process the match text, applying different colors to groups
         groupPositions.forEach((group) => {
-          // Add text before this group (part of full match)
           if (group.index > matchPos) {
             const beforeText = escapeHtml(fullMatchText.slice(matchPos, group.index));
-            matchResult += `<span style="background-color: ${fullMatchColor.bg}; color: ${fullMatchColor.text}; padding: 2px 0; font-weight: 600;">${beforeText}</span>`;
+            matchResult += `<span style="background-color: ${fullMatchColor.bg}; color: #f4f4f5; border-radius: 2px;">${beforeText}</span>`;
           }
 
-          // Add the group with its color
           const groupColor = GROUP_COLORS[group.groupNum % GROUP_COLORS.length] || GROUP_COLORS[1];
-          matchResult += `<mark class="regex-match regex-group-${group.groupNum}" style="background-color: ${groupColor.bg}; color: ${groupColor.text};" data-match-index="${matchIndex + group.index}" data-match-num="${matchCount}" data-group-num="${group.groupNum}" title="${tooltipData}">${escapeHtml(group.text)}</mark>`;
+          matchResult += `<mark style="background-color: ${groupColor.bg}; color: #f4f4f5; border-radius: 2px; font-weight: 600;" title="${tooltipData}">${escapeHtml(group.text)}</mark>`;
 
           matchPos = group.index + group.text.length;
         });
 
-        // Add remaining text after last group
         if (matchPos < fullMatchText.length) {
           const afterText = escapeHtml(fullMatchText.slice(matchPos));
-          matchResult += `<span style="background-color: ${fullMatchColor.bg}; color: ${fullMatchColor.text}; padding: 2px 0; font-weight: 600;">${afterText}</span>`;
+          matchResult += `<span style="background-color: ${fullMatchColor.bg}; color: #f4f4f5; border-radius: 2px;">${afterText}</span>`;
         }
 
         result += matchResult;
       } else {
-        // No groups - just highlight the full match
         const fullMatchColor = GROUP_COLORS[0];
-        result += `<mark class="regex-match" style="background-color: ${fullMatchColor.bg}; color: ${fullMatchColor.text};" data-match-index="${matchIndex}" data-match-num="${matchCount}" title="${tooltipData}">${escapeHtml(fullMatchText)}</mark>`;
+        result += `<mark style="background-color: ${fullMatchColor.bg}; color: #f4f4f5; border-radius: 2px; font-weight: 600;" title="${tooltipData}">${escapeHtml(fullMatchText)}</mark>`;
       }
 
       lastIndex = re.lastIndex;
 
-      // Prevent infinite loop for zero-length matches
       if (match.index === re.lastIndex) {
         re.lastIndex++;
       }
     }
 
-    // Add remaining text
     if (lastIndex < text.length) {
       result += escapeHtml(text.slice(lastIndex));
     }
@@ -216,208 +261,730 @@ const generateHighlightedHtml = (text, regex, flags) => {
   }
 };
 
+function ToolHeader({ title, description }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
+        {title}
+      </h2>
+      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+    </div>
+  );
+}
+
 // Live Highlighted Editor Component
-const LiveHighlightedEditor = ({ text, setText, regex, flags }) => {
+function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, indicatorColor }) {
   const textareaRef = useRef(null);
   const backdropRef = useRef(null);
   const [highlightedHtml, setHighlightedHtml] = useState('');
 
-  // Update highlighting when text, regex, or flags change
   useEffect(() => {
     const html = generateHighlightedHtml(text, regex, flags);
     setHighlightedHtml(html);
   }, [text, regex, flags]);
 
-  // Sync scroll between textarea and backdrop
   const handleScroll = useCallback(() => {
     if (textareaRef.current && backdropRef.current) {
       backdropRef.current.scrollTop = textareaRef.current.scrollTop;
       backdropRef.current.scrollLeft = textareaRef.current.scrollLeft;
     }
   }, []);
+
+  const handleCopy = () => {
+    if (text) {
+      navigator.clipboard.writeText(text);
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '8px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            {label}
+          </label>
+          {indicator && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '10px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                backgroundColor:
+                  indicatorColor === 'green'
+                    ? 'rgba(34, 197, 94, 0.15)'
+                    : indicatorColor === 'blue'
+                      ? 'rgba(59, 130, 246, 0.15)'
+                      : 'rgba(113, 113, 122, 0.15)',
+                color:
+                  indicatorColor === 'green'
+                    ? '#22c55e'
+                    : indicatorColor === 'blue'
+                      ? '#3b82f6'
+                      : '#71717a',
+              }}
+            >
+              {indicator}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={handleCopy}
+          disabled={!text}
+          title="Copy to clipboard"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '28px',
+            height: '28px',
+            padding: '6px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '4px',
+            color: text ? '#a1a1aa' : '#3f3f46',
+            cursor: text ? 'pointer' : 'not-allowed',
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            if (text) {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.color = '#f4f4f5';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = text ? '#a1a1aa' : '#3f3f46';
+          }}
+        >
+          <Copy style={{ width: '16px', height: '16px' }} />
+        </button>
+      </div>
+
+      <div style={{ position: 'relative', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        {/* Backdrop - shows highlighted text */}
+        <div
+          ref={backdropRef}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            overflow: 'auto',
+            padding: '12px',
+            backgroundColor: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: '8px',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+            fontSize: '14px',
+            lineHeight: 1.6,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            color: '#f4f4f5',
+            pointerEvents: 'none',
+          }}
+          dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+        />
+
+        {/* Textarea - for user input */}
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onScroll={handleScroll}
+          placeholder="Enter text to match against..."
+          spellCheck={false}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: '100%',
+            padding: '12px',
+            background: 'transparent',
+            border: '1px solid #27272a',
+            borderRadius: '8px',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+            fontSize: '14px',
+            lineHeight: 1.6,
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            color: 'transparent',
+            caretColor: '#f4f4f5',
+            resize: 'none',
+            outline: 'none',
+            zIndex: 1,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function MatchRow({ label, position, value, color, underline, isLast }) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '80px 80px 1fr',
+        gap: '12px',
+        padding: '6px 0',
+        alignItems: 'center',
+        borderBottom: isLast ? 'none' : '1px solid #27272a',
+      }}
+    >
+      <div style={{ justifySelf: 'start', display: 'inline-block' }}>
+        <span
+          style={{
+            display: 'inline-block',
+            fontSize: '12px',
+            fontWeight: 500,
+            color: color,
+            whiteSpace: 'nowrap',
+            borderBottom: underline ? `2px solid ${color}` : 'none',
+            paddingBottom: underline ? '2px' : '0',
+          }}
+        >
+          {label}
+        </span>
+      </div>
+      <span
+        style={{
+          fontSize: '12px',
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+          color: '#71717a',
+        }}
+      >
+        {position}
+      </span>
+      <span
+        style={{
+          fontSize: '12px',
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+          color: '#f4f4f5',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+        title={value}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+// Regex Quick Reference Data
+const REFERENCE_CATEGORIES = {
+  common: {
+    label: 'Common',
+    icon: '★',
+    tokens: [
+      { token: '.', desc: 'Any single character' },
+      { token: '\\d', desc: 'Digit (0-9)' },
+      { token: '\\D', desc: 'Non-digit' },
+      { token: '\\w', desc: 'Word character (a-z, A-Z, 0-9, _)' },
+      { token: '\\W', desc: 'Non-word character' },
+      { token: '\\s', desc: 'Whitespace' },
+      { token: '\\S', desc: 'Non-whitespace' },
+    ],
+  },
+  anchors: {
+    label: 'Anchors',
+    icon: '⚓',
+    tokens: [
+      { token: '^', desc: 'Start of string or line' },
+      { token: '$', desc: 'End of string or line' },
+      { token: '\\b', desc: 'Word boundary' },
+      { token: '\\B', desc: 'Non-word boundary' },
+    ],
+  },
+  quantifiers: {
+    label: 'Quantifiers',
+    icon: '{}',
+    tokens: [
+      { token: '*', desc: 'Zero or more (greedy)' },
+      { token: '*?', desc: 'Zero or more (lazy)' },
+      { token: '+', desc: 'One or more (greedy)' },
+      { token: '+?', desc: 'One or more (lazy)' },
+      { token: '?', desc: 'Zero or one (greedy)' },
+      { token: '??', desc: 'Zero or one (lazy)' },
+      { token: '{n}', desc: 'Exactly n times' },
+      { token: '{n,}', desc: 'n or more times' },
+      { token: '{n,m}', desc: 'Between n and m times' },
+    ],
+  },
+  groups: {
+    label: 'Groups',
+    icon: '()',
+    tokens: [
+      { token: '(...)', desc: 'Capturing group' },
+      { token: '(?:...)', desc: 'Non-capturing group' },
+      { token: '(?=...)', desc: 'Positive lookahead' },
+      { token: '(?!...)', desc: 'Negative lookahead' },
+      { token: '(?<=...)', desc: 'Positive lookbehind' },
+      { token: '(?<!...)', desc: 'Negative lookbehind' },
+      { token: '(?<name>...)', desc: 'Named group' },
+    ],
+  },
+  classes: {
+    label: 'Character Classes',
+    icon: '[]',
+    tokens: [
+      { token: '[abc]', desc: 'Any character: a, b, or c' },
+      { token: '[^abc]', desc: 'Any character except: a, b, c' },
+      { token: '[a-z]', desc: 'Character in range: a-z' },
+      { token: '[^a-z]', desc: 'Character NOT in range: a-z' },
+      { token: '[a-zA-Z]', desc: 'Character in range: a-z or A-Z' },
+    ],
+  },
+  flags: {
+    label: 'Flags',
+    icon: '⚑',
+    tokens: [
+      { token: 'g', desc: 'Global - find all matches' },
+      { token: 'i', desc: 'Ignore case' },
+      { token: 'm', desc: 'Multiline mode' },
+      { token: 's', desc: 'Dot matches newlines' },
+      { token: 'u', desc: 'Unicode support' },
+      { token: 'y', desc: 'Sticky mode' },
+      { token: 'd', desc: 'Indices for captures' },
+    ],
+  },
+};
+
+function QuickReferencePanel() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('common');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTokens = searchQuery
+    ? Object.values(REFERENCE_CATEGORIES).flatMap((cat) =>
+        cat.tokens
+          .filter(
+            (t) =>
+              t.token.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              t.desc.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((t) => ({ ...t, category: cat.label }))
+      )
+    : REFERENCE_CATEGORIES[activeCategory].tokens.map((t) => ({
+        ...t,
+        category: REFERENCE_CATEGORIES[activeCategory].label,
+      }));
+
+  return (
+    <div style={{ marginTop: '8px', borderTop: '1px solid #27272a', paddingTop: '8px' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          width: '100%',
+          padding: '8px 0',
+          backgroundColor: 'transparent',
+          border: 'none',
+          color: '#3b82f6',
+          fontSize: '12px',
+          fontWeight: 600,
+          cursor: 'pointer',
+        }}
+      >
+        <span
+          style={{
+            transform: isOpen ? 'rotate(90deg)' : 'none',
+            transition: 'transform 0.15s ease',
+          }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </span>
+        Quick Reference
+      </button>
+
+      {isOpen && (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '140px 1fr',
+            gap: '16px',
+            padding: '12px',
+            backgroundColor: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: '6px',
+            marginTop: '8px',
+          }}
+        >
+          {/* Left sidebar - Categories */}
+          <div style={{ borderRight: '1px solid #27272a', paddingRight: '8px' }}>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '6px 8px',
+                fontSize: '12px',
+                backgroundColor: '#27272a',
+                border: '1px solid #3f3f46',
+                borderRadius: '4px',
+                color: '#f4f4f5',
+                marginBottom: '8px',
+              }}
+            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              {Object.entries(REFERENCE_CATEGORIES).map(([key, cat]) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setActiveCategory(key);
+                    setSearchQuery('');
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '6px 8px',
+                    fontSize: '12px',
+                    textAlign: 'left',
+                    backgroundColor:
+                      activeCategory === key && !searchQuery ? '#27272a' : 'transparent',
+                    border: 'none',
+                    borderRadius: '4px',
+                    color: activeCategory === key && !searchQuery ? '#3b82f6' : '#a1a1aa',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span style={{ fontSize: '10px' }}>{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right side - Token list */}
+          <div>
+            {searchQuery && (
+              <div
+                style={{
+                  fontSize: '11px',
+                  color: '#71717a',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                Search results
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+              {filteredTokens.length > 0 ? (
+                filteredTokens.map((token, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: searchQuery ? '100px 80px 1fr' : '80px 1fr',
+                      gap: '12px',
+                      padding: '6px 8px',
+                      borderRadius: '4px',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#27272a';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {searchQuery && (
+                      <span style={{ fontSize: '11px', color: '#3b82f6' }}>{token.category}</span>
+                    )}
+                    <span
+                      style={{
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                        fontSize: '13px',
+                        color: '#22c55e',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {token.token}
+                    </span>
+                    <span style={{ fontSize: '13px', color: '#a1a1aa' }}>{token.desc}</span>
+                  </div>
+                ))
+              ) : (
+                <div
+                  style={{
+                    padding: '12px',
+                    fontSize: '13px',
+                    color: '#71717a',
+                    textAlign: 'center',
+                  }}
+                >
+                  No matching tokens found
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MatchCard({ match, index, isLastMatch }) {
+  const fullMatchColor = GROUP_COLORS[0];
+  const startIndex = match.index;
+  const endIndex = startIndex + match[0].length;
+
+  // Build rows: Match row + Group rows
+  const rows = [];
+
+  // Group rows - track positions to avoid duplicates
+  const groupRows = [];
+  if (match.length > 1) {
+    const groupPositions = [];
+    let currentPos = 0;
+
+    for (let i = 1; i < match.length; i++) {
+      const groupText = match[i];
+      if (groupText !== undefined) {
+        const groupIndex = match[0].indexOf(groupText, currentPos);
+        if (groupIndex !== -1) {
+          groupPositions.push({
+            groupNum: i,
+            start: groupIndex,
+            end: groupIndex + groupText.length,
+            text: groupText,
+          });
+          currentPos = groupIndex + groupText.length;
+        }
+      }
+    }
+
+    // Sort by start position
+    groupPositions.sort((a, b) => a.start - b.start);
+
+    groupPositions.forEach((group, idx) => {
+      const groupColor = GROUP_COLORS[group.groupNum % GROUP_COLORS.length] || GROUP_COLORS[1];
+      const position = `${startIndex + group.start}-${startIndex + group.end}`;
+      const isLastGroup = idx === groupPositions.length - 1;
+
+      groupRows.push(
+        <MatchRow
+          key={`group-${group.groupNum}`}
+          label={`Group ${group.groupNum}`}
+          position={position}
+          value={group.text || 'null'}
+          color={groupColor.text}
+          underline={true}
+          isLast={isLastGroup}
+        />
+      );
+    });
+  }
+
+  // Match row - isLast only if no groups
+  const isMatchRowLast = groupRows.length === 0;
+
+  rows.push(
+    <MatchRow
+      key="match"
+      label={`Match ${index + 1}`}
+      position={`${startIndex}-${endIndex}`}
+      value={match[0]}
+      color={fullMatchColor.text}
+      underline={true}
+      isLast={isMatchRowLast}
+    />
+  );
+
+  // Add group rows
+  rows.push(...groupRows);
 
   return (
     <div
       style={{
-        position: 'relative',
-        flex: 1,
-        minHeight: 0,
-        overflow: 'hidden',
+        paddingBottom: isLastMatch ? '0' : '8px',
+        marginBottom: isLastMatch ? '0' : '8px',
+        borderBottom: isLastMatch ? 'none' : '1px solid #3f3f46',
       }}
     >
-      {/* Backdrop - shows highlighted text */}
-      <div
-        ref={backdropRef}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          overflow: 'auto',
-          padding: '0.75rem',
-          backgroundColor: 'var(--cds-layer)',
-          border: '1px solid var(--cds-border-strong)',
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '0.875rem',
-          lineHeight: '1.6',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-          color: 'var(--cds-text-primary)',
-          pointerEvents: 'none',
-        }}
-        dangerouslySetInnerHTML={{ __html: highlightedHtml || escapeHtml(text) || '<br>' }}
-      />
-
-      {/* Textarea - for user input */}
-      <textarea
-        ref={textareaRef}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onScroll={handleScroll}
-        placeholder="Enter the text to test against..."
-        spellCheck={false}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100%',
-          height: '100%',
-          padding: '0.75rem',
-          background: 'transparent',
-          border: '1px solid var(--cds-border-strong)',
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '0.875rem',
-          lineHeight: '1.6',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-          color: 'transparent',
-          caretColor: 'var(--cds-text-primary)',
-          resize: 'none',
-          outline: 'none',
-          zIndex: 1,
-        }}
-      />
-
-      {/* CSS for highlighted matches */}
-      <style>{`
-                .regex-match {
-                    padding: 0 1px;
-                    border-radius: 2px;
-                    font-weight: 600;
-                    pointer-events: auto;
-                    cursor: help;
-                    transition: all 0.15s ease;
-                }
-                .regex-match:hover {
-                    filter: contrast(1.1) brightness(1.1);
-                    box-shadow: 0 0 0 2px var(--cds-focus);
-                    z-index: 2;
-                }
-            `}</style>
+      {rows}
     </div>
   );
-};
+}
 
-// Expandable Regex Input Component with auto-resize and syntax highlighting
-const ExpandableRegexInput = ({ value, onChange, error }) => {
-  const textareaRef = useRef(null);
-  const backdropRef = useRef(null);
-  const highlightedHtml = React.useMemo(() => highlightRegex(value), [value]);
-
-  const LINE_HEIGHT = 20;
-  const MIN_LINES = 1;
-  const MAX_LINES = 10;
-  const MIN_HEIGHT = MIN_LINES * LINE_HEIGHT + 16;
-  const MAX_HEIGHT = MAX_LINES * LINE_HEIGHT + 16;
-
-  // Sync scroll
-  const handleScroll = useCallback(() => {
-    if (textareaRef.current && backdropRef.current) {
-      backdropRef.current.scrollTop = textareaRef.current.scrollTop;
-      backdropRef.current.scrollLeft = textareaRef.current.scrollLeft;
+function ResultPane({ label, matches, error, indicator, indicatorColor }) {
+  const handleCopyAll = () => {
+    const text = matches.map((m) => m[0]).join('\n');
+    if (text) {
+      navigator.clipboard.writeText(text);
     }
-  }, []);
-
-  // Auto-resize
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      const scrollHeight = textareaRef.current.scrollHeight;
-      const newHeight = Math.min(Math.max(scrollHeight, MIN_HEIGHT), MAX_HEIGHT);
-      textareaRef.current.style.height = `${newHeight}px`;
-    }
-  }, [value]);
+  };
 
   return (
-    <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'stretch' }}>
-      {/* Syntax Highlighting Backdrop */}
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
       <div
-        ref={backdropRef}
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          padding: '0.5rem 24px 0.5rem 0.75rem',
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '0.875rem',
-          lineHeight: '1.4',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-all',
-          color: error ? 'var(--cds-support-error)' : 'var(--cds-text-primary)',
-          pointerEvents: 'none',
-          overflow: 'hidden',
-          backgroundColor: 'transparent',
-          zIndex: 0,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '8px',
         }}
-        dangerouslySetInnerHTML={{ __html: highlightedHtml || '<br>' }}
-      />
-
-      <textarea
-        ref={textareaRef}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onScroll={handleScroll}
-        placeholder="Regular Expression..."
-        spellCheck={false}
-        className="regex-input-scrollbar"
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            {label}
+          </label>
+          {indicator && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '10px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                backgroundColor:
+                  indicatorColor === 'green'
+                    ? 'rgba(34, 197, 94, 0.15)'
+                    : indicatorColor === 'blue'
+                      ? 'rgba(59, 130, 246, 0.15)'
+                      : 'rgba(113, 113, 122, 0.15)',
+                color:
+                  indicatorColor === 'green'
+                    ? '#22c55e'
+                    : indicatorColor === 'blue'
+                      ? '#3b82f6'
+                      : '#71717a',
+              }}
+            >
+              {indicator}
+            </span>
+          )}
+        </div>
+        <Button variant="secondary" onClick={handleCopyAll} disabled={matches.length === 0}>
+          <Copy style={{ width: '14px', height: '14px' }} />
+          Copy All
+        </Button>
+      </div>
+      <div
         style={{
-          width: '100%',
-          minHeight: `${MIN_HEIGHT}px`,
-          maxHeight: `${MAX_HEIGHT}px`,
-          padding: '0.5rem 24px 0.5rem 0.75rem',
-          backgroundColor: 'transparent',
-          border: 'none',
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '0.875rem',
-          lineHeight: '1.4',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-all',
-          resize: 'vertical',
-          outline: 'none',
+          flex: 1,
           overflowY: 'auto',
-          overflowX: 'hidden',
-          color: 'transparent',
-          caretColor: 'var(--cds-text-primary)',
-          display: 'block',
-          scrollbarWidth: 'thin',
-          scrollbarGutter: 'stable',
-          zIndex: 1,
-          position: 'relative',
+          padding: '12px',
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
         }}
-      />
+      >
+        {matches.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {matches.map((match, i) => (
+              <MatchCard key={i} match={match} index={i} isLastMatch={i === matches.length - 1} />
+            ))}
+          </div>
+        ) : !error ? (
+          <div
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+              color: '#52525b',
+            }}
+          >
+            <Regex style={{ width: '48px', height: '48px', opacity: 0.3 }} />
+            <div
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              No matches found
+            </div>
+          </div>
+        ) : null}
+      </div>
+      <QuickReferencePanel />
     </div>
   );
-};
+}
 
-// Flags Input Component
-const FlagsInputWithPopover = ({ flags, setFlags }) => {
+function FlagsDropdown({ flags, setFlags }) {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  const flagOptions = [
+    { flag: 'g', name: 'Global', description: 'Find all matches, not just the first' },
+    { flag: 'i', name: 'Case Insensitive', description: 'Match both uppercase and lowercase' },
+    { flag: 'm', name: 'Multiline', description: '^ and $ match line boundaries' },
+    { flag: 's', name: 'Dot All', description: '. matches newlines (dotall mode)' },
+    { flag: 'u', name: 'Unicode', description: 'Enable full Unicode support' },
+    { flag: 'd', name: 'Indices', description: 'Return match start/end indices' },
+    { flag: 'y', name: 'Sticky', description: 'Match only from lastIndex position' },
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
   const toggleFlag = (flag) => {
     if (flags.includes(flag)) {
@@ -427,622 +994,378 @@ const FlagsInputWithPopover = ({ flags, setFlags }) => {
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
+  const displayFlags = flags.split('').sort().join('') || '—';
 
   return (
-    <div
-      ref={containerRef}
-      style={{ position: 'relative', display: 'flex', alignItems: 'stretch' }}
-    >
-      <div
+    <div ref={dropdownRef} style={{ position: 'relative' }}>
+      <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          padding: '0.75rem 0.75rem 0',
-          height: '100%',
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+          height: '40px',
+          minWidth: '80px',
+          padding: '0 12px',
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '6px',
           cursor: 'pointer',
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: '0.875rem',
-          color: 'var(--cds-text-secondary)',
-          backgroundColor: isOpen ? 'var(--cds-layer-selected-01)' : 'transparent',
-          transition: 'all 0.2s ease',
-          userSelect: 'none',
-          borderLeft: '1px solid var(--cds-border-subtle)',
-          minWidth: '60px',
-          justifyContent: 'center',
-          lineHeight: '1.4',
+          transition: 'all 0.15s ease',
         }}
-        onMouseEnter={(e) =>
-          !isOpen && (e.currentTarget.style.backgroundColor = 'var(--cds-layer-hover-01)')
-        }
-        onMouseLeave={(e) => !isOpen && (e.currentTarget.style.backgroundColor = 'transparent')}
       >
-        {flags || <span style={{ opacity: 0.5, fontSize: '0.875rem' }}>flags</span>}
-      </div>
+        <span
+          style={{
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+            fontSize: '14px',
+            fontWeight: 600,
+            color: flags ? '#3b82f6' : '#71717a',
+          }}
+        >
+          {displayFlags}
+        </span>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          style={{
+            color: '#71717a',
+            transition: 'transform 0.15s ease',
+            transform: isOpen ? 'rotate(180deg)' : 'none',
+          }}
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
 
       {isOpen && (
         <div
           style={{
             position: 'absolute',
-            top: 'calc(100% + 8px)',
+            top: 'calc(100% + 4px)',
             right: 0,
-            padding: '0.5rem',
-            backgroundColor: 'var(--cds-layer-01)',
-            border: '1px solid var(--cds-border-strong)',
-            borderRadius: '4px',
-            boxShadow: '0 12px 24px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)',
-            zIndex: 1000,
             minWidth: '240px',
+            backgroundColor: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: '8px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            zIndex: 50,
+            overflow: 'hidden',
           }}
         >
-          <div
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              color: 'var(--cds-text-secondary)',
-              textTransform: 'uppercase',
-              marginBottom: '0.5rem',
-              padding: '0 0.5rem',
-            }}
-          >
-            Regex Flags
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            {FLAG_OPTIONS.map(({ flag, label, desc }) => (
-              <div
-                key={flag}
-                onClick={() => toggleFlag(flag)}
+          {flagOptions.map((option, index) => {
+            const isActive = flags.includes(option.flag);
+            return (
+              <button
+                key={option.flag}
+                onClick={() => toggleFlag(option.flag)}
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.625rem 0.5rem',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  borderTop: index > 0 ? '1px solid #27272a' : 'none',
                   cursor: 'pointer',
-                  borderRadius: '2px',
-                  backgroundColor: flags.includes(flag)
-                    ? 'var(--cds-layer-selected-01)'
-                    : 'transparent',
-                  transition: 'all 0.15s',
+                  textAlign: 'left',
                 }}
-                onMouseEnter={(e) =>
-                  !flags.includes(flag) &&
-                  (e.currentTarget.style.backgroundColor = 'var(--cds-layer-hover-01)')
-                }
-                onMouseLeave={(e) =>
-                  !flags.includes(flag) && (e.currentTarget.style.backgroundColor = 'transparent')
-                }
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#27272a';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
-                <span
-                  style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontWeight: 600,
-                    color: flags.includes(flag)
-                      ? 'var(--cds-link-primary)'
-                      : 'var(--cds-text-secondary)',
-                    minWidth: '16px',
-                  }}
-                >
-                  {flag}
-                </span>
-                <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                   <div
                     style={{
-                      fontSize: '0.875rem',
-                      color: 'var(--cds-text-primary)',
-                      fontWeight: flags.includes(flag) ? 600 : 400,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginBottom: '4px',
                     }}
                   >
-                    {label}
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '4px',
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        backgroundColor: isActive ? '#3b82f6' : '#27272a',
+                        color: isActive ? '#ffffff' : '#a1a1aa',
+                      }}
+                    >
+                      {option.flag}
+                    </span>
+                    <span style={{ fontWeight: 600, color: '#f4f4f5', fontSize: '14px' }}>
+                      {option.name}
+                    </span>
                   </div>
-                  <div
+                  <span
                     style={{
-                      fontSize: '0.7rem',
-                      color: 'var(--cds-text-secondary)',
-                      marginTop: '2px',
+                      color: '#71717a',
+                      fontSize: '12px',
+                      lineHeight: 1.4,
+                      marginLeft: '32px',
                     }}
                   >
-                    {desc}
-                  </div>
+                    {option.description}
+                  </span>
                 </div>
-                {flags.includes(flag) && (
-                  <span style={{ color: 'var(--cds-link-primary)' }}>✓</span>
-                )}
-              </div>
-            ))}
-          </div>
+                <div style={{ display: 'flex', alignItems: 'center', paddingLeft: '8px' }}>
+                  {isActive && (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#22c55e"
+                      strokeWidth="3"
+                    >
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
   );
-};
-
-// Match Info Row Component
-const MatchInfoRow = ({ label, range, value, color, indent = false }) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.4rem 0.75rem',
-      borderBottom: '1px solid var(--cds-border-subtle)',
-      fontFamily: "'IBM Plex Mono', monospace",
-      fontSize: '0.875rem',
-      backgroundColor: 'transparent',
-    }}
-  >
-    <div
-      style={{
-        width: '120px',
-        paddingLeft: indent ? '1rem' : '0',
-        position: 'relative',
-      }}
-    >
-      <span
-        style={{
-          borderBottom: `2px solid ${color}`,
-          paddingBottom: '2px',
-          fontWeight: 600,
-          color: 'var(--cds-text-primary)',
-        }}
-      >
-        {label}
-      </span>
-    </div>
-    <div
-      style={{
-        width: '80px',
-        color: 'var(--cds-text-secondary)',
-        fontSize: '0.75rem',
-        textAlign: 'center',
-      }}
-    >
-      {range}
-    </div>
-    <div
-      style={{
-        flex: 1,
-        paddingLeft: '1.5rem',
-        borderLeft: '1px solid var(--cds-border-subtle)',
-        color: 'var(--cds-text-primary)',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      }}
-    >
-      {value}
-    </div>
-  </div>
-);
-
-// Tool Pane with Label Component
-const ToolPaneWithLabel = ({ label, children, action }) => (
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      minHeight: 0,
-      flex: 1,
-    }}
-  >
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        minHeight: '28px',
-        marginBottom: '0',
-        borderBottom: '1px solid var(--cds-border-subtle)',
-        padding: '0.25rem 0.75rem',
-        backgroundColor: 'transparent',
-      }}
-    >
-      <label
-        style={{
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          lineHeight: 1.5,
-          letterSpacing: '0.32px',
-          color: 'var(--cds-text-secondary)',
-          textTransform: 'uppercase',
-        }}
-      >
-        {label}
-      </label>
-      {label === 'MATCH INFORMATION' ? (
-        <ChevronDown size={16} fill="var(--cds-icon-secondary)" />
-      ) : (
-        action
-      )}
-    </div>
-    {children}
-  </div>
-);
+}
 
 export default function RegExpTester() {
-  const [regexStr, setRegexStr] = useState('');
-  const [flags, setFlags] = useState('gm');
-  const [text, setText] = useState('');
-  const [output, setOutput] = useState([]);
-  const [error, setError] = useState('');
+  const [regex, setRegex] = useState('(\\w+)\\s(\\w+)');
+  const [flags, setFlags] = useState('g');
+  const [text, setText] = useState('John Doe, Jane Smith, Alan Turing');
   const [matches, setMatches] = useState([]);
+  const [error, setError] = useState('');
 
-  // Add scrollbar styles
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-            .regex-input-scrollbar::-webkit-scrollbar {
-                width: 6px;
-            }
-            .regex-input-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-                margin: 2px 0;
-            }
-            .regex-input-scrollbar::-webkit-scrollbar-thumb {
-                background-color: var(--cds-border-subtle);
-                border-radius: 3px;
-                border: 1px solid transparent;
-                background-clip: padding-box;
-            }
-            .regex-input-scrollbar::-webkit-scrollbar-thumb:hover {
-                background-color: var(--cds-border-strong);
-            }
-            .regex-input-scrollbar::-webkit-scrollbar-corner {
-                background: transparent;
-            }
-        `;
-    document.head.appendChild(style);
-    return () => document.head.removeChild(style);
-  }, []);
-
-  const layout = useLayoutToggle({
-    toolKey: 'regexp-tester-layout',
-    defaultDirection: 'horizontal',
-    showToggle: true,
-    persist: true,
-  });
-
-  useEffect(() => {
-    runRegex();
-  }, [regexStr, flags, text]);
-
-  const runRegex = () => {
-    if (!regexStr) {
-      setOutput([]);
-      setError('');
+  const testRegex = (r = regex, f = flags, t = text) => {
+    if (!r) {
       setMatches([]);
+      setError('');
       return;
     }
     try {
-      const startTime = performance.now();
-      const isGlobal = flags.includes('g');
-      const sanitizedFlags = isGlobal ? flags : flags + 'g';
-      const re = new RegExp(regexStr, sanitizedFlags);
-      const foundMatches = Array.from(text.matchAll(re));
-      setMatches(foundMatches);
+      const re = new RegExp(r, f);
+      let m;
 
-      if (foundMatches.length === 0) {
-        const endTime = performance.now();
-        const duration = (endTime - startTime).toFixed(3);
-        setOutput([
-          <div
-            key="summary"
-            style={{
-              padding: '0.75rem',
-              borderBottom: '1px solid var(--cds-border-subtle)',
-              color: 'var(--cds-text-secondary)',
-              fontSize: '0.875rem',
-            }}
-          >
-            No matches found. ({parseFloat(duration) < 0.001 ? '< 0.001' : duration}ms)
-          </div>,
-        ]);
+      // matchAll requires 'g' flag, so handle non-global separately
+      if (f.includes('g')) {
+        m = Array.from(t.matchAll(re));
       } else {
-        const matchRows = foundMatches.flatMap((match, i) => {
-          const rows = [];
-          const fullMatchColor = GROUP_COLORS[0];
-
-          rows.push(
-            <MatchInfoRow
-              key={`match-${i}`}
-              label={`Match ${i + 1}`}
-              range={`${match.index}-${match.index + match[0].length}`}
-              value={match[0]}
-              color={fullMatchColor.border}
-            />
-          );
-
-          if (match.length > 1) {
-            const fullMatchText = match[0];
-            let currentSearchPos = 0;
-
-            for (let gi = 1; gi < match.length; gi++) {
-              const groupText = match[gi];
-              if (groupText !== undefined && groupText !== '') {
-                const groupIndexInMatch = fullMatchText.indexOf(groupText, currentSearchPos);
-                if (groupIndexInMatch !== -1) {
-                  const absoluteStart = match.index + groupIndexInMatch;
-                  const absoluteEnd = absoluteStart + groupText.length;
-                  const groupColor = GROUP_COLORS[gi % GROUP_COLORS.length] || GROUP_COLORS[1];
-
-                  rows.push(
-                    <MatchInfoRow
-                      key={`match-${i}-g-${gi}`}
-                      label={`Group ${gi}`}
-                      range={`${absoluteStart}-${absoluteEnd}`}
-                      value={groupText}
-                      color={groupColor.border}
-                      indent={true}
-                    />
-                  );
-                  currentSearchPos = groupIndexInMatch + groupText.length;
-                }
-              }
-            }
-          }
-          return rows;
-        });
-
-        const endTime = performance.now();
-        const duration = (endTime - startTime).toFixed(3);
-
-        setOutput([
-          <div
-            key="summary"
-            style={{
-              padding: '0.75rem',
-              borderBottom: '1px solid var(--cds-border-subtle)',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--cds-text-primary)',
-              backgroundColor: 'var(--cds-layer-01)',
-            }}
-          >
-            Found {foundMatches.length} match{foundMatches.length !== 1 ? 'es' : ''}
-            <span
-              style={{
-                color: 'var(--cds-text-secondary)',
-                fontSize: '0.75rem',
-                fontWeight: 400,
-                marginLeft: '0.5rem',
-              }}
-            >
-              ({parseFloat(duration) < 0.001 ? '< 0.001' : duration}ms)
-            </span>
-          </div>,
-          <div
-            key="table-header"
-            style={{
-              display: 'flex',
-              padding: '0.5rem 0.75rem',
-              borderBottom: '1px solid var(--cds-border-strong)',
-              color: 'var(--cds-text-secondary)',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              backgroundColor: 'var(--cds-layer)',
-            }}
-          >
-            <div style={{ width: '120px' }}>Name</div>
-            <div style={{ width: '80px', textAlign: 'center' }}>Range</div>
-            <div style={{ flex: 1, paddingLeft: '1.5rem' }}>Value</div>
-          </div>,
-          <div key="match-rows-container" style={{ backgroundColor: 'var(--cds-layer)' }}>
-            {matchRows}
-          </div>,
-        ]);
+        // For non-global, just find the first match
+        const firstMatch = re.exec(t);
+        m = firstMatch ? [firstMatch] : [];
       }
+
+      setMatches(m);
       setError('');
     } catch (e) {
-      setError(e.message);
-      setOutput([]);
+      setError(e.toString());
       setMatches([]);
     }
   };
 
-  const handleCopyFullRegex = () => {
-    const fullRegex = `/${regexStr}/${flags}`;
-    navigator.clipboard.writeText(fullRegex);
-  };
+  useEffect(() => {
+    testRegex();
+  }, [regex, flags, text]);
 
   return (
-    <Grid
-      fullWidth
-      style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', height: '100%' }}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+        backgroundColor: '#09090b',
+      }}
     >
-      <Column>
-        <ToolHeader
-          title="RegExp Tester"
-          description="Test Regular Expressions against text. Matches are highlighted in the test string."
-        />
-      </Column>
+      <ToolHeader
+        title="RegExp Tester"
+        description="Write and debug regular expressions with real-time feedback. Visualize matches, groups, and capture properties instantly."
+      />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
-      {/* Regex Input Row - Unified Input Group */}
-      <Column>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'stretch',
-            padding: '0 0.5rem',
-            backgroundColor: 'var(--cds-layer)',
-            border: error
-              ? '2px solid var(--cds-support-error)'
-              : '1px solid var(--cds-border-strong)',
-            borderRadius: '4px',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1)',
-            position: 'relative',
-            overflow: 'visible', // For popover
-          }}
-          className="regex-input-row"
-        >
-          {/* Prefix / */}
-          <div
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: '16px',
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <label
             style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              padding: '0.75rem 0.5rem 0',
-              userSelect: 'none',
-              borderRight: '1px solid var(--cds-border-subtle)',
-              minWidth: '40px',
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              display: 'block',
+              marginBottom: '6px',
             }}
           >
+            Pattern
+          </label>
+          <div style={{ position: 'relative' }}>
             <span
               style={{
-                color: 'var(--cds-text-secondary)',
-                fontSize: '1.25rem',
-                fontFamily: "'IBM Plex Mono', monospace",
-                opacity: 0.7,
-                lineHeight: '1.2',
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#3b82f6',
+                fontWeight: 600,
+                opacity: 0.5,
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                zIndex: 2,
               }}
             >
               /
             </span>
-          </div>
-
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'stretch',
-              padding: '0',
-            }}
-          >
-            <ExpandableRegexInput value={regexStr} onChange={setRegexStr} error={error} />
-          </div>
-
-          {/* Suffix / */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              padding: '0.75rem 0.5rem 0',
-              userSelect: 'none',
-              borderLeft: '1px solid var(--cds-border-subtle)',
-              minWidth: '40px',
-            }}
-          >
-            <span
-              style={{
-                color: 'var(--cds-text-secondary)',
-                fontSize: '1.25rem',
-                fontFamily: "'IBM Plex Mono', monospace",
-                opacity: 0.7,
-                lineHeight: '1.2',
-              }}
-            >
-              /
-            </span>
-          </div>
-
-          {/* Flags Input */}
-          <FlagsInputWithPopover flags={flags} setFlags={setFlags} />
-
-          {/* Copy Button */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderLeft: '1px solid var(--cds-border-subtle)',
-              minWidth: '48px',
-            }}
-          >
-            <CopyButton
-              onClick={handleCopyFullRegex}
-              disabled={!regexStr}
-              size="md"
-              iconDescription="Copy full regex string"
-              align="center"
-              kind="ghost"
-              className="transparent-copy-btn"
-            />
-          </div>
-
-          <style>{`
-                    .regex-input-row:focus-within {
-                        border-color: var(--cds-focus) !important;
-                        box-shadow: 0 0 0 2px var(--cds-focus), inset 0 1px 2px rgba(0,0,0,0.1);
-                    }
-                    .regex-input-row:hover:not(:focus-within) {
-                        border-color: var(--cds-border-interactive);
-                    }
-                    .transparent-copy-btn {
-                        background-color: transparent !important;
-                        border: none !important;
-                        width: 100% !important;
-                        height: 100% !important;
-                    }
-                    .transparent-copy-btn:hover {
-                        background-color: var(--cds-layer-hover-01) !important;
-                    }
-                `}</style>
-        </div>
-      </Column>
-
-      {/* Error Display */}
-      {error && (
-        <Column>
-          <div
-            style={{
-              color: 'var(--cds-support-error)',
-              padding: '0.5rem',
-              backgroundColor: 'var(--cds-support-error-inverse)',
-              borderRadius: '4px',
-              fontSize: '0.875rem',
-              margin: '0 0.5rem',
-            }}
-          >
-            {error}
-          </div>
-        </Column>
-      )}
-
-      <Column style={{ flex: 1, minHeight: 0 }}>
-        <ToolSplitPane columnCount={layout.direction === 'horizontal' ? 2 : 1}>
-          {/* Left Pane: Live Highlighted Input */}
-          <ToolPaneWithLabel
-            label={`Test String${matches.length > 0 ? ` (${matches.length} match${matches.length !== 1 ? 'es' : ''})` : ''}`}
-          >
-            <LiveHighlightedEditor text={text} setText={setText} regex={regexStr} flags={flags} />
-          </ToolPaneWithLabel>
-
-          {/* Right Pane: Match Information */}
-          <ToolPaneWithLabel label="MATCH INFORMATION">
+            {/* Highlighted backdrop */}
             <div
               style={{
-                flex: 1,
-                overflowY: 'auto',
-                backgroundColor: 'var(--cds-layer)',
-                border: '1px solid var(--cds-border-strong)',
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: '0.875rem',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                padding: '0 24px 0 28px',
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                fontSize: '14px',
+                fontWeight: 500,
+                lineHeight: '40px',
+                backgroundColor: '#18181b',
+                border: error ? '1px solid #ef4444' : '1px solid #27272a',
+                borderRadius: '6px',
+                color: '#f4f4f5',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                pointerEvents: 'none',
+              }}
+              dangerouslySetInnerHTML={{ __html: highlightRegexPattern(regex) || '<br>' }}
+            />
+            {/* Transparent input */}
+            <input
+              value={regex}
+              onChange={(e) => setRegex(e.target.value)}
+              placeholder="[a-z]+"
+              spellCheck={false}
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '40px',
+                padding: '0 24px 0 28px',
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                fontSize: '14px',
+                fontWeight: 500,
+                background: 'transparent',
+                border: '1px solid transparent',
+                borderRadius: '6px',
+                color: 'transparent',
+                caretColor: '#f4f4f5',
+                outline: 'none',
+                zIndex: 1,
+              }}
+            />
+            <span
+              style={{
+                position: 'absolute',
+                right: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#3b82f6',
+                fontWeight: 600,
+                opacity: 0.5,
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                zIndex: 2,
               }}
             >
-              {output.length > 0 ? (
-                output
-              ) : (
-                <div style={{ padding: '1rem', color: 'var(--cds-text-secondary)' }}>
-                  Matching results will appear here...
-                </div>
-              )}
-            </div>
-          </ToolPaneWithLabel>
-        </ToolSplitPane>
-      </Column>
-    </Grid>
+              /
+            </span>
+          </div>
+        </div>
+        <div>
+          <label
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              display: 'block',
+              marginBottom: '6px',
+            }}
+          >
+            Flags
+          </label>
+          <FlagsDropdown flags={flags} setFlags={setFlags} />
+        </div>
+      </div>
+
+      {error && (
+        <div
+          style={{
+            marginBottom: '16px',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            color: '#ef4444',
+            fontSize: '13px',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '16px',
+            flex: 1,
+            minHeight: 0,
+          }}
+        >
+          <LiveHighlightedEditor
+            label="Test String"
+            text={text}
+            setText={setText}
+            regex={regex}
+            flags={flags}
+            indicator="Source"
+            indicatorColor="green"
+          />
+
+          <ResultPane
+            label="Result"
+            matches={matches}
+            error={error}
+            indicator={`${matches.length} matches`}
+            indicatorColor="blue"
+          />
+        </div>
+      </div>
+    </div>
   );
 }

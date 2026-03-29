@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Dropdown, NumberInput, Toggle, TextInput } from '@carbon/react';
-import { Renew, Help } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { Dropdown, NumberInput, Toggle, TextInput } from '@carbon/react';
+import { Play, HelpCircle } from 'lucide-react';
 import { SEPARATOR_OPTIONS, OUTPUT_FORMAT_OPTIONS } from '../constants';
 
 export default function GeneratorControls({
@@ -101,25 +102,16 @@ export default function GeneratorControls({
 
       {/* Generate Button */}
       <div>
-        <Button
-          kind="primary"
-          size="md"
-          renderIcon={Renew}
-          onClick={onGenerate}
-          disabled={state.isGenerating}
-        >
+        <Button variant="default" onClick={onGenerate} disabled={state.isGenerating}>
+          <Play size={14} />
           {state.isGenerating ? 'Generating...' : 'Generate'}
         </Button>
       </div>
 
       {/* Help Button */}
       <div>
-        <Button
-          kind="tertiary"
-          size="md"
-          renderIcon={Help}
-          onClick={() => dispatch({ type: 'TOGGLE_HELP' })}
-        >
+        <Button variant="secondary" onClick={() => dispatch({ type: 'TOGGLE_HELP' })}>
+          <HelpCircle size={14} />
           Help
         </Button>
       </div>

@@ -1,0 +1,704 @@
+Re-optimizing dependencies because vite config has changed
+
+  VITE v5.4.21  ready in 325 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+WARNING: Invalid deprecation "modern".
+
+WARNING: mixed-decls deprecation is obsolete. If you were previously silencing it, your code may now behave in unexpected ways.
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+5:03:09 AM [vite] hmr update /src/pages/TextConverter/index.jsx
+5:03:32 AM [vite] hmr update /src/pages/StringUtilities/index.jsx
+5:03:58 AM [vite] hmr update /src/pages/CodeFormatter/index.jsx
+5:05:31 AM [vite] hmr update /src/pages/DateTimeConverter/index.jsx
+5:06:02 AM [vite] hmr update /src/pages/JwtDebugger/index.jsx
+5:06:36 AM [vite] hmr update /src/pages/NumberConverter/index.jsx
+5:07:03 AM [vite] hmr update /src/pages/ColorConverter/index.jsx
+5:07:29 AM [vite] hmr update /src/pages/DataGenerator/index.jsx
+5:07:59 AM [vite] hmr update /src/pages/TextDiffChecker/index.jsx
+5:08:24 AM [vite] hmr update /src/pages/BarcodeGenerator.jsx
+5:08:49 AM [vite] hmr update /src/pages/CronJobParser.jsx
+5:09:13 AM [vite] hmr update /src/pages/RegExpTester.jsx
+5:09:18 AM [vite] Pre-transform error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+5:09:18 AM [vite] Pre-transform error: Failed to resolve import "../components/ui/switch" from "src/pages/RegExpTester.jsx". Does the file exist?
+5:09:18 AM [vite] Pre-transform error: Failed to resolve import "../../components/ui/switch" from "src/pages/TextConverter/index.jsx". Does the file exist?
+5:09:18 AM [vite] Pre-transform error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+5:09:18 AM [vite] Pre-transform error: Failed to resolve import "../../components/ui/select" from "src/pages/DataGenerator/index.jsx". Does the file exist?
+5:09:18 AM [vite] Pre-transform error: Failed to resolve import "../../components/ui/select" from "src/pages/CodeFormatter/index.jsx". Does the file exist?
+5:09:18 AM [vite] Internal server error: Failed to resolve import "../components/ui/switch" from "src/pages/RegExpTester.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/RegExpTester.jsx:6:23
+  21 |  import { Input } from "../components/ui/input";
+  22 |  import { Label } from "../components/ui/label";
+  23 |  import { Switch } from "../components/ui/switch";
+     |                          ^
+  24 |  import { Regex, Play, Info, Check, Copy, Trash2, Sliders, Columns, Layout } from "lucide-react";
+  25 |  import { cn } from "../utils/cn";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 8)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:09:18 AM [vite] Internal server error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+  Plugin: vite:react-babel
+  File: /app/frontend/src/pages/CronJobParser.jsx:85:12
+  83 |              >
+  84 |                {p.label}
+  85 |              </button>
+     |              ^
+  86 |            ))}
+  87 |          </div>
+      at constructor (/app/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at JSXParserMixin.raise (/app/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at JSXParserMixin.jsxParseElementAt (/app/frontend/node_modules/@babel/parser/lib/index.js:4727:16)
+      at JSXParserMixin.jsxParseElement (/app/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11665:28)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at JSXParserMixin.parseFunctionBody (/app/frontend/node_modules/@babel/parser/lib/index.js:12083:24)
+      at JSXParserMixin.parseArrowExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:12065:10)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11677:12)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseExprListItem (/app/frontend/node_modules/@babel/parser/lib/index.js:12165:18)
+      at JSXParserMixin.parseCallExpressionArguments (/app/frontend/node_modules/@babel/parser/lib/index.js:11242:22)
+      at JSXParserMixin.parseCoverCallAndAsyncArrowHead (/app/frontend/node_modules/@babel/parser/lib/index.js:11176:29)
+      at JSXParserMixin.parseSubscript (/app/frontend/node_modules/@babel/parser/lib/index.js:11110:19)
+      at JSXParserMixin.parseSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11084:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11075:17)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+5:09:18 AM [vite] Internal server error: Failed to resolve import "../../components/ui/switch" from "src/pages/TextConverter/index.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/TextConverter/index.jsx:5:23
+  20 |  import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from "../../components/ToolUI";
+  21 |  import { Button } from "../../components/ui/button";
+  22 |  import { Switch } from "../../components/ui/switch";
+     |                          ^
+  23 |  import { Label } from "../../components/ui/label";
+  24 |  import { Play, Plus, Columns, Layout } from "lucide-react";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 7)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:09:19 AM [vite] Internal server error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/BarcodeGenerator.jsx:2:66
+  17 |  var _s = $RefreshSig$();
+  18 |  import React, { useState, useEffect } from "react";
+  19 |  import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from "../../components/ToolUI";
+     |                                                                     ^
+  20 |  import { Button } from "../../components/ui/button";
+  21 |  import { Input } from "../../components/ui/input";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:09:19 AM [vite] Internal server error: Failed to resolve import "../../components/ui/select" from "src/pages/DataGenerator/index.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/DataGenerator/index.jsx:6:78
+  21 |  import { Input } from "../../components/ui/input";
+  22 |  import { Label } from "../../components/ui/label";
+  23 |  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+     |                                                                                 ^
+  24 |  import { LayoutDashboard, Play, FileJson, FileCode, FileType, Columns, Layout, Trash2, Plus } from "lucide-react";
+  25 |  import { Generate } from "../../generated/wails/dataGeneratorService";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 8)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:09:19 AM [vite] Internal server error: Failed to resolve import "../../components/ui/select" from "src/pages/CodeFormatter/index.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/CodeFormatter/index.jsx:4:78
+  19 |  import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from "../../components/ToolUI";
+  20 |  import { Button } from "../../components/ui/button";
+  21 |  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+     |                                                                                 ^
+  22 |  import { Label } from "../../components/ui/label";
+  23 |  import { Play, Copy, Check, Braces, Code2, Code, Brackets } from "lucide-react";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 6)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:11:45 AM [vite] hmr update /src/ToolRouter.jsx
+5:12:30 AM [vite] Pre-transform error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+5:12:30 AM [vite] Pre-transform error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+5:12:30 AM [vite] Internal server error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+  Plugin: vite:react-babel
+  File: /app/frontend/src/pages/CronJobParser.jsx:85:12
+  83 |              >
+  84 |                {p.label}
+  85 |              </button>
+     |              ^
+  86 |            ))}
+  87 |          </div>
+      at constructor (/app/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at JSXParserMixin.raise (/app/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at JSXParserMixin.jsxParseElementAt (/app/frontend/node_modules/@babel/parser/lib/index.js:4727:16)
+      at JSXParserMixin.jsxParseElement (/app/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11665:28)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at JSXParserMixin.parseFunctionBody (/app/frontend/node_modules/@babel/parser/lib/index.js:12083:24)
+      at JSXParserMixin.parseArrowExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:12065:10)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11677:12)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseExprListItem (/app/frontend/node_modules/@babel/parser/lib/index.js:12165:18)
+      at JSXParserMixin.parseCallExpressionArguments (/app/frontend/node_modules/@babel/parser/lib/index.js:11242:22)
+      at JSXParserMixin.parseCoverCallAndAsyncArrowHead (/app/frontend/node_modules/@babel/parser/lib/index.js:11176:29)
+      at JSXParserMixin.parseSubscript (/app/frontend/node_modules/@babel/parser/lib/index.js:11110:19)
+      at JSXParserMixin.parseSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11084:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11075:17)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+5:12:30 AM [vite] Internal server error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/BarcodeGenerator.jsx:2:66
+  17 |  var _s = $RefreshSig$();
+  18 |  import React, { useState, useEffect } from "react";
+  19 |  import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from "../../components/ToolUI";
+     |                                                                     ^
+  20 |  import { Button } from "../../components/ui/button";
+  21 |  import { Input } from "../../components/ui/input";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:12:32 AM [vite] ✨ new dependencies optimized: @radix-ui/react-switch, @radix-ui/react-select
+5:12:32 AM [vite] ✨ optimized dependencies changed. reloading
+WARNING: Invalid deprecation "modern".
+
+WARNING: mixed-decls deprecation is obsolete. If you were previously silencing it, your code may now behave in unexpected ways.
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+5:12:32 AM [vite] Pre-transform error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+5:12:32 AM [vite] Pre-transform error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+5:12:33 AM [vite] Internal server error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+  Plugin: vite:react-babel
+  File: /app/frontend/src/pages/CronJobParser.jsx:85:12
+  83 |              >
+  84 |                {p.label}
+  85 |              </button>
+     |              ^
+  86 |            ))}
+  87 |          </div>
+      at constructor (/app/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at JSXParserMixin.raise (/app/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at JSXParserMixin.jsxParseElementAt (/app/frontend/node_modules/@babel/parser/lib/index.js:4727:16)
+      at JSXParserMixin.jsxParseElement (/app/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11665:28)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at JSXParserMixin.parseFunctionBody (/app/frontend/node_modules/@babel/parser/lib/index.js:12083:24)
+      at JSXParserMixin.parseArrowExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:12065:10)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11677:12)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseExprListItem (/app/frontend/node_modules/@babel/parser/lib/index.js:12165:18)
+      at JSXParserMixin.parseCallExpressionArguments (/app/frontend/node_modules/@babel/parser/lib/index.js:11242:22)
+      at JSXParserMixin.parseCoverCallAndAsyncArrowHead (/app/frontend/node_modules/@babel/parser/lib/index.js:11176:29)
+      at JSXParserMixin.parseSubscript (/app/frontend/node_modules/@babel/parser/lib/index.js:11110:19)
+      at JSXParserMixin.parseSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11084:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11075:17)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+5:12:33 AM [vite] Internal server error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/BarcodeGenerator.jsx:2:66
+  17 |  var _s = $RefreshSig$();
+  18 |  import React, { useState, useEffect } from "react";
+  19 |  import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from "../../components/ToolUI";
+     |                                                                     ^
+  20 |  import { Button } from "../../components/ui/button";
+  21 |  import { Input } from "../../components/ui/input";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:14:03 AM [vite] hmr update /src/App.jsx
+5:14:03 AM [vite] hmr update /src/components/Sidebar.jsx
+5:14:03 AM [vite] hmr update /src/components/TitleBar.jsx
+5:14:30 AM [vite] hmr update /src/components/Sidebar.jsx
+5:14:35 AM [vite] Internal server error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+  Plugin: vite:react-babel
+  File: /app/frontend/src/pages/CronJobParser.jsx:85:12
+  83 |              >
+  84 |                {p.label}
+  85 |              </button>
+     |              ^
+  86 |            ))}
+  87 |          </div>
+      at constructor (/app/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at JSXParserMixin.raise (/app/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at JSXParserMixin.jsxParseElementAt (/app/frontend/node_modules/@babel/parser/lib/index.js:4727:16)
+      at JSXParserMixin.jsxParseElement (/app/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11665:28)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at JSXParserMixin.parseFunctionBody (/app/frontend/node_modules/@babel/parser/lib/index.js:12083:24)
+      at JSXParserMixin.parseArrowExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:12065:10)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11677:12)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseExprListItem (/app/frontend/node_modules/@babel/parser/lib/index.js:12165:18)
+      at JSXParserMixin.parseCallExpressionArguments (/app/frontend/node_modules/@babel/parser/lib/index.js:11242:22)
+      at JSXParserMixin.parseCoverCallAndAsyncArrowHead (/app/frontend/node_modules/@babel/parser/lib/index.js:11176:29)
+      at JSXParserMixin.parseSubscript (/app/frontend/node_modules/@babel/parser/lib/index.js:11110:19)
+      at JSXParserMixin.parseSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11084:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11075:17)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+5:14:35 AM [vite] Internal server error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/BarcodeGenerator.jsx:2:66
+  17 |  var _s = $RefreshSig$();
+  18 |  import React, { useState, useEffect } from "react";
+  19 |  import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from "../../components/ToolUI";
+     |                                                                     ^
+  20 |  import { Button } from "../../components/ui/button";
+  21 |  import { Input } from "../../components/ui/input";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:14:36 AM [vite] ✨ new dependencies optimized: @radix-ui/react-scroll-area
+5:14:36 AM [vite] ✨ optimized dependencies changed. reloading
+WARNING: Invalid deprecation "modern".
+
+WARNING: mixed-decls deprecation is obsolete. If you were previously silencing it, your code may now behave in unexpected ways.
+
+DEPRECATION WARNING [legacy-js-api]: The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+
+More info: https://sass-lang.com/d/legacy-js-api
+
+5:14:37 AM [vite] Pre-transform error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+5:14:37 AM [vite] Pre-transform error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+5:14:37 AM [vite] Internal server error: /app/frontend/src/pages/CronJobParser.jsx: Expected corresponding JSX closing tag for <Button>. (85:12)
+
+  83 |             >
+  84 |               {p.label}
+> 85 |             </button>
+     |             ^
+  86 |           ))}
+  87 |         </div>
+  88 |       </ToolControls>
+  Plugin: vite:react-babel
+  File: /app/frontend/src/pages/CronJobParser.jsx:85:12
+  83 |              >
+  84 |                {p.label}
+  85 |              </button>
+     |              ^
+  86 |            ))}
+  87 |          </div>
+      at constructor (/app/frontend/node_modules/@babel/parser/lib/index.js:365:19)
+      at JSXParserMixin.raise (/app/frontend/node_modules/@babel/parser/lib/index.js:6599:19)
+      at JSXParserMixin.jsxParseElementAt (/app/frontend/node_modules/@babel/parser/lib/index.js:4727:16)
+      at JSXParserMixin.jsxParseElement (/app/frontend/node_modules/@babel/parser/lib/index.js:4749:17)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4759:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11665:28)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at JSXParserMixin.parseFunctionBody (/app/frontend/node_modules/@babel/parser/lib/index.js:12083:24)
+      at JSXParserMixin.parseArrowExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:12065:10)
+      at JSXParserMixin.parseParenAndDistinguishExpression (/app/frontend/node_modules/@babel/parser/lib/index.js:11677:12)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:11321:23)
+      at JSXParserMixin.parseExprAtom (/app/frontend/node_modules/@babel/parser/lib/index.js:4764:20)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11071:23)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (/app/frontend/node_modules/@babel/parser/lib/index.js:10889:61)
+      at JSXParserMixin.parseExprOps (/app/frontend/node_modules/@babel/parser/lib/index.js:10894:23)
+      at JSXParserMixin.parseMaybeConditional (/app/frontend/node_modules/@babel/parser/lib/index.js:10871:23)
+      at JSXParserMixin.parseMaybeAssign (/app/frontend/node_modules/@babel/parser/lib/index.js:10821:21)
+      at /app/frontend/node_modules/@babel/parser/lib/index.js:10790:39
+      at JSXParserMixin.allowInAnd (/app/frontend/node_modules/@babel/parser/lib/index.js:12416:12)
+      at JSXParserMixin.parseMaybeAssignAllowIn (/app/frontend/node_modules/@babel/parser/lib/index.js:10790:17)
+      at JSXParserMixin.parseMaybeAssignAllowInOrVoidPattern (/app/frontend/node_modules/@babel/parser/lib/index.js:12483:17)
+      at JSXParserMixin.parseExprListItem (/app/frontend/node_modules/@babel/parser/lib/index.js:12165:18)
+      at JSXParserMixin.parseCallExpressionArguments (/app/frontend/node_modules/@babel/parser/lib/index.js:11242:22)
+      at JSXParserMixin.parseCoverCallAndAsyncArrowHead (/app/frontend/node_modules/@babel/parser/lib/index.js:11176:29)
+      at JSXParserMixin.parseSubscript (/app/frontend/node_modules/@babel/parser/lib/index.js:11110:19)
+      at JSXParserMixin.parseSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11084:19)
+      at JSXParserMixin.parseExprSubscripts (/app/frontend/node_modules/@babel/parser/lib/index.js:11075:17)
+      at JSXParserMixin.parseUpdate (/app/frontend/node_modules/@babel/parser/lib/index.js:11056:21)
+      at JSXParserMixin.parseMaybeUnary (/app/frontend/node_modules/@babel/parser/lib/index.js:11036:23)
+5:14:37 AM [vite] Internal server error: Failed to resolve import "../../components/ToolUI" from "src/pages/BarcodeGenerator.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/frontend/src/pages/BarcodeGenerator.jsx:2:66
+  17 |  var _s = $RefreshSig$();
+  18 |  import React, { useState, useEffect } from "react";
+  19 |  import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from "../../components/ToolUI";
+     |                                                                     ^
+  20 |  import { Button } from "../../components/ui/button";
+  21 |  import { Input } from "../../components/ui/input";
+      at TransformPluginContext._formatError (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41)
+      at TransformPluginContext.error (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16)
+      at normalizeUrl (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+      at async Promise.all (index 4)
+      at async TransformPluginContext.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7)
+      at async PluginContainer.transform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18)
+      at async loadAndTransform (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27)
+      at async viteTransformMiddleware (file:///app/frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:62106:24)
+5:16:30 AM [vite] hmr update /src/pages/CronJobParser.jsx
+5:17:01 AM [vite] hmr update /src/ToolRouter.jsx
+5:18:57 AM [vite] hmr update /src/pages/BarcodeGenerator.jsx
+5:18:57 AM [vite] hmr update /src/pages/CronJobParser.jsx
+6:15:03 AM [vite] hmr update /src/components/inputs/ToolCopyButton.jsx
+6:15:03 AM [vite] hmr update /src/components/inputs/ToolInput.jsx
+6:15:03 AM [vite] hmr update /src/components/inputs/ToolInputGroup.jsx
+6:15:03 AM [vite] hmr update /src/components/inputs/ToolTabBar.jsx
+6:15:03 AM [vite] hmr update /src/components/inputs/ToolTextArea.jsx
+6:15:03 AM [vite] hmr update /src/components/Sidebar.jsx
+6:15:03 AM [vite] hmr update /src/components/TitleBar.jsx
+6:15:03 AM [vite] hmr update /src/components/ui/button.jsx
+6:15:03 AM [vite] hmr update /src/components/ui/input.jsx
+6:15:03 AM [vite] hmr update /src/components/ui/label.jsx
+6:15:03 AM [vite] hmr update /src/components/ui/scroll-area.jsx
+6:15:03 AM [vite] hmr update /src/components/ui/select.jsx
+6:15:03 AM [vite] hmr update /src/components/ui/switch.jsx
+6:15:03 AM [vite] hmr update /src/pages/BarcodeGenerator.jsx
+6:15:03 AM [vite] hmr update /src/pages/CodeFormatter/index.jsx
+6:15:03 AM [vite] hmr update /src/pages/ColorConverter/index.jsx
+6:15:03 AM [vite] hmr update /src/pages/CronJobParser.jsx
+6:15:03 AM [vite] hmr update /src/pages/DataGenerator/index.jsx
+6:15:04 AM [vite] hmr update /src/pages/DateTimeConverter/index.jsx
+6:15:04 AM [vite] hmr update /src/pages/JwtDebugger/index.jsx
+6:15:04 AM [vite] hmr update /src/pages/NumberConverter/index.jsx
+6:15:04 AM [vite] hmr update /src/pages/RegExpTester.jsx
+6:15:04 AM [vite] hmr update /src/pages/StringUtilities/index.jsx
+6:15:04 AM [vite] hmr update /src/pages/TextConverter/index.jsx
+6:15:04 AM [vite] hmr update /src/pages/TextDiffChecker/index.jsx
+6:15:04 AM [vite] hmr update /src/components/inputs/ToolInput.jsx, /src/components/inputs/ToolInputGroup.jsx, /src/components/inputs/ToolTabBar.jsx, /src/components/inputs/ToolTextArea.jsx, /src/components/inputs/ToolCopyButton.jsx, /src/components/ui/input.jsx, /src/components/ui/label.jsx, /src/components/ui/button.jsx, /src/pages/DateTimeConverter/index.jsx, /src/pages/JwtDebugger/index.jsx, /src/pages/TextDiffChecker/index.jsx, /src/pages/NumberConverter/index.jsx, /src/pages/StringUtilities/index.jsx, /src/pages/ColorConverter/index.jsx, /src/pages/RegExpTester.jsx, /src/pages/DataGenerator/index.jsx, /src/pages/TextConverter/index.jsx, /src/pages/CodeFormatter/index.jsx, /src/components/ui/switch.jsx, /src/components/ui/select.jsx, /src/components/Sidebar.jsx, /src/components/TitleBar.jsx, /src/components/ui/scroll-area.jsx, /src/pages/CronJobParser.jsx, /src/pages/BarcodeGenerator.jsx
+6:15:04 AM [vite] vite.config.js changed, restarting server...
+6:15:05 AM [vite] server restarted.
+8:10:23 AM [vite] vite.config.js changed, restarting server...
+Re-optimizing dependencies because vite config has changed
+8:10:24 AM [vite] server restarted.
+Error:   Failed to scan for dependencies from entries:
+  /app/frontend/index.html
+/app/frontend/spotlight.html
+
+  [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "src/generated/wails/barcodeService.ts" for import "Generate"[0m
+
+    src/pages/BarcodeGenerator.jsx:24:9:
+[37m      24 │ import { [32mGenerate[37m } from '../generated/wails/barcodeService';
+         ╵          [32m~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "src/pages/StringUtilities/strings.js" for import "convertCase"[0m
+
+    src/pages/StringUtilities/index.jsx:20:2:
+[37m      20 │   [32mconvertCase[37m,
+         ╵   [32m~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "src/pages/StringUtilities/strings.js" for import "sortLines"[0m
+
+    src/pages/StringUtilities/index.jsx:21:2:
+[37m      21 │   [32msortLines[37m,
+         ╵   [32m~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "src/pages/StringUtilities/strings.js" for import "removeDuplicates"[0m
+
+    src/pages/StringUtilities/index.jsx:22:2:
+[37m      22 │   [32mremoveDuplicates[37m,
+         ╵   [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "src/pages/StringUtilities/strings.js" for import "getTextStats"[0m
+
+    src/pages/StringUtilities/index.jsx:23:2:
+[37m      23 │   [32mgetTextStats[37m,
+         ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "src/pages/StringUtilities/strings.js" for import "trimLines"[0m
+
+    src/pages/StringUtilities/index.jsx:24:2:
+[37m      24 │   [32mtrimLines[37m,
+         ╵   [32m~~~~~~~~~[0m
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "src/pages/StringUtilities/strings.js" for import "removeEmptyLines"[0m
+
+    src/pages/StringUtilities/index.jsx:25:2:
+[37m      25 │   [32mremoveEmptyLines[37m,
+         ╵   [32m~~~~~~~~~~~~~~~~[0m
+
+
+    at failureErrorWithLog (/app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:1472:15)
+    at /app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:945:25
+    at runOnEndCallbacks (/app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:1315:45)
+    at buildResponseToResult (/app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:943:7)
+    at /app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:955:9
+    at new Promise (<anonymous>)
+    at requestCallbacks.on-end (/app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:954:54)
+    at handleRequest (/app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:647:17)
+    at handleIncomingPacket (/app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:672:7)
+    at Socket.readFromStdout (/app/frontend/node_modules/vite/node_modules/esbuild/lib/main.js:600:7)
+    at Socket.emit (node:events:519:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)

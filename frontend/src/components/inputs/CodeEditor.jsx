@@ -4,7 +4,6 @@ import { EditorState } from '@codemirror/state';
 import { defaultKeymap } from '@codemirror/commands';
 import { carbonCodeMirrorExtension } from './carbonCodeMirrorTheme';
 import { createSQLKeywordHighlighter } from './sqlHighlighter';
-import { TextArea } from '@carbon/react';
 
 /**
  * Maps language names to CodeMirror language modules
@@ -44,7 +43,7 @@ async function loadLanguageExtension(language) {
 
 /**
  * Editable code editor with syntax highlighting
- * Falls back to Carbon TextArea when highlighting is disabled
+ * Falls back to plain textarea when highlighting is disabled
  *
  * @param {string} value - Editor content
  * @param {function} onChange - Callback when content changes: (value) => void
@@ -205,49 +204,50 @@ export default function CodeEditor({
     flexDirection: 'column',
     height: '100%',
     minHeight: '120px',
-    border: '1px solid var(--cds-border-strong)',
-    backgroundColor: 'var(--cds-field)',
-    position: 'relative',
+    border: '1px solid #27272a',
+    backgroundColor: '#18181b',
+    borderRadius: '8px',
     overflow: 'hidden',
     ...style,
   };
 
   const labelStyle = {
-    fontSize: '0.75rem',
-    fontWeight: 400,
+    fontSize: '12px',
+    fontWeight: 600,
     textTransform: 'uppercase',
-    letterSpacing: '0.32px',
-    color: 'var(--cds-text-secondary)',
-    padding: '0.5rem 1rem',
-    borderBottom: '1px solid var(--cds-border-subtle)',
-    backgroundColor: 'var(--cds-layer)',
+    letterSpacing: '0.05em',
+    color: '#71717a',
+    padding: '8px 12px',
+    borderBottom: '1px solid #27272a',
+    backgroundColor: '#1c1917',
     flexShrink: 0,
   };
 
-  // Fallback to TextArea when highlighting is disabled or failed to load
+  // Fallback to plain textarea when highlighting is disabled or failed to load
   if (!highlight || loadError) {
     return (
       <div className={className} style={containerStyle}>
         {label && <div style={labelStyle}>{label}</div>}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <TextArea
-            id="code-editor-fallback"
-            labelText={label || 'Code'}
-            hideLabel={true}
-            value={value}
-            onChange={(e) => onChange?.(e.target.value)}
-            readOnly={readOnly}
-            placeholder={placeholder}
-            rows={10}
-            style={{
-              height: '100%',
-              fontFamily: "'IBM Plex Mono', monospace",
-              resize: 'none',
-              border: 'none',
-              backgroundColor: 'transparent',
-            }}
-          />
-        </div>
+        <textarea
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          readOnly={readOnly}
+          placeholder={placeholder}
+          style={{
+            flex: 1,
+            width: '100%',
+            height: '100%',
+            padding: '12px',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+            fontSize: '14px',
+            lineHeight: 1.5,
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: '#f4f4f5',
+            resize: 'none',
+            outline: 'none',
+          }}
+        />
       </div>
     );
   }
@@ -270,8 +270,8 @@ export default function CodeEditor({
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            color: 'var(--cds-text-secondary)',
-            fontSize: '0.875rem',
+            color: '#71717a',
+            fontSize: '14px',
           }}
         >
           Loading editor...

@@ -53,7 +53,7 @@ export default function HelpModal({ open, onClose }) {
                     backgroundColor: 'var(--cds-layer-hover)',
                     padding: '0.25rem 0.5rem',
                     borderRadius: '3px',
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                     fontSize: '0.875rem',
                     minWidth: '280px',
                   }}
@@ -101,7 +101,7 @@ export default function HelpModal({ open, onClose }) {
                         backgroundColor: 'var(--cds-layer)',
                         padding: '0.125rem 0.375rem',
                         borderRadius: '3px',
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '0.8125rem',
                       }}
                     >

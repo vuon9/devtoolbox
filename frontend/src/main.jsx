@@ -1,7 +1,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import './index.scss'; // Use our new SCSS
+import './globals.css'; // Tailwind CSS styles
+import './index.scss'; // Carbon Design System styles (transitioning)
 import App from './App';
 
 const container = document.getElementById('root');

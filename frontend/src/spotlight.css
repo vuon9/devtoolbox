@@ -1,13 +1,12 @@
-/* Spotlight window specific styles */
+/* Command Palette window specific styles - matching new dark theme */
 :root,
 html,
 body,
 #root,
-[class*='cds--theme-'],
 .app-container {
-  background: #161616 !important;
-  background-color: #161616 !important;
-  color: #f4f4f4 !important;
+  background: #18181b !important;
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
 }
 
 #root {
@@ -16,4 +15,10 @@ body,
   height: 100vh;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+.command-palette-app-wrapper {
+  height: 100%;
+  width: 100%;
+  background: transparent;
 }
