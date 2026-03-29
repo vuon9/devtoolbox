@@ -14,6 +14,7 @@ func StartHTTPServer(port int) {
 	dataGenSvc := service.NewDataGeneratorService(nil)
 	codeFmtSvc := service.NewCodeFormatterService(nil)
 	dateTimeSvc := service.NewDateTimeService(nil)
+	numberConvSvc := service.NewNumberConverterService(nil)
 
 	// Create server and register services
 	server := router.NewServer()
@@ -23,6 +24,7 @@ func StartHTTPServer(port int) {
 	server.Register(dataGenSvc)
 	server.Register(codeFmtSvc)
 	server.Register(dateTimeSvc)
+	server.Register(numberConvSvc)
 
 	// Start server
 	server.Start(port)
