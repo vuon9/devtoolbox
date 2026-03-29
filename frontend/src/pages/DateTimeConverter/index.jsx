@@ -442,7 +442,7 @@ export default function DateTimeConverter() {
               fontSize: '24px',
               fontWeight: 600,
               color: '#f4f4f5',
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             }}
           >
             {info.time}
@@ -601,7 +601,7 @@ export default function DateTimeConverter() {
                   fontSize: '28px',
                   fontWeight: 600,
                   color: '#3b82f6',
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   letterSpacing: '-0.02em',
                 }}
               >
@@ -670,7 +670,7 @@ export default function DateTimeConverter() {
                 style={{
                   width: '100%',
                   padding: '12px',
-                  fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+                  fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '14px',
                   backgroundColor: '#09090b',
                   border: '1px solid #27272a',
@@ -744,7 +744,7 @@ export default function DateTimeConverter() {
                     </span>
                     <code
                       style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
                         color: '#f4f4f5',
                         flex: 1,
@@ -786,7 +786,7 @@ export default function DateTimeConverter() {
                     </span>
                     <code
                       style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
                         color: '#f4f4f5',
                         flex: 1,
@@ -830,7 +830,7 @@ export default function DateTimeConverter() {
                     </span>
                     <code
                       style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
                         color: '#f4f4f5',
                         flex: 1,
@@ -874,7 +874,7 @@ export default function DateTimeConverter() {
                     </span>
                     <code
                       style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
                         color: '#f4f4f5',
                         flex: 1,
@@ -918,7 +918,7 @@ export default function DateTimeConverter() {
                     </span>
                     <code
                       style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
                         color: '#f4f4f5',
                         flex: 1,

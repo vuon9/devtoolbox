@@ -23,7 +23,7 @@ export function InputSection({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="e.g., 1738412345, 2026-02-01T12:24:05Z, 1738412345 + 3600..."
-          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+          style={{ fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace" }}
         />
         <div>
           <ComboBox

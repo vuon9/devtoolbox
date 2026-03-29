@@ -397,7 +397,7 @@ function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, 
             backgroundColor: '#18181b',
             border: '1px solid #27272a',
             borderRadius: '8px',
-            fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             lineHeight: 1.6,
             whiteSpace: 'pre-wrap',
@@ -428,7 +428,7 @@ function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, 
             background: 'transparent',
             border: '1px solid #27272a',
             borderRadius: '8px',
-            fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaca', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             lineHeight: 1.6,
             whiteSpace: 'pre-wrap',
@@ -475,7 +475,7 @@ function MatchRow({ label, position, value, color, underline, isLast }) {
       <span
         style={{
           fontSize: '12px',
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           color: '#71717a',
         }}
       >
@@ -484,7 +484,7 @@ function MatchRow({ label, position, value, color, underline, isLast }) {
       <span
         style={{
           fontSize: '12px',
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           color: '#f4f4f5',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -735,7 +735,7 @@ function QuickReferencePanel() {
                     )}
                     <span
                       style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
                         color: '#22c55e',
                         fontWeight: 600,
@@ -1017,7 +1017,7 @@ function FlagsDropdown({ flags, setFlags }) {
       >
         <span
           style={{
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             fontWeight: 600,
             color: flags ? '#3b82f6' : '#71717a',
@@ -1099,7 +1099,7 @@ function FlagsDropdown({ flags, setFlags }) {
                         width: '24px',
                         height: '24px',
                         borderRadius: '4px',
-                        fontFamily: "'IBM Plex Mono', monospace",
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '14px',
                         fontWeight: 600,
                         backgroundColor: isActive ? '#3b82f6' : '#27272a',
@@ -1233,7 +1233,7 @@ export default function RegExpTester() {
                 color: '#3b82f6',
                 fontWeight: 600,
                 opacity: 0.5,
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 zIndex: 2,
               }}
             >
@@ -1248,7 +1248,7 @@ export default function RegExpTester() {
                 right: 0,
                 bottom: 0,
                 padding: '0 24px 0 28px',
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '14px',
                 fontWeight: 500,
                 lineHeight: '40px',
@@ -1273,7 +1273,7 @@ export default function RegExpTester() {
                 width: '100%',
                 height: '40px',
                 padding: '0 24px 0 28px',
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '14px',
                 fontWeight: 500,
                 background: 'transparent',
@@ -1294,7 +1294,7 @@ export default function RegExpTester() {
                 color: '#3b82f6',
                 fontWeight: 600,
                 opacity: 0.5,
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 zIndex: 2,
               }}
             >
@@ -1330,7 +1330,7 @@ export default function RegExpTester() {
             border: '1px solid rgba(239, 68, 68, 0.2)',
             color: '#ef4444',
             fontSize: '13px',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           }}
         >
           {error}

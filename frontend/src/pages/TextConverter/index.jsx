@@ -231,7 +231,7 @@ function ToolPane({
           flex: 1,
           width: '100%',
           padding: '12px',
-          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '14px',
           lineHeight: 1.6,
           backgroundColor: '#18181b',
@@ -422,7 +422,7 @@ export default function TextBasedConverter() {
               letterSpacing: '0.05em',
             }}
           >
-            Quick Actions:
+            Quick Presets:
           </span>
           {DEFAULT_COMMON_TAGS.map((tag) => {
             const isActive = tag.category === category && tag.method === method;

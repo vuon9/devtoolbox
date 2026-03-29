@@ -66,7 +66,7 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         style={{
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           border: 'none',
           background: 'transparent',
           padding: '0.5rem',

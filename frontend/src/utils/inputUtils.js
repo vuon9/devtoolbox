@@ -6,7 +6,7 @@
  * Get default monospace font family
  * @returns {string} CSS font-family value
  */
-export const getMonospaceFontFamily = () => "'IBM Plex Mono', monospace";
+export const getMonospaceFontFamily = () => "'Menlo', 'Monaco', 'Courier New', monospace";
 
 /**
  * Get default font size for data areas

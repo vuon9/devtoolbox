@@ -259,23 +259,6 @@ export function Sidebar({ isVisible, onOpenSettings }) {
           {/* Quick Access - only show when expanded */}
           {!isCollapsed && !searchQuery && (
             <>
-              <NavLink
-                to="/tool/text-converter"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '10px 16px',
-                  margin: '0 8px',
-                  fontSize: '14px',
-                  color: '#a1a1aa',
-                  borderRadius: '8px',
-                }}
-              >
-                <History style={{ width: '16px', height: '16px' }} />
-                <span>Recent</span>
-              </NavLink>
-
               {favoriteTools.length > 0 && (
                 <>
                   <div style={{ height: '1px', background: '#27272a', margin: '12px 16px' }} />

@@ -165,7 +165,7 @@ function ToolTextArea({ label, value, onChange, placeholder, readOnly }) {
           width: '100%',
           minHeight: '300px',
           padding: '12px',
-          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '13px',
           lineHeight: 1.5,
           backgroundColor: readOnly ? '#1c1917' : '#18181b',
@@ -375,7 +375,7 @@ function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px'
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             fontSize: '13px',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           }}
         >
           {value || 'Select type'}
@@ -440,7 +440,7 @@ function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px'
                   style={{
                     padding: '6px 10px',
                     fontSize: '13px',
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                     color: value === item ? '#22c55e' : '#a1a1aa',
                     cursor: 'pointer',
                     transition: 'all 0.1s ease',
@@ -542,7 +542,7 @@ function SchemaField({ field, index, onUpdate, onRemove }) {
         onChange={(e) => onUpdate(index, 'label', e.target.value)}
         placeholder="Field name"
         style={{
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '13px',
           background: 'transparent',
           border: 'none',

@@ -86,7 +86,7 @@ function CaseResult({ label, value }) {
       <div
         style={{
           flex: 1,
-          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '13px',
           color: '#f4f4f5',
           overflow: 'hidden',

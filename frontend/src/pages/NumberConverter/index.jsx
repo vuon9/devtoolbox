@@ -77,7 +77,7 @@ function Column1Bases({ result, base }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '14px',
                   color: '#f4f4f5',
                 }}
@@ -130,7 +130,7 @@ function Column1Bases({ result, base }) {
                     style={{
                       fontSize: '11px',
                       color: bit === 1 ? '#3b82f6' : 'rgba(113,113,122,0.3)',
-                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                     }}
                   >
                     {bit}
@@ -145,7 +145,7 @@ function Column1Bases({ result, base }) {
             fontSize: '11px',
             color: '#a1a1aa',
             textAlign: 'center',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           }}
         >
           {result.bitValues &&
@@ -198,7 +198,7 @@ function Column2Data({ result }) {
             >
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace',
+                  fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '14px',
                   color: i === result.bytes.highlighted ? '#3b82f6' : '#f4f4f5',
                 }}
@@ -244,7 +244,7 @@ function Column2Data({ result }) {
               style={{
                 fontSize: '24px',
                 color: '#f4f4f5',
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 marginBottom: '4px',
               }}
             >
@@ -294,7 +294,7 @@ function Column2Data({ result }) {
             <div>
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '14px',
                   color: '#f4f4f5',
                 }}
@@ -338,7 +338,7 @@ function Column3Context({ result }) {
           >
             <div
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '15px',
                 color: '#f4f4f5',
                 textAlign: 'center',
@@ -382,7 +382,7 @@ function Column3Context({ result }) {
       >
         <div
           style={{
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '15px',
             color: '#f4f4f5',
             textAlign: 'center',
@@ -420,7 +420,7 @@ function Column3Context({ result }) {
           >
             <div
               style={{
-                fontFamily: "'IBM Plex Mono', monospace',
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '14px',
                 color: '#f4f4f5',
                 textAlign: 'center',
@@ -461,7 +461,7 @@ function Column3Context({ result }) {
           >
             <div
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '15px',
                 color: '#f4f4f5',
                 textAlign: 'center',
@@ -561,7 +561,7 @@ export default function NumberConverter() {
             borderRadius: '6px',
             padding: '10px 12px',
             color: '#f4f4f5',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             outline: 'none',
           }}

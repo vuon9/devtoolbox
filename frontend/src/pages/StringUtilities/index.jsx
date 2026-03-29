@@ -134,7 +134,7 @@ function ToolPane({
           flex: 1,
           width: '100%',
           padding: '12px',
-          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '14px',
           lineHeight: 1.6,
           backgroundColor: '#18181b',
@@ -166,7 +166,7 @@ function StatBadge({ label, value }) {
       <span
         style={{
           fontSize: '14px',
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontWeight: 600,
           color: '#f4f4f5',
         }}

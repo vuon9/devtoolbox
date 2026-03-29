@@ -82,7 +82,7 @@ export default function ColorHistory({ history, onLoadFromHistory, onClearHistor
               />
               <span
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '0.75rem',
                 }}
               >

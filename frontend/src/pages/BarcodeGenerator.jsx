@@ -81,7 +81,7 @@ function ToolTextArea({ label, value, onChange, placeholder }) {
           width: '100%',
           minHeight: '200px',
           padding: '12px',
-          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '14px',
           lineHeight: 1.5,
           backgroundColor: '#18181b',

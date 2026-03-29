@@ -128,7 +128,7 @@ const ConversionCard = ({
         invalid={!!error}
         invalidText={error}
         style={{
-          fontFamily: "'IBM Plex Mono', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
         }}
       />
     </div>

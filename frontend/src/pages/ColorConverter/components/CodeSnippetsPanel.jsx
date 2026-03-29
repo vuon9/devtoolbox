@@ -71,7 +71,7 @@ export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChan
 
                       <pre
                         style={{
-                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontSize: '0.8rem',
                           margin: 0,
                           whiteSpace: 'pre-wrap',

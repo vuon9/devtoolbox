@@ -372,7 +372,7 @@ export default function CronJobParser() {
               style={{
                 width: '100%',
                 padding: '10px 12px',
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '14px',
                 fontWeight: 500,
                 backgroundColor: '#18181b',
@@ -494,7 +494,7 @@ export default function CronJobParser() {
                         <td style={{ padding: '10px 12px', verticalAlign: 'middle' }}>
                           <span
                             style={{
-                              fontFamily: "'IBM Plex Mono', monospace",
+                              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                               fontSize: '13px',
                               fontWeight: 500,
                               color: '#3b82f6',
@@ -512,7 +512,7 @@ export default function CronJobParser() {
                           <div
                             style={{
                               fontSize: '12px',
-                              fontFamily: "'IBM Plex Mono', monospace",
+                              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                               fontWeight: 500,
                               color: '#71717a',
                             }}
@@ -639,7 +639,7 @@ export default function CronJobParser() {
                       <div
                         style={{
                           fontSize: '12px',
-                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontWeight: 500,
                           color: '#a1a1aa',
                         }}
@@ -650,7 +650,7 @@ export default function CronJobParser() {
                         <div
                           style={{
                             fontSize: '11px',
-                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                             color: '#52525b',
                             marginTop: '4px',
                           }}
@@ -699,7 +699,7 @@ export default function CronJobParser() {
                       <div
                         style={{
                           fontSize: '12px',
-                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontWeight: 500,
                           color: '#3b82f6',
                         }}
@@ -709,7 +709,7 @@ export default function CronJobParser() {
                       <div
                         style={{
                           fontSize: '11px',
-                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontWeight: 500,
                           color: '#22c55e',
                           marginTop: '4px',
@@ -760,7 +760,7 @@ export default function CronJobParser() {
                       <div
                         style={{
                           fontSize: '12px',
-                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontWeight: 500,
                           color: '#f4f4f5',
                         }}
@@ -771,7 +771,7 @@ export default function CronJobParser() {
                         <div
                           style={{
                             fontSize: '11px',
-                            fontFamily: "'IBM Plex Mono', monospace",
+                            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                             color: '#52525b',
                             marginTop: '4px',
                           }}

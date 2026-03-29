@@ -41,7 +41,7 @@ export default function InspectorPane({ input, setInput, stats }) {
             flex: 1,
             width: '100%',
             padding: '12px',
-            fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             lineHeight: 1.5,
             backgroundColor: '#18181b',
@@ -105,7 +105,7 @@ export default function InspectorPane({ input, setInput, stats }) {
                     fontWeight: 600,
                     fontSize: '18px',
                     color: '#f4f4f5',
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   }}
                 >
                   {item.value.toLocaleString()}

@@ -28,16 +28,17 @@ export const DEFAULTS = {
   },
 };
 
-// Default Quick Action Tags
+// Default Quick Presets
 export const DEFAULT_COMMON_TAGS = [
   { id: 'url', category: 'Encode - Decode', method: 'URL', label: 'URL Encode' },
   { id: 'base64', category: 'Encode - Decode', method: 'Base64', label: 'Base64' },
-  { id: 'all-hashes', category: 'Hash', method: 'All', label: 'All Hashes' },
+  { id: 'md5', category: 'Hash', method: 'MD5', label: 'MD5' },
+  { id: 'sha256', category: 'Hash', method: 'SHA-256', label: 'SHA256' },
 ];
 
 // Labels
 export const LABELS = {
-  QUICK_ACTION: 'Quick Action:',
+  QUICK_PRESETS: 'Quick Presets:',
   INPUT: (category, subMode, method) => `Input - ${category} (${subMode || method})`,
   OUTPUT: 'Output',
   IMAGE_PREVIEW: 'Image Preview',
@@ -67,7 +68,7 @@ export const ERRORS = {
 export const BUTTONS = {
   ADD: 'Add',
   ADDED: 'Added',
-  QUICK_ACTION: 'Quick Action +',
+  QUICK_PRESETS: 'Quick Presets +',
   COPY: 'Copy',
   COPIED: 'Copied!',
   DOWNLOAD: 'Download',

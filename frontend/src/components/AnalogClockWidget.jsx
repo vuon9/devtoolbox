@@ -164,7 +164,7 @@ export default function AnalogClockWidget({ date }) {
       >
         <div
           style={{
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '1.5rem',
             fontWeight: 600,
             color: 'var(--cds-text-primary)',

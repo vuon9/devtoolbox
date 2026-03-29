@@ -150,7 +150,7 @@ export default function MultiHashOutput({ value, error, onCopy }) {
               style={{
                 width: '100%',
                 padding: '8px 12px',
-                fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '12px',
                 backgroundColor: '#18181b',
                 border: '1px solid #27272a',

@@ -238,7 +238,7 @@ export default function CodeEditor({
             width: '100%',
             height: '100%',
             padding: '12px',
-            fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             lineHeight: 1.5,
             backgroundColor: 'transparent',

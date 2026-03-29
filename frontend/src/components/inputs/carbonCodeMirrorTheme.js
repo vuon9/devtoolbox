@@ -40,7 +40,7 @@ export const carbonDarkTheme = EditorView.theme({
   '&': {
     backgroundColor: 'var(--cds-field)',
     color: 'var(--cds-text-primary)',
-    fontFamily: "'IBM Plex Mono', monospace",
+    fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
     fontSize: '0.875rem',
     lineHeight: '1.5',
     height: '100%',
@@ -76,7 +76,7 @@ export const carbonDarkTheme = EditorView.theme({
     backgroundColor: 'var(--cds-layer)',
     color: 'var(--cds-text-secondary)',
     borderRight: '1px solid var(--cds-border-subtle)',
-    fontFamily: "'IBM Plex Mono', monospace",
+    fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
     fontSize: '0.75rem',
   },
   '.cm-gutterElement': {

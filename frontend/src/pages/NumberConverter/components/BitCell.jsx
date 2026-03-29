@@ -42,7 +42,7 @@ const BitCell = ({ bitValue, position, onToggle, isActive = false }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
         fontSize: '14px',
         fontWeight: 600,
         color: isSet ? 'var(--cds-text-inverse)' : 'var(--cds-text-primary)',
