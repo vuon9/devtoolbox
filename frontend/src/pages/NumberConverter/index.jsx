@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Copy, Check, Dice5 } from 'lucide-react';
-import { Convert } from '../../generated';
+import { Convert as ConvertNumber } from '../../generated/http/numberConverterService';
 
 function debounce(func, wait) {
   let timeout;
@@ -36,7 +36,15 @@ function Column1Bases({ result, base }) {
 
   return (
     <div>
-      <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>
+      <h4
+        style={{
+          fontSize: '10px',
+          color: '#71717a',
+          textTransform: 'uppercase',
+          margin: '0 0 8px 0',
+          letterSpacing: '0.05em',
+        }}
+      >
         Number Bases
       </h4>
 
@@ -57,11 +65,23 @@ function Column1Bases({ result, base }) {
               transition: 'border-color 0.15s ease',
             }}
           >
-            <span style={{ fontSize: '10px', color: b.active ? '#3b82f6' : '#71717a', textTransform: 'uppercase' }}>
+            <span
+              style={{
+                fontSize: '10px',
+                color: b.active ? '#3b82f6' : '#71717a',
+                textTransform: 'uppercase',
+              }}
+            >
               {b.label}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '12px', color: '#f4f4f5' }}>
+              <span
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: '12px',
+                  color: '#f4f4f5',
+                }}
+              >
                 {b.value}
               </span>
               {copied[b.id] ? (
@@ -75,37 +95,62 @@ function Column1Bases({ result, base }) {
       </div>
 
       {/* Bit Breakdown */}
-      <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '12px 0 6px 0', letterSpacing: '0.05em' }}>
+      <h4
+        style={{
+          fontSize: '10px',
+          color: '#71717a',
+          textTransform: 'uppercase',
+          margin: '12px 0 6px 0',
+          letterSpacing: '0.05em',
+        }}
+      >
         Bit Values
       </h4>
-      <div style={{ backgroundColor: '#18181b', padding: '8px', borderRadius: '6px', border: '1px solid #27272a' }}>
+      <div
+        style={{
+          backgroundColor: '#18181b',
+          padding: '8px',
+          borderRadius: '6px',
+          border: '1px solid #27272a',
+        }}
+      >
         <div style={{ display: 'flex', gap: '1px', marginBottom: '6px' }}>
-          {result.bits && result.bits.map((bit, i) => (
-            <div key={i} style={{ flex: 1, textAlign: 'center' }}>
-              <div style={{
-                backgroundColor: bit === 1 ? 'rgba(59,130,246,0.2)' : 'rgba(24,24,27,0.4)',
-                borderRadius: '2px',
-                padding: '3px 0',
-                marginBottom: '2px',
-              }}>
-                <span style={{
-                  fontSize: '10px',
-                  color: bit === 1 ? '#3b82f6' : 'rgba(113,113,122,0.3)',
-                  fontFamily: "'IBM Plex Mono', monospace",
-                }}>
-                  {bit}
-                </span>
+          {result.bits &&
+            result.bits.map((bit, i) => (
+              <div key={i} style={{ flex: 1, textAlign: 'center' }}>
+                <div
+                  style={{
+                    backgroundColor: bit === 1 ? 'rgba(59,130,246,0.2)' : 'rgba(24,24,27,0.4)',
+                    borderRadius: '2px',
+                    padding: '3px 0',
+                    marginBottom: '2px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      color: bit === 1 ? '#3b82f6' : 'rgba(113,113,122,0.3)',
+                      fontFamily: "'IBM Plex Mono', monospace",
+                    }}
+                  >
+                    {bit}
+                  </span>
+                </div>
+                <span style={{ fontSize: '8px', color: '#71717a' }}>{result.bitValues[i]}</span>
               </div>
-              <span style={{ fontSize: '8px', color: '#71717a' }}>
-                {result.bitValues[i]}
-              </span>
-            </div>
-          ))}
+            ))}
         </div>
-        <div style={{ fontSize: '10px', color: '#a1a1aa', textAlign: 'center', fontFamily: "'IBM Plex Mono', monospace' }}>
-          {result.bitValues && result.bits && result.bitValues
-            .filter((_, i) => result.bits[i] === 1)
-            .join('+')}
+        <div
+          style={{
+            fontSize: '10px',
+            color: '#a1a1aa',
+            textAlign: 'center',
+            fontFamily: "'IBM Plex Mono', monospace",
+          }}
+        >
+          {result.bitValues &&
+            result.bits &&
+            result.bitValues.filter((_, i) => result.bits[i] === 1).join('+')}
           ={result.decimal}
         </div>
       </div>
@@ -117,24 +162,47 @@ function Column2Data({ result }) {
   return (
     <div>
       {/* Bytes */}
-      <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>
+      <h4
+        style={{
+          fontSize: '10px',
+          color: '#71717a',
+          textTransform: 'uppercase',
+          margin: '0 0 8px 0',
+          letterSpacing: '0.05em',
+        }}
+      >
         As Bytes
       </h4>
-      <div style={{ backgroundColor: '#18181b', padding: '10px', borderRadius: '6px', border: '1px solid #27272a', marginBottom: '10px' }}>
+      <div
+        style={{
+          backgroundColor: '#18181b',
+          padding: '10px',
+          borderRadius: '6px',
+          border: '1px solid #27272a',
+          marginBottom: '10px',
+        }}
+      >
         <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
           {result.bytes.bigEndian.map((byte, i) => (
             <div
               key={i}
               style={{
                 flex: 1,
-                backgroundColor: i === result.bytes.highlighted ? 'rgba(59,130,246,0.2)' : '#27272a',
+                backgroundColor:
+                  i === result.bytes.highlighted ? 'rgba(59,130,246,0.2)' : '#27272a',
                 padding: '6px',
                 borderRadius: '4px',
                 textAlign: 'center',
                 border: i === result.bytes.highlighted ? '1px solid rgba(59,130,246,0.4)' : 'none',
               }}
             >
-              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', color: i === result.bytes.highlighted ? '#3b82f6' : '#f4f4f5' }}>
+              <div
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: '11px',
+                  color: i === result.bytes.highlighted ? '#3b82f6' : '#f4f4f5',
+                }}
+              >
                 {byte}
               </div>
               <div style={{ fontSize: '8px', color: '#71717a', marginTop: '2px' }}>
@@ -151,11 +219,35 @@ function Column2Data({ result }) {
       {/* ASCII */}
       {result.ascii && result.ascii.code !== undefined && (
         <>
-          <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '10px 0 6px 0', letterSpacing: '0.05em' }}>
+          <h4
+            style={{
+              fontSize: '10px',
+              color: '#71717a',
+              textTransform: 'uppercase',
+              margin: '10px 0 6px 0',
+              letterSpacing: '0.05em',
+            }}
+          >
             As ASCII
           </h4>
-          <div style={{ backgroundColor: '#18181b', padding: '10px', borderRadius: '6px', border: '1px solid #27272a', marginBottom: '10px', textAlign: 'center' }}>
-            <div style={{ fontSize: '24px', color: '#f4f4f5', fontFamily: "'IBM Plex Mono', monospace", marginBottom: '4px' }}>
+          <div
+            style={{
+              backgroundColor: '#18181b',
+              padding: '10px',
+              borderRadius: '6px',
+              border: '1px solid #27272a',
+              marginBottom: '10px',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '24px',
+                color: '#f4f4f5',
+                fontFamily: "'IBM Plex Mono', monospace",
+                marginBottom: '4px',
+              }}
+            >
               {result.ascii.printable ? result.ascii.char : '•'}
             </div>
             <div style={{ fontSize: '10px', color: '#71717a' }}>
@@ -168,24 +260,48 @@ function Column2Data({ result }) {
       {/* Color */}
       {result.color && result.color.valid && (
         <>
-          <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '10px 0 6px 0', letterSpacing: '0.05em' }}>
+          <h4
+            style={{
+              fontSize: '10px',
+              color: '#71717a',
+              textTransform: 'uppercase',
+              margin: '10px 0 6px 0',
+              letterSpacing: '0.05em',
+            }}
+          >
             As Color
           </h4>
-          <div style={{ backgroundColor: '#18181b', padding: '8px', borderRadius: '6px', border: '1px solid #27272a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              width: '28px',
-              height: '28px',
-              backgroundColor: result.color.hex,
-              borderRadius: '4px',
-              border: '2px solid #27272a',
-            }} />
+          <div
+            style={{
+              backgroundColor: '#18181b',
+              padding: '8px',
+              borderRadius: '6px',
+              border: '1px solid #27272a',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <div
+              style={{
+                width: '28px',
+                height: '28px',
+                backgroundColor: result.color.hex,
+                borderRadius: '4px',
+                border: '2px solid #27272a',
+              }}
+            />
             <div>
-              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', color: '#f4f4f5' }}>
+              <div
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: '11px',
+                  color: '#f4f4f5',
+                }}
+              >
                 {result.color.hex}
               </div>
-              <div style={{ fontSize: '9px', color: '#71717a' }}>
-                RGB blue channel
-              </div>
+              <div style={{ fontSize: '9px', color: '#71717a' }}>RGB blue channel</div>
             </div>
           </div>
         </>
@@ -200,28 +316,78 @@ function Column3Context({ result }) {
       {/* IPv4 */}
       {result.ipv4 && result.ipv4.address && (
         <>
-          <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>
+          <h4
+            style={{
+              fontSize: '10px',
+              color: '#71717a',
+              textTransform: 'uppercase',
+              margin: '0 0 8px 0',
+              letterSpacing: '0.05em',
+            }}
+          >
             As IPv4
           </h4>
-          <div style={{ backgroundColor: '#18181b', padding: '10px', borderRadius: '6px', border: '1px solid #27272a', marginBottom: '10px' }}>
-            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', color: '#f4f4f5', textAlign: 'center' }}>
+          <div
+            style={{
+              backgroundColor: '#18181b',
+              padding: '10px',
+              borderRadius: '6px',
+              border: '1px solid #27272a',
+              marginBottom: '10px',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '13px',
+                color: '#f4f4f5',
+                textAlign: 'center',
+              }}
+            >
               {result.ipv4.address}
             </div>
-            <div style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}>
-              {result.ipv4.type === 'broadcast' ? 'Broadcast address' : 
-               result.ipv4.type === 'network' ? 'Network address' : 
-               'Last octet only'}
+            <div
+              style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}
+            >
+              {result.ipv4.type === 'broadcast'
+                ? 'Broadcast address'
+                : result.ipv4.type === 'network'
+                  ? 'Network address'
+                  : 'Last octet only'}
             </div>
           </div>
         </>
       )}
 
       {/* File Size */}
-      <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '10px 0 6px 0', letterSpacing: '0.05em' }}>
+      <h4
+        style={{
+          fontSize: '10px',
+          color: '#71717a',
+          textTransform: 'uppercase',
+          margin: '10px 0 6px 0',
+          letterSpacing: '0.05em',
+        }}
+      >
         As File Size
       </h4>
-      <div style={{ backgroundColor: '#18181b', padding: '10px', borderRadius: '6px', border: '1px solid #27272a', marginBottom: '10px' }}>
-        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', color: '#f4f4f5', textAlign: 'center' }}>
+      <div
+        style={{
+          backgroundColor: '#18181b',
+          padding: '10px',
+          borderRadius: '6px',
+          border: '1px solid #27272a',
+          marginBottom: '10px',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: '13px',
+            color: '#f4f4f5',
+            textAlign: 'center',
+          }}
+        >
           {result.fileSize.human}
         </div>
         <div style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}>
@@ -232,14 +398,39 @@ function Column3Context({ result }) {
       {/* Unix Timestamp */}
       {result.timestamp && result.timestamp.datetime && (
         <>
-          <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '10px 0 6px 0', letterSpacing: '0.05em' }}>
+          <h4
+            style={{
+              fontSize: '10px',
+              color: '#71717a',
+              textTransform: 'uppercase',
+              margin: '10px 0 6px 0',
+              letterSpacing: '0.05em',
+            }}
+          >
             As Unix Time
           </h4>
-          <div style={{ backgroundColor: '#18181b', padding: '10px', borderRadius: '6px', border: '1px solid #27272a', marginBottom: '10px' }}>
-            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', color: '#f4f4f5', textAlign: 'center' }}>
+          <div
+            style={{
+              backgroundColor: '#18181b',
+              padding: '10px',
+              borderRadius: '6px',
+              border: '1px solid #27272a',
+              marginBottom: '10px',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '11px',
+                color: '#f4f4f5',
+                textAlign: 'center',
+              }}
+            >
               {result.timestamp.datetime}
             </div>
-            <div style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}>
+            <div
+              style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}
+            >
               {result.timestamp.duration} since epoch
             </div>
           </div>
@@ -249,14 +440,38 @@ function Column3Context({ result }) {
       {/* Percentage */}
       {result.percentage !== undefined && (
         <>
-          <h4 style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', margin: '10px 0 6px 0', letterSpacing: '0.05em' }}>
+          <h4
+            style={{
+              fontSize: '10px',
+              color: '#71717a',
+              textTransform: 'uppercase',
+              margin: '10px 0 6px 0',
+              letterSpacing: '0.05em',
+            }}
+          >
             As Percentage
           </h4>
-          <div style={{ backgroundColor: '#18181b', padding: '10px', borderRadius: '6px', border: '1px solid #27272a' }}>
-            <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px', color: '#f4f4f5', textAlign: 'center' }}>
+          <div
+            style={{
+              backgroundColor: '#18181b',
+              padding: '10px',
+              borderRadius: '6px',
+              border: '1px solid #27272a',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '13px',
+                color: '#f4f4f5',
+                textAlign: 'center',
+              }}
+            >
               {result.percentage}%
             </div>
-            <div style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}>
+            <div
+              style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}
+            >
               of 8-bit max (255)
             </div>
           </div>
@@ -281,7 +496,7 @@ export default function NumberConverter() {
       }
 
       try {
-        const response = await Convert({
+        const response = await ConvertNumber({
           value: value,
           base: currentBase,
         });
@@ -311,20 +526,22 @@ export default function NumberConverter() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      padding: '24px',
-      overflow: 'hidden',
-      backgroundColor: '#09090b',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+        backgroundColor: '#09090b',
+      }}
+    >
       {/* Header */}
       <div style={{ marginBottom: '12px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#f4f4f5', margin: '0 0 4px 0' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#f4f4f5', margin: '0 0 4px 0' }}>
           Number Converter
         </h2>
-        <p style={{ color: '#a1a1aa', fontSize: '12px', margin: 0 }}>
+        <p style={{ color: '#a1a1aa', fontSize: '14px', margin: 0 }}>
           Convert and interpret numbers in different contexts
         </p>
         <hr style={{ border: 'none', borderTop: '1px solid #27272a', margin: '12px 0' }} />
@@ -371,34 +588,38 @@ export default function NumberConverter() {
 
       {/* Error message */}
       {error && (
-        <div style={{
-          padding: '8px 12px',
-          backgroundColor: 'rgba(239, 68, 68, 0.1)',
-          border: '1px solid rgba(239, 68, 68, 0.2)',
-          borderRadius: '6px',
-          color: '#ef4444',
-          fontSize: '12px',
-          marginBottom: '12px',
-        }}>
+        <div
+          style={{
+            padding: '8px 12px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            borderRadius: '6px',
+            color: '#ef4444',
+            fontSize: '12px',
+            marginBottom: '12px',
+          }}
+        >
           {error}
         </div>
       )}
 
       {/* 3 Column Layout */}
       {result && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '10px',
-          flex: 1,
-          overflow: 'auto',
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '10px',
+            flex: 1,
+            overflow: 'auto',
+          }}
+        >
           {/* Column 1: Number Bases */}
           <Column1Bases result={result} base={base} />
-          
+
           {/* Column 2: Data Representation */}
           <Column2Data result={result} />
-          
+
           {/* Column 3: Network & Time */}
           <Column3Context result={result} />
         </div>
