@@ -160,9 +160,9 @@ func main() {
 	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:            "Spotlight",
 		Width:            640,
-		Height:           480,
-		MinHeight:        480,
-		MaxHeight:        480,
+		Height:           384,
+		MinHeight:        384,
+		MaxHeight:        384,
 		Frameless:        true,
 		Hidden:           true,
 		BackgroundColour: application.RGBA{Red: 22, Green: 22, Blue: 22, Alpha: 255},

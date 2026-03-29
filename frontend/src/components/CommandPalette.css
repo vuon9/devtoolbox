@@ -59,7 +59,7 @@
 }
 
 .command-palette-results {
-  height: 332px; /* Reduced to ~80% of original (416 * 0.8) */
+  height: 264px; /* Results area: 80% of original (332 * 0.8) */
   overflow: hidden;
   background: #18181b;
 }
@@ -73,7 +73,7 @@
 
 .command-palette-list {
   overflow-y: auto;
-  max-height: 320px; /* Reduced to match results height */
+  max-height: 252px; /* 80% of original (320 * 0.8) */
 }
 
 .command-palette-item {
