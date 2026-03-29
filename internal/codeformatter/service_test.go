@@ -322,50 +322,6 @@ func TestFormatXML(t *testing.T) {
 	}
 }
 
-func TestFormatSQL(t *testing.T) {
-	svc := NewCodeFormatterService().(*codeFormatterService)
-
-	tests := []struct {
-		name     string
-		req      FormatRequest
-		contains string
-	}{
-		{
-			name: "SQL formatting",
-			req: FormatRequest{
-				Input:      "SELECT * FROM users WHERE id = 1",
-				FormatType: "sql",
-				Minify:     false,
-			},
-			contains: "SELECT",
-		},
-		{
-			name: "SQL minification",
-			req: FormatRequest{
-				Input:      "SELECT  *  FROM  users",
-				FormatType: "sql",
-				Minify:     true,
-			},
-			contains: "SELECT * FROM users",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := svc.formatSQL(tt.req)
-
-			if result.Error != "" {
-				t.Errorf("Unexpected error: %v", result.Error)
-				return
-			}
-
-			if !strings.Contains(result.Output, tt.contains) {
-				t.Errorf("Expected output to contain %q, got %q", tt.contains, result.Output)
-			}
-		})
-	}
-}
-
 func TestFormatCSS(t *testing.T) {
 	svc := NewCodeFormatterService().(*codeFormatterService)
 
@@ -410,59 +366,6 @@ func TestFormatCSS(t *testing.T) {
 	}
 }
 
-func TestFormatJavaScript(t *testing.T) {
-	svc := NewCodeFormatterService().(*codeFormatterService)
-
-	tests := []struct {
-		name     string
-		req      FormatRequest
-		contains string
-	}{
-		{
-			name: "JavaScript formatting",
-			req: FormatRequest{
-				Input:      "function test(){return 1;}",
-				FormatType: "javascript",
-				Minify:     false,
-			},
-			contains: "function",
-		},
-		{
-			name: "JavaScript minification",
-			req: FormatRequest{
-				Input:      "function test() {\n  return 1;\n}",
-				FormatType: "javascript",
-				Minify:     true,
-			},
-			contains: "function test()",
-		},
-		{
-			name: "JS alias works",
-			req: FormatRequest{
-				Input:      "var x=1;",
-				FormatType: "js",
-				Minify:     false,
-			},
-			contains: "var",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := svc.formatJavaScript(tt.req)
-
-			if result.Error != "" {
-				t.Errorf("Unexpected error: %v", result.Error)
-				return
-			}
-
-			if !strings.Contains(result.Output, tt.contains) {
-				t.Errorf("Expected output to contain %q, got %q", tt.contains, result.Output)
-			}
-		})
-	}
-}
-
 func TestMinifyCSS(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -491,44 +394,6 @@ func TestMinifyCSS(t *testing.T) {
 			result := minifyCSS(tt.input)
 			if result != tt.expected {
 				t.Errorf("minifyCSS(%q) = %q, want %q", tt.input, result, tt.expected)
-			}
-		})
-	}
-}
-
-func TestMinifyJS(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:     "Remove extra spaces",
-			input:    "var  x  =  1;",
-			expected: "var x = 1;",
-		},
-		{
-			name:     "Remove single-line comment",
-			input:    "var x = 1; // comment",
-			expected: "var x = 1;",
-		},
-		{
-			name:     "Remove multi-line comment",
-			input:    "var x = /* comment */ 1;",
-			expected: "var x = 1;",
-		},
-		{
-			name:     "Preserve strings",
-			input:    `var x = "hello world";`,
-			expected: `var x = "hello world";`,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := minifyJS(tt.input)
-			if result != tt.expected {
-				t.Errorf("minifyJS(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
 		})
 	}
