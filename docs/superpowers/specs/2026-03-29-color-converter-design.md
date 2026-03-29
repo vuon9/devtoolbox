@@ -83,14 +83,28 @@ A comprehensive color tool for developers and designers that goes beyond simple 
   - Click/drag to adjust value/brightness
   - Size: flexible width, same height as wheel
 
-#### 3. Dual Color Previews
+#### 3. Dual Color Previews with Editable Text Colors
 
-- **Purpose:** Show same color with different text colors for instant contrast assessment
-- **Left Preview:** Color with white text ("WHITE TEXT" label) - represents dark mode usage
-- **Right Preview:** Color with black text ("BLACK TEXT" label) - represents light mode usage
-- **Why two previews:** Same hex code, different foreground colors to instantly see contrast quality
-- **Size:** Side by side, 50% width each, 50px height
-- **Display:** Show hex code in monospace font centered on each
+- **Purpose:** Show background color with customizable text colors for instant contrast assessment
+- **Layout:** Side by side, 50% width each
+- **Left Preview (Dark Mode Context):**
+  - Background: Main selected color
+  - Default text: White (#FFFFFF)
+  - Text input field below to change text color
+  - Shows "Aa" sample text
+- **Right Preview (Light Mode Context):**
+  - Background: Main selected color
+  - Default text: Black (#000000)
+  - Text input field below to change text color
+  - Shows "Aa" sample text
+- **Why customizable text:** Users can test their specific brand text colors against the background
+- **Text Color Inputs:**
+  - Small hex input fields below each preview
+  - Click to edit, accepts hex codes
+  - Real-time update of contrast ratio display
+  - Recent text colors dropdown (last 5 used)
+- **Contrast Display:** Shows "X.XX:1" ratio below each preview
+- **Size:** Previews 60px height, inputs below
 
 #### 4. Input Fields
 
@@ -144,20 +158,23 @@ A comprehensive color tool for developers and designers that goes beyond simple 
 - **Display:** Horizontal gradient bar with labels below (50, 100, 200... 900)
 - **Size:** 36px height bar, full width
 
-#### 3. Accessibility (WCAG)
+#### 3. Accessibility (WCAG) with Custom Text Colors
 
-- **Purpose:** Check if color meets contrast requirements
+- **Purpose:** Check if selected text color meets contrast requirements against the background
+- **Text Colors:** Uses the customizable text colors from the Dual Previews section (not just white/black)
 - **Checks:**
-  - On White background (normal text)
-  - On Black background (normal text)
+  - Text Color 1 on Main Background (e.g., white text on blue)
+  - Text Color 2 on Main Background (e.g., black text on blue)
 - **Each Check Shows:**
-  - Mini preview (50×36px box with "Aa" text)
-  - "On White" or "On Black" label
+  - Mini preview (50×36px box with "Aa" text using the actual selected text color)
+  - Label showing which text color is being tested
   - Contrast ratio (e.g., "4.56:1")
   - Pass badge: AAA ✓ (green) or AA Large ✓ (yellow)
 - **Badges:**
   - Green (#22c55e): Passes AAA
   - Yellow (#eab308): Passes AA only
+  - Red (#ef4444): Fails AA
+- **Real-time:** Updates instantly when text color changes
   - Red (#ef4444): Fails AA
 - **Colorblind Simulation:**
   - Dropdown: Normal, Protanopia, Deuteranopia, Tritanopia
