@@ -31,7 +31,7 @@ func (f *Formatter) Format(data []string, format string, separator string) (stri
 	case "yaml":
 		return f.formatYAML(data)
 	case "raw":
-		return f.formatRaw(data)
+		return f.formatRaw(data, separator)
 	default:
 		return "", ErrInvalidFormat
 	}
@@ -71,7 +71,17 @@ func (f *Formatter) formatXML(data []string) (string, error) {
 	for _, item := range data {
 		var obj map[string]interface{}
 		if err := json.Unmarshal([]byte(item), &obj); err != nil {
-			return "", fmt.Errorf("failed to parse JSON for XML: %w", err)
+			// If not valid JSON, treat as simple value element
+			strVal := item
+			strVal = strings.ReplaceAll(strVal, "&", "&amp;")
+			strVal = strings.ReplaceAll(strVal, "<", "&lt;")
+			strVal = strings.ReplaceAll(strVal, ">", "&gt;")
+			strVal = strings.ReplaceAll(strVal, "\"", "&quot;")
+			strVal = strings.ReplaceAll(strVal, "'", "&apos;")
+			buf.WriteString("  <item>")
+			buf.WriteString(strVal)
+			buf.WriteString("</item>\n")
+			continue
 		}
 
 		buf.WriteString("  <item>\n")
@@ -201,14 +211,20 @@ func (f *Formatter) formatTSV(data []string) (string, error) {
 
 // formatYAML formats data as YAML
 func (f *Formatter) formatYAML(data []string) (string, error) {
-	// Parse each JSON string into a map and convert to proper YAML
-	var items []map[string]interface{}
+	if len(data) == 0 {
+		return "", nil
+	}
+
+	// Try to parse each item as JSON, fall back to treating as simple strings
+	var items []interface{}
 	for _, item := range data {
 		var obj map[string]interface{}
 		if err := json.Unmarshal([]byte(item), &obj); err != nil {
-			return "", fmt.Errorf("failed to parse JSON for YAML: %w", err)
+			// If not valid JSON, treat as simple string value
+			items = append(items, item)
+		} else {
+			items = append(items, obj)
 		}
-		items = append(items, obj)
 	}
 
 	result, err := yaml.Marshal(items)
@@ -220,12 +236,30 @@ func (f *Formatter) formatYAML(data []string) (string, error) {
 }
 
 // formatRaw formats data as "key: value" lines, one record per block
-func (f *Formatter) formatRaw(data []string) (string, error) {
+func (f *Formatter) formatRaw(data []string, separator string) (string, error) {
 	if len(data) == 0 {
 		return "", nil
 	}
 
 	var buf strings.Builder
+
+	// Map separator names to actual separator strings
+	sep := "\n\n" // default: double newline between records
+	switch strings.ToLower(separator) {
+	case "newline":
+		sep = "\n"
+	case "comma":
+		sep = ","
+	case "tab":
+		sep = "\t"
+	case "none":
+		sep = ""
+	default:
+		// Use the separator as-is if it's not a named separator
+		if separator != "" {
+			sep = separator
+		}
+	}
 
 	for i, item := range data {
 		var obj map[string]interface{}
@@ -233,7 +267,7 @@ func (f *Formatter) formatRaw(data []string) (string, error) {
 			// If not valid JSON, just output the string
 			buf.WriteString(item)
 			if i < len(data)-1 {
-				buf.WriteString("\n\n")
+				buf.WriteString(sep)
 			}
 			continue
 		}
@@ -243,9 +277,9 @@ func (f *Formatter) formatRaw(data []string) (string, error) {
 			buf.WriteString(fmt.Sprintf("%s: %v\n", key, val))
 		}
 
-		// Add blank line between records
+		// Add separator between records
 		if i < len(data)-1 {
-			buf.WriteString("\n")
+			buf.WriteString(sep)
 		}
 	}
 

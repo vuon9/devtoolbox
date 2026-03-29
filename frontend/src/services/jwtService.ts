@@ -23,14 +23,13 @@ const httpCall = async (
 ): Promise<any> => {
   // JWTService -> jwt-service (simple mapping)
   const serviceMap: Record<string, string> = {
-    'JWTService': 'jwt-service',
-    'BarcodeService': 'barcode-service',
-    'DataGeneratorService': 'data-generator-service',
+    JWTService: 'jwt-service',
+    BarcodeService: 'barcode-service',
+    DataGeneratorService: 'data-generator-service',
   };
-  const kebabService = serviceMap[serviceName] || serviceName
-    .replace(/Service$/, '-service')
-    .toLowerCase();
-  
+  const kebabService =
+    serviceMap[serviceName] || serviceName.replace(/Service$/, '-service').toLowerCase();
+
   // Decode -> decode
   const kebabMethod = methodName
     .replace(/([A-Z])/g, '-$1')
@@ -82,5 +81,10 @@ export async function Encode(
     return WailsEncode(headerJSON, payloadJSON, algorithm, secret);
   }
 
-  return httpCall('JWTService', 'Encode', { arg0: headerJSON, arg1: payloadJSON, arg2: algorithm, arg3: secret });
+  return httpCall('JWTService', 'Encode', {
+    arg0: headerJSON,
+    arg1: payloadJSON,
+    arg2: algorithm,
+    arg3: secret,
+  });
 }

@@ -39,14 +39,14 @@ const TOOL_ICONS = {
 const getIconForCommand = (command) => {
   // System commands have explicit icons
   if (command.icon) return command.icon;
-  
+
   // Extract tool ID from path
   const pathMatch = command.path?.match(/\/tool\/([^/?]+)/);
   if (pathMatch) {
     const toolId = pathMatch[1];
     return TOOL_ICONS[toolId] || Wrench;
   }
-  
+
   return Wrench;
 };
 
@@ -225,9 +225,9 @@ export function CommandPalette() {
     }
 
     const query = searchQuery.toLowerCase();
-    const filtered = COMMANDS.filter((cmd) =>
-      cmd.label.toLowerCase().includes(query)
-    ).sort((a, b) => fuzzyScore(a.label, query) - fuzzyScore(b.label, query));
+    const filtered = COMMANDS.filter((cmd) => cmd.label.toLowerCase().includes(query)).sort(
+      (a, b) => fuzzyScore(a.label, query) - fuzzyScore(b.label, query)
+    );
 
     setCommands(filtered);
     setSelectedIndex(0);

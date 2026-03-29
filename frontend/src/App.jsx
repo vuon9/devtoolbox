@@ -13,7 +13,7 @@ function NavigationHandler() {
 
   useEffect(() => {
     console.log('[App] Setting up navigation event listener...');
-    
+
     // Listen for navigation events from command palette (via Go backend)
     const unsubscribe = Events.On('navigate:to', (path) => {
       console.log('[App] Received navigate:to event:', path);
