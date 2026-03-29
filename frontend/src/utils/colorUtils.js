@@ -1,6 +1,8 @@
 // Color utility functions
 // Provides contrast ratio calculations and WCAG compliance checking
 
+import { hexToRgb } from '../services/colorService.js';
+
 /**
  * Calculates relative luminance of an RGB color
  * Uses WCAG 2.0 formula: https://www.w3.org/TR/WCAG20/#relativeluminancedef
@@ -16,41 +18,12 @@ export function getLuminance(r, g, b) {
   const bsRGB = b / 255;
 
   // Apply gamma correction
-  const rLinear = rsRGB <= 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4);
-  const gLinear = gsRGB <= 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4);
-  const bLinear = bsRGB <= 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4);
+  const rLinear = rsRGB < 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4);
+  const gLinear = gsRGB < 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4);
+  const bLinear = bsRGB < 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4);
 
   // Calculate luminance
   return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
-}
-
-/**
- * Parses hex color to RGB object
- * @param {string} hex - Hex color string (#RRGGBB or RRGGBB)
- * @returns {{r: number, g: number, b: number}|null} - RGB object or null if invalid
- */
-function hexToRgb(hex) {
-  if (!hex || typeof hex !== 'string') return null;
-
-  let cleanHex = hex.replace('#', '');
-
-  // Convert 3-digit to 6-digit
-  if (cleanHex.length === 3) {
-    cleanHex = cleanHex
-      .split('')
-      .map((char) => char + char)
-      .join('');
-  }
-
-  if (cleanHex.length !== 6) return null;
-
-  const r = parseInt(cleanHex.substring(0, 2), 16);
-  const g = parseInt(cleanHex.substring(2, 4), 16);
-  const b = parseInt(cleanHex.substring(4, 6), 16);
-
-  if (isNaN(r) || isNaN(g) || isNaN(b)) return null;
-
-  return { r, g, b };
 }
 
 /**

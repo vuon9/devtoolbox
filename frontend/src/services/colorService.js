@@ -60,6 +60,13 @@ export function hexToRgb(hex) {
  * @returns {string} - Hex color string (#RRGGBB)
  */
 export function rgbToHex(r, g, b) {
+  if (typeof r !== 'number' || r < 0 || r > 255)
+    throw new Error('Invalid RGB value: r must be 0-255');
+  if (typeof g !== 'number' || g < 0 || g > 255)
+    throw new Error('Invalid RGB value: g must be 0-255');
+  if (typeof b !== 'number' || b < 0 || b > 255)
+    throw new Error('Invalid RGB value: b must be 0-255');
+
   const toHex = (n) => {
     const clamped = Math.max(0, Math.min(255, Math.round(n)));
     const hex = clamped.toString(16).padStart(2, '0');
@@ -77,6 +84,13 @@ export function rgbToHex(r, g, b) {
  * @returns {{h: number, s: number, l: number}} - HSL object (h: 0-360, s: 0-100, l: 0-100)
  */
 export function rgbToHsl(r, g, b) {
+  if (typeof r !== 'number' || r < 0 || r > 255)
+    throw new Error('Invalid RGB value: r must be 0-255');
+  if (typeof g !== 'number' || g < 0 || g > 255)
+    throw new Error('Invalid RGB value: g must be 0-255');
+  if (typeof b !== 'number' || b < 0 || b > 255)
+    throw new Error('Invalid RGB value: b must be 0-255');
+
   // Normalize RGB to 0-1 range
   r /= 255;
   g /= 255;
@@ -169,6 +183,13 @@ export function hslToRgb(h, s, l) {
  * @returns {{c: number, m: number, y: number, k: number}} - CMYK object (0-100)
  */
 export function rgbToCmyk(r, g, b) {
+  if (typeof r !== 'number' || r < 0 || r > 255)
+    throw new Error('Invalid RGB value: r must be 0-255');
+  if (typeof g !== 'number' || g < 0 || g > 255)
+    throw new Error('Invalid RGB value: g must be 0-255');
+  if (typeof b !== 'number' || b < 0 || b > 255)
+    throw new Error('Invalid RGB value: b must be 0-255');
+
   r /= 255;
   g /= 255;
   b /= 255;
@@ -225,6 +246,13 @@ export function cmykToRgb(c, m, y, k) {
  * @returns {{h: number, s: number, b: number}} - HSB object (h: 0-360, s: 0-100, b: 0-100)
  */
 export function rgbToHsb(r, g, b) {
+  if (typeof r !== 'number' || r < 0 || r > 255)
+    throw new Error('Invalid RGB value: r must be 0-255');
+  if (typeof g !== 'number' || g < 0 || g > 255)
+    throw new Error('Invalid RGB value: g must be 0-255');
+  if (typeof b !== 'number' || b < 0 || b > 255)
+    throw new Error('Invalid RGB value: b must be 0-255');
+
   r /= 255;
   g /= 255;
   b /= 255;
