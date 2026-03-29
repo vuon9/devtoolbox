@@ -1,37 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Events } from '@wailsio/runtime';
+
 import { Sidebar } from './components/Sidebar';
 import { TitleBar } from './components/TitleBar';
 import { SettingsModal } from './components/SettingsModal';
 import ToolRouter from './ToolRouter';
 import './App.css';
 
-// NavigationHandler listens for navigate events from command palette
-function NavigationHandler() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    console.log('[App] Setting up navigation event listener...');
-
-    // Listen for navigation events from command palette (via Go backend)
-    const unsubscribe = Events.On('navigate:to', (path) => {
-      console.log('[App] Received navigate:to event:', path);
-      if (path) {
-        navigate(path);
-      }
-    });
-
-    return () => {
-      console.log('[App] Cleaning up navigation event listener');
-      if (unsubscribe) unsubscribe();
-    };
-  }, [navigate]);
-
-  return null;
-}
-
 function App() {
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [themeMode, setThemeMode] = useState(() => {
@@ -42,8 +20,50 @@ function App() {
   const openSettings = () => setIsSettingsOpen(true);
   const closeSettings = () => setIsSettingsOpen(false);
 
-  // Global spotlight shortcut is Cmd+Shift+Space (handled by Go backend)
+  // Handle navigation events from command palette
+  useEffect(() => {
+    console.log('[App] Setting up navigation listener for command palette...');
 
+    const handleNavigation = (data) => {
+      console.log('[App] Received navigate:to event:', data);
+
+      // In Wails V3, data might be the path string OR an event object with path in data
+      let path = '';
+      if (typeof data === 'string') {
+        path = data;
+      } else if (data && typeof data === 'object') {
+        if (data.data) {
+          path = typeof data.data === 'string' ? data.data : data.data[0];
+        } else if (data.path) {
+          path = data.path;
+        }
+      }
+
+      if (path) {
+        console.log('[App] Navigating to path:', path);
+        navigate(path);
+      } else {
+        console.warn('[App] Received empty/invalid path via navigate:to:', data);
+      }
+    };
+
+    let unsubscribe = null;
+    try {
+      unsubscribe = Events.On('navigate:to', (event) => {
+        handleNavigation(event);
+      });
+      console.log('[App] Navigation listener registered successfully');
+    } catch (err) {
+      console.error('[App] Failed to register navigation listener:', err);
+    }
+
+    return () => {
+      console.log('[App] Cleaning up navigation listener');
+      if (unsubscribe) unsubscribe();
+    };
+  }, [navigate]);
+
+  // Handle theme changes
   useEffect(() => {
     localStorage.setItem('themeMode', themeMode);
     if (themeMode === 'dark') {
@@ -90,7 +110,6 @@ function App() {
             <Route path="/tool/:toolId/*" element={<ToolRouter />} />
             <Route path="*" element={<Navigate to="/tool/text-converter" replace />} />
           </Routes>
-          <NavigationHandler />
         </main>
       </div>
 
