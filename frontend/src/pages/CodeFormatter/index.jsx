@@ -264,7 +264,7 @@ function OutputPane({ content, language, error, filterComponent }) {
 
       {filterComponent}
 
-      {error && (
+      {error && !error.toLowerCase().includes('filter') && (
         <div
           style={{
             padding: '8px 12px',
@@ -283,39 +283,46 @@ function OutputPane({ content, language, error, filterComponent }) {
   );
 }
 
-function FilterBar({ value, onChange, placeholder, show }) {
+function FilterBar({ value, onChange, placeholder, show, error }) {
   if (!show) return null;
 
   return (
     <div
       style={{
         display: 'flex',
-        gap: '10px',
+        flexDirection: 'column',
+        gap: '6px',
         padding: '8px 12px',
-        backgroundColor: '#27272a',
+        backgroundColor: error ? 'rgba(239, 68, 68, 0.1)' : '#27272a',
         borderRadius: '6px',
-        alignItems: 'center',
-        border: '1px solid #3f3f46',
+        border: error ? '1px solid #ef4444' : '1px solid #3f3f46',
         marginBottom: '8px',
       }}
     >
-      <Filter style={{ width: '16px', height: '16px', color: '#a1a1aa', flexShrink: 0 }} />
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        style={{
-          flex: 1,
-          backgroundColor: 'transparent',
-          border: 'none',
-          color: '#f4f4f5',
-          padding: '4px 0',
-          fontSize: '13px',
-          fontFamily: "'IBM Plex Mono', monospace",
-          outline: 'none',
-        }}
-      />
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <Filter style={{ width: '16px', height: '16px', color: error ? '#ef4444' : '#a1a1aa', flexShrink: 0 }} />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          style={{
+            flex: 1,
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: error ? '#ef4444' : '#f4f4f5',
+            padding: '4px 0',
+            fontSize: '13px',
+            fontFamily: "'IBM Plex Mono', monospace",
+            outline: 'none',
+          }}
+        />
+      </div>
+      {error && (
+        <div style={{ fontSize: '11px', color: '#ef4444', fontFamily: "'IBM Plex Mono', monospace" }}>
+          {error}
+        </div>
+      )}
     </div>
   );
 }
@@ -436,13 +443,14 @@ export default function CodeFormatter() {
         <OutputPane
           content={output}
           language={language}
-          error={error}
+          error={error && !error.toLowerCase().includes('filter') ? error : ''}
           filterComponent={
             <FilterBar
               value={filter}
               onChange={setFilter}
               placeholder={filterPlaceholders[language]}
               show={language !== 'css'}
+              error={error && error.toLowerCase().includes('filter') ? error : ''}
             />
           }
         />
