@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
-  Close,
+  X,
   Moon,
   Monitor,
   Type,
@@ -345,7 +345,7 @@ export function CommandPalette() {
               inputRef.current?.focus();
             }}
           >
-            <Close size={16} />
+            <X size={16} />
           </button>
         )}
       </div>
