@@ -228,6 +228,25 @@ A comprehensive color tool for developers and designers that goes beyond simple 
 - **Accessibility:** Contrast ratios update in real-time
 - **Code:** Export block updates automatically
 
+## Hex Code Interactions (Global Pattern)
+
+All hex code displays throughout the tool follow this interaction pattern:
+
+- **Click to Copy:** Clicking any hex code copies it to clipboard
+- **Hover Effect:** On hover, hex code gets:
+  - Background highlight (slightly lighter, e.g., rgba(255,255,255,0.05))
+  - Cursor changes to `pointer`
+  - Optional: subtle scale transform (1.02)
+- **Tooltip:** Shows "Click to copy" on hover
+- **Success Feedback:** Brief visual confirmation when copied (e.g., checkmark icon appears, text color changes to green momentarily)
+- **Applies To:**
+  - Main color input fields
+  - Harmony color tiles
+  - Generated palette labels
+  - Recent color tooltips
+  - Collection preview swatches
+  - Code export values
+
 ## Accessibility Requirements
 
 - **Keyboard Navigation:** All controls accessible via keyboard
