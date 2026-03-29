@@ -532,6 +532,7 @@ export default function TextDiffChecker() {
         title="Text Diff"
         description="Compare two pieces of text and visualize differences instantly. Supports line, word, and character-level diffs."
       />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
       {/* Controls */}
       <div
@@ -540,8 +541,6 @@ export default function TextDiffChecker() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: '1px solid #27272a',
-          paddingBottom: '16px',
           flexWrap: 'wrap',
           gap: '12px',
         }}

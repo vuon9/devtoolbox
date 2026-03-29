@@ -812,6 +812,7 @@ export default function DataGenerator() {
         title="Data Generator"
         description="Generate mock data for testing and development. Create realistic datasets in JSON, CSV, or raw formats."
       />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -819,8 +820,6 @@ export default function DataGenerator() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: '1px solid #27272a',
-          paddingBottom: '16px',
           flexWrap: 'wrap',
           gap: '12px',
         }}
@@ -894,7 +893,11 @@ export default function DataGenerator() {
                 backgroundColor: '#1c1917',
               }}
             >
-              <Button size="sm" onClick={addField} style={{ width: '100%', justifyContent: 'center' }}>
+              <Button
+                size="sm"
+                onClick={addField}
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
                 <Plus style={{ width: '14px', height: '14px' }} />
                 Add Field
               </Button>

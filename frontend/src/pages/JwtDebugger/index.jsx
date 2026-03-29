@@ -447,7 +447,7 @@ export default function JwtDebugger() {
       const decodeRes = await Decode(token);
       setPayload(JSON.stringify(decodeRes.payload, null, 2));
       setHeader(JSON.stringify(decodeRes.header, null, 2));
-      
+
       // If secret is provided, verify the signature
       if (verifySecret.trim()) {
         const verifyRes = await Verify(token, verifySecret, verifyEncoding);
@@ -487,7 +487,7 @@ export default function JwtDebugger() {
   // Auto-encode when inputs change in encode mode (with debounce)
   useEffect(() => {
     if (activeMode !== 'encode') return;
-    
+
     const timeoutId = setTimeout(() => {
       if (header.trim() && payload.trim()) {
         handleEncode();
@@ -518,6 +518,7 @@ export default function JwtDebugger() {
         title="JWT Debugger"
         description="Inspect, decode, and encode JSON Web Tokens. Verify signatures and visualize payload contents with ease."
       />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -525,8 +526,6 @@ export default function JwtDebugger() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: '1px solid #27272a',
-          paddingBottom: '16px',
         }}
       >
         <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />

@@ -1,7 +1,199 @@
-import React, { useState, useEffect } from 'react';
-import { Timer, Play, Clock, Calendar, Hash, History, Trash2, Info } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import cronstrue from 'cronstrue';
+
+const CRON_FIELDS = {
+  minute: {
+    label: 'Minute',
+    min: 0,
+    max: 59,
+    validRange: '0-59',
+    examples: '*  */5  0,15,30  0-30',
+    presets: [
+      { label: 'Every minute', value: '*' },
+      { label: 'Every 5 min', value: '*/5' },
+      { label: 'Every 15 min', value: '*/15' },
+      { label: 'Every 30 min', value: '*/30' },
+      { label: 'At :00', value: '0' },
+      { label: 'At :30', value: '30' },
+    ],
+  },
+  hour: {
+    label: 'Hour',
+    min: 0,
+    max: 23,
+    validRange: '0-23',
+    examples: '*  */2  0,12,18  9-17',
+    presets: [
+      { label: 'Every hour', value: '*' },
+      { label: 'Every 2 hours', value: '*/2' },
+      { label: 'Every 6 hours', value: '*/6' },
+      { label: 'At midnight', value: '0' },
+      { label: 'At noon', value: '12' },
+    ],
+  },
+  day: {
+    label: 'Day',
+    min: 1,
+    max: 31,
+    validRange: '1-31',
+    examples: '*  */5  1,15  1-15  L',
+    presets: [
+      { label: 'Every day', value: '*' },
+      { label: '1st', value: '1' },
+      { label: '15th', value: '15' },
+      { label: 'Last day', value: 'L' },
+    ],
+  },
+  month: {
+    label: 'Month',
+    min: 1,
+    max: 12,
+    validRange: '1-12',
+    examples: '*  */3  1,4,7,10  1-6',
+    presets: [
+      { label: 'Every month', value: '*' },
+      { label: 'Jan-Mar', value: '1-3' },
+      { label: 'Apr-Jun', value: '4-6' },
+    ],
+  },
+  weekday: {
+    label: 'Weekday',
+    min: 0,
+    max: 7,
+    validRange: '0-7 (0=Sun)',
+    examples: '*  1-5  0,6  1,3,5',
+    presets: [
+      { label: 'Every day', value: '*' },
+      { label: 'Mon-Fri', value: '1-5' },
+      { label: 'Weekends', value: '0,6' },
+      { label: 'Mon', value: '1' },
+    ],
+  },
+};
+
+const EXPRESSION_PRESETS = [
+  { name: 'Every Minute', expr: '* * * * *', desc: 'Run every minute' },
+  { name: 'Every 5 Min', expr: '*/5 * * * *', desc: 'Run every 5 minutes' },
+  { name: 'Every 15 Min', expr: '*/15 * * * *', desc: 'Run every 15 minutes' },
+  { name: 'Every 30 Min', expr: '*/30 * * * *', desc: 'Run every 30 minutes' },
+  { name: 'Hourly', expr: '0 * * * *', desc: 'Run at the start of every hour' },
+  { name: 'Daily', expr: '0 0 * * *', desc: 'Run once a day at midnight' },
+  { name: 'Daily 6am', expr: '0 6 * * *', desc: 'Run every day at 6am' },
+  { name: 'Daily 9am', expr: '0 9 * * *', desc: 'Run every day at 9am' },
+  { name: 'Daily 6pm', expr: '0 18 * * *', desc: 'Run every day at 6pm' },
+  { name: 'Twice Daily', expr: '0 */12 * * *', desc: 'Run every 12 hours' },
+  { name: 'Weekdays', expr: '0 9 * * 1-5', desc: 'Run at 9am on weekdays' },
+  { name: 'Weekly', expr: '0 0 * * 0', desc: 'Run once a week on Sunday' },
+  { name: 'Weekly Mon', expr: '0 0 * * 1', desc: 'Run once a week on Monday' },
+  { name: 'Bi-Weekly', expr: '0 0 */14 * *', desc: 'Run every 14 days' },
+  { name: 'Monthly', expr: '0 0 1 * *', desc: 'Run on the 1st of each month' },
+  { name: 'Monthly 15th', expr: '0 0 15 * *', desc: 'Run on the 15th of each month' },
+  { name: 'Monthly Last', expr: '0 0 L * *', desc: 'Run on the last day of each month' },
+  { name: 'Quarterly', expr: '0 0 1 */3 *', desc: 'Run every quarter' },
+  { name: 'Yearly', expr: '0 0 1 1 *', desc: 'Run once a year on Jan 1st' },
+];
+
+function parseCronExpression(expr) {
+  const parts = expr.trim().split(/\s+/);
+  if (parts.length !== 5) return null;
+  return {
+    minute: parts[0] || '*',
+    hour: parts[1] || '*',
+    day: parts[2] || '*',
+    month: parts[3] || '*',
+    weekday: parts[4] || '*',
+  };
+}
+
+function buildExpression(fields) {
+  return `${fields.minute} ${fields.hour} ${fields.day} ${fields.month} ${fields.weekday}`;
+}
+
+function findPreviousExecution(expr, beforeDate) {
+  try {
+    const [minute, hour, day, month, weekday] = expr.split(/\s+/);
+    let current = new Date(beforeDate);
+    let attempts = 0;
+    const maxAttempts = 365 * 24 * 60;
+    while (attempts < maxAttempts) {
+      current = new Date(current.getTime() - 60000);
+      attempts++;
+      const matchesMinute = matchCronField(minute, current.getMinutes());
+      const matchesHour = matchCronField(hour, current.getHours());
+      const matchesDay = matchCronField(day, current.getDate());
+      const matchesMonth = matchCronField(month, current.getMonth() + 1);
+      const matchesWeekday = matchCronField(weekday, current.getDay());
+      if (matchesMinute && matchesHour && matchesDay && matchesMonth && matchesWeekday) {
+        return new Date(current);
+      }
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function findNextExecution(expr, afterDate) {
+  try {
+    const [minute, hour, day, month, weekday] = expr.split(/\s+/);
+    let current = new Date(afterDate);
+    let attempts = 0;
+    const maxAttempts = 365 * 24 * 60;
+    while (attempts < maxAttempts) {
+      current = new Date(current.getTime() + 60000);
+      attempts++;
+      const matchesMinute = matchCronField(minute, current.getMinutes());
+      const matchesHour = matchCronField(hour, current.getHours());
+      const matchesDay = matchCronField(day, current.getDate());
+      const matchesMonth = matchCronField(month, current.getMonth() + 1);
+      const matchesWeekday = matchCronField(weekday, current.getDay());
+      if (matchesMinute && matchesHour && matchesDay && matchesMonth && matchesWeekday) {
+        return new Date(current);
+      }
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function matchCronField(pattern, value) {
+  if (pattern === '*') return true;
+  if (pattern === 'L' && value >= 28) return true;
+  if (pattern.includes('/')) {
+    const [range, step] = pattern.split('/');
+    const stepNum = parseInt(step);
+    if (range === '*') return value % stepNum === 0;
+  }
+  if (pattern.includes('-')) {
+    const [start, end] = pattern.split('-').map(Number);
+    return value >= start && value <= end;
+  }
+  if (pattern.includes(',')) {
+    const values = pattern.split(',').map(Number);
+    return values.includes(value);
+  }
+  return parseInt(pattern) === value;
+}
+
+function getFieldDescription(value, label) {
+  if (value === '*') return 'Any ' + label.toLowerCase();
+  if (value.includes('/')) {
+    const step = value.split('/')[1];
+    return `Every ${step}`;
+  }
+  if (value.includes('-')) {
+    const [start, end] = value.split('-');
+    return `${start}-${end}`;
+  }
+  if (value.includes(',')) {
+    return value.split(',').join(', ');
+  }
+  if (value === 'L') return 'Last day';
+  return `At ${value}`;
+}
 
 function ToolHeader({ title, description }) {
   return (
@@ -16,63 +208,85 @@ function ToolHeader({ title, description }) {
   );
 }
 
-function ToolControls({ children, style = {} }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        gap: '16px',
-        marginBottom: '16px',
-        ...style,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 export default function CronJobParser() {
-  const [cron, setCron] = useState('*/15 * * * *');
+  const [expression, setExpression] = useState('*/15 * * * *');
+  const [fields, setFields] = useState(() => parseCronExpression('*/15 * * * *'));
   const [description, setDescription] = useState('');
-  const [nextRuns, setNextRuns] = useState([]);
   const [error, setError] = useState('');
+  const [selectedPreset, setSelectedPreset] = useState('Every 15 Min');
 
-  const parseCron = (val = cron) => {
-    if (!val.trim()) {
-      setDescription('');
-      setError('');
-      return;
-    }
-    try {
-      const desc = cronstrue.toString(val);
-      setDescription(desc);
-      setError('');
-      setNextRuns([
-        'Mon, 23 Mar 2026 12:00:00 GMT',
-        'Mon, 23 Mar 2026 12:15:00 GMT',
-        'Mon, 23 Mar 2026 12:30:00 GMT',
-        'Mon, 23 Mar 2026 12:45:00 GMT',
-        'Mon, 23 Mar 2026 13:00:00 GMT',
-      ]);
-    } catch (e) {
-      setError(e.toString());
-      setDescription('');
-      setNextRuns([]);
-    }
+  const [now, setNow] = useState(new Date());
+  const [prevExecutions, setPrevExecutions] = useState([]);
+  const [nextExecutions, setNextExecutions] = useState([]);
+
+  const fieldColors = {
+    minute: '#22c55e',
+    hour: '#3b82f6',
+    day: '#eab308',
+    month: '#ef4444',
+    weekday: '#a855f7',
   };
 
   useEffect(() => {
-    parseCron();
-  }, [cron]);
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const presets = [
-    { label: 'Every Minute', value: '* * * * *' },
-    { label: 'Every 15 Min', value: '*/15 * * * *' },
-    { label: 'Every Hour', value: '0 * * * *' },
-    { label: 'Daily @ Mid', value: '0 0 * * *' },
-    { label: 'Weekly', value: '0 0 * * 0' },
-  ];
+  const nextFromNow = useMemo(() => {
+    if (error) return null;
+    return findNextExecution(expression, now);
+  }, [expression, now, error]);
+
+  const formatCountdown = (targetDate) => {
+    if (!targetDate) return '—';
+    const diff = targetDate - now;
+    if (diff <= 0) return 'now';
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+    if (minutes > 0) return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
+  };
+
+  useEffect(() => {
+    try {
+      const desc = cronstrue.toString(expression);
+      setDescription(desc);
+      setError('');
+      let prev1 = findPreviousExecution(expression, now);
+      let prev2 = prev1 ? findPreviousExecution(expression, prev1) : null;
+      let next1 = findNextExecution(expression, now);
+      let next2 = next1 ? findNextExecution(expression, next1) : null;
+      setPrevExecutions([prev2, prev1].filter(Boolean));
+      setNextExecutions([next1, next2].filter(Boolean));
+    } catch (e) {
+      setError('Invalid cron expression');
+      setDescription('');
+      setPrevExecutions([]);
+      setNextExecutions([]);
+    }
+  }, [expression, now]);
+
+  const formatDate = (date) => {
+    if (!date) return '—';
+    return date.toLocaleString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const handleExpressionChange = (newExpr) => {
+    setExpression(newExpr);
+    const newFields = parseCronExpression(newExpr);
+    if (newFields) {
+      setFields(newFields);
+      setSelectedPreset('');
+    }
+  };
 
   return (
     <div
@@ -87,251 +301,488 @@ export default function CronJobParser() {
     >
       <ToolHeader
         title="Cron Job Parser"
-        description="Decode cron expressions into human-readable descriptions. Validate schedules and preview the next several execution times."
+        description="Build and validate cron expressions with an interactive visual builder."
       />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
-      <ToolControls style={{ justifyContent: 'space-between' }}>
-        <div style={{ flex: 1, maxWidth: '400px' }}>
-          <label
-            style={{
-              display: 'block',
-              fontSize: '11px',
-              fontWeight: 600,
-              color: '#71717a',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '6px',
-              marginLeft: '4px',
-            }}
-          >
-            Cron Expression
-          </label>
-          <div style={{ position: 'relative' }}>
-            <Hash
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '24px',
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <div
               style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '16px',
-                height: '16px',
+                fontSize: '11px',
+                fontWeight: 600,
                 color: '#71717a',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                marginBottom: '8px',
               }}
-            />
+            >
+              Quick Presets
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {EXPRESSION_PRESETS.map((preset) => (
+                <Button
+                  key={preset.name}
+                  size="sm"
+                  active={selectedPreset === preset.name}
+                  onClick={() => {
+                    const newFields = parseCronExpression(preset.expr);
+                    if (newFields) {
+                      setFields(newFields);
+                      setExpression(preset.expr);
+                      setSelectedPreset(preset.name);
+                    }
+                  }}
+                  title={preset.desc}
+                >
+                  {preset.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <div
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#71717a',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                marginBottom: '8px',
+              }}
+            >
+              Expression
+            </div>
             <input
-              value={cron}
-              onChange={(e) => setCron(e.target.value)}
-              placeholder="* * * * *"
+              type="text"
+              value={expression}
+              onChange={(e) => handleExpressionChange(e.target.value)}
+              spellCheck={false}
               style={{
                 width: '100%',
-                height: '40px',
-                padding: '0 12px 0 40px',
-                fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
-                fontSize: '18px',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
+                padding: '10px 12px',
+                fontFamily: "'IBM Plex Mono', monospace",
+                fontSize: '14px',
+                fontWeight: 500,
+                backgroundColor: '#18181b',
+                border: error ? '1px solid #ef4444' : '1px solid #27272a',
+                borderRadius: '8px',
+                color: '#f4f4f5',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+            <div
+              style={{ marginTop: '6px', fontSize: '12px', color: error ? '#ef4444' : '#71717a' }}
+            >
+              {error || description}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <div
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#71717a',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                marginBottom: '8px',
+              }}
+            >
+              Field Breakdown
+            </div>
+            <div
+              style={{
                 backgroundColor: '#18181b',
                 border: '1px solid #27272a',
                 borderRadius: '8px',
-                color: '#3b82f6',
-                outline: 'none',
-              }}
-            />
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-          {presets.map((p) => (
-            <Button
-              key={p.label}
-              size="sm"
-              active={cron === p.value}
-              onClick={() => setCron(p.value)}
-            >
-              {p.label}
-            </Button>
-          ))}
-        </div>
-      </ToolControls>
-
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
-        <div
-          style={{
-            padding: '24px',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(59, 130, 246, 0.05)',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
-            marginBottom: '24px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              color: 'rgba(59, 130, 246, 0.6)',
-              marginBottom: '8px',
-            }}
-          >
-            <Info style={{ width: '12px', height: '12px' }} />
-            Human Readable Description
-          </div>
-          <div
-            style={{
-              fontSize: '24px',
-              fontWeight: 600,
-              letterSpacing: '-0.025em',
-              lineHeight: 1.4,
-              color: error ? '#ef4444' : '#f4f4f5',
-            }}
-          >
-            {error ? 'Invalid Cron Expression' : description || 'Enter an expression above...'}
-          </div>
-          {error && (
-            <div
-              style={{
-                marginTop: '8px',
-                fontSize: '12px',
-                fontFamily: "'IBM Plex Mono', monospace",
-                color: 'rgba(239, 68, 68, 0.7)',
-                fontStyle: 'italic',
+                overflow: 'hidden',
               }}
             >
-              {error}
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #27272a' }}>
+                    <th
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: '#52525b',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      Field
+                    </th>
+                    <th
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: '#52525b',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      Value
+                    </th>
+                    <th
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: '#52525b',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      Description
+                    </th>
+                    <th
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: '#52525b',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      Valid Range & Examples
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {['minute', 'hour', 'day', 'month', 'weekday'].map((fieldName, index) => {
+                    const config = CRON_FIELDS[fieldName];
+                    const value = fields[fieldName];
+                    const color = fieldColors[fieldName];
+                    return (
+                      <tr
+                        key={fieldName}
+                        style={{ borderBottom: index < 4 ? '1px solid #27272a' : 'none' }}
+                      >
+                        <td style={{ padding: '10px 12px', verticalAlign: 'middle' }}>
+                          <span
+                            style={{
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              color,
+                              borderBottom: `2px solid ${color}`,
+                              paddingBottom: '2px',
+                            }}
+                          >
+                            {config.label}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 12px', verticalAlign: 'middle' }}>
+                          <span
+                            style={{
+                              fontFamily: "'IBM Plex Mono', monospace",
+                              fontSize: '13px',
+                              fontWeight: 500,
+                              color: '#3b82f6',
+                            }}
+                          >
+                            {value}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 12px', verticalAlign: 'middle' }}>
+                          <span style={{ fontSize: '12px', color: '#a1a1aa' }}>
+                            {getFieldDescription(value, config.label)}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 12px', verticalAlign: 'middle' }}>
+                          <div
+                            style={{
+                              fontSize: '12px',
+                              fontFamily: "'IBM Plex Mono', monospace",
+                              fontWeight: 500,
+                              color: '#71717a',
+                            }}
+                          >
+                            {config.validRange}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#3f3f46', marginTop: '4px' }}>
+                            e.g. {config.examples}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
-          <div
-            style={{
-              padding: '24px',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(39, 39, 42, 0.2)',
-              border: '1px solid #27272a',
-            }}
-          >
+        <div style={{ display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+          <div style={{ flex: 1, minHeight: 0 }}>
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '10px',
-                fontWeight: 700,
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#71717a',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
-                color: 'rgba(113, 113, 122, 0.5)',
-                borderBottom: '1px solid #27272a',
-                paddingBottom: '8px',
-                marginBottom: '16px',
+                marginBottom: '12px',
               }}
             >
-              <Clock style={{ width: '12px', height: '12px' }} />
-              Next Execution Times
+              Execution Timeline
             </div>
-            <div>
-              {nextRuns.map((run, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    padding: '8px',
-                    borderRadius: '4px',
-                    cursor: 'default',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(39, 39, 42, 0.3)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      color: 'rgba(113, 113, 122, 0.4)',
-                      width: '16px',
-                    }}
-                  >
-                    {i + 1}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '12px',
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontWeight: 500,
-                      color: 'rgba(244, 244, 245, 0.8)',
-                    }}
-                  >
-                    {run}
-                  </span>
-                </div>
-              ))}
-              {nextRuns.length === 0 && (
-                <div
-                  style={{
-                    fontSize: '12px',
-                    color: '#71717a',
-                    fontStyle: 'italic',
-                    padding: '0 8px',
-                  }}
-                >
-                  Waiting for valid expression...
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div
-            style={{
-              padding: '24px',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(39, 39, 42, 0.2)',
-              border: '1px solid #27272a',
-            }}
-          >
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '10px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                color: 'rgba(113, 113, 122, 0.5)',
-                borderBottom: '1px solid #27272a',
-                paddingBottom: '8px',
-                marginBottom: '16px',
+                backgroundColor: '#18181b',
+                border: '1px solid #27272a',
+                borderRadius: '8px',
+                overflow: 'hidden',
               }}
             >
-              <Timer style={{ width: '12px', height: '12px' }} />
-              Syntax Guide
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-              <div>
-                <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '4px' }}>*</div>
-                <div style={{ fontSize: '12px', color: '#71717a' }}>Any value</div>
-              </div>
-              <div>
-                <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '4px' }}>,</div>
-                <div style={{ fontSize: '12px', color: '#71717a' }}>Value list</div>
-              </div>
-              <div>
-                <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '4px' }}>-</div>
-                <div style={{ fontSize: '12px', color: '#71717a' }}>Range</div>
-              </div>
-              <div>
-                <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '4px' }}>/</div>
-                <div style={{ fontSize: '12px', color: '#71717a' }}>Step values</div>
-              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #27272a' }}>
+                    <th
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: '#52525b',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        width: '28px',
+                      }}
+                    ></th>
+                    <th
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: '#52525b',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      Label
+                    </th>
+                    <th
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'left',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: '#52525b',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      Time
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid #27272a' }}>
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <button
+                        onClick={() =>
+                          prevExecutions[0] &&
+                          handleExpressionChange(
+                            buildExpression(parseCronExpression(expression) || {})
+                          )
+                        }
+                        disabled={prevExecutions.length === 0}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          padding: '6px',
+                          backgroundColor: 'transparent',
+                          border: '1px solid #27272a',
+                          borderRadius: '6px',
+                          color: prevExecutions.length > 0 ? '#71717a' : '#3f3f46',
+                          cursor: prevExecutions.length > 0 ? 'pointer' : 'not-allowed',
+                        }}
+                      >
+                        <ChevronLeft style={{ width: '16px', height: '16px' }} />
+                      </button>
+                    </td>
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 500, color: '#71717a' }}>
+                        Previous
+                      </div>
+                      {prevExecutions[1] && (
+                        <div style={{ fontSize: '10px', color: '#52525b', marginTop: '4px' }}>
+                          2 ago
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontWeight: 500,
+                          color: '#a1a1aa',
+                        }}
+                      >
+                        {prevExecutions[0] ? formatDate(prevExecutions[0]) : '—'}
+                      </div>
+                      {prevExecutions[1] && (
+                        <div
+                          style={{
+                            fontSize: '11px',
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            color: '#52525b',
+                            marginTop: '4px',
+                          }}
+                        >
+                          {formatDate(prevExecutions[1])}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                  <tr
+                    style={{
+                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                      borderBottom: '1px solid rgba(59, 130, 246, 0.2)',
+                    }}
+                  >
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <button
+                        onClick={() => setNow(new Date())}
+                        title="Reset to now"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          padding: '6px',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          borderRadius: '6px',
+                          color: '#3b82f6',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <RefreshCw style={{ width: '14px', height: '14px' }} />
+                      </button>
+                    </td>
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 500, color: '#3b82f6' }}>
+                        Current
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#22c55e', marginTop: '4px' }}>
+                        Next in
+                      </div>
+                    </td>
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontWeight: 500,
+                          color: '#3b82f6',
+                        }}
+                      >
+                        {formatDate(now)}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '11px',
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontWeight: 500,
+                          color: '#22c55e',
+                          marginTop: '4px',
+                        }}
+                      >
+                        {formatCountdown(nextFromNow)}
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <button
+                        onClick={() =>
+                          nextExecutions[0] &&
+                          handleExpressionChange(
+                            buildExpression(parseCronExpression(expression) || {})
+                          )
+                        }
+                        disabled={nextExecutions.length === 0}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          padding: '6px',
+                          backgroundColor: 'transparent',
+                          border: '1px solid #27272a',
+                          borderRadius: '6px',
+                          color: nextExecutions.length > 0 ? '#22c55e' : '#3f3f46',
+                          cursor: nextExecutions.length > 0 ? 'pointer' : 'not-allowed',
+                        }}
+                      >
+                        <ChevronRight style={{ width: '16px', height: '16px' }} />
+                      </button>
+                    </td>
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 500, color: '#22c55e' }}>
+                        Next
+                      </div>
+                      {nextExecutions[1] && (
+                        <div style={{ fontSize: '10px', color: '#52525b', marginTop: '4px' }}>
+                          2 later
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          fontFamily: "'IBM Plex Mono', monospace",
+                          fontWeight: 500,
+                          color: '#f4f4f5',
+                        }}
+                      >
+                        {nextExecutions[0] ? formatDate(nextExecutions[0]) : '—'}
+                      </div>
+                      {nextExecutions[1] && (
+                        <div
+                          style={{
+                            fontSize: '11px',
+                            fontFamily: "'IBM Plex Mono', monospace",
+                            color: '#52525b',
+                            marginTop: '4px',
+                          }}
+                        >
+                          {formatDate(nextExecutions[1])}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

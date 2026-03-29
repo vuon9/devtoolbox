@@ -268,6 +268,7 @@ export default function BarcodeGenerator() {
         title="Barcode / QR Code"
         description="Generate high-quality QR codes and barcodes for various standards. Customize appearance and download directly as PNG."
       />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -275,8 +276,6 @@ export default function BarcodeGenerator() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: '1px solid #27272a',
-          paddingBottom: '16px',
           flexWrap: 'wrap',
           gap: '12px',
         }}

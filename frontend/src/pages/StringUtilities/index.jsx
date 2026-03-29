@@ -237,12 +237,11 @@ export default function StringUtilities() {
         title="String Utilities"
         description="All-in-one text processing toolkit. Convert cases, sort lines, remove duplicates, and inspect text properties."
       />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
       <div
         style={{
           marginBottom: '16px',
-          paddingBottom: '16px',
-          borderBottom: '1px solid #27272a',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',

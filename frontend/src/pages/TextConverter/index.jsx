@@ -390,6 +390,7 @@ export default function TextBasedConverter() {
       }}
     >
       <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
       {/* First row: Dropdowns + Quick Actions */}
       <div
@@ -398,8 +399,6 @@ export default function TextBasedConverter() {
           alignItems: 'center',
           gap: '16px',
           marginBottom: '16px',
-          paddingBottom: '16px',
-          borderBottom: '1px solid #27272a',
         }}
       >
         <ConversionControls

@@ -1199,6 +1199,7 @@ export default function RegExpTester() {
         title="RegExp Tester"
         description="Write and debug regular expressions with real-time feedback. Visualize matches, groups, and capture properties instantly."
       />
+      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -1206,8 +1207,6 @@ export default function RegExpTester() {
           alignItems: 'flex-end',
           gap: '16px',
           marginBottom: '16px',
-          paddingBottom: '16px',
-          borderBottom: '1px solid #27272a',
         }}
       >
         <div style={{ flex: 1 }}>
