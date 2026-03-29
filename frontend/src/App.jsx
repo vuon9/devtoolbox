@@ -1,10 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { TitleBar } from './components/TitleBar';
 import { SettingsModal } from './components/SettingsModal';
 import ToolRouter from './ToolRouter';
 import './App.css';
+
+// NavigationHandler listens for navigate events from command palette
+function NavigationHandler() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Listen for navigation events from command palette (via Go backend)
+    const unsubscribe = window.runtime?.EventsOn?.('navigate:to', (path) => {
+      console.log('[App] Received navigate:to event:', path);
+      if (path) {
+        navigate(path);
+      }
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [navigate]);
+
+  return null;
+}
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -65,6 +86,7 @@ function App() {
             <Route path="/tool/:toolId/*" element={<ToolRouter />} />
             <Route path="*" element={<Navigate to="/tool/text-converter" replace />} />
           </Routes>
+          <NavigationHandler />
         </main>
       </div>
 

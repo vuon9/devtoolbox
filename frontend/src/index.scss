@@ -1,9 +1,12 @@
 @use '@carbon/styles/scss/config' with (
-  $use-flexbox-grid: true
+  $use-flexbox-grid: true,
+  $font-path: ''
 );
 @use '@carbon/styles/scss/themes';
 @use '@carbon/styles/scss/theme';
-@use '@carbon/styles';
+// Import only core styles without fonts
+@use '@carbon/styles/scss/components';
+@use '@carbon/styles/scss/utilities';
 
 /* Tailwind CSS is automatically injected by @tailwindcss/vite plugin */
 

@@ -16,14 +16,8 @@ export default defineConfig({
       scss: {
         // Suppress expected carbon-design-system deprecation warnings
         // until the library updates its internal Sass usage
-        silenceDeprecations: [
-          'modern',
-          'import',
-          'global-builtin',
-          'if-function',
-          'mixed-decls',
-          'color-functions',
-        ],
+        silenceDeprecations: ['import', 'global-builtin', 'legacy-js-api'],
+        quietDeps: true,
       },
     },
   },
