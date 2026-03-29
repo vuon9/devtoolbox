@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FileText, Zap, Filter, Braces, Code2, Code } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-xml-doc';
@@ -44,7 +45,9 @@ function debounce(func, wait) {
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
         {title}
       </h2>
       <p style={{ color: '#a1a1aa', marginTop: '4px', fontSize: '14px' }}>{description}</p>
@@ -81,7 +84,15 @@ function LanguageSelect({ value, onChange }) {
           <selectedLang.icon style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
           <span>{selectedLang.label}</span>
         </div>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.5 }}>
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          style={{ opacity: 0.5 }}
+        >
           <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
@@ -132,63 +143,26 @@ function LanguageSelect({ value, onChange }) {
   );
 }
 
-function SampleButton({ onClick, disabled }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-        height: '36px',
-        padding: '0 12px',
-        backgroundColor: '#27272a',
-        border: '1px solid #3f3f46',
-        borderRadius: '6px',
-        color: '#a1a1aa',
-        fontSize: '13px',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'all 0.15s ease',
-      }}
-    >
-      <FileText style={{ width: '14px', height: '14px' }} />
-      Load Sample
-    </button>
-  );
-}
-
-function MinifyButton({ active, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-        height: '36px',
-        padding: '0 12px',
-        backgroundColor: active ? '#2563eb' : '#27272a',
-        border: `1px solid ${active ? '#2563eb' : '#3f3f46'}`,
-        borderRadius: '6px',
-        color: active ? '#ffffff' : '#a1a1aa',
-        fontSize: '13px',
-        cursor: 'pointer',
-        transition: 'all 0.15s ease',
-      }}
-    >
-      <Zap style={{ width: '14px', height: '14px' }} />
-      Minify
-    </button>
-  );
-}
-
 function InputPane({ value, onChange, placeholder }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-        <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#71717a', fontWeight: 600, letterSpacing: '0.05em' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '6px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            color: '#71717a',
+            fontWeight: 600,
+            letterSpacing: '0.05em',
+          }}
+        >
           Input
         </span>
       </div>
@@ -223,18 +197,38 @@ function OutputPane({ content, language, error, filterComponent }) {
 
   const getPrismLanguage = (lang) => {
     switch (lang) {
-      case 'json': return 'json';
-      case 'xml': return 'xml';
-      case 'html': return 'markup';
-      case 'css': return 'css';
-      default: return 'text';
+      case 'json':
+        return 'json';
+      case 'xml':
+        return 'xml';
+      case 'html':
+        return 'markup';
+      case 'css':
+        return 'css';
+      default:
+        return 'text';
     }
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-        <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#71717a', fontWeight: 600, letterSpacing: '0.05em' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '6px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '11px',
+            textTransform: 'uppercase',
+            color: '#71717a',
+            fontWeight: 600,
+            letterSpacing: '0.05em',
+          }}
+        >
           Formatted Output
         </span>
       </div>
@@ -252,7 +246,16 @@ function OutputPane({ content, language, error, filterComponent }) {
       >
         {content && (
           <pre style={{ margin: 0, background: 'transparent' }}>
-            <code className={`language-${getPrismLanguage(language)}`} style={{ background: 'transparent', padding: 0, fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace", fontSize: '13px', lineHeight: 1.5 }}>
+            <code
+              className={`language-${getPrismLanguage(language)}`}
+              style={{
+                background: 'transparent',
+                padding: 0,
+                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                fontSize: '13px',
+                lineHeight: 1.5,
+              }}
+            >
               {content}
             </code>
           </pre>
@@ -297,7 +300,14 @@ function FilterBar({ value, onChange, placeholder, show, error }) {
       }}
     >
       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-        <Filter style={{ width: '16px', height: '16px', color: error ? '#ef4444' : '#a1a1aa', flexShrink: 0 }} />
+        <Filter
+          style={{
+            width: '16px',
+            height: '16px',
+            color: error ? '#ef4444' : '#a1a1aa',
+            flexShrink: 0,
+          }}
+        />
         <input
           type="text"
           value={value}
@@ -316,7 +326,13 @@ function FilterBar({ value, onChange, placeholder, show, error }) {
         />
       </div>
       {error && (
-        <div style={{ fontSize: '11px', color: '#ef4444', fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace" }}>
+        <div
+          style={{
+            fontSize: '11px',
+            color: '#ef4444',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+          }}
+        >
           {error}
         </div>
       )}
@@ -327,7 +343,9 @@ function FilterBar({ value, onChange, placeholder, show, error }) {
 export default function CodeFormatter() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
-  const [language, setLanguage] = useState(() => localStorage.getItem('code-formatter-lang') || 'json');
+  const [language, setLanguage] = useState(
+    () => localStorage.getItem('code-formatter-lang') || 'json'
+  );
   const [filter, setFilter] = useState('');
   const [minify, setMinify] = useState(false);
   const [error, setError] = useState('');

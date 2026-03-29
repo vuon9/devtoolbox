@@ -21,15 +21,11 @@ function App() {
   const openCommandPalette = () => setIsCommandPaletteOpen(true);
   const closeCommandPalette = () => setIsCommandPaletteOpen(false);
 
-  // Keyboard shortcut for Command Palette (Cmd+K / Ctrl+K)
+  // Global spotlight shortcut is Cmd+Shift+Space (handled by Go backend)
+  // In-app shortcuts can be added here if needed
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsCommandPaletteOpen(prev => !prev);
-      }
-      // Close on Escape
+      // Close Command Palette on Escape if open
       if (e.key === 'Escape' && isCommandPaletteOpen) {
         setIsCommandPaletteOpen(false);
       }
