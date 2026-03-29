@@ -8,7 +8,8 @@ Base64, JWT, JSON formatting, hashing, encoding, escaping, color conversion, reg
 
 **Features Spotlight-like Command Palette:** Press `Cmd+Ctrl+M` (macOS) or `Ctrl+Alt+M` (Windows/Linux) from anywhere to open the floating command palette. Works even over fullscreen apps!
 
-<img width="1552" height="922" alt="DevToolbox interface" src="https://github.com/user-attachments/assets/7dc24777-7330-485a-b6b4-b522739536c0" />
+<img width="1552" height="922" alt="SCR-20260329-qrkw" src="https://github.com/user-attachments/assets/22a79bde-03cc-4605-a705-67ad986635df" />
+
 
 No browser tabs. No data sent to servers. Just open and use.
 
