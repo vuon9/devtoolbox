@@ -203,7 +203,7 @@ function InputPane({ value, onChange, placeholder }) {
           borderRadius: '8px',
           padding: '8px',
           color: '#f4f4f5',
-          fontFamily: "'IBM Plex Mono', 'Menlo', monospace",
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '13px',
           lineHeight: 1.5,
           resize: 'none',
@@ -250,16 +250,12 @@ function OutputPane({ content, language, error, filterComponent }) {
           marginBottom: '8px',
         }}
       >
-        {content ? (
+        {content && (
           <pre style={{ margin: 0, background: 'transparent' }}>
-            <code className={`language-${getPrismLanguage(language)}`} style={{ background: 'transparent', padding: 0, fontFamily: "'IBM Plex Mono', 'Menlo', monospace", fontSize: '13px', lineHeight: 1.5 }}>
+            <code className={`language-${getPrismLanguage(language)}`} style={{ background: 'transparent', padding: 0, fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace", fontSize: '13px', lineHeight: 1.5 }}>
               {content}
             </code>
           </pre>
-        ) : (
-          <span style={{ color: '#3f3f46', fontFamily: "'IBM Plex Mono', monospace", fontSize: '13px' }}>
-            Result will appear here...
-          </span>
         )}
       </div>
 
@@ -274,7 +270,7 @@ function OutputPane({ content, language, error, filterComponent }) {
             border: '1px solid rgba(239, 68, 68, 0.2)',
             color: '#ef4444',
             fontSize: '12px',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           }}
         >
           {error}
@@ -314,13 +310,13 @@ function FilterBar({ value, onChange, placeholder, show, error }) {
             color: error ? '#ef4444' : '#f4f4f5',
             padding: '4px 0',
             fontSize: '13px',
-            fontFamily: "'IBM Plex Mono', monospace",
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             outline: 'none',
           }}
         />
       </div>
       {error && (
-        <div style={{ fontSize: '11px', color: '#ef4444', fontFamily: "'IBM Plex Mono', monospace" }}>
+        <div style={{ fontSize: '11px', color: '#ef4444', fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace" }}>
           {error}
         </div>
       )}
