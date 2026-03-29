@@ -48,6 +48,7 @@ function ToolHeader({ title, description }) {
         {title}
       </h2>
       <p style={{ color: '#a1a1aa', marginTop: '4px', fontSize: '14px' }}>{description}</p>
+      <hr style={{ marginTop: '16px', border: 'none', borderTop: '1px solid #27272a' }} />
     </div>
   );
 }
