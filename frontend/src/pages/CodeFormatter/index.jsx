@@ -6,7 +6,7 @@ import 'prismjs/components/prism-xml-doc';
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-markup';
 import 'prismjs/themes/prism-tomorrow.css';
-import { Format } from '../../generated/wails/codeFormatterService';
+import { Format } from '../../generated';
 
 const languages = [
   { id: 'json', label: 'JSON', icon: Braces },
