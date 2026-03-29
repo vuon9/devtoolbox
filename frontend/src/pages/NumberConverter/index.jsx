@@ -78,7 +78,7 @@ function Column1Bases({ result, base }) {
               <span
                 style={{
                   fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: '12px',
+                  fontSize: '14px',
                   color: '#f4f4f5',
                 }}
               >
@@ -198,8 +198,8 @@ function Column2Data({ result }) {
             >
               <div
                 style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: '11px',
+                  fontFamily: "'IBM Plex Mono', monospace',
+                  fontSize: '14px',
                   color: i === result.bytes.highlighted ? '#3b82f6' : '#f4f4f5',
                 }}
               >
@@ -295,7 +295,7 @@ function Column2Data({ result }) {
               <div
                 style={{
                   fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: '11px',
+                  fontSize: '14px',
                   color: '#f4f4f5',
                 }}
               >
@@ -339,7 +339,7 @@ function Column3Context({ result }) {
             <div
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: '13px',
+                fontSize: '15px',
                 color: '#f4f4f5',
                 textAlign: 'center',
               }}
@@ -383,7 +383,7 @@ function Column3Context({ result }) {
         <div
           style={{
             fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: '13px',
+            fontSize: '15px',
             color: '#f4f4f5',
             textAlign: 'center',
           }}
@@ -420,8 +420,8 @@ function Column3Context({ result }) {
           >
             <div
               style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: '11px',
+                fontFamily: "'IBM Plex Mono', monospace',
+                fontSize: '14px',
                 color: '#f4f4f5',
                 textAlign: 'center',
               }}
@@ -462,7 +462,7 @@ function Column3Context({ result }) {
             <div
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: '13px',
+                fontSize: '15px',
                 color: '#f4f4f5',
                 textAlign: 'center',
               }}
@@ -577,7 +577,7 @@ export default function NumberConverter() {
             borderRadius: '6px',
             padding: '8px 12px',
             color: '#a1a1aa',
-            fontSize: '12px',
+            fontSize: '14px',
             cursor: 'pointer',
           }}
         >
@@ -595,7 +595,7 @@ export default function NumberConverter() {
             border: '1px solid rgba(239, 68, 68, 0.2)',
             borderRadius: '6px',
             color: '#ef4444',
-            fontSize: '12px',
+            fontSize: '14px',
             marginBottom: '12px',
           }}
         >
