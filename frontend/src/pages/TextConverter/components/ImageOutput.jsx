@@ -111,15 +111,67 @@ export default function ImageOutput({ value, onCopy }) {
     return (
       <div
         style={{
-          height: '100%',
+          flex: 1,
+          minHeight: 0,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#71717a',
-          fontStyle: 'italic',
+          flexDirection: 'column',
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          overflow: 'hidden',
         }}
       >
-        Enter base64 image data...
+        <div
+          style={{
+            padding: '8px 12px',
+            borderBottom: '1px solid #27272a',
+            backgroundColor: '#09090b',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            Image Preview
+          </span>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+              color: '#3b82f6',
+            }}
+          >
+            Result
+          </span>
+        </div>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#52525b',
+            fontStyle: 'italic',
+          }}
+        >
+          Enter base64 image data...
+        </div>
       </div>
     );
   }
@@ -130,7 +182,6 @@ export default function ImageOutput({ value, onCopy }) {
     const link = document.createElement('a');
     link.href = imageSrc;
 
-    // Determine file extension from data
     let extension = 'png';
     if (value.includes('jpeg') || value.includes('jpg') || value.startsWith('/9j/')) {
       extension = 'jpg';
@@ -156,26 +207,30 @@ export default function ImageOutput({ value, onCopy }) {
   return (
     <div
       style={{
-        height: '100%',
+        flex: 1,
+        minHeight: 0,
         display: 'flex',
         flexDirection: 'column',
+        backgroundColor: '#18181b',
+        border: '1px solid #27272a',
+        borderRadius: '8px',
         overflow: 'hidden',
       }}
     >
-      {/* Header with actions */}
       <div
         style={{
+          padding: '8px 12px',
+          borderBottom: '1px solid #27272a',
+          backgroundColor: '#09090b',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '0 0 8px 0',
-          borderBottom: '1px solid #27272a',
-          marginBottom: '8px',
         }}
       >
         <span
           style={{
-            fontSize: '12px',
+            fontSize: '11px',
+            fontWeight: 600,
             color: '#71717a',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
@@ -183,26 +238,50 @@ export default function ImageOutput({ value, onCopy }) {
         >
           Image Preview
         </span>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+              color: '#3b82f6',
+            }}
+          >
+            Result
+          </span>
           <button
             onClick={handleCopy}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              fontSize: '12px',
-              fontWeight: 500,
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              padding: '6px',
               backgroundColor: 'transparent',
-              border: '1px solid #3f3f46',
+              border: 'none',
               borderRadius: '4px',
               color: '#a1a1aa',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.color = '#f4f4f5';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#a1a1aa';
+            }}
           >
-            <Copy style={{ width: '14px', height: '14px' }} />
-            {copyFeedback}
+            <Copy style={{ width: '16px', height: '16px' }} />
           </button>
           <button
             onClick={handleDownload}
@@ -210,26 +289,33 @@ export default function ImageOutput({ value, onCopy }) {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              fontSize: '12px',
-              fontWeight: 500,
-              backgroundColor: '#2563eb',
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              padding: '6px',
+              backgroundColor: 'transparent',
               border: 'none',
               borderRadius: '4px',
-              color: '#ffffff',
+              color: loadError ? '#3f3f46' : '#a1a1aa',
               cursor: loadError ? 'not-allowed' : 'pointer',
-              opacity: loadError ? 0.5 : 1,
               transition: 'all 0.15s ease',
             }}
+            onMouseEnter={(e) => {
+              if (!loadError) {
+                e.currentTarget.style.backgroundColor = '#27272a';
+                e.currentTarget.style.color = '#f4f4f5';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = loadError ? '#3f3f46' : '#a1a1aa';
+            }}
           >
-            <Download style={{ width: '14px', height: '14px' }} />
-            Download
+            <Download style={{ width: '16px', height: '16px' }} />
           </button>
         </div>
       </div>
 
-      {/* Image display */}
       <div
         style={{
           flex: 1,
@@ -237,9 +323,8 @@ export default function ImageOutput({ value, onCopy }) {
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'auto',
-          backgroundColor: '#18181b',
-          borderRadius: '4px',
           padding: '16px',
+          minHeight: 0,
         }}
       >
         {!validation.valid ? (
@@ -273,20 +358,6 @@ export default function ImageOutput({ value, onCopy }) {
             <div style={{ fontSize: '12px', color: '#71717a' }}>
               The base64 data may be corrupted or not an image
             </div>
-            <div
-              style={{
-                fontSize: '10px',
-                color: '#71717a',
-                maxWidth: '300px',
-                wordBreak: 'break-all',
-                marginTop: '8px',
-                padding: '8px',
-                backgroundColor: '#27272a',
-                borderRadius: '4px',
-              }}
-            >
-              Preview: {value.substring(0, 50)}...
-            </div>
           </div>
         ) : (
           <img
@@ -298,29 +369,11 @@ export default function ImageOutput({ value, onCopy }) {
               objectFit: 'contain',
               borderRadius: '4px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-              display: loadError ? 'none' : 'block',
             }}
             onError={() => {
               setLoadError(true);
             }}
           />
-        )}
-      </div>
-
-      {/* Data info */}
-      <div
-        style={{
-          marginTop: '8px',
-          padding: '8px',
-          backgroundColor: '#1c1917',
-          borderRadius: '4px',
-          fontSize: '12px',
-          color: '#71717a',
-        }}
-      >
-        Data length: {value.length.toLocaleString()} characters
-        {validation.valid && (
-          <span style={{ marginLeft: '16px', color: '#22c55e' }}>Valid Base64</span>
         )}
       </div>
     </div>

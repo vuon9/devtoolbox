@@ -1,20 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Type, Hash, ListOrdered, AlignLeft, Trash2, Undo2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Undo2, Copy, ArrowUpDown, RefreshCw, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import CaseConverterPane from './components/CaseConverterPane';
-import SortDedupePane from './components/SortDedupePane';
-import InspectorPane from './components/InspectorPane';
-import ModeTabBar from './components/ModeTabBar';
-import {
-  convertCase,
-  sortLines,
-  removeDuplicates,
-  getTextStats,
-  trimLines,
-  removeEmptyLines,
-} from './strings';
+import { sortLines, removeDuplicates, getTextStats, trimLines, removeEmptyLines } from './strings';
 
-// Inline-styled components
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
@@ -28,7 +17,16 @@ function ToolHeader({ title, description }) {
   );
 }
 
-function ToolPane({ label, value, onChange, readOnly, placeholder, style = {} }) {
+function ToolPane({
+  label,
+  value,
+  onChange,
+  readOnly,
+  placeholder,
+  indicator,
+  indicatorColor,
+  style = {},
+}) {
   const handleCopy = () => {
     if (value) {
       navigator.clipboard.writeText(value);
@@ -40,8 +38,8 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, style = {} })
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
-        minHeight: '200px',
+        flex: 1,
+        minHeight: 0,
         ...style,
       }}
     >
@@ -50,141 +48,131 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, style = {} })
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          minHeight: '30px',
           marginBottom: '8px',
         }}
       >
-        <label
-          style={{
-            fontSize: '11px',
-            fontWeight: 600,
-            color: '#71717a',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-          }}
-        >
-          {label}
-        </label>
-        {!readOnly && (
-          <button
-            onClick={handleCopy}
-            title="Copy to clipboard"
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '28px',
-              height: '28px',
-              padding: '6px',
-              backgroundColor: 'transparent',
-              border: 'none',
-              borderRadius: '4px',
-              color: '#a1a1aa',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#a1a1aa';
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
             }}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            {label}
+          </label>
+          {indicator && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '10px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                backgroundColor:
+                  indicatorColor === 'green'
+                    ? 'rgba(34, 197, 94, 0.15)'
+                    : indicatorColor === 'blue'
+                      ? 'rgba(59, 130, 246, 0.15)'
+                      : 'rgba(113, 113, 122, 0.15)',
+                color:
+                  indicatorColor === 'green'
+                    ? '#22c55e'
+                    : indicatorColor === 'blue'
+                      ? '#3b82f6'
+                      : '#71717a',
+              }}
             >
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-          </button>
-        )}
+              {indicator}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={handleCopy}
+          disabled={!value}
+          title="Copy to clipboard"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '28px',
+            height: '28px',
+            padding: '6px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '4px',
+            color: value ? '#a1a1aa' : '#3f3f46',
+            cursor: value ? 'pointer' : 'not-allowed',
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            if (value) {
+              e.currentTarget.style.backgroundColor = '#27272a';
+              e.currentTarget.style.color = '#f4f4f5';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = value ? '#a1a1aa' : '#3f3f46';
+          }}
+        >
+          <Copy style={{ width: '16px', height: '16px' }} />
+        </button>
       </div>
-      <div
+      <textarea
+        value={value}
+        onChange={onChange}
+        readOnly={readOnly}
+        placeholder={placeholder}
         style={{
           flex: 1,
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
+          width: '100%',
+          padding: '12px',
+          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontSize: '14px',
+          lineHeight: 1.6,
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          color: '#f4f4f5',
+          resize: 'none',
+          outline: 'none',
         }}
-      >
-        <textarea
-          value={value}
-          onChange={onChange}
-          readOnly={readOnly}
-          placeholder={placeholder}
-          style={{
-            flex: 1,
-            width: '100%',
-            height: '100%',
-            padding: '12px',
-            fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
-            fontSize: '14px',
-            lineHeight: 1.5,
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
-            borderRadius: '8px',
-            color: '#f4f4f5',
-            resize: 'none',
-            outline: 'none',
-          }}
-        />
-      </div>
+      />
     </div>
   );
 }
 
-function ToolSplitPane({ children, columnCount = 2 }) {
+function StatBadge({ label, value }) {
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: columnCount === 1 ? '1fr' : '1fr 1fr',
-        gap: '16px',
-        flex: 1,
-        minHeight: 0,
-        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        padding: '6px 12px',
+        backgroundColor: '#18181b',
+        borderRadius: '6px',
+        border: '1px solid #27272a',
       }}
     >
-      {children}
-    </div>
-  );
-}
-
-function StatItem({ label, value }) {
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <div
+      <span style={{ fontSize: '11px', color: '#71717a', fontWeight: 500 }}>{label}</span>
+      <span
         style={{
-          fontSize: '10px',
-          fontWeight: 600,
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-          color: '#71717a',
-          marginBottom: '2px',
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontSize: '18px',
+          fontSize: '14px',
           fontFamily: "'IBM Plex Mono', monospace",
           fontWeight: 600,
           color: '#f4f4f5',
         }}
       >
         {value}
-      </div>
+      </span>
     </div>
   );
 }
@@ -192,46 +180,47 @@ function StatItem({ label, value }) {
 export default function StringUtilities() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
-  const [activeMode, setActiveMode] = useState(
-    () => localStorage.getItem('string-utils-mode') || 'case'
-  );
+  const [sortMode, setSortMode] = useState('none');
+  const [dedupe, setDedupe] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem('string-utils-mode', activeMode);
-  }, [activeMode]);
+  const stats = getTextStats(output || input);
 
-  const handleCaseChange = (type) => {
-    setOutput(convertCase(input, type));
+  const handleSortToggle = () => {
+    const modes = ['none', 'asc', 'desc'];
+    const currentIndex = modes.indexOf(sortMode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    const newMode = modes[nextIndex];
+    setSortMode(newMode);
+    applySort(newMode, dedupe);
   };
 
-  const handleSort = (options) => {
-    setOutput(sortLines(input, options));
+  const handleDedupeToggle = () => {
+    const newDedupe = !dedupe;
+    setDedupe(newDedupe);
+    applySort(sortMode, newDedupe);
   };
 
-  const handleDedupe = () => {
-    setOutput(removeDuplicates(input));
-  };
-
-  const handleTrim = () => {
-    setOutput(trimLines(input));
-  };
-
-  const handleRemoveEmpty = () => {
-    setOutput(removeEmptyLines(input));
+  const applySort = (mode = sortMode, doDedupe = dedupe) => {
+    let result = input;
+    if (mode === 'asc') {
+      result = sortLines(result, { reverse: false });
+    } else if (mode === 'desc') {
+      result = sortLines(result, { reverse: true });
+    }
+    if (doDedupe) {
+      result = removeDuplicates(result);
+    }
+    result = trimLines(result);
+    result = removeEmptyLines(result);
+    setOutput(result);
   };
 
   const handleReset = () => {
     setInput('');
     setOutput('');
+    setSortMode('none');
+    setDedupe(false);
   };
-
-  const stats = getTextStats(activeMode === 'inspector' ? input : output || input);
-
-  const modes = [
-    { id: 'case', label: 'Case Converter', icon: Type },
-    { id: 'sort', label: 'Sort & Dedupe', icon: ListOrdered },
-    { id: 'inspector', label: 'Text Inspector', icon: Hash },
-  ];
 
   return (
     <div
@@ -246,93 +235,124 @@ export default function StringUtilities() {
     >
       <ToolHeader
         title="String Utilities"
-        description="All-in-one text processing toolkit. Convert between cases, sort lines, remove duplicates, and inspect text properties."
+        description="All-in-one text processing toolkit. Convert cases, sort lines, remove duplicates, and inspect text properties."
       />
 
       <div
         style={{
           marginBottom: '16px',
+          paddingBottom: '16px',
+          borderBottom: '1px solid #27272a',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #27272a',
-          paddingBottom: '16px',
+          justifyContent: 'flex-end',
+          gap: '12px',
         }}
       >
-        <ModeTabBar modes={modes} activeMode={activeMode} onModeChange={setActiveMode} />
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Button variant="ghost" size="sm" onClick={handleTrim}>
-            <AlignLeft style={{ width: '14px', height: '14px' }} />
-            Trim Lines
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleRemoveEmpty}>
-            <Trash2 style={{ width: '14px', height: '14px' }} />
-            Clear Empty
-          </Button>
-          <div
-            style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }}
-          />
-          <Button variant="destructive" size="sm" onClick={handleReset}>
-            <Undo2 style={{ width: '14px', height: '14px' }} />
-            Reset
-          </Button>
-        </div>
+        <span
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#71717a',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
+          Quick Actions:
+        </span>
+        <Button size="sm" active={sortMode !== 'none'} onClick={handleSortToggle}>
+          {sortMode === 'asc' ? (
+            <ArrowUp style={{ width: '14px', height: '14px' }} />
+          ) : sortMode === 'desc' ? (
+            <ArrowDown style={{ width: '14px', height: '14px' }} />
+          ) : (
+            <ArrowUpDown style={{ width: '14px', height: '14px' }} />
+          )}
+          {sortMode === 'asc' ? 'Asc' : sortMode === 'desc' ? 'Desc' : 'Sort'}
+        </Button>
+        <Button size="sm" active={dedupe} onClick={handleDedupeToggle}>
+          <RefreshCw style={{ width: '14px', height: '14px' }} />
+          Dedupe
+        </Button>
+        <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a' }} />
+        <Button variant="destructive" size="sm" onClick={handleReset}>
+          <Undo2 style={{ width: '14px', height: '14px' }} />
+          Reset
+        </Button>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0 }}>
-        {activeMode === 'inspector' ? (
-          <InspectorPane input={input} setInput={setInput} stats={stats} />
-        ) : (
-          <ToolSplitPane>
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
-              <ToolPane
-                label="Input Text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Paste or type text here..."
-              />
-              <div
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '16px',
+          flex: 1,
+          minHeight: 0,
+        }}
+      >
+        <ToolPane
+          label="Input Text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Paste or type text here..."
+          indicator="Source"
+          indicatorColor="green"
+        />
+        <div
+          style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: '12px' }}
+        >
+          <div style={{ flex: '0 0 50%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <ToolPane
+              label="Result"
+              value={output}
+              readOnly
+              placeholder="Transformed text will appear here..."
+              indicator="Output"
+              indicatorColor="blue"
+            />
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              flexWrap: 'wrap',
+              flexShrink: 0,
+            }}
+          >
+            <StatBadge label="Chars" value={stats.chars.toLocaleString()} />
+            <StatBadge label="Words" value={stats.words.toLocaleString()} />
+            <StatBadge label="Lines" value={stats.lines.toLocaleString()} />
+            <StatBadge label="Bytes" value={stats.bytes.toLocaleString()} />
+            <StatBadge label="Sentences" value={stats.sentences.toLocaleString()} />
+          </div>
+          <div
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              backgroundColor: '#1c1917',
+              border: '1px solid #27272a',
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span
                 style={{
-                  padding: '16px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1c1917',
-                  border: '1px solid #27272a',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#71717a',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
                 }}
               >
-                {activeMode === 'case' ? (
-                  <CaseConverterPane input={input} />
-                ) : (
-                  <SortDedupePane onSort={handleSort} onDedupe={handleDedupe} />
-                )}
-              </div>
+                Case Conversion
+              </span>
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
-              <ToolPane
-                label="Result"
-                value={output}
-                readOnly
-                placeholder="Transformed text will appear here..."
-              />
-              <div
-                style={{
-                  padding: '16px',
-                  borderRadius: '8px',
-                  backgroundColor: '#1c1917',
-                  border: '1px solid #27272a',
-                  display: 'flex',
-                  justifyContent: 'space-around',
-                  textAlign: 'center',
-                }}
-              >
-                <StatItem label="Lines" value={stats.lines} />
-                <StatItem label="Words" value={stats.words} />
-                <StatItem label="Chars" value={stats.chars} />
-              </div>
-            </div>
-          </ToolSplitPane>
-        )}
+            <CaseConverterPane input={output || input} />
+          </div>
+        </div>
       </div>
     </div>
   );

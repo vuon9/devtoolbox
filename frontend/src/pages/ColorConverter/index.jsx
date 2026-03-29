@@ -1,10 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
 import { Palette, Pipette, Hash, Copy, Check, History, Trash2, Sliders } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import { Button } from '../../components/ui/Button';
+
+function ToolHeader({ title, description }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
+        {title}
+      </h2>
+      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+    </div>
+  );
+}
+
+function ToolControls({ children, style = {} }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '16px',
+        marginBottom: '16px',
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function ColorInput({ label, value, onChange, icon: Icon }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div>
+      <label
+        style={{
+          display: 'block',
+          fontSize: '11px',
+          fontWeight: 600,
+          color: '#71717a',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          marginBottom: '6px',
+          marginLeft: '4px',
+        }}
+      >
+        {label}
+      </label>
+      <div style={{ position: 'relative' }}>
+        <Icon
+          style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '16px',
+            height: '16px',
+            color: '#71717a',
+          }}
+        />
+        <input
+          value={value}
+          onChange={onChange}
+          style={{
+            width: '100%',
+            height: '40px',
+            padding: '0 36px 0 36px',
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: '14px',
+            fontWeight: 500,
+            backgroundColor: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: '6px',
+            color: '#f4f4f5',
+            outline: 'none',
+          }}
+        />
+        <button
+          onClick={handleCopy}
+          style={{
+            position: 'absolute',
+            right: '8px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            padding: '4px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            color: copied ? '#22c55e' : '#71717a',
+          }}
+        >
+          {copied ? (
+            <Check style={{ width: '14px', height: '14px' }} />
+          ) : (
+            <Copy style={{ width: '14px', height: '14px' }} />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function ColorConverter() {
   const [hex, setHex] = useState('#3b82f6');
@@ -19,7 +125,6 @@ export default function ColorConverter() {
   });
 
   const updateAll = (color) => {
-    // Simple mock logic for demonstration since color-utils is not available
     setHex(color);
     setHistory((prev) => {
       const next = [color, ...prev.filter((c) => c !== color)].slice(0, 10);
@@ -37,73 +142,164 @@ export default function ColorConverter() {
   };
 
   return (
-    <div className="flex flex-col h-full p-6 overflow-hidden bg-background">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+        backgroundColor: '#09090b',
+      }}
+    >
       <ToolHeader
         title="Color Converter"
         description="Convert colors between Hex, RGB, HSL, and more. Visualize palettes and maintain a history of your favorite shades."
       />
 
-      <ToolControls className="mb-6 justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-3 bg-muted/30 p-1 rounded-lg border border-border/40">
-            <div
-              className="h-9 w-12 rounded-md border border-border/40 shadow-inner"
-              style={{ backgroundColor: hex }}
-            />
-            <div className="font-mono font-bold text-lg text-primary mr-3">{hex.toUpperCase()}</div>
+      <ToolControls>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            backgroundColor: 'rgba(39, 39, 42, 0.3)',
+            padding: '4px 16px 4px 4px',
+            borderRadius: '8px',
+            border: '1px solid #27272a',
+          }}
+        >
+          <div
+            style={{
+              height: '36px',
+              width: '48px',
+              borderRadius: '6px',
+              border: '1px solid #27272a',
+              backgroundColor: hex,
+            }}
+          />
+          <div
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontWeight: 700,
+              fontSize: '18px',
+              color: '#3b82f6',
+            }}
+          >
+            {hex.toUpperCase()}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setHistory([])}
-            className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            Clear History
-          </Button>
-        </div>
+        <Button variant="ghost" size="sm" onClick={() => setHistory([])}>
+          <Trash2 style={{ width: '14px', height: '14px' }} />
+          Clear History
+        </Button>
       </ToolControls>
 
-      <div className="flex-1 min-h-0 space-y-8 overflow-y-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4 p-6 rounded-lg bg-muted/20 border border-border/40 shadow-sm">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
-              <Sliders className="h-3 w-3" />
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+          <div
+            style={{
+              padding: '24px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(39, 39, 42, 0.2)',
+              border: '1px solid #27272a',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '10px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'rgba(113, 113, 122, 0.5)',
+                borderBottom: '1px solid #27272a',
+                paddingBottom: '8px',
+                marginBottom: '16px',
+              }}
+            >
+              <Sliders style={{ width: '12px', height: '12px' }} />
               Color Values
             </div>
 
-            <ColorInput label="Hexadecimal" value={hex} onChange={handleHexChange} icon={Hash} />
-            <ColorInput
-              label="RGB (Red, Green, Blue)"
-              value={rgb}
-              onChange={setRgb}
-              icon={Pipette}
-            />
-            <ColorInput
-              label="HSL (Hue, Saturation, Light)"
-              value={hsl}
-              onChange={setHsl}
-              icon={Pipette}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <ColorInput label="Hexadecimal" value={hex} onChange={handleHexChange} icon={Hash} />
+              <ColorInput
+                label="RGB (Red, Green, Blue)"
+                value={rgb}
+                onChange={setRgb}
+                icon={Pipette}
+              />
+              <ColorInput
+                label="HSL (Hue, Saturation, Light)"
+                value={hsl}
+                onChange={setHsl}
+                icon={Pipette}
+              />
+            </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2 px-1">
-              <History className="h-3 w-3" />
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '10px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'rgba(113, 113, 122, 0.5)',
+                borderBottom: '1px solid #27272a',
+                paddingBottom: '8px',
+                marginBottom: '16px',
+                paddingLeft: '4px',
+              }}
+            >
+              <History style={{ width: '12px', height: '12px' }} />
               Recent Colors
             </div>
-            <div className="grid grid-cols-5 gap-3">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
               {history.map((color, i) => (
                 <button
                   key={i}
-                  className="group relative h-12 rounded-md border border-border/40 shadow-sm transition-transform hover:scale-105"
-                  style={{ backgroundColor: color }}
+                  style={{
+                    height: '48px',
+                    borderRadius: '6px',
+                    border: '1px solid #27272a',
+                    backgroundColor: color,
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
                   onClick={() => updateAll(color)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
                 >
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 text-[10px] font-bold font-mono uppercase text-foreground">
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'rgba(9, 9, 11, 0.5)',
+                      opacity: 0,
+                      transition: 'opacity 0.15s ease',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      color: '#f4f4f5',
+                      textTransform: 'uppercase',
+                    }}
+                  >
                     {color}
                   </div>
                 </button>
@@ -112,57 +308,57 @@ export default function ColorConverter() {
           </div>
         </div>
 
-        {/* Color Palette visualization mockup */}
-        <div className="p-6 rounded-lg bg-muted/20 border border-border/40 space-y-4">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
+        <div
+          style={{
+            padding: '24px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(39, 39, 42, 0.2)',
+            border: '1px solid #27272a',
+            marginTop: '24px',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'rgba(113, 113, 122, 0.5)',
+              borderBottom: '1px solid #27272a',
+              paddingBottom: '8px',
+              marginBottom: '16px',
+            }}
+          >
             Generated Palette
           </div>
-          <div className="flex h-24 rounded-lg overflow-hidden border border-border/40 shadow-inner">
+          <div
+            style={{
+              display: 'flex',
+              height: '96px',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              border: '1px solid #27272a',
+            }}
+          >
             {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((p) => (
               <div
                 key={p}
-                className="flex-1 transition-all hover:flex-[1.5]"
-                style={{ backgroundColor: hex, opacity: p / 100 }}
+                style={{
+                  flex: 1,
+                  backgroundColor: hex,
+                  opacity: p / 100,
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.flex = '1.5';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.flex = '1';
+                }}
               />
             ))}
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function ColorInput({ label, value, onChange, icon: Icon }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="grid w-full items-center gap-1.5">
-      <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 ml-1">
-        {label}
-      </Label>
-      <div className="relative">
-        <Icon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/50" />
-        <Input
-          value={value}
-          onChange={onChange}
-          className="pl-9 h-10 bg-background/50 border-border/40 font-mono font-medium focus:ring-primary/20"
-        />
-        <button
-          onClick={handleCopy}
-          className="absolute right-2 top-2 p-1.5 hover:bg-muted rounded transition-colors"
-        >
-          {copied ? (
-            <Check className="h-3.5 w-3.5 text-green-500" />
-          ) : (
-            <Copy className="h-3.5 w-3.5 text-muted-foreground/50" />
-          )}
-        </button>
       </div>
     </div>
   );

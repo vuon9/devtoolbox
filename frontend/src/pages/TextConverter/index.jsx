@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Play, Plus, Columns } from 'lucide-react';
+import { Columns } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 import ConversionControls from './components/ConversionControls';
 import ConfigurationPane from './components/ConfigurationPane';
 import MultiHashOutput from './components/MultiHashOutput';
-import CommonTags from './components/CommonTags';
 import ImageOutput, { isBase64Image } from './components/ImageOutput';
 import { CONVERTER_MAP } from './constants';
 import {
@@ -98,7 +98,18 @@ function ToolControls({ children, style = {} }) {
   );
 }
 
-function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, style = {} }) {
+function ToolPane({
+  label,
+  value,
+  onChange,
+  readOnly,
+  placeholder,
+  onCopy,
+  indicator,
+  indicatorColor,
+  error,
+  style = {},
+}) {
   const handleCopy = () => {
     if (onCopy) {
       onCopy();
@@ -112,8 +123,8 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, style
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
-        minHeight: '50vh',
+        flex: 1,
+        minHeight: 0,
         ...style,
       }}
     >
@@ -122,21 +133,51 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, style
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          minHeight: '30px',
           marginBottom: '8px',
         }}
       >
-        <label
-          style={{
-            fontSize: '11px',
-            fontWeight: 600,
-            color: '#71717a',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-          }}
-        >
-          {label}
-        </label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            {label}
+          </label>
+          {indicator && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '10px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                backgroundColor:
+                  indicatorColor === 'green'
+                    ? 'rgba(34, 197, 94, 0.15)'
+                    : indicatorColor === 'blue'
+                      ? 'rgba(59, 130, 246, 0.15)'
+                      : 'rgba(113, 113, 122, 0.15)',
+                color:
+                  indicatorColor === 'green'
+                    ? '#22c55e'
+                    : indicatorColor === 'blue'
+                      ? '#3b82f6'
+                      : '#71717a',
+              }}
+            >
+              {indicator}
+            </span>
+          )}
+        </div>
         <button
           onClick={handleCopy}
           disabled={!value}
@@ -181,37 +222,26 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, onCopy, style
           </svg>
         </button>
       </div>
-      <div
+      <textarea
+        value={value}
+        onChange={onChange}
+        readOnly={readOnly}
+        placeholder={placeholder}
         style={{
           flex: 1,
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
+          width: '100%',
+          padding: '12px',
+          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontSize: '14px',
+          lineHeight: 1.6,
+          backgroundColor: '#18181b',
+          border: error ? '1px solid #ef4444' : '1px solid #27272a',
+          borderRadius: '8px',
+          color: '#f4f4f5',
+          resize: 'none',
+          outline: 'none',
         }}
-      >
-        <textarea
-          value={value}
-          onChange={onChange}
-          readOnly={readOnly}
-          placeholder={placeholder}
-          style={{
-            flex: 1,
-            width: '100%',
-            height: '100%',
-            padding: '12px',
-            fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
-            fontSize: '14px',
-            lineHeight: 1.5,
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
-            borderRadius: '8px',
-            color: '#f4f4f5',
-            resize: 'none',
-            outline: 'none',
-          }}
-        />
-      </div>
+      />
     </div>
   );
 }
@@ -225,153 +255,10 @@ function ToolSplitPane({ children, isVertical = false }) {
         gap: '16px',
         flex: 1,
         minHeight: 0,
-        overflow: 'hidden',
       }}
     >
       {children}
     </div>
-  );
-}
-
-// Button component with inline styles
-function Button({
-  children,
-  onClick,
-  disabled,
-  variant = 'default',
-  size = 'default',
-  style = {},
-}) {
-  const baseStyle = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    fontWeight: 600,
-    fontSize: '12px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    borderRadius: '6px',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    opacity: disabled ? 0.5 : 1,
-    transition: 'all 0.15s ease',
-    ...style,
-  };
-
-  const variantStyles = {
-    default: {
-      backgroundColor: '#2563eb',
-      color: '#ffffff',
-      border: 'none',
-      padding: size === 'sm' ? '6px 12px' : '8px 16px',
-    },
-    ghost: {
-      backgroundColor: 'transparent',
-      color: '#a1a1aa',
-      border: 'none',
-      padding: size === 'sm' ? '6px 12px' : '8px 16px',
-    },
-    outline: {
-      backgroundColor: 'transparent',
-      color: '#f4f4f5',
-      border: '1px solid #27272a',
-      padding: size === 'sm' ? '6px 12px' : '8px 16px',
-    },
-  };
-
-  const sizeStyles = {
-    sm: { height: '32px', fontSize: '12px' },
-    default: { height: '36px', fontSize: '14px' },
-    icon: { width: '32px', height: '32px', padding: '6px' },
-  };
-
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        ...baseStyle,
-        ...variantStyles[variant],
-        ...sizeStyles[size],
-      }}
-      onMouseEnter={(e) => {
-        if (!disabled) {
-          if (variant === 'ghost' || variant === 'outline') {
-            e.currentTarget.style.backgroundColor = '#27272a';
-            e.currentTarget.style.color = '#f4f4f5';
-          } else {
-            e.currentTarget.style.backgroundColor = '#1d4ed8';
-          }
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (variant === 'ghost' || variant === 'outline') {
-          e.currentTarget.style.backgroundColor = 'transparent';
-          e.currentTarget.style.color = variant === 'ghost' ? '#a1a1aa' : '#f4f4f5';
-        } else {
-          e.currentTarget.style.backgroundColor = '#2563eb';
-        }
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-// Switch component with inline styles
-function Switch({ id, checked, onCheckedChange, disabled = false }) {
-  return (
-    <button
-      id={id}
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={() => onCheckedChange(!checked)}
-      style={{
-        position: 'relative',
-        width: '40px',
-        height: '22px',
-        backgroundColor: checked ? '#2563eb' : '#27272a',
-        borderRadius: '11px',
-        border: 'none',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        transition: 'background-color 0.2s ease',
-        padding: '0',
-      }}
-    >
-      <span
-        style={{
-          position: 'absolute',
-          top: '2px',
-          left: '2px',
-          width: '18px',
-          height: '18px',
-          backgroundColor: '#ffffff',
-          borderRadius: '50%',
-          transition: 'transform 0.2s ease',
-          transform: checked ? 'translateX(18px)' : 'translateX(0)',
-        }}
-      />
-    </button>
-  );
-}
-
-// Label component with inline styles
-function Label({ htmlFor, children, style = {} }) {
-  return (
-    <label
-      htmlFor={htmlFor}
-      style={{
-        fontSize: '10px',
-        fontWeight: 600,
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        color: '#a1a1aa',
-        ...style,
-      }}
-    >
-      {children}
-    </label>
   );
 }
 
@@ -439,26 +326,6 @@ export default function TextBasedConverter() {
   useEffect(() => localStorage.setItem(STORAGE_KEYS.SUBMODE, subMode), [subMode]);
   useEffect(() => localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify(config)), [config]);
 
-  const isCurrentInQuickActions = useCallback(() => {
-    const isInDefault = DEFAULT_COMMON_TAGS.some(
-      (tag) => tag.category === category && tag.method === method
-    );
-    return isInDefault;
-  }, [category, method]);
-
-  const addCurrentToQuickActions = useCallback(() => {
-    if (isCurrentInQuickActions()) return;
-
-    const newTag = {
-      id: `${category}-${method}`.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-      category,
-      method,
-      label: `${category} - ${method}`,
-    };
-
-    // Note: This would need to be implemented with custom tags state
-  }, [category, method, isCurrentInQuickActions]);
-
   const performConversion = useCallback(async (text, cat, meth, sub, cfg) => {
     if (!text && cat !== 'Hash') {
       setOutput('');
@@ -497,10 +364,6 @@ export default function TextBasedConverter() {
     }
   }, [input, category, method, subMode, config.autoRun, performConversion]);
 
-  const handleConvert = () => {
-    performConversion(input, category, method, subMode, config);
-  };
-
   const updateConfig = (newCfg) => setConfig((prev) => ({ ...prev, ...newCfg }));
 
   const showConfig = category === 'Encrypt - Decrypt' || method === 'HMAC';
@@ -523,21 +386,22 @@ export default function TextBasedConverter() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
+        backgroundColor: '#09090b',
       }}
     >
       <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
 
-      <CommonTags
-        currentCategory={category}
-        currentMethod={method}
-        onTagSelect={(cat, meth) => {
-          setCategory(cat);
-          setMethod(meth);
+      {/* First row: Dropdowns + Quick Actions */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+          marginBottom: '16px',
+          paddingBottom: '16px',
+          borderBottom: '1px solid #27272a',
         }}
-      />
-
-      {/* First row: Dropdowns + Buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px' }}>
+      >
         <ConversionControls
           category={category}
           setCategory={(c) => {
@@ -550,50 +414,34 @@ export default function TextBasedConverter() {
         />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto' }}>
-          <Button onClick={handleConvert} disabled={config.autoRun} size="sm">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-              <polygon points="5,3 19,12 5,21"></polygon>
-            </svg>
-            Convert
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            disabled={isCurrentInQuickActions()}
-            onClick={addCurrentToQuickActions}
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Added
-          </Button>
-
-          <div
+          <span
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              paddingLeft: '12px',
-              borderLeft: '1px solid #27272a',
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
             }}
           >
-            <Switch
-              id="auto-run"
-              checked={config.autoRun}
-              onCheckedChange={(val) => updateConfig({ autoRun: val })}
-            />
-            <Label htmlFor="auto-run">Auto-run</Label>
-          </div>
-
+            Quick Actions:
+          </span>
+          {DEFAULT_COMMON_TAGS.map((tag) => {
+            const isActive = tag.category === category && tag.method === method;
+            return (
+              <Button
+                key={tag.id}
+                size="sm"
+                active={isActive}
+                onClick={() => {
+                  setCategory(tag.category);
+                  setMethod(tag.method);
+                }}
+              >
+                {tag.label}
+              </Button>
+            );
+          })}
+          <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a' }} />
           <Button variant="ghost" size="icon" onClick={() => setIsVertical(!isVertical)}>
             <Columns
               style={{
@@ -608,7 +456,7 @@ export default function TextBasedConverter() {
 
       {/* Second row: Mode toggle (Encode/Decode) */}
       {showModeToggle && (
-        <div style={{ marginBottom: '12px' }}>
+        <div style={{ marginBottom: '16px' }}>
           <ModeToggle mode={subMode} modeLabels={modeLabels} onChange={setSubMode} />
         </div>
       )}
@@ -619,13 +467,15 @@ export default function TextBasedConverter() {
         </div>
       )}
 
-      <div style={{ flex: 1, minHeight: 0 }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <ToolSplitPane isVertical={isVertical}>
           <ToolPane
             label={LABELS.INPUT(category, subMode, method)}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={PLACEHOLDERS.INPUT}
+            indicator="Source"
+            indicatorColor="green"
           />
 
           {isAllHashes ? (
@@ -633,11 +483,12 @@ export default function TextBasedConverter() {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                height: '100%',
+                flex: 1,
                 minHeight: 0,
                 border: '1px solid #27272a',
                 borderRadius: '8px',
                 backgroundColor: '#18181b',
+                overflow: 'hidden',
               }}
             >
               <div
@@ -645,13 +496,14 @@ export default function TextBasedConverter() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: '6px',
-                  padding: '12px 12px 0',
+                  padding: '8px 12px',
+                  borderBottom: '1px solid #27272a',
+                  backgroundColor: '#09090b',
                 }}
               >
                 <label
                   style={{
-                    fontSize: '10px',
+                    fontSize: '11px',
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
@@ -660,6 +512,23 @@ export default function TextBasedConverter() {
                 >
                   {LABELS.OUTPUT}
                 </label>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    color: '#3b82f6',
+                  }}
+                >
+                  All Hashes
+                </span>
               </div>
               <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
                 <MultiHashOutput value={output} error={error} />
@@ -673,7 +542,9 @@ export default function TextBasedConverter() {
               value={output}
               readOnly
               placeholder={PLACEHOLDERS.OUTPUT}
-              style={error ? { border: '1px solid #ef4444' } : {}}
+              indicator="Result"
+              indicatorColor="blue"
+              error={!!error}
             />
           )}
         </ToolSplitPane>

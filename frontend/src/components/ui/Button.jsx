@@ -22,7 +22,6 @@ export function Button({
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.5 : 1,
     transition: 'all 0.15s ease',
-    border: '1px solid',
     ...style,
   };
 
@@ -43,25 +42,27 @@ export function Button({
           padding: paddingMap[size] || paddingMap.default,
           backgroundColor: isActive ? '#2563eb' : '#18181b',
           color: isActive ? '#ffffff' : '#a1a1aa',
-          borderColor: isActive ? '#2563eb' : '#3f3f46',
+          border: isActive ? '1px solid #2563eb' : '1px solid #3f3f46',
         }}
         onMouseEnter={(e) => {
           if (disabled) return;
           if (isActive) {
             e.currentTarget.style.backgroundColor = '#1d4ed8';
+            e.currentTarget.style.border = '1px solid #1d4ed8';
           } else {
             e.currentTarget.style.backgroundColor = '#27272a';
             e.currentTarget.style.color = '#f4f4f5';
-            e.currentTarget.style.borderColor = '#52525b';
+            e.currentTarget.style.border = '1px solid #52525b';
           }
         }}
         onMouseLeave={(e) => {
           if (isActive) {
             e.currentTarget.style.backgroundColor = '#2563eb';
+            e.currentTarget.style.border = '1px solid #2563eb';
           } else {
             e.currentTarget.style.backgroundColor = '#18181b';
             e.currentTarget.style.color = '#a1a1aa';
-            e.currentTarget.style.borderColor = '#3f3f46';
+            e.currentTarget.style.border = '1px solid #3f3f46';
           }
         }}
       >
@@ -75,22 +76,22 @@ export function Button({
     default: {
       backgroundColor: '#2563eb',
       color: '#ffffff',
-      borderColor: '#2563eb',
+      border: '1px solid #2563eb',
     },
     ghost: {
       backgroundColor: 'transparent',
       color: '#a1a1aa',
-      borderColor: 'transparent',
+      border: 'none',
     },
     outline: {
       backgroundColor: 'transparent',
       color: '#f4f4f5',
-      borderColor: '#3f3f46',
+      border: '1px solid #3f3f46',
     },
     destructive: {
       backgroundColor: 'transparent',
       color: '#ef4444',
-      borderColor: 'transparent',
+      border: 'none',
     },
   };
 

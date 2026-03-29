@@ -66,18 +66,18 @@ function CaseResult({ label, value }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
-        padding: '12px',
-        backgroundColor: '#1c1917',
-        borderRadius: '6px',
-        marginBottom: '8px',
+        gap: '8px',
+        padding: '6px 8px',
+        backgroundColor: '#18181b',
+        borderRadius: '4px',
+        marginBottom: '4px',
       }}
     >
       <div
         style={{
-          fontSize: '12px',
+          fontSize: '11px',
           color: '#71717a',
-          minWidth: '100px',
+          minWidth: '90px',
           fontWeight: 600,
         }}
       >
@@ -87,7 +87,7 @@ function CaseResult({ label, value }) {
         style={{
           flex: 1,
           fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
-          fontSize: '14px',
+          fontSize: '13px',
           color: '#f4f4f5',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -104,9 +104,9 @@ function CaseResult({ label, value }) {
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: '28px',
-          height: '28px',
-          padding: '6px',
+          width: '24px',
+          height: '24px',
+          padding: '4px',
           backgroundColor: copied ? '#2563eb' : 'transparent',
           border: 'none',
           borderRadius: '4px',
@@ -128,7 +128,7 @@ function CaseResult({ label, value }) {
           }
         }}
       >
-        <Copy style={{ width: '14px', height: '14px' }} />
+        <Copy style={{ width: '12px', height: '12px' }} />
       </button>
     </div>
   );
@@ -136,7 +136,7 @@ function CaseResult({ label, value }) {
 
 export default function CaseConverterPane({ input }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
       {cases.map((caseItem) => (
         <CaseResult
           key={caseItem.id}

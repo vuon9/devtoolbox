@@ -2,7 +2,7 @@
 // All hard-coded strings centralized for reusability and i18n support
 
 // Tool Header
-export const TOOL_TITLE = 'Text Based Converter';
+export const TOOL_TITLE = 'Text Converter';
 export const TOOL_DESCRIPTION =
   'Your all-in-one text transformation toolkit. Encrypt sensitive data, encode for transmission, hash for verification, escape for code safety, and convert between 40+ formats. Features quick action tags, real-time preview, and smart auto-detection.';
 

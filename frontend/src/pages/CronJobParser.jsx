@@ -1,11 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../components/ToolUI';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { Timer, Play, Clock, Calendar, Hash, History, Trash2, Info } from 'lucide-react';
-import { cn } from '../utils/cn';
+import { Button } from '../components/ui/Button';
 import cronstrue from 'cronstrue';
+
+function ToolHeader({ title, description }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
+        {title}
+      </h2>
+      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+    </div>
+  );
+}
+
+function ToolControls({ children, style = {} }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '16px',
+        marginBottom: '16px',
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function CronJobParser() {
   const [cron, setCron] = useState('*/15 * * * *');
@@ -23,7 +48,6 @@ export default function CronJobParser() {
       const desc = cronstrue.toString(val);
       setDescription(desc);
       setError('');
-      // Mock next runs for demo
       setNextRuns([
         'Mon, 23 Mar 2026 12:00:00 GMT',
         'Mon, 23 Mar 2026 12:15:00 GMT',
@@ -51,40 +75,78 @@ export default function CronJobParser() {
   ];
 
   return (
-    <div className="flex flex-col h-full p-6 overflow-hidden bg-background">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+        backgroundColor: '#09090b',
+      }}
+    >
       <ToolHeader
         title="Cron Job Parser"
         description="Decode cron expressions into human-readable descriptions. Validate schedules and preview the next several execution times."
       />
 
-      <ToolControls className="mb-6 justify-between items-end">
-        <div className="flex-1 max-w-lg">
-          <Label
-            htmlFor="cron-input"
-            className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5 ml-1"
+      <ToolControls style={{ justifyContent: 'space-between' }}>
+        <div style={{ flex: 1, maxWidth: '400px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '11px',
+              fontWeight: 600,
+              color: '#71717a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: '6px',
+              marginLeft: '4px',
+            }}
           >
             Cron Expression
-          </Label>
-          <div className="relative group">
-            <Hash className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
-            <Input
-              id="cron-input"
+          </label>
+          <div style={{ position: 'relative' }}>
+            <Hash
+              style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '16px',
+                height: '16px',
+                color: '#71717a',
+              }}
+            />
+            <input
               value={cron}
               onChange={(e) => setCron(e.target.value)}
               placeholder="* * * * *"
-              className="pl-10 h-10 bg-background/50 border-border/40 font-mono text-lg font-bold tracking-widest text-primary shadow-sm focus:ring-primary/20"
+              style={{
+                width: '100%',
+                height: '40px',
+                padding: '0 12px 0 40px',
+                fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+                fontSize: '18px',
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                backgroundColor: '#18181b',
+                border: '1px solid #27272a',
+                borderRadius: '8px',
+                color: '#3b82f6',
+                outline: 'none',
+              }}
             />
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 ml-4">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {presets.map((p) => (
             <Button
               key={p.label}
-              variant="outline"
               size="sm"
+              active={cron === p.value}
               onClick={() => setCron(p.value)}
-              className="h-7 px-3 text-[9px] font-bold uppercase tracking-wider bg-background/50 hover:bg-primary/10 hover:border-primary/30"
             >
               {p.label}
             </Button>
@@ -92,74 +154,183 @@ export default function CronJobParser() {
         </div>
       </ToolControls>
 
-      <div className="flex-1 min-h-0 space-y-6 overflow-y-auto">
-        <div className="p-6 rounded-lg bg-primary/5 border border-primary/20 shadow-inner group">
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary/60 mb-2">
-            <Info className="h-3 w-3" />
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        <div
+          style={{
+            padding: '24px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            marginBottom: '24px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'rgba(59, 130, 246, 0.6)',
+              marginBottom: '8px',
+            }}
+          >
+            <Info style={{ width: '12px', height: '12px' }} />
             Human Readable Description
           </div>
           <div
-            className={cn(
-              'text-2xl font-semibold tracking-tight leading-relaxed',
-              error ? 'text-destructive' : 'text-foreground'
-            )}
+            style={{
+              fontSize: '24px',
+              fontWeight: 600,
+              letterSpacing: '-0.025em',
+              lineHeight: 1.4,
+              color: error ? '#ef4444' : '#f4f4f5',
+            }}
           >
             {error ? 'Invalid Cron Expression' : description || 'Enter an expression above...'}
           </div>
           {error && (
-            <div className="mt-2 text-xs font-mono text-destructive/70 italic">{error}</div>
+            <div
+              style={{
+                marginTop: '8px',
+                fontSize: '12px',
+                fontFamily: "'IBM Plex Mono', monospace",
+                color: 'rgba(239, 68, 68, 0.7)',
+                fontStyle: 'italic',
+              }}
+            >
+              {error}
+            </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-6 rounded-lg bg-muted/20 border border-border/40 space-y-4">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
-              <Clock className="h-3 w-3" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+          <div
+            style={{
+              padding: '24px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(39, 39, 42, 0.2)',
+              border: '1px solid #27272a',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '10px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'rgba(113, 113, 122, 0.5)',
+                borderBottom: '1px solid #27272a',
+                paddingBottom: '8px',
+                marginBottom: '16px',
+              }}
+            >
+              <Clock style={{ width: '12px', height: '12px' }} />
               Next Execution Times
             </div>
-            <div className="space-y-2">
+            <div>
               {nextRuns.map((run, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-4 group p-2 rounded hover:bg-muted/30 transition-colors cursor-default"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    padding: '8px',
+                    borderRadius: '4px',
+                    cursor: 'default',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(39, 39, 42, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                 >
-                  <span className="text-[10px] font-mono text-muted-foreground/40 w-4">
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      color: 'rgba(113, 113, 122, 0.4)',
+                      width: '16px',
+                    }}
+                  >
                     {i + 1}
                   </span>
-                  <span className="text-xs font-mono font-medium text-foreground/80 group-hover:text-primary transition-colors">
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      fontWeight: 500,
+                      color: 'rgba(244, 244, 245, 0.8)',
+                    }}
+                  >
                     {run}
                   </span>
                 </div>
               ))}
               {nextRuns.length === 0 && (
-                <div className="text-xs text-muted-foreground italic px-2">
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#71717a',
+                    fontStyle: 'italic',
+                    padding: '0 8px',
+                  }}
+                >
                   Waiting for valid expression...
                 </div>
               )}
             </div>
           </div>
 
-          <div className="p-6 rounded-lg bg-muted/20 border border-border/40 space-y-4">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
-              <Timer className="h-3 w-3" />
+          <div
+            style={{
+              padding: '24px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(39, 39, 42, 0.2)',
+              border: '1px solid #27272a',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '10px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'rgba(113, 113, 122, 0.5)',
+                borderBottom: '1px solid #27272a',
+                paddingBottom: '8px',
+                marginBottom: '16px',
+              }}
+            >
+              <Timer style={{ width: '12px', height: '12px' }} />
               Syntax Guide
             </div>
-            <div className="grid grid-cols-2 gap-4 text-[11px]">
-              <div className="space-y-1">
-                <div className="font-bold text-primary">*</div>
-                <div className="text-muted-foreground">Any value</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+              <div>
+                <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '4px' }}>*</div>
+                <div style={{ fontSize: '12px', color: '#71717a' }}>Any value</div>
               </div>
-              <div className="space-y-1">
-                <div className="font-bold text-primary">,</div>
-                <div className="text-muted-foreground">Value list</div>
+              <div>
+                <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '4px' }}>,</div>
+                <div style={{ fontSize: '12px', color: '#71717a' }}>Value list</div>
               </div>
-              <div className="space-y-1">
-                <div className="font-bold text-primary">-</div>
-                <div className="text-muted-foreground">Range</div>
+              <div>
+                <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '4px' }}>-</div>
+                <div style={{ fontSize: '12px', color: '#71717a' }}>Range</div>
               </div>
-              <div className="space-y-1">
-                <div className="font-bold text-primary">/</div>
-                <div className="text-muted-foreground">Step values</div>
+              <div>
+                <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '4px' }}>/</div>
+                <div style={{ fontSize: '12px', color: '#71717a' }}>Step values</div>
               </div>
             </div>
           </div>

@@ -1,10 +1,136 @@
 import React, { useState, useEffect } from 'react';
-import { ToolHeader, ToolPane, ToolSplitPane, ToolControls } from '../../components/ToolUI';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
 import { Binary, Hash, Layout, Columns, Copy, Check, Trash2 } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import { Button } from '../../components/ui/Button';
+
+function ToolHeader({ title, description }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <h2
+        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+      >
+        {title}
+      </h2>
+      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+    </div>
+  );
+}
+
+function ToolControls({ children, style = {} }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px',
+        marginBottom: '16px',
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function ToolPane({ label, value, onChange, placeholder, style = {} }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, ...style }}>
+      <div style={{ marginBottom: '8px' }}>
+        <label
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: '#71717a',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
+          {label}
+        </label>
+      </div>
+      <textarea
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{
+          flex: 1,
+          width: '100%',
+          padding: '12px',
+          fontFamily: "'IBM Plex Mono', 'Menlo', 'Monaco', monospace",
+          fontSize: '14px',
+          lineHeight: 1.6,
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: '8px',
+          color: '#f4f4f5',
+          resize: 'none',
+          outline: 'none',
+        }}
+      />
+    </div>
+  );
+}
+
+function BaseCard({ label, value, base }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div
+      style={{
+        padding: '16px',
+        borderRadius: '8px',
+        backgroundColor: 'rgba(39, 39, 42, 0.3)',
+        border: '1px solid #27272a',
+        cursor: 'pointer',
+        transition: 'border-color 0.15s ease',
+      }}
+      onClick={handleCopy}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = '#27272a';
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span
+          style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: 'rgba(113, 113, 122, 0.6)',
+          }}
+        >
+          {label}
+        </span>
+        {copied ? (
+          <Check style={{ width: '14px', height: '14px', color: '#22c55e' }} />
+        ) : (
+          <Copy style={{ width: '14px', height: '14px', color: 'rgba(113, 113, 122, 0.4)' }} />
+        )}
+      </div>
+      <div
+        style={{
+          fontSize: '20px',
+          fontFamily: "'IBM Plex Mono', monospace",
+          fontWeight: 700,
+          color: '#f4f4f5',
+          marginTop: '4px',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {value || '0'}
+      </div>
+    </div>
+  );
+}
 
 export default function NumberConverter() {
   const [input, setInput] = useState('42');
@@ -39,121 +165,154 @@ export default function NumberConverter() {
   }, [input, base]);
 
   const bases = [
-    { id: 'bin', label: 'Binary (Base 2)', value: 2, icon: Binary },
-    { id: 'oct', label: 'Octal (Base 8)', value: 8, icon: Hash },
-    { id: 'dec', label: 'Decimal (Base 10)', value: 10, icon: Hash },
-    { id: 'hex', label: 'Hex (Base 16)', value: 16, icon: Binary },
+    { id: 'bin', label: 'Binary', value: 2, icon: Binary },
+    { id: 'oct', label: 'Octal', value: 8, icon: Hash },
+    { id: 'dec', label: 'Decimal', value: 10, icon: Hash },
+    { id: 'hex', label: 'Hex', value: 16, icon: Binary },
   ];
 
   return (
-    <div className="flex flex-col h-full p-6 overflow-hidden bg-background">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        padding: '24px',
+        overflow: 'hidden',
+        backgroundColor: '#09090b',
+      }}
+    >
       <ToolHeader
         title="Number Converter"
         description="Seamlessly convert numbers between binary, octal, decimal, and hexadecimal bases. View bitwise representation and cross-base values instantly."
       />
 
-      <ToolControls className="mb-6">
-        <div className="flex gap-1 bg-muted/30 p-1 rounded-lg border border-border/40">
-          {bases.map((b) => (
-            <button
-              key={b.id}
-              onClick={() => setBase(b.value)}
-              className={cn(
-                'flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all',
-                base === b.value
-                  ? 'bg-background text-primary shadow-sm ring-1 ring-border/50'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <b.icon className="h-3.5 w-3.5" />
-              {b.label}
-            </button>
-          ))}
+      <ToolControls>
+        <div
+          style={{
+            display: 'flex',
+            gap: '4px',
+            backgroundColor: 'rgba(39, 39, 42, 0.3)',
+            padding: '4px',
+            borderRadius: '8px',
+            border: '1px solid #27272a',
+          }}
+        >
+          {bases.map((b) => {
+            const isActive = base === b.value;
+            return (
+              <button
+                key={b.id}
+                onClick={() => setBase(b.value)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 16px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  backgroundColor: isActive ? '#18181b' : 'transparent',
+                  color: isActive ? '#3b82f6' : '#71717a',
+                  boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
+                }}
+              >
+                <b.icon style={{ width: '14px', height: '14px' }} />
+                {b.label}
+              </button>
+            );
+          })}
         </div>
 
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setInput('')}
-          className="h-8 gap-2 font-bold uppercase tracking-wider text-[10px] ml-auto text-destructive hover:bg-destructive/10"
+          style={{ marginLeft: 'auto' }}
         >
-          <Trash2 className="h-3.5 w-3.5" />
+          <Trash2 style={{ width: '14px', height: '14px' }} />
           Clear
         </Button>
       </ToolControls>
 
-      <div className="flex-1 min-h-0 space-y-6 overflow-y-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
           <ToolPane
             label={`Input (Base ${base})`}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Enter value..."
-            className="flex-1"
           />
 
-          <div className="grid grid-cols-1 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
             <BaseCard label="Binary" value={results.bin} base={2} />
             <BaseCard label="Decimal" value={results.dec} base={10} />
             <BaseCard label="Hexadecimal" value={results.hex} base={16} />
           </div>
         </div>
 
-        {/* Bit Grid */}
-        <div className="p-4 rounded-lg bg-muted/20 border border-border/40 space-y-4">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 border-b pb-2">
+        <div
+          style={{
+            padding: '16px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(39, 39, 42, 0.2)',
+            border: '1px solid #27272a',
+            marginTop: '24px',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'rgba(113, 113, 122, 0.5)',
+              borderBottom: '1px solid #27272a',
+              paddingBottom: '8px',
+              marginBottom: '16px',
+            }}
+          >
             Bit Representation (Binary 32-bit)
           </div>
-          <div className="grid grid-cols-8 sm:grid-cols-16 gap-1 md:gap-2">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(16, 1fr)',
+              gap: '4px',
+            }}
+          >
             {results.bin
               .padStart(32, '0')
               .split('')
               .map((bit, i) => (
                 <div
                   key={i}
-                  className={cn(
-                    'h-8 flex items-center justify-center rounded border font-mono text-xs transition-colors',
-                    bit === '1'
-                      ? 'bg-primary/20 border-primary/40 text-primary font-bold shadow-inner'
-                      : 'bg-background/40 border-border/20 text-muted-foreground/30'
-                  )}
+                  style={{
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '4px',
+                    border: '1px solid',
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: '12px',
+                    backgroundColor:
+                      bit === '1' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(24, 24, 27, 0.4)',
+                    borderColor: bit === '1' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(39, 39, 42, 0.2)',
+                    color: bit === '1' ? '#3b82f6' : 'rgba(113, 113, 122, 0.3)',
+                    fontWeight: bit === '1' ? 700 : 400,
+                  }}
                 >
                   {bit}
                 </div>
               ))}
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function BaseCard({ label, value, base }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div
-      className="p-4 rounded-lg bg-muted/30 border border-border/40 group hover:border-primary/30 transition-all cursor-pointer"
-      onClick={handleCopy}
-    >
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-          {label}
-        </span>
-        {copied ? (
-          <Check className="h-3.5 w-3.5 text-green-500" />
-        ) : (
-          <Copy className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />
-        )}
-      </div>
-      <div className="text-xl font-mono font-bold text-foreground truncate select-all">
-        {value || '0'}
       </div>
     </div>
   );

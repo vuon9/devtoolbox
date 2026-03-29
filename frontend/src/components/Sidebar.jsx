@@ -352,6 +352,12 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                         'jwt',
                         'barcode',
                         'data-generator',
+                        'regexp',
+                        'cron',
+                        'code-formatter',
+                        'color-converter',
+                        'number-converter',
+                        'datetime-converter',
                       ].includes(tool.id)
                     }
                     collapsed={isCollapsed}
