@@ -1,57 +1,94 @@
 import React, { useState } from 'react';
-import { Input } from '../../../components/ui/input';
-import { Label } from '../../../components/ui/label';
-import { Button } from '../../../components/ui/Button';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function ConfigurationPane({ config, updateConfig }) {
   const [showKey, setShowKey] = useState(false);
 
   return (
-    <div className="flex flex-wrap gap-4 p-4 bg-muted/30 border rounded-md">
-      <div className="flex-1 min-w-[250px] space-y-2">
-        <Label
-          htmlFor="config-key"
-          className="text-[10px] font-bold uppercase tracking-wider opacity-70"
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+      {/* Secret Key */}
+      <div style={{ flex: 1, minWidth: '250px' }}>
+        <label
+          style={{
+            display: 'block',
+            fontSize: '11px',
+            color: '#71717a',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            marginBottom: '6px',
+          }}
         >
           Secret Key
-        </Label>
-        <div className="relative">
-          <Input
-            id="config-key"
+        </label>
+        <div style={{ position: 'relative' }}>
+          <input
             type={showKey ? 'text' : 'password'}
             placeholder="Enter key (e.g. 32 chars for AES-256)"
             value={config.key}
             onChange={(e) => updateConfig({ key: e.target.value })}
-            className="h-8 text-xs pr-10"
+            style={{
+              width: '100%',
+              backgroundColor: '#18181b',
+              border: '1px solid #27272a',
+              borderRadius: '6px',
+              padding: '8px 36px 8px 10px',
+              color: '#f4f4f5',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '13px',
+              outline: 'none',
+            }}
           />
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
-            className="absolute right-0 top-0 h-8 w-8"
             onClick={() => setShowKey(!showKey)}
             title={showKey ? 'Hide key' : 'Show key'}
+            style={{
+              position: 'absolute',
+              right: '8px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: '#71717a',
+              cursor: 'pointer',
+              padding: '4px',
+            }}
           >
-            {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </Button>
+            {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
         </div>
       </div>
 
-      <div className="flex-1 min-w-[250px] space-y-2">
-        <Label
-          htmlFor="config-iv"
-          className="text-[10px] font-bold uppercase tracking-wider opacity-70"
+      {/* IV */}
+      <div style={{ flex: 1, minWidth: '250px' }}>
+        <label
+          style={{
+            display: 'block',
+            fontSize: '11px',
+            color: '#71717a',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            marginBottom: '6px',
+          }}
         >
           IV (Initialization Vector)
-        </Label>
-        <Input
-          id="config-iv"
+        </label>
+        <input
           type="text"
           placeholder="Enter IV (e.g. 16 chars for AES-CBC)"
           value={config.iv}
           onChange={(e) => updateConfig({ iv: e.target.value })}
-          className="h-8 text-xs"
+          style={{
+            width: '100%',
+            backgroundColor: '#18181b',
+            border: '1px solid #27272a',
+            borderRadius: '6px',
+            padding: '8px 10px',
+            color: '#f4f4f5',
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: '13px',
+            outline: 'none',
+          }}
         />
       </div>
     </div>
