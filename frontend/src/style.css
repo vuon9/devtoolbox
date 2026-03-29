@@ -66,28 +66,4 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
 }
 
-/* Scrollbar styling - Dark, thin, subtle */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #27272a;
-  border-radius: 3px;
-  border: none;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #3f3f46;
-}
-
-/* Firefox scrollbar support */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #27272a transparent;
-}
+/* Scrollbar styling - moved to globals.css */

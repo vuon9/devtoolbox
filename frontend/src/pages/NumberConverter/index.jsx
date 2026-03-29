@@ -488,35 +488,45 @@ export default function NumberConverter() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  const debouncedConvert = useCallback(
-    debounce(async (value, currentBase) => {
-      if (!value.trim()) {
+  const convertNumber = useCallback(async (value, currentBase) => {
+    if (!value.trim()) {
+      setResult(null);
+      setError('');
+      return;
+    }
+
+    try {
+      const response = await ConvertNumber({
+        value: value,
+        base: currentBase,
+      });
+
+      if (response.error) {
+        setError(response.error);
         setResult(null);
+      } else {
+        setResult(response);
         setError('');
-        return;
       }
+    } catch (err) {
+      setError(err.message || 'Conversion failed');
+      setResult(null);
+    }
+  }, []);
 
-      try {
-        const response = await ConvertNumber({
-          value: value,
-          base: currentBase,
-        });
-
-        if (response.error) {
-          setError(response.error);
-          setResult(null);
-        } else {
-          setResult(response);
-          setError('');
-        }
-      } catch (err) {
-        setError(err.message || 'Conversion failed');
-        setResult(null);
-      }
-    }, 300),
-    []
+  const debouncedConvert = useCallback(
+    debounce((value, currentBase) => {
+      convertNumber(value, currentBase);
+    }, 150),
+    [convertNumber]
   );
 
+  // Immediate conversion on mount
+  useEffect(() => {
+    convertNumber(input, base);
+  }, []);
+
+  // Debounced conversion when input changes
   useEffect(() => {
     debouncedConvert(input, base);
   }, [input, base, debouncedConvert]);

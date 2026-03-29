@@ -358,7 +358,7 @@ export default function DateTimeConverter() {
     }
   };
 
-  // Sortable timezone card component
+  // Sortable timezone card component - compact table-style layout
   const SortableTimezoneCard = ({ tz, info, onRemove }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
       id: tz,
@@ -375,24 +375,24 @@ export default function DateTimeConverter() {
         ref={setNodeRef}
         style={{
           ...style,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '8px 12px',
           backgroundColor: '#09090b',
-          border: '1px solid #27272a',
-          borderRadius: '6px',
-          padding: '12px',
-          position: 'relative',
+          borderBottom: '1px solid #27272a',
           cursor: isDragging ? 'grabbing' : 'grab',
         }}
         {...attributes}
       >
+        {/* Drag handle */}
         <div
           style={{
-            position: 'absolute',
-            top: '8px',
-            left: '8px',
             color: '#3f3f46',
             display: 'flex',
             alignItems: 'center',
             cursor: 'grab',
+            flexShrink: 0,
           }}
           {...listeners}
           title="Drag to reorder"
@@ -400,12 +400,43 @@ export default function DateTimeConverter() {
           <GripVertical size={14} />
         </div>
 
+        {/* City and timezone info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#f4f4f5' }}>{info.city}</div>
+          <div style={{ fontSize: '10px', color: '#71717a' }}>{info.timezone}</div>
+        </div>
+
+        {/* Time */}
+        <div
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            color: '#f4f4f5',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+            flexShrink: 0,
+          }}
+        >
+          {info.time}
+        </div>
+
+        {/* Offset */}
+        <div
+          style={{
+            fontSize: '10px',
+            color: '#a1a1aa',
+            padding: '2px 6px',
+            backgroundColor: '#18181b',
+            borderRadius: '4px',
+            flexShrink: 0,
+          }}
+        >
+          {info.offset}
+        </div>
+
+        {/* Remove button */}
         <button
           onClick={() => onRemove(tz)}
           style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
             background: 'none',
             border: 'none',
             cursor: 'pointer',
@@ -413,60 +444,12 @@ export default function DateTimeConverter() {
             color: '#71717a',
             display: 'flex',
             alignItems: 'center',
+            flexShrink: 0,
           }}
           title="Remove from favorites"
         >
           <Trash2 size={12} />
         </button>
-
-        <div style={{ marginBottom: '4px', paddingLeft: '20px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 600, color: '#f4f4f5' }}>{info.city}</span>
-        </div>
-
-        <div
-          style={{ fontSize: '11px', color: '#71717a', marginBottom: '8px', paddingLeft: '20px' }}
-        >
-          {info.timezone}
-        </div>
-
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            justifyContent: 'space-between',
-            paddingLeft: '20px',
-          }}
-        >
-          <span
-            style={{
-              fontSize: '24px',
-              fontWeight: 600,
-              color: '#f4f4f5',
-              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-            }}
-          >
-            {info.time}
-          </span>
-          <span
-            style={{
-              fontSize: '11px',
-              color: '#a1a1aa',
-              padding: '2px 6px',
-              backgroundColor: '#18181b',
-              borderRadius: '4px',
-            }}
-          >
-            {info.offset}
-          </span>
-        </div>
-
-        {info.date && (
-          <div
-            style={{ fontSize: '12px', color: '#a1a1aa', marginTop: '4px', paddingLeft: '20px' }}
-          >
-            {info.date}
-          </div>
-        )}
       </div>
     );
   };
@@ -553,7 +536,7 @@ export default function DateTimeConverter() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 320px',
+          gridTemplateColumns: '1fr 1fr',
           gap: '24px',
           flex: 1,
           minHeight: 0,
@@ -598,7 +581,7 @@ export default function DateTimeConverter() {
             >
               <div
                 style={{
-                  fontSize: '28px',
+                  fontSize: '14px',
                   fontWeight: 600,
                   color: '#3b82f6',
                   fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
@@ -976,8 +959,18 @@ export default function DateTimeConverter() {
               </div>
             </div>
           )}
+        </div>
 
-          {/* 3. Timezone Converter */}
+        {/* Right Column - Favorite Timezones + Timezone Converter */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            overflow: 'auto',
+          }}
+        >
+          {/* Timezone Converter - Moved to right column */}
           <div>
             <span
               style={{
@@ -1023,12 +1016,12 @@ export default function DateTimeConverter() {
                     onChange={(e) => setFromTimezone(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '8px 12px',
+                      padding: '10px 12px',
                       backgroundColor: '#09090b',
                       border: '1px solid #27272a',
                       borderRadius: '6px',
                       color: '#f4f4f5',
-                      fontSize: '13px',
+                      fontSize: '12px',
                       cursor: 'pointer',
                     }}
                   >
@@ -1072,12 +1065,12 @@ export default function DateTimeConverter() {
                     onChange={(e) => setToTimezone(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '8px 12px',
+                      padding: '10px 12px',
                       backgroundColor: '#09090b',
                       border: '1px solid #27272a',
                       borderRadius: '6px',
                       color: '#f4f4f5',
-                      fontSize: '13px',
+                      fontSize: '12px',
                       cursor: 'pointer',
                     }}
                   >
@@ -1101,21 +1094,20 @@ export default function DateTimeConverter() {
                     </optgroup>
                   </select>
                 </div>
+              </div>
 
-                {/* Add to favorites button */}
-                <div style={{ marginTop: '16px' }}>
-                  <Button
-                    size="sm"
-                    onClick={() => addFavorite(toTimezone)}
-                    disabled={favoriteTimezones.includes(toTimezone)}
-                    style={{
-                      opacity: favoriteTimezones.includes(toTimezone) ? 0.5 : 1,
-                    }}
-                  >
-                    <Star size={12} style={{ marginRight: '4px' }} />
-                    Add
-                  </Button>
-                </div>
+              {/* Add to favorites button */}
+              <div style={{ marginBottom: '12px' }}>
+                <Button
+                  onClick={() => addFavorite(toTimezone)}
+                  disabled={favoriteTimezones.includes(toTimezone)}
+                  style={{
+                    opacity: favoriteTimezones.includes(toTimezone) ? 0.5 : 1,
+                  }}
+                >
+                  <Star size={14} />
+                  Add to Favorites
+                </Button>
               </div>
 
               {/* Conversion result */}
@@ -1134,7 +1126,7 @@ export default function DateTimeConverter() {
                     <div style={{ fontSize: '11px', color: '#71717a', marginBottom: '4px' }}>
                       {timezoneResult.fromTz} ({timezoneResult.fromOffset})
                     </div>
-                    <div style={{ fontSize: '14px', color: '#f4f4f5', fontWeight: 500 }}>
+                    <div style={{ fontSize: '13px', color: '#f4f4f5', fontWeight: 500 }}>
                       {timezoneResult.from}
                     </div>
                   </div>
@@ -1142,7 +1134,7 @@ export default function DateTimeConverter() {
                     <div style={{ fontSize: '11px', color: '#71717a', marginBottom: '4px' }}>
                       {timezoneResult.toTz} ({timezoneResult.toOffset})
                     </div>
-                    <div style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 500 }}>
+                    <div style={{ fontSize: '13px', color: '#3b82f6', fontWeight: 500 }}>
                       {timezoneResult.to}
                     </div>
                   </div>
@@ -1150,17 +1142,7 @@ export default function DateTimeConverter() {
               )}
             </div>
           </div>
-        </div>
 
-        {/* Right Column - Favorite Timezones */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-            overflow: 'auto',
-          }}
-        >
           {/* Favorite Timezones Panel */}
           <div>
             <span
@@ -1184,50 +1166,45 @@ export default function DateTimeConverter() {
                 backgroundColor: '#18181b',
                 border: '1px solid #27272a',
                 borderRadius: '8px',
-                padding: '16px',
+                overflow: 'hidden',
               }}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {favoriteTimezones.length === 0 ? (
-                  <div
-                    style={{
-                      textAlign: 'center',
-                      padding: '24px',
-                      color: '#71717a',
-                      fontSize: '13px',
-                    }}
-                  >
-                    No favorite timezones yet.
-                    <br />
-                    Add them from the converter below.
-                  </div>
-                ) : (
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={favoriteTimezones}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {favoriteTimezones.map((tz) => {
-                          const info = getTimezoneInfo(tz, results?.milliseconds);
-                          return (
-                            <SortableTimezoneCard
-                              key={tz}
-                              tz={tz}
-                              info={info}
-                              onRemove={removeFavorite}
-                            />
-                          );
-                        })}
-                      </div>
-                    </SortableContext>
-                  </DndContext>
-                )}
-              </div>
+              {favoriteTimezones.length === 0 ? (
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '24px',
+                    color: '#71717a',
+                    fontSize: '13px',
+                  }}
+                >
+                  No favorite timezones yet.
+                  <br />
+                  Add them from the converter below.
+                </div>
+              ) : (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={favoriteTimezones} strategy={verticalListSortingStrategy}>
+                    <div>
+                      {favoriteTimezones.map((tz) => {
+                        const info = getTimezoneInfo(tz, results?.milliseconds);
+                        return (
+                          <SortableTimezoneCard
+                            key={tz}
+                            tz={tz}
+                            info={info}
+                            onRemove={removeFavorite}
+                          />
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              )}
             </div>
           </div>
         </div>
