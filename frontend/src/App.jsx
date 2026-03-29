@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Events } from '@wailsio/runtime';
 import { Sidebar } from './components/Sidebar';
 import { TitleBar } from './components/TitleBar';
 import { SettingsModal } from './components/SettingsModal';
@@ -11,8 +12,10 @@ function NavigationHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('[App] Setting up navigation event listener...');
+    
     // Listen for navigation events from command palette (via Go backend)
-    const unsubscribe = window.runtime?.EventsOn?.('navigate:to', (path) => {
+    const unsubscribe = Events.On('navigate:to', (path) => {
       console.log('[App] Received navigate:to event:', path);
       if (path) {
         navigate(path);
@@ -20,6 +23,7 @@ function NavigationHandler() {
     });
 
     return () => {
+      console.log('[App] Cleaning up navigation event listener');
       if (unsubscribe) unsubscribe();
     };
   }, [navigate]);
