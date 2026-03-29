@@ -38,7 +38,7 @@ function Column1Bases({ result, base }) {
     <div>
       <h4
         style={{
-          fontSize: '10px',
+          fontSize: '11px',
           color: '#71717a',
           textTransform: 'uppercase',
           margin: '0 0 8px 0',
@@ -67,7 +67,7 @@ function Column1Bases({ result, base }) {
           >
             <span
               style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 color: b.active ? '#3b82f6' : '#71717a',
                 textTransform: 'uppercase',
               }}
@@ -97,7 +97,7 @@ function Column1Bases({ result, base }) {
       {/* Bit Breakdown */}
       <h4
         style={{
-          fontSize: '10px',
+          fontSize: '11px',
           color: '#71717a',
           textTransform: 'uppercase',
           margin: '12px 0 6px 0',
@@ -128,7 +128,7 @@ function Column1Bases({ result, base }) {
                 >
                   <span
                     style={{
-                      fontSize: '10px',
+                      fontSize: '11px',
                       color: bit === 1 ? '#3b82f6' : 'rgba(113,113,122,0.3)',
                       fontFamily: "'IBM Plex Mono', monospace",
                     }}
@@ -142,7 +142,7 @@ function Column1Bases({ result, base }) {
         </div>
         <div
           style={{
-            fontSize: '10px',
+            fontSize: '11px',
             color: '#a1a1aa',
             textAlign: 'center',
             fontFamily: "'IBM Plex Mono', monospace",
@@ -164,7 +164,7 @@ function Column2Data({ result }) {
       {/* Bytes */}
       <h4
         style={{
-          fontSize: '10px',
+          fontSize: '11px',
           color: '#71717a',
           textTransform: 'uppercase',
           margin: '0 0 8px 0',
@@ -211,7 +211,7 @@ function Column2Data({ result }) {
             </div>
           ))}
         </div>
-        <div style={{ fontSize: '10px', color: '#71717a', textAlign: 'center' }}>
+        <div style={{ fontSize: '11px', color: '#71717a', textAlign: 'center' }}>
           32-bit big-endian
         </div>
       </div>
@@ -221,7 +221,7 @@ function Column2Data({ result }) {
         <>
           <h4
             style={{
-              fontSize: '10px',
+              fontSize: '11px',
               color: '#71717a',
               textTransform: 'uppercase',
               margin: '10px 0 6px 0',
@@ -250,7 +250,7 @@ function Column2Data({ result }) {
             >
               {result.ascii.printable ? result.ascii.char : '•'}
             </div>
-            <div style={{ fontSize: '10px', color: '#71717a' }}>
+            <div style={{ fontSize: '11px', color: '#71717a' }}>
               Code {result.ascii.code} {result.ascii.printable ? '' : '(non-printable)'}
             </div>
           </div>
@@ -262,7 +262,7 @@ function Column2Data({ result }) {
         <>
           <h4
             style={{
-              fontSize: '10px',
+              fontSize: '11px',
               color: '#71717a',
               textTransform: 'uppercase',
               margin: '10px 0 6px 0',
@@ -318,7 +318,7 @@ function Column3Context({ result }) {
         <>
           <h4
             style={{
-              fontSize: '10px',
+              fontSize: '11px',
               color: '#71717a',
               textTransform: 'uppercase',
               margin: '0 0 8px 0',
@@ -362,7 +362,7 @@ function Column3Context({ result }) {
       {/* File Size */}
       <h4
         style={{
-          fontSize: '10px',
+          fontSize: '11px',
           color: '#71717a',
           textTransform: 'uppercase',
           margin: '10px 0 6px 0',
@@ -400,7 +400,7 @@ function Column3Context({ result }) {
         <>
           <h4
             style={{
-              fontSize: '10px',
+              fontSize: '11px',
               color: '#71717a',
               textTransform: 'uppercase',
               margin: '10px 0 6px 0',
@@ -442,7 +442,7 @@ function Column3Context({ result }) {
         <>
           <h4
             style={{
-              fontSize: '10px',
+              fontSize: '11px',
               color: '#71717a',
               textTransform: 'uppercase',
               margin: '10px 0 6px 0',
