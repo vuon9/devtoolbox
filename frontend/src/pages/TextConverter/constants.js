@@ -31,7 +31,6 @@ export const CONVERTER_MAP = {
     'Binary',
     'Morse Code',
     'Punnycode',
-    'JWT Decode',
     'Bencoded',
     'Protobuf',
     'ROT13',
