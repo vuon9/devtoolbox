@@ -348,11 +348,11 @@ export default function CodeFormatter() {
           Minify: minifyMode,
         });
 
-        if (result.Error) {
-          setError(result.Error);
+        if (result.error) {
+          setError(result.error);
           setOutput('');
         } else {
-          setOutput(result.Output);
+          setOutput(result.output);
         }
       } catch (err) {
         setError(err.message || 'Formatting failed');
