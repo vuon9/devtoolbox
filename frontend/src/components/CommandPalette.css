@@ -1,6 +1,6 @@
-/* Spotlight Palette - Redesigned to match Command Palette */
+/* Command Palette - Global (Cmd+Shift+Space) */
 
-.spotlight-container {
+.command-palette-container {
   width: 100%;
   height: 100%;
   background: #18181b;
@@ -10,7 +10,7 @@
   overflow: hidden;
 }
 
-.spotlight-search-box {
+.command-palette-search-box {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -18,12 +18,12 @@
   border-bottom: 1px solid #27272a;
 }
 
-.spotlight-search-icon {
+.command-palette-search-icon {
   color: #71717a;
   flex-shrink: 0;
 }
 
-.spotlight-input {
+.command-palette-input {
   flex: 1;
   background: transparent;
   border: none;
@@ -34,11 +34,11 @@
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-.spotlight-input::placeholder {
+.command-palette-input::placeholder {
   color: #71717a;
 }
 
-.spotlight-clear-btn {
+.command-palette-clear-btn {
   background: transparent;
   border: none;
   color: #71717a;
@@ -51,29 +51,29 @@
   transition: background-color 0.15s ease;
 }
 
-.spotlight-clear-btn:hover {
+.command-palette-clear-btn:hover {
   background: #27272a;
 }
 
-.spotlight-results {
+.command-palette-results {
   height: 416px;
   overflow: hidden;
   background: #18181b;
 }
 
-.spotlight-empty {
+.command-palette-empty {
   padding: 24px;
   text-align: center;
   color: #71717a;
   font-size: 13px;
 }
 
-.spotlight-list {
+.command-palette-list {
   overflow-y: auto;
   max-height: 400px;
 }
 
-.spotlight-item {
+.command-palette-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -83,18 +83,34 @@
   border-bottom: none;
 }
 
-.spotlight-item:hover,
-.spotlight-item.selected {
+.command-palette-item:hover,
+.command-palette-item.selected {
   background: #27272a;
 }
 
-.spotlight-item.selected {
+.command-palette-item.selected {
   background: #27272a;
   border-left: 2px solid #3b82f6;
   padding-left: 14px;
 }
 
-.spotlight-item-content {
+.command-palette-item.recent {
+  position: relative;
+}
+
+.command-palette-item.recent::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: #3b82f6;
+  border-radius: 50%;
+}
+
+.command-palette-item-content {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -102,12 +118,12 @@
   min-width: 0;
 }
 
-.spotlight-item-icon {
+.command-palette-item-icon {
   color: #71717a;
   flex-shrink: 0;
 }
 
-.spotlight-item-label {
+.command-palette-item-label {
   color: #f4f4f5;
   font-size: 13px;
   white-space: nowrap;
@@ -116,30 +132,20 @@
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-.spotlight-item-category {
-  color: #71717a;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  flex-shrink: 0;
-  margin-left: 16px;
-  font-weight: 500;
-}
-
 /* Scrollbar styling */
-.spotlight-list::-webkit-scrollbar {
+.command-palette-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.spotlight-list::-webkit-scrollbar-track {
+.command-palette-list::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.spotlight-list::-webkit-scrollbar-thumb {
+.command-palette-list::-webkit-scrollbar-thumb {
   background: #27272a;
   border-radius: 3px;
 }
 
-.spotlight-list::-webkit-scrollbar-thumb:hover {
+.command-palette-list::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
 }

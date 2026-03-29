@@ -817,12 +817,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                 Recent Colors ({recentColors.length})
               </span>
               {recentColors.length > 0 && (
-                <Button
-                  onClick={clearRecent}
-                  variant="ghost"
-                  size="sm"
-                  style={{ fontSize: '14px', padding: '6px 12px' }}
-                >
+                <Button onClick={clearRecent} variant="danger">
                   <Trash2 style={{ width: '14px', height: '14px' }} />
                   Clear
                 </Button>

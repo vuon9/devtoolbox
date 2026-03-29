@@ -908,7 +908,7 @@ function ResultPane({ label, matches, error, indicator, indicatorColor }) {
             </span>
           )}
         </div>
-        <Button variant="ghost" size="sm" onClick={handleCopyAll} disabled={matches.length === 0}>
+        <Button variant="secondary" onClick={handleCopyAll} disabled={matches.length === 0}>
           <Copy style={{ width: '14px', height: '14px' }} />
           Copy All
         </Button>

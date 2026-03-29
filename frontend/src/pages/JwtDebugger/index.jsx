@@ -531,7 +531,7 @@ export default function JwtDebugger() {
         <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Button variant="ghost" onClick={fillSample}>
+          <Button variant="secondary" onClick={fillSample}>
             <FileText style={{ width: '14px', height: '14px' }} />
             Sample
           </Button>

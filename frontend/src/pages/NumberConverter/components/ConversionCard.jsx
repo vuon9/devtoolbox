@@ -1,6 +1,7 @@
 import React from 'react';
-import { TextInput, Button } from '@carbon/react';
-import { Copy, ArrowUp } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { TextInput } from '@carbon/react';
+import { Copy, ArrowUp } from 'lucide-react';
 import { BASES } from '../constants';
 import { formatNumber } from '../utils';
 
@@ -90,24 +91,18 @@ const ConversionCard = ({
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           {onSync && (
-            <Button
-              kind="ghost"
-              size="sm"
-              renderIcon={ArrowUp}
-              iconDescription="Use as input source"
-              onClick={onSync}
-              hasIconOnly
-            />
+            <Button variant="secondary" onClick={onSync} style={{ padding: '4px' }}>
+              <ArrowUp size={14} />
+            </Button>
           )}
           <Button
-            kind="ghost"
-            size="sm"
-            renderIcon={Copy}
-            iconDescription="Copy to clipboard"
+            variant="secondary"
             onClick={handleCopy}
             disabled={!displayValue}
-            hasIconOnly
-          />
+            style={{ padding: '4px' }}
+          >
+            <Copy size={14} />
+          </Button>
         </div>
       </div>
 

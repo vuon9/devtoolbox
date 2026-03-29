@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '@carbon/react';
-import { TrashCan } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { Trash2 } from 'lucide-react';
 
 export default function ColorHistory({ history, onLoadFromHistory, onClearHistory }) {
   return (
@@ -25,14 +25,9 @@ export default function ColorHistory({ history, onLoadFromHistory, onClearHistor
         }}
       >
         <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>History</span>
-        <Button
-          hasIconOnly
-          renderIcon={TrashCan}
-          kind="ghost"
-          size="sm"
-          onClick={onClearHistory}
-          iconDescription="Clear history"
-        />
+        <Button variant="danger" onClick={onClearHistory} style={{ padding: '4px' }}>
+          <Trash2 size={14} />
+        </Button>
       </div>
 
       <div

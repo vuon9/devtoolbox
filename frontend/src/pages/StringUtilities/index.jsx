@@ -274,7 +274,7 @@ export default function StringUtilities() {
           Dedupe
         </Button>
         <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a' }} />
-        <Button variant="destructive" size="sm" onClick={handleReset}>
+        <Button variant="danger" onClick={handleReset}>
           <Undo2 style={{ width: '14px', height: '14px' }} />
           Reset
         </Button>

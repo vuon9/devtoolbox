@@ -559,7 +559,7 @@ export default function TextDiffChecker() {
           {/* Mode toggle */}
           <ToggleGroup options={modeOptions} value={mode} onChange={setMode} />
 
-          <Button variant="destructive" size="sm" onClick={handleReset}>
+          <Button variant="danger" onClick={handleReset}>
             <Undo2 style={{ width: '14px', height: '14px' }} />
             Reset
           </Button>

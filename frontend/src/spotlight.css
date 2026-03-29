@@ -1,4 +1,4 @@
-/* Spotlight window specific styles - matching new dark theme */
+/* Command Palette window specific styles - matching new dark theme */
 :root,
 html,
 body,
@@ -15,4 +15,10 @@ body,
   height: 100vh;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+.command-palette-app-wrapper {
+  height: 100%;
+  width: 100%;
+  background: transparent;
 }

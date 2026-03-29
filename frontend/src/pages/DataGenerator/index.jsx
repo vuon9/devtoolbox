@@ -841,14 +841,18 @@ export default function DataGenerator() {
             <Play style={{ width: '14px', height: '14px' }} />
             {isGenerating ? 'Generating...' : 'Generate'}
           </Button>
-          <Button variant="ghost" onClick={() => setShowHelp(true)}>
+          <Button variant="secondary" onClick={() => setShowHelp(true)}>
             <HelpCircle style={{ width: '14px', height: '14px' }} />
             Help
           </Button>
           <div
             style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }}
           />
-          <Button variant="ghost" onClick={() => setIsVertical(!isVertical)}>
+          <Button
+            variant="secondary"
+            onClick={() => setIsVertical(!isVertical)}
+            style={{ padding: '4px' }}
+          >
             <Columns
               style={{
                 width: '14px',

@@ -441,7 +441,11 @@ export default function TextBasedConverter() {
             );
           })}
           <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a' }} />
-          <Button variant="ghost" size="icon" onClick={() => setIsVertical(!isVertical)}>
+          <Button
+            variant="secondary"
+            onClick={() => setIsVertical(!isVertical)}
+            style={{ padding: '4px' }}
+          >
             <Columns
               style={{
                 width: '16px',

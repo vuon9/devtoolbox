@@ -283,14 +283,18 @@ export default function BarcodeGenerator() {
         <TypeToggle types={types} value={type} onChange={handleTypeChange} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Button variant="ghost" size="sm" onClick={() => setInput('')}>
+          <Button variant="danger" onClick={() => setInput('')}>
             <Trash2 style={{ width: '14px', height: '14px' }} />
             Clear
           </Button>
           <div
             style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }}
           />
-          <Button variant="ghost" size="sm" onClick={() => setIsVertical(!isVertical)}>
+          <Button
+            variant="secondary"
+            onClick={() => setIsVertical(!isVertical)}
+            style={{ padding: '4px' }}
+          >
             <Columns
               style={{
                 width: '14px',
@@ -410,7 +414,7 @@ export default function BarcodeGenerator() {
                   <Download style={{ width: '14px', height: '14px' }} />
                   PNG
                 </Button>
-                <Button variant="ghost" onClick={handleDownloadSVG}>
+                <Button variant="secondary" onClick={handleDownloadSVG}>
                   <Download style={{ width: '14px', height: '14px' }} />
                   SVG
                 </Button>

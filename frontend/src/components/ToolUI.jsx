@@ -56,13 +56,12 @@ export function ToolPane({
           {label}
         </label>
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
+          variant="secondary"
           onClick={handleCopy}
           disabled={!value}
+          style={{ padding: '4px' }}
         >
-          <Copy className="h-4 w-4" />
+          <Copy style={{ width: '14px', height: '14px' }} />
         </Button>
       </div>
       <div className="flex-1 relative flex flex-col">

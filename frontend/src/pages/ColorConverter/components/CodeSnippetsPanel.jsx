@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Tile, Tabs, TabList, Tab, TabPanels, TabPanel, CopyButton } from '@carbon/react';
-import { Copy } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { Tile, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
+import { Copy } from 'lucide-react';
 
 const languageTabs = [
   { id: 'css', label: 'CSS' },
@@ -83,13 +84,13 @@ export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChan
                       </pre>
                     </div>
 
-                    <CopyButton
-                      kind="ghost"
-                      size="sm"
+                    <Button
+                      variant="secondary"
                       onClick={() => onCopy(snippet.code)}
-                      iconDescription="Copy"
-                      style={{ flexShrink: 0 }}
-                    />
+                      style={{ flexShrink: 0, padding: '4px' }}
+                    >
+                      <Copy size={14} />
+                    </Button>
                   </div>
                 </Tile>
               ))}
