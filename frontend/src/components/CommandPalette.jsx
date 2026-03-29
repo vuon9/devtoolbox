@@ -4,7 +4,7 @@ import {
   Search,
   Close,
   Moon,
-  Application,
+  Monitor,
   Type,
   Binary,
   ShieldCheck,
@@ -179,7 +179,7 @@ const COMMANDS = [
     id: 'window-toggle',
     label: 'Show/Hide Main Window',
     action: 'toggle-window',
-    icon: Application,
+    icon: Monitor,
   },
 ];
 
