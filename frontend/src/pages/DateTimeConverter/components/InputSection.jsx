@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, TextInput, ComboBox } from '@carbon/react';
-import { Add } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { TextInput, ComboBox } from '@carbon/react';
+import { Plus } from 'lucide-react';
 import { ToolControls } from '../../../components/ToolUI';
 
 export function InputSection({
@@ -49,13 +50,8 @@ export function InputSection({
           style={{ minWidth: '300px' }}
           disabled={disabled}
         />
-        <Button
-          size="md"
-          onClick={onAddTimezone}
-          disabled={!selectedNewTimezone}
-          renderIcon={Add}
-          iconDescription="Add timezone"
-        >
+        <Button variant="default" onClick={onAddTimezone} disabled={!selectedNewTimezone}>
+          <Plus size={14} />
           Add
         </Button>
       </div>

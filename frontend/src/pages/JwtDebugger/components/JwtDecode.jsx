@@ -3,8 +3,8 @@ import { ToolLayout, ToolTextArea, ToolInputGroup } from '../../../components/To
 import { actions } from '../jwtReducer';
 import { ErrorMessage, SuccessMessage } from './StatusMessages';
 import SignatureVerification from './SignatureVerification';
-import { Button } from '@carbon/react';
-import { MagicWand } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { FileText } from 'lucide-react';
 import { EXAMPLE_SECRET } from '../jwtUtils';
 import { Encode } from '../../../services/api';
 
@@ -64,13 +64,8 @@ export default function JwtDecode({ state, dispatch, layout, verifySignature }) 
         />
 
         <div style={{ marginTop: '.5rem', display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            kind="secondary"
-            size="md"
-            renderIcon={MagicWand}
-            onClick={handleGenerateExample}
-            style={{ flexShrink: 0, justifyContent: 'flex-end' }}
-          >
+          <Button variant="secondary" onClick={handleGenerateExample}>
+            <FileText size={14} />
             Sample
           </Button>
         </div>

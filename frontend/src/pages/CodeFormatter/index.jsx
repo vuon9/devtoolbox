@@ -442,8 +442,14 @@ export default function CodeFormatter() {
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
-          <SampleButton onClick={handleLoadSample} disabled={isFormatting} />
-          <MinifyButton active={minify} onClick={() => setMinify(!minify)} />
+          <Button variant="secondary" onClick={handleLoadSample} disabled={isFormatting}>
+            <FileText size={14} />
+            Load Sample
+          </Button>
+          <Button active={minify} onClick={() => setMinify(!minify)}>
+            <Zap size={14} />
+            Minify
+          </Button>
         </div>
       </div>
 

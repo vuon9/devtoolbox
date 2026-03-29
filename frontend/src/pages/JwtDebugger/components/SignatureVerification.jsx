@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Select, SelectItem } from '@carbon/react';
-import { Security } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { Select, SelectItem } from '@carbon/react';
+import { Shield } from 'lucide-react';
 import { ToolCopyButton, ToolInput } from '../../../components/ToolUI';
 import { actions } from '../jwtReducer';
 
@@ -107,13 +108,8 @@ export default function SignatureVerification({ state, dispatch, verifySignature
         </div>
       )}
 
-      <Button
-        kind="primary"
-        size="md"
-        renderIcon={Security}
-        onClick={verifySignature}
-        style={{ marginTop: '1rem' }}
-      >
+      <Button variant="default" onClick={verifySignature} style={{ marginTop: '1rem' }}>
+        <Shield size={14} />
         Verify Signature
       </Button>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Copy, Check, Dice5 } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 import { Convert as ConvertNumber } from '../../generated/http/numberConverterService';
 
 function debounce(func, wait) {
@@ -566,24 +567,10 @@ export default function NumberConverter() {
             outline: 'none',
           }}
         />
-        <button
-          onClick={handleRandom}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            backgroundColor: '#27272a',
-            border: '1px solid #3f3f46',
-            borderRadius: '6px',
-            padding: '8px 12px',
-            color: '#a1a1aa',
-            fontSize: '14px',
-            cursor: 'pointer',
-          }}
-        >
+        <Button variant="secondary" onClick={handleRandom}>
           <Dice5 size={14} />
           Random
-        </button>
+        </Button>
       </div>
 
       {/* Error message */}

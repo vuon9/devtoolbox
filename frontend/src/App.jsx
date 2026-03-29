@@ -3,14 +3,12 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { TitleBar } from './components/TitleBar';
 import { SettingsModal } from './components/SettingsModal';
-import { CommandPalette } from './components/CommandPalette';
 import ToolRouter from './ToolRouter';
 import './App.css';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [themeMode, setThemeMode] = useState(() => {
     return localStorage.getItem('themeMode') || 'dark';
   });
@@ -18,22 +16,8 @@ function App() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const openSettings = () => setIsSettingsOpen(true);
   const closeSettings = () => setIsSettingsOpen(false);
-  const openCommandPalette = () => setIsCommandPaletteOpen(true);
-  const closeCommandPalette = () => setIsCommandPaletteOpen(false);
 
   // Global spotlight shortcut is Cmd+Shift+Space (handled by Go backend)
-  // In-app shortcuts can be added here if needed
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Close Command Palette on Escape if open
-      if (e.key === 'Escape' && isCommandPaletteOpen) {
-        setIsCommandPaletteOpen(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCommandPaletteOpen]);
 
   useEffect(() => {
     localStorage.setItem('themeMode', themeMode);
@@ -87,13 +71,6 @@ function App() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={closeSettings}
-        themeMode={themeMode}
-        setThemeMode={setThemeMode}
-      />
-
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={closeCommandPalette}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
       />

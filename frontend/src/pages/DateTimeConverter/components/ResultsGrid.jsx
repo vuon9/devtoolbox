@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Grid, Column } from '@carbon/react';
-import { Close } from '@carbon/icons-react';
+import { Button } from '../../../components/ui/Button';
+import { Grid, Column } from '@carbon/react';
+import { X } from 'lucide-react';
 import DateTimeOutputField from './DateTimeOutputField';
 import { OUTPUT_FORMATS } from '../constants';
 import {
@@ -53,20 +54,18 @@ export function ResultsGrid({
                 value={formatDate(parsedDate, 'sql', tzId)}
               />
               <Button
-                kind="ghost"
-                size="sm"
-                renderIcon={Close}
-                iconDescription="Remove timezone"
+                variant="danger"
                 onClick={() => onRemoveTimezone(tzId)}
                 style={{
                   position: 'absolute',
                   top: '0.5rem',
                   right: '0.5rem',
-                  minHeight: '1.5rem',
-                  padding: '0 0.25rem',
+                  padding: '4px',
                   zIndex: 1,
                 }}
-              />
+              >
+                <X size={14} />
+              </Button>
             </div>
           ))}
         </div>
