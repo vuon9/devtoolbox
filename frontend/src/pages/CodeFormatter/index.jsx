@@ -245,7 +245,7 @@ function OutputPane({ content, language, error, filterComponent }) {
           backgroundColor: '#18181b',
           border: error ? '1px solid #ef4444' : '1px solid #27272a',
           borderRadius: '8px',
-          padding: '8px',
+          padding: '0',
           overflow: 'auto',
           marginBottom: '8px',
         }}
