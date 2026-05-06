@@ -49,6 +49,15 @@ tasks:
     cmds:
       - task: common:run:server
 
+  dev:server:
+    summary: Runs the API server in development mode with hot reload
+    desc: |
+      Requires 'air' (Go live reload). Installs it automatically if missing.
+      Watches .go files and rebuilds/restarts on changes.
+    cmds:
+      - command -v air >/dev/null 2>&1 || go install github.com/air-verse/air@latest
+      - air
+
   build:docker:
     summary: Builds a Docker image for server mode deployment
     cmds:

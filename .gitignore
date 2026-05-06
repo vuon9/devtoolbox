@@ -12,3 +12,9 @@ runtime.js
 .worktrees/
 .superpowers
 docs/plans/
+docs/superpowers/
+# Playwright
+frontend/test-results/
+test-results/
+frontend/playwright-report/
+playwright-report/

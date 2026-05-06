@@ -50,6 +50,35 @@ Here are principles and guidelines for developing tools and agents in this proje
 - Do not commit secrets or credentials.
 - If unsure about removing or changing conventions, discuss before large refactors.
 
+## Development workflow
+
+### Running the app
+
+| Mode | Command |
+|------|---------|
+| Desktop app (GUI) | `go run .` or `task dev` |
+| Server-only (no GUI) | `go run . --server-only` |
+| Custom port | `go run . --server-only --port 8081` (default 8081) |
+| Hot reload (server-only) | `task dev:server` |
+| Custom port with hot reload | `PORT=3000 task dev:server` |
+
+### Running tests
+
+| Scope | Command |
+|-------|---------|
+| All Go tests | `go test ./...` |
+| Go tests (verbose) | `go test -v ./...` |
+| Frontend unit tests | `cd frontend && npm test` |
+| Frontend E2E (Playwright) | Start backend + frontend first, then `cd frontend && npm run test:e2e` |
+| E2E with UI mode | Start backend + frontend first, then `cd frontend && npm run test:e2e:ui` |
+
+### Linting & formatting
+
+| Scope | Command |
+|-------|---------|
+| Frontend format check | `cd frontend && npm run format:check` |
+| Frontend format fix | `cd frontend && npm run format` |
+
 ## Final note
 - This document is a concise set of rules and intent. For implementation details and examples, read the code and shared UI helpers; the code is the authoritative source.
 - Keep the guide short and actionable; prefer making the code easy to understand over expanding this file.
