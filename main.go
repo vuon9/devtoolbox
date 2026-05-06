@@ -4,6 +4,7 @@ import (
 	"devtoolbox/internal/settings"
 	"devtoolbox/service"
 	"embed"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -43,6 +44,16 @@ func init() {
 }
 
 func main() {
+	serverOnly := flag.Bool("server-only", false, "Run in server-only mode (no GUI)")
+	port := flag.Int("port", 8081, "HTTP server port")
+	flag.Parse()
+
+	if *serverOnly {
+		log.Printf("Starting server-only mode on port %d...", *port)
+		StartHTTPServer(*port)
+		return
+	}
+
 	ginEngine := gin.New()
 	ginEngine.Use(gin.Recovery())
 	ginEngine.Use(LoggingMiddleware())
@@ -95,7 +106,11 @@ func main() {
 	// Register app services
 	app.RegisterService(application.NewService(service.NewJWTService(app)))
 	app.RegisterService(application.NewService(service.NewDateTimeService(app)))
-	app.RegisterService(application.NewService(service.NewConversionService(app)))
+	app.RegisterService(application.NewService(service.NewEncrypterService(app)))
+	app.RegisterService(application.NewService(service.NewEncoderService(app)))
+	app.RegisterService(application.NewService(service.NewHashGeneratorService(app)))
+	app.RegisterService(application.NewService(service.NewCodeConverterService(app)))
+	app.RegisterService(application.NewService(service.NewTextUtilitiesService(app)))
 	app.RegisterService(application.NewService(service.NewBarcodeService(app)))
 	app.RegisterService(application.NewService(service.NewDataGeneratorService(app)))
 	app.RegisterService(application.NewService(service.NewCodeFormatterService(app)))
@@ -110,7 +125,7 @@ func main() {
 
 	// Start HTTP server for browser support (background)
 	go func() {
-		StartHTTPServer(8081)
+		StartHTTPServer(*port)
 	}()
 
 	// Create main window
