@@ -37,7 +37,7 @@ export default function ToolLayoutToggle({
       top: '8px',
       right: '8px',
       zIndex: 10,
-      backgroundColor: '#1c1917',
+      backgroundColor: 'var(--card)',
       borderRadius: '4px',
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
     },
@@ -64,19 +64,19 @@ export default function ToolLayoutToggle({
           backgroundColor: 'transparent',
           border: 'none',
           borderRadius: '4px',
-          color: disabled ? '#3f3f46' : '#a1a1aa',
+          color: disabled ? 'var(--border)' : 'var(--muted-foreground)',
           cursor: disabled ? 'not-allowed' : 'pointer',
           transition: 'all 0.15s ease',
         }}
         onMouseEnter={(e) => {
           if (!disabled) {
-            e.currentTarget.style.backgroundColor = '#27272a';
-            e.currentTarget.style.color = '#f4f4f5';
+            e.currentTarget.style.backgroundColor = 'var(--muted)';
+            e.currentTarget.style.color = 'var(--foreground)';
           }
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = 'transparent';
-          e.currentTarget.style.color = disabled ? '#3f3f46' : '#a1a1aa';
+          e.currentTarget.style.color = disabled ? 'var(--border)' : 'var(--muted-foreground)';
         }}
       >
         {isHorizontal ? (

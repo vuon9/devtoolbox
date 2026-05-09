@@ -5,8 +5,15 @@ import { Switch } from '../../../components/ui/switch';
 import { Play, HelpCircle } from 'lucide-react';
 import { SEPARATOR_OPTIONS, OUTPUT_FORMAT_OPTIONS } from '../constants';
 
-const selectClass = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
-const labelClass = { display: 'block', fontSize: '0.75rem', fontWeight: 400, color: 'var(--muted-foreground)', marginBottom: '0.25rem' };
+const selectClass =
+  'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
+const labelClass = {
+  display: 'block',
+  fontSize: '0.75rem',
+  fontWeight: 400,
+  color: 'var(--muted-foreground)',
+  marginBottom: '0.25rem',
+};
 
 export default function GeneratorControls({
   state,
@@ -28,13 +35,23 @@ export default function GeneratorControls({
           className={selectClass}
         >
           {presetItems.map((item) => (
-            <option key={item} value={item}>{presetLabels[item] || item}</option>
+            <option key={item} value={item}>
+              {presetLabels[item] || item}
+            </option>
           ))}
         </select>
       </div>
 
       {/* Mode Toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingBottom: '6px', minWidth: '120px' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          paddingBottom: '6px',
+          minWidth: '120px',
+        }}
+      >
         <span style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Single</span>
         <Switch
           id="mode-toggle"
@@ -56,7 +73,9 @@ export default function GeneratorControls({
             min={10}
             max={1000}
             value={state.batchCount}
-            onChange={(e) => dispatch({ type: 'SET_BATCH_COUNT', payload: parseInt(e.target.value, 10) })}
+            onChange={(e) =>
+              dispatch({ type: 'SET_BATCH_COUNT', payload: parseInt(e.target.value, 10) })
+            }
             className={selectClass}
           />
         </div>
@@ -72,7 +91,9 @@ export default function GeneratorControls({
           className={selectClass}
         >
           {OUTPUT_FORMAT_OPTIONS.map((o) => (
-            <option key={o.id} value={o.id}>{o.label}</option>
+            <option key={o.id} value={o.id}>
+              {o.label}
+            </option>
           ))}
         </select>
       </div>
@@ -88,7 +109,9 @@ export default function GeneratorControls({
             className={selectClass}
           >
             {SEPARATOR_OPTIONS.map((o) => (
-              <option key={o.id} value={o.id}>{o.label}</option>
+              <option key={o.id} value={o.id}>
+                {o.label}
+              </option>
             ))}
           </select>
         </div>

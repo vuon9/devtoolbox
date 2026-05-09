@@ -31,9 +31,25 @@ export default function HelpModal({ open, onClose }) {
           padding: '1.5rem',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1rem',
+          }}
+        >
           <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Documentation & Help</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: 'var(--muted-foreground)' }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px',
+              color: 'var(--muted-foreground)',
+            }}
+          >
             <X size={20} />
           </button>
         </div>
@@ -44,7 +60,12 @@ export default function HelpModal({ open, onClose }) {
             <h4 style={{ marginBottom: '0.5rem', marginTop: 0 }}>{HELP_CONTENT.syntax.title}</h4>
             <p style={{ marginBottom: '1rem', color: 'var(--muted-foreground)' }}>
               {HELP_CONTENT.syntax.description}{' '}
-              <a href={HELP_CONTENT.syntax.link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>
+              <a
+                href={HELP_CONTENT.syntax.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--primary)' }}
+              >
                 View Go template docs
               </a>
             </p>
@@ -102,17 +123,46 @@ export default function HelpModal({ open, onClose }) {
               </a>
             </p>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid var(--border)' }}>
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                border: '1px solid var(--border)',
+              }}
+            >
               <thead>
                 <tr style={{ backgroundColor: 'var(--muted)' }}>
-                  <th style={{ padding: '0.5rem', textAlign: 'left', fontWeight: 600, fontSize: '0.875rem', borderBottom: '1px solid var(--border)', width: '150px' }}>Category</th>
-                  <th style={{ padding: '0.5rem', textAlign: 'left', fontWeight: 600, fontSize: '0.875rem', borderBottom: '1px solid var(--border)' }}>Functions</th>
+                  <th
+                    style={{
+                      padding: '0.5rem',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.875rem',
+                      borderBottom: '1px solid var(--border)',
+                      width: '150px',
+                    }}
+                  >
+                    Category
+                  </th>
+                  <th
+                    style={{
+                      padding: '0.5rem',
+                      textAlign: 'left',
+                      fontWeight: 600,
+                      fontSize: '0.875rem',
+                      borderBottom: '1px solid var(--border)',
+                    }}
+                  >
+                    Functions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {HELP_CONTENT.functions.map((func, idx) => (
                   <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '0.5rem', fontWeight: 600, fontSize: '0.875rem' }}>{func.category}</td>
+                    <td style={{ padding: '0.5rem', fontWeight: 600, fontSize: '0.875rem' }}>
+                      {func.category}
+                    </td>
                     <td style={{ padding: '0.5rem' }}>
                       <code
                         style={{

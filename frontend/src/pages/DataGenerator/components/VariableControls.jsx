@@ -1,8 +1,15 @@
 import React from 'react';
 import { Checkbox } from '../../../components/ui/checkbox';
 
-const selectClass = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
-const labelClass = { display: 'block', fontSize: '0.75rem', fontWeight: 400, color: 'var(--muted-foreground)', marginBottom: '0.25rem' };
+const selectClass =
+  'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
+const labelClass = {
+  display: 'block',
+  fontSize: '0.75rem',
+  fontWeight: 400,
+  color: 'var(--muted-foreground)',
+  marginBottom: '0.25rem',
+};
 
 export default function VariableControls({ variables, values, onChange }) {
   if (!variables || variables.length === 0) return null;
@@ -30,12 +37,16 @@ export default function VariableControls({ variables, values, onChange }) {
                 className={selectClass}
               >
                 {variable.options.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
                 ))}
               </select>
             </div>
           ) : variable.type === 'boolean' ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.5rem' }}>
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.5rem' }}
+            >
               <Checkbox
                 id={`var-${variable.name}`}
                 checked={values[variable.name] ?? variable.default}

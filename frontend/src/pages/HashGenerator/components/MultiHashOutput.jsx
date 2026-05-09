@@ -19,12 +19,12 @@ export default function MultiHashOutput({ value, error }) {
   try {
     data = typeof value === 'string' ? JSON.parse(value) : value;
   } catch {
-    return <div style={{ color: '#a1a1aa', padding: '12px', fontSize: '13px' }}>{value}</div>;
+    return <div style={{ color: 'var(--muted-foreground)', padding: '12px', fontSize: '13px' }}>{value}</div>;
   }
 
   if (!data || typeof data !== 'object') {
     return (
-      <div style={{ color: '#a1a1aa', padding: '12px', fontSize: '13px' }}>No hash results</div>
+      <div style={{ color: 'var(--muted-foreground)', padding: '12px', fontSize: '13px' }}>No hash results</div>
     );
   }
 
@@ -41,8 +41,8 @@ export default function MultiHashOutput({ value, error }) {
             gap: '4px',
             padding: '8px 12px',
             borderRadius: '6px',
-            backgroundColor: '#1c1917',
-            border: '1px solid #27272a',
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -50,7 +50,7 @@ export default function MultiHashOutput({ value, error }) {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
               }}
@@ -65,8 +65,8 @@ export default function MultiHashOutput({ value, error }) {
                 fontWeight: 600,
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
-                backgroundColor: copiedIndex === idx ? 'rgba(34, 197, 94, 0.15)' : '#27272a',
-                color: copiedIndex === idx ? '#22c55e' : '#a1a1aa',
+                backgroundColor: copiedIndex === idx ? 'rgba(34, 197, 94, 0.15)' : 'var(--muted)',
+                color: copiedIndex === idx ? '#22c55e' : 'var(--muted-foreground)',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
@@ -80,7 +80,7 @@ export default function MultiHashOutput({ value, error }) {
             style={{
               fontSize: '12px',
               fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-              color: '#f4f4f5',
+              color: 'var(--foreground)',
               wordBreak: 'break-all',
             }}
           >
