@@ -1,34 +1,101 @@
 @import 'tailwindcss';
 
-/* Tailwind CSS v4 - explicit content sources relative to this file */
+/* Radix Colors — neutral gray + blue as primary + red/green for semantic */
+@import '@radix-ui/colors/gray.css';
+@import '@radix-ui/colors/gray-dark.css';
+@import '@radix-ui/colors/blue.css';
+@import '@radix-ui/colors/blue-dark.css';
+@import '@radix-ui/colors/red.css';
+@import '@radix-ui/colors/red-dark.css';
+@import '@radix-ui/colors/green.css';
+@import '@radix-ui/colors/green-dark.css';
+
 @source "./**/*.jsx";
 @source "./**/*.js";
 @source "./**/*.tsx";
 @source "./**/*.ts";
 @source "../index.html";
 
-/* Global scrollbar styling - Dark, thin, subtle */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Tailwind dark variant — class-based */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Light theme (default) */
+:root {
+  --background: var(--gray-1);
+  --foreground: var(--gray-12);
+  --card: var(--gray-2);
+  --card-foreground: var(--gray-12);
+  --popover: var(--gray-2);
+  --popover-foreground: var(--gray-12);
+  --primary: var(--blue-9);
+  --primary-foreground: white;
+  --secondary: var(--gray-3);
+  --secondary-foreground: var(--gray-12);
+  --muted: var(--gray-3);
+  --muted-foreground: var(--gray-11);
+  --accent: var(--blue-3);
+  --accent-foreground: var(--blue-12);
+  --destructive: var(--red-9);
+  --destructive-foreground: white;
+  --border: var(--gray-6);
+  --input: var(--gray-3);
+  --ring: var(--blue-9);
+  --success: var(--green-9);
+  --warning: #e5c07b;
+
+  --sidebar-background: var(--gray-2);
+  --sidebar-foreground: var(--gray-12);
+  --sidebar-accent: var(--blue-9);
+  --titlebar-background: var(--gray-2);
+  --scrollbar-thumb: var(--gray-7);
+  --scrollbar-track: transparent;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Dark theme overrides */
+.dark {
+  --sidebar-background: var(--gray-2);
+  --sidebar-foreground: var(--gray-12);
+  --sidebar-accent: var(--blue-9);
+  --titlebar-background: var(--gray-2);
+  --scrollbar-thumb: var(--gray-7);
+  --scrollbar-track: transparent;
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: #27272a;
-  border-radius: 3px;
-  border: none;
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: #3f3f46;
-}
+/* Scrollbar using theme variables */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--gray-8); }
+* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
 
-/* Firefox scrollbar support */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #27272a transparent;
-}
+/* SQL keyword highlighting */
+.cm-sql-ddl { color: #ff6b9d !important; font-weight: bold !important; }
+.cm-sql-dml { color: #7ee787 !important; }
+.cm-sql-conditional { color: #b388ff !important; font-weight: bold !important; }
+.cm-sql-join { color: #ffab40 !important; font-weight: bold !important; }
+.cm-sql-aggregate { color: #69f0ae !important; font-weight: bold !important; }
+.cm-sql-ordering { color: #ffd740 !important; }

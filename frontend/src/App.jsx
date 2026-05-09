@@ -6,7 +6,6 @@ import { Sidebar } from './components/Sidebar';
 import { TitleBar } from './components/TitleBar';
 import { SettingsModal } from './components/SettingsModal';
 import ToolRouter from './ToolRouter';
-import './App.css';
 
 function App() {
   const navigate = useNavigate();
