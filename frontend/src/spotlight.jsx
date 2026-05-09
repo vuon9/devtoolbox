@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { CommandPalette } from './components/CommandPalette';
 import { ThemeProvider } from './context/ThemeContext';
-import './index.scss';
 import './spotlight.css';
 
 // Command Palette (Global - Cmd+Shift+Space)

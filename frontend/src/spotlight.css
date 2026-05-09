@@ -4,9 +4,9 @@ html,
 body,
 #root,
 .app-container {
-  background: #18181b !important;
-  background-color: #18181b !important;
-  color: #f4f4f5 !important;
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
 }
 
 #root {
