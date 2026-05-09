@@ -71,7 +71,7 @@ function SidebarItem({ to, icon: Icon, label, disabled, collapsed }) {
   if (disabled) {
     return (
       <div
-        style={{ ...baseStyle, color: '#52525b', cursor: 'not-allowed' }}
+        style={{ ...baseStyle, color: 'var(--muted-foreground)', cursor: 'not-allowed' }}
         title={collapsed ? label : undefined}
       >
         {Icon && <Icon style={{ width: '16px', height: '16px', flexShrink: 0, opacity: 0.4 }} />}
@@ -85,7 +85,7 @@ function SidebarItem({ to, icon: Icon, label, disabled, collapsed }) {
                 fontSize: '10px',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
-                color: '#3f3f46',
+                color: 'var(--border)',
                 marginLeft: 'auto',
               }}
             >
@@ -103,17 +103,17 @@ function SidebarItem({ to, icon: Icon, label, disabled, collapsed }) {
       title={collapsed ? label : undefined}
       style={({ isActive }) => ({
         ...baseStyle,
-        color: isActive ? '#ffffff' : '#a1a1aa',
-        backgroundColor: isActive ? '#27272a' : 'transparent',
+        color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
+        backgroundColor: isActive ? 'var(--border)' : 'transparent',
       })}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'rgba(39, 39, 42, 0.5)';
-        e.currentTarget.style.color = '#e4e4e7';
+        e.currentTarget.style.backgroundColor = 'var(--muted)';
+        e.currentTarget.style.color = 'var(--foreground)';
       }}
       onMouseLeave={(e) => {
         const isActive = e.currentTarget.classList.contains('active');
-        e.currentTarget.style.backgroundColor = isActive ? '#27272a' : 'transparent';
-        e.currentTarget.style.color = isActive ? '#ffffff' : '#a1a1aa';
+        e.currentTarget.style.backgroundColor = isActive ? 'var(--border)' : 'transparent';
+        e.currentTarget.style.color = isActive ? 'var(--foreground)' : 'var(--muted-foreground)';
       }}
     >
       {Icon && <Icon style={{ width: '16px', height: '16px', flexShrink: 0 }} />}
@@ -189,8 +189,8 @@ export function Sidebar({ isVisible, onOpenSettings }) {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#18181b',
-        borderRight: '1px solid #27272a',
+        backgroundColor: 'var(--sidebar-background)',
+        borderRight: '1px solid var(--border)',
         transition: 'width 0.2s ease',
       }}
     >
@@ -223,7 +223,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
             style={{
               fontWeight: 700,
               fontSize: '18px',
-              color: '#f4f4f5',
+              color: 'var(--foreground)',
               marginLeft: '12px',
               whiteSpace: 'nowrap',
             }}
@@ -245,7 +245,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                 transform: 'translateY(-50%)',
                 width: '16px',
                 height: '16px',
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
               }}
             />
             <input
@@ -254,15 +254,23 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                 width: '100%',
                 height: '40px',
                 padding: '0 12px 0 36px',
-                backgroundColor: '#27272a',
-                border: '1px solid #3f3f46',
+                backgroundColor: 'var(--muted)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 fontSize: '14px',
                 outline: 'none',
+                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)',
+                transition: 'border-color 0.15s ease',
               }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--ring)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }}
             />
           </div>
         </div>
@@ -275,7 +283,9 @@ export function Sidebar({ isVisible, onOpenSettings }) {
             <>
               {favoriteTools.length > 0 && (
                 <>
-                  <div style={{ height: '1px', background: '#27272a', margin: '12px 16px' }} />
+                  <div
+                    style={{ height: '1px', background: 'var(--border)', margin: '12px 16px' }}
+                  />
                   <div
                     style={{
                       display: 'flex',
@@ -284,7 +294,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                       padding: '8px 16px',
                       fontSize: '11px',
                       fontWeight: 600,
-                      color: '#71717a',
+                      color: 'var(--muted-foreground)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em',
                     }}
@@ -304,7 +314,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                 </>
               )}
 
-              <div style={{ height: '1px', background: '#27272a', margin: '16px' }} />
+              <div style={{ height: '1px', background: 'var(--border)', margin: '16px' }} />
             </>
           )}
 
@@ -320,7 +330,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                     padding: '12px 16px 8px',
                     fontSize: '11px',
                     fontWeight: 600,
-                    color: '#71717a',
+                    color: 'var(--muted-foreground)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
                   }}
@@ -373,7 +383,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                 padding: '32px 16px',
                 textAlign: 'center',
                 fontSize: '14px',
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
               }}
             >
               No tools found.
@@ -386,7 +396,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
       <div
         style={{
           padding: isCollapsed ? '8px' : '16px',
-          borderTop: '1px solid #27272a',
+          borderTop: '1px solid var(--border)',
           display: 'flex',
           flexDirection: isCollapsed ? 'column' : 'row',
           gap: isCollapsed ? '4px' : '8px',
@@ -404,7 +414,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
             flex: isCollapsed ? 'none' : 1,
             padding: isCollapsed ? '10px' : '10px 12px',
             fontSize: '14px',
-            color: '#a1a1aa',
+            color: 'var(--muted-foreground)',
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '8px',
@@ -412,12 +422,12 @@ export function Sidebar({ isVisible, onOpenSettings }) {
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#27272a';
-            e.currentTarget.style.color = '#f4f4f5';
+            e.currentTarget.style.backgroundColor = 'var(--border)';
+            e.currentTarget.style.color = 'var(--foreground)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#a1a1aa';
+            e.currentTarget.style.color = 'var(--muted-foreground)';
           }}
         >
           <Settings style={{ width: '16px', height: '16px', flexShrink: 0 }} />
@@ -434,21 +444,21 @@ export function Sidebar({ isVisible, onOpenSettings }) {
             height: '36px',
             padding: '6px',
             fontSize: '14px',
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             backgroundColor: 'transparent',
-            border: '1px solid #27272a',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
             flexShrink: 0,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#27272a';
-            e.currentTarget.style.color = '#f4f4f5';
+            e.currentTarget.style.backgroundColor = 'var(--border)';
+            e.currentTarget.style.color = 'var(--foreground)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#71717a';
+            e.currentTarget.style.color = 'var(--muted-foreground)';
           }}
         >
           {isCollapsed ? (

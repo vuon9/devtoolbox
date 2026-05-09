@@ -13,35 +13,48 @@ import {
   FileText,
 } from 'lucide-react';
 import { Decode, Encode, Verify } from '../../services/jwtService';
+import CodeEditor from '../../components/inputs/CodeEditor';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
+import EditorToggle from '../../components/inputs/EditorToggle';
 
-// Sample data for testing
 const SAMPLE_JWT =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 const SAMPLE_HEADER = '{"alg": "HS256", "typ": "JWT"}';
 const SAMPLE_PAYLOAD = '{"sub": "1234567890", "name": "John Doe", "iat": 1516239022}';
 const SAMPLE_SECRET = 'your-256-bit-secret';
+const TOOL_KEY = 'jwt-debugger';
 
-// Inline-styled components
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
 
-function ToolTextArea({ label, value, onChange, placeholder, readOnly, style = {} }) {
+function ToolTextArea({
+  label,
+  value,
+  onChange,
+  placeholder,
+  readOnly,
+  highlightOn,
+  language = 'plaintext',
+  style = {},
+}) {
   const handleCopy = () => {
-    if (value) {
-      navigator.clipboard.writeText(value);
-    }
+    if (value) navigator.clipboard.writeText(value);
   };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, ...style }}>
       <div
@@ -56,7 +69,7 @@ function ToolTextArea({ label, value, onChange, placeholder, readOnly, style = {
           style={{
             fontSize: '11px',
             fontWeight: 600,
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -76,19 +89,19 @@ function ToolTextArea({ label, value, onChange, placeholder, readOnly, style = {
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '4px',
-            color: value ? '#a1a1aa' : '#3f3f46',
+            color: value ? 'var(--muted-foreground)' : 'var(--border)',
             cursor: value ? 'pointer' : 'not-allowed',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
             if (value) {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
+              e.currentTarget.style.backgroundColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--foreground)';
             }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = value ? '#a1a1aa' : '#3f3f46';
+            e.currentTarget.style.color = value ? 'var(--muted-foreground)' : 'var(--border)';
           }}
         >
           <svg
@@ -106,27 +119,40 @@ function ToolTextArea({ label, value, onChange, placeholder, readOnly, style = {
           </svg>
         </button>
       </div>
-      <textarea
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        style={{
-          flex: 1,
-          width: '100%',
-          minHeight: '150px',
-          padding: '12px',
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          fontSize: '13px',
-          lineHeight: 1.5,
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
-          borderRadius: '8px',
-          color: '#f4f4f5',
-          resize: 'none',
-          outline: 'none',
-        }}
-      />
+      {readOnly ? (
+        highlightOn ? (
+          <HighlightedCode code={value} language={language} copyable={false} />
+        ) : (
+          <textarea
+            value={value}
+            readOnly
+            placeholder={placeholder}
+            style={{
+              flex: 1,
+              width: '100%',
+              minHeight: '150px',
+              padding: '12px',
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+              fontSize: '13px',
+              lineHeight: 1.5,
+              backgroundColor: 'var(--background)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              color: 'var(--foreground)',
+              resize: 'none',
+              outline: 'none',
+            }}
+          />
+        )
+      ) : (
+        <CodeEditor
+          value={value}
+          onChange={(val) => onChange?.({ target: { value: val } })}
+          language={language}
+          highlight={highlightOn}
+          placeholder={placeholder}
+        />
+      )}
     </div>
   );
 }
@@ -154,10 +180,10 @@ function ToggleGroup({ options, value, onChange }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: '#1c1917',
+        backgroundColor: 'var(--card)',
         borderRadius: '8px',
         padding: '4px',
-        border: '1px solid #27272a',
+        border: '1px solid var(--border)',
       }}
     >
       {options.map((option) => {
@@ -172,10 +198,10 @@ function ToggleGroup({ options, value, onChange }) {
               alignItems: 'center',
               gap: '8px',
               padding: '8px 16px',
-              backgroundColor: isActive ? '#27272a' : 'transparent',
+              backgroundColor: isActive ? 'var(--border)' : 'transparent',
               border: 'none',
               borderRadius: '6px',
-              color: isActive ? '#f4f4f5' : '#71717a',
+              color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
               fontSize: '13px',
               fontWeight: 500,
               cursor: 'pointer',
@@ -183,14 +209,14 @@ function ToggleGroup({ options, value, onChange }) {
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = '#27272a';
-                e.currentTarget.style.color = '#a1a1aa';
+                e.currentTarget.style.backgroundColor = 'var(--border)';
+                e.currentTarget.style.color = 'var(--muted-foreground)';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#71717a';
+                e.currentTarget.style.color = 'var(--muted-foreground)';
               }
             }}
           >
@@ -216,9 +242,7 @@ function StatusMessage({ type, children }) {
       color: '#ef4444',
     },
   };
-
   const style = styles[type] || styles.error;
-
   return (
     <div
       style={{
@@ -241,14 +265,13 @@ function StatusMessage({ type, children }) {
 
 function SecretInput({ label, value, onChange, placeholder }) {
   const [showSecret, setShowSecret] = useState(false);
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <label
         style={{
           fontSize: '11px',
           fontWeight: 600,
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
         }}
@@ -264,10 +287,10 @@ function SecretInput({ label, value, onChange, placeholder }) {
           style={{
             flex: 1,
             padding: '8px 12px',
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
+            backgroundColor: 'var(--background)',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
-            color: '#f4f4f5',
+            color: 'var(--foreground)',
             fontSize: '14px',
             outline: 'none',
           }}
@@ -276,14 +299,14 @@ function SecretInput({ label, value, onChange, placeholder }) {
           onClick={() => setShowSecret(!showSecret)}
           style={{
             padding: '8px',
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
+            backgroundColor: 'var(--background)',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             cursor: 'pointer',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#f4f4f5')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#71717a')}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--foreground)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--muted-foreground)')}
         >
           {showSecret ? (
             <EyeOff style={{ width: '16px', height: '16px' }} />
@@ -299,7 +322,6 @@ function SecretInput({ label, value, onChange, placeholder }) {
 function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find((o) => o.value === value);
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
@@ -307,7 +329,7 @@ function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
           style={{
             fontSize: '11px',
             fontWeight: 600,
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -322,27 +344,25 @@ function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            width: width,
+            width,
             height: '32px',
             padding: '0 12px',
-            backgroundColor: isOpen ? '#27272a' : '#18181b',
-            border: '1px solid #3f3f46',
+            backgroundColor: isOpen ? 'var(--border)' : 'var(--background)',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
-            color: '#f4f4f5',
+            color: 'var(--foreground)',
             fontSize: '14px',
             cursor: 'pointer',
             outline: 'none',
           }}
           onMouseEnter={(e) => {
             if (!isOpen) {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.borderColor = '#52525b';
+              e.currentTarget.style.backgroundColor = 'var(--border)';
             }
           }}
           onMouseLeave={(e) => {
             if (!isOpen) {
-              e.currentTarget.style.backgroundColor = '#18181b';
-              e.currentTarget.style.borderColor = '#3f3f46';
+              e.currentTarget.style.backgroundColor = 'var(--background)';
             }
           }}
         >
@@ -374,8 +394,8 @@ function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
               left: 0,
               right: 0,
               marginTop: '4px',
-              backgroundColor: '#1c1917',
-              border: '1px solid #27272a',
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
               borderRadius: '6px',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
               zIndex: 50,
@@ -393,17 +413,18 @@ function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
                 style={{
                   padding: '8px 12px',
                   fontSize: '14px',
-                  color: value === opt.value ? '#f4f4f5' : '#a1a1aa',
+                  color: value === opt.value ? 'var(--foreground)' : 'var(--muted-foreground)',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#27272a';
-                  e.currentTarget.style.color = '#f4f4f5';
+                  e.currentTarget.style.backgroundColor = 'var(--border)';
+                  e.currentTarget.style.color = 'var(--foreground)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = value === opt.value ? '#f4f4f5' : '#a1a1aa';
+                  e.currentTarget.style.color =
+                    value === opt.value ? 'var(--foreground)' : 'var(--muted-foreground)';
                 }}
               >
                 {opt.label}
@@ -417,6 +438,9 @@ function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
 }
 
 export default function JwtDebugger() {
+  const [highlightOn, setHighlightOn] = useState(
+    () => localStorage.getItem(`${TOOL_KEY}-editor-highlight`) !== 'false'
+  );
   const [jwt, setJwt] = useState('');
   const [payload, setPayload] = useState('');
   const [header, setHeader] = useState('');
@@ -443,22 +467,15 @@ export default function JwtDebugger() {
   const handleDecode = async (token = jwt) => {
     if (!token.trim()) return;
     try {
-      // Always decode to get header and payload
       const decodeRes = await Decode(token);
       setPayload(JSON.stringify(decodeRes.payload, null, 2));
       setHeader(JSON.stringify(decodeRes.header, null, 2));
-
-      // If secret is provided, verify the signature
       if (verifySecret.trim()) {
         const verifyRes = await Verify(token, verifySecret, verifyEncoding);
         setIsValid(verifyRes.valid || verifyRes.isValid);
-        if (verifyRes.error) {
-          setError(verifyRes.error);
-        } else {
-          setError('');
-        }
+        setError(verifyRes.error || '');
       } else {
-        setIsValid(null); // Can't verify without secret
+        setIsValid(null);
         setError('');
       }
     } catch (err) {
@@ -481,21 +498,14 @@ export default function JwtDebugger() {
 
   useEffect(() => {
     if (jwt && activeMode === 'decode') handleDecode(jwt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jwt, activeMode, verifySecret, verifyEncoding]);
 
-  // Auto-encode when inputs change in encode mode (with debounce)
   useEffect(() => {
     if (activeMode !== 'encode') return;
-
     const timeoutId = setTimeout(() => {
-      if (header.trim() && payload.trim()) {
-        handleEncode();
-      }
-    }, 500); // 500ms debounce
-
+      if (header.trim() && payload.trim()) handleEncode();
+    }, 500);
     return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [header, payload, algorithm, secret, activeMode]);
 
   const modes = [
@@ -511,14 +521,14 @@ export default function JwtDebugger() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader
         title="JWT Debugger"
         description="Inspect, decode, and encode JSON Web Tokens. Verify signatures and visualize payload contents with ease."
       />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -529,16 +539,14 @@ export default function JwtDebugger() {
         }}
       >
         <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <EditorToggle enabled={highlightOn} onToggle={setHighlightOn} toolKey={TOOL_KEY} />
           <Button variant="secondary" onClick={fillSample}>
-            <FileText style={{ width: '14px', height: '14px' }} />
-            Sample
+            <FileText style={{ width: '14px', height: '14px' }} /> Sample
           </Button>
           {activeMode === 'encode' && (
             <Button onClick={handleEncode}>
-              <Lock style={{ width: '14px', height: '14px' }} />
-              Sign & Encode
+              <Lock style={{ width: '14px', height: '14px' }} /> Sign & Encode
             </Button>
           )}
         </div>
@@ -552,32 +560,21 @@ export default function JwtDebugger() {
               value={jwt}
               onChange={(e) => setJwt(e.target.value)}
               placeholder="Paste encoded JWT here..."
+              highlightOn={highlightOn}
             />
-
             <div
               style={{
                 padding: '16px',
-                backgroundColor: '#1c1917',
-                border: '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
               }}
             >
               <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '12px',
-                }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}
               >
-                <Key style={{ width: '14px', height: '14px', color: '#71717a' }} />
-                <span
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    color: '#f4f4f5',
-                  }}
-                >
+                <Key style={{ width: '14px', height: '14px', color: 'var(--muted-foreground)' }} />
+                <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--foreground)' }}>
                   Signature Verification (Optional)
                 </span>
               </div>
@@ -601,37 +598,38 @@ export default function JwtDebugger() {
                 placeholder="Enter secret to verify signature..."
               />
             </div>
-
             {isValid !== null && (
               <StatusMessage type={isValid ? 'success' : 'error'}>
                 {isValid ? (
                   <>
-                    <CheckCircle2 style={{ width: '16px', height: '16px' }} />
-                    Signature Verified
+                    <CheckCircle2 style={{ width: '16px', height: '16px' }} /> Signature Verified
                   </>
                 ) : (
                   <>
-                    <AlertCircle style={{ width: '16px', height: '16px' }} />
-                    Invalid Signature / Format
+                    <AlertCircle style={{ width: '16px', height: '16px' }} /> Invalid Signature /
+                    Format
                   </>
                 )}
               </StatusMessage>
             )}
             {error && !isValid && <StatusMessage type="error">{error}</StatusMessage>}
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <ToolTextArea
               label="Header (Algorithm & Type)"
               value={header}
               readOnly
               placeholder="{ 'alg': 'HS256', 'typ': 'JWT' }"
+              highlightOn={highlightOn}
+              language="json"
             />
             <ToolTextArea
               label="Payload (Data)"
               value={payload}
               readOnly
               placeholder="{ 'sub': '1234567890', 'name': 'John Doe' }"
+              highlightOn={highlightOn}
+              language="json"
             />
           </div>
         </ToolSplitPane>
@@ -643,38 +641,30 @@ export default function JwtDebugger() {
               value={header}
               onChange={(e) => setHeader(e.target.value)}
               placeholder='{"alg": "HS256", "typ": "JWT"}'
+              highlightOn={highlightOn}
+              language="json"
             />
             <ToolTextArea
               label="Payload (JSON)"
               value={payload}
               onChange={(e) => setPayload(e.target.value)}
               placeholder='{"sub": "1234567890", "name": "John Doe"}'
+              highlightOn={highlightOn}
+              language="json"
             />
-
             <div
               style={{
                 padding: '16px',
-                backgroundColor: '#1c1917',
-                border: '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
               }}
             >
               <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '12px',
-                }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}
               >
-                <Key style={{ width: '14px', height: '14px', color: '#71717a' }} />
-                <span
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    color: '#f4f4f5',
-                  }}
-                >
+                <Key style={{ width: '14px', height: '14px', color: 'var(--muted-foreground)' }} />
+                <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--foreground)' }}>
                   Signing Configuration
                 </span>
               </div>
@@ -700,13 +690,13 @@ export default function JwtDebugger() {
               </div>
             </div>
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <ToolTextArea
               label="Encoded Token"
               value={jwt}
               readOnly
               placeholder="Encoded JWT will appear here..."
+              highlightOn={highlightOn}
             />
             {error && <StatusMessage type="error">{error}</StatusMessage>}
           </div>

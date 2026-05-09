@@ -8,17 +8,17 @@ export default function ColorHistory({ history, onLoadFromHistory, onClearHistor
       style={{
         display: 'flex',
         flexDirection: 'column',
-        border: '1px solid var(--cds-border-subtle)',
+        border: '1px solid var(--border)',
         overflow: 'hidden',
-        backgroundColor: 'var(--cds-layer)',
+        backgroundColor: 'var(--card)',
         flex: 1,
       }}
     >
       <div
         style={{
           padding: '0.5rem 0.75rem',
-          backgroundColor: 'var(--cds-layer-hover)',
-          borderBottom: '1px solid var(--cds-border-subtle)',
+          backgroundColor: 'var(--muted)',
+          borderBottom: '1px solid var(--border)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -43,7 +43,7 @@ export default function ColorHistory({ history, onLoadFromHistory, onClearHistor
             style={{
               textAlign: 'center',
               padding: '1rem',
-              color: 'var(--cds-text-secondary)',
+              color: 'var(--muted-foreground)',
               fontSize: '0.875rem',
             }}
           >
@@ -62,7 +62,7 @@ export default function ColorHistory({ history, onLoadFromHistory, onClearHistor
                 cursor: 'pointer',
                 borderRadius: '4px',
                 marginBottom: '0.25rem',
-                backgroundColor: 'var(--cds-layer-hover)',
+                backgroundColor: 'var(--muted)',
               }}
             >
               <div
@@ -71,7 +71,7 @@ export default function ColorHistory({ history, onLoadFromHistory, onClearHistor
                   height: '18px',
                   borderRadius: '3px',
                   backgroundColor: item.hex,
-                  border: '1px solid var(--cds-border-strong)',
+                  border: '1px solid var(--border)',
                   flexShrink: 0,
                 }}
               />

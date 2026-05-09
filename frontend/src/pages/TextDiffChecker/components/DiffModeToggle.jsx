@@ -13,10 +13,10 @@ export default function DiffModeToggle({ activeMode, onChange }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: '#1c1917',
+        backgroundColor: 'var(--card)',
         borderRadius: '8px',
         padding: '4px',
-        border: '1px solid #27272a',
+        border: '1px solid var(--border)',
       }}
     >
       {modes.map((mode, idx) => {
@@ -31,10 +31,10 @@ export default function DiffModeToggle({ activeMode, onChange }) {
               alignItems: 'center',
               gap: '8px',
               padding: '8px 16px',
-              backgroundColor: isActive ? '#27272a' : 'transparent',
+              backgroundColor: isActive ? 'var(--muted)' : 'transparent',
               border: 'none',
               borderRadius: '6px',
-              color: isActive ? '#f4f4f5' : '#71717a',
+              color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
               fontSize: '13px',
               fontWeight: 500,
               cursor: 'pointer',
@@ -44,14 +44,14 @@ export default function DiffModeToggle({ activeMode, onChange }) {
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = '#27272a';
-                e.currentTarget.style.color = '#a1a1aa';
+                e.currentTarget.style.backgroundColor = 'var(--muted)';
+                e.currentTarget.style.color = 'var(--muted-foreground)';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#71717a';
+                e.currentTarget.style.color = 'var(--muted-foreground)';
               }
             }}
           >

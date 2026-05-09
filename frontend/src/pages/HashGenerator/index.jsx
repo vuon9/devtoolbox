@@ -3,6 +3,9 @@ import { Columns } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { hashGeneratorAPI } from './api/hashGeneratorAPI';
 import MultiHashOutput from './components/MultiHashOutput';
+import CodeEditor from '../../components/inputs/CodeEditor';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
+import EditorToggle from '../../components/inputs/EditorToggle';
 
 const METHODS = [
   'All',
@@ -29,16 +32,22 @@ const METHODS = [
 
 const TOOL_TITLE = 'Hash Generator';
 const TOOL_DESCRIPTION = 'Compute cryptographic and non-cryptographic hash digests.';
+const TOOL_KEY = 'hash-generator';
 
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
@@ -52,6 +61,8 @@ function ToolPane({
   indicator,
   indicatorColor,
   error,
+  highlightOn,
+  language = 'plaintext',
 }) {
   const handleCopy = () => {
     if (value) navigator.clipboard.writeText(value);
@@ -71,7 +82,7 @@ function ToolPane({
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -115,7 +126,7 @@ function ToolPane({
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '4px',
-            color: value ? '#a1a1aa' : '#3f3f46',
+            color: value ? 'var(--muted-foreground)' : 'var(--border)',
             cursor: value ? 'pointer' : 'not-allowed',
           }}
         >
@@ -132,26 +143,39 @@ function ToolPane({
           </svg>
         </button>
       </div>
-      <textarea
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        style={{
-          flex: 1,
-          width: '100%',
-          padding: '12px',
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          fontSize: '14px',
-          lineHeight: 1.6,
-          backgroundColor: '#18181b',
-          border: error ? '1px solid #ef4444' : '1px solid #27272a',
-          borderRadius: '8px',
-          color: '#f4f4f5',
-          resize: 'none',
-          outline: 'none',
-        }}
-      />
+      {readOnly ? (
+        highlightOn ? (
+          <HighlightedCode code={value} language={language} copyable={false} />
+        ) : (
+          <textarea
+            value={value}
+            readOnly
+            placeholder={placeholder}
+            style={{
+              flex: 1,
+              width: '100%',
+              padding: '12px',
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+              fontSize: '14px',
+              lineHeight: 1.6,
+              backgroundColor: 'var(--background)',
+              border: error ? '1px solid #ef4444' : '1px solid var(--border)',
+              borderRadius: '8px',
+              color: 'var(--foreground)',
+              resize: 'none',
+              outline: 'none',
+            }}
+          />
+        )
+      ) : (
+        <CodeEditor
+          value={value}
+          onChange={(val) => onChange?.(val)}
+          language={language}
+          highlight={highlightOn}
+          placeholder={placeholder}
+        />
+      )}
     </div>
   );
 }
@@ -175,6 +199,9 @@ function ToolSplitPane({ children, isVertical }) {
 const STORAGE_KEY = 'hash-generator-layout';
 
 export default function HashGenerator() {
+  const [highlightOn, setHighlightOn] = useState(
+    () => localStorage.getItem(`${TOOL_KEY}-editor-highlight`) !== 'false'
+  );
   const [method, setMethod] = useState('MD5');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
@@ -234,11 +261,11 @@ export default function HashGenerator() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
         <select
@@ -249,9 +276,9 @@ export default function HashGenerator() {
             padding: '0 12px',
             fontSize: '13px',
             borderRadius: '6px',
-            backgroundColor: '#1c1917',
-            border: '1px solid #27272a',
-            color: '#f4f4f5',
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
+            color: 'var(--foreground)',
             outline: 'none',
             minWidth: '180px',
           }}
@@ -274,9 +301,9 @@ export default function HashGenerator() {
               padding: '0 12px',
               fontSize: '13px',
               borderRadius: '6px',
-              backgroundColor: '#1c1917',
-              border: '1px solid #27272a',
-              color: '#f4f4f5',
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
+              color: 'var(--foreground)',
               outline: 'none',
               width: '200px',
             }}
@@ -284,6 +311,7 @@ export default function HashGenerator() {
         )}
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <EditorToggle enabled={highlightOn} onToggle={setHighlightOn} toolKey={TOOL_KEY} />
           <Button
             variant="secondary"
             onClick={() => setIsVertical(!isVertical)}
@@ -301,22 +329,15 @@ export default function HashGenerator() {
       </div>
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: isVertical ? '1fr' : '1fr 1fr',
-            gap: '16px',
-            flex: 1,
-            minHeight: 0,
-          }}
-        >
+        <ToolSplitPane isVertical={isVertical}>
           <ToolPane
             label="Input"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(val) => setInput(val)}
             placeholder="Enter text to hash..."
             indicator="Source"
             indicatorColor="green"
+            highlightOn={highlightOn}
           />
           {isAll ? (
             <div
@@ -325,9 +346,9 @@ export default function HashGenerator() {
                 flexDirection: 'column',
                 flex: 1,
                 minHeight: 0,
-                border: '1px solid #27272a',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
-                backgroundColor: '#18181b',
+                backgroundColor: 'var(--background)',
                 overflow: 'hidden',
               }}
             >
@@ -337,8 +358,8 @@ export default function HashGenerator() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '8px 12px',
-                  borderBottom: '1px solid #27272a',
-                  backgroundColor: '#09090b',
+                  borderBottom: '1px solid var(--border)',
+                  backgroundColor: 'var(--card)',
                 }}
               >
                 <label
@@ -347,7 +368,7 @@ export default function HashGenerator() {
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    color: '#71717a',
+                    color: 'var(--muted-foreground)',
                   }}
                 >
                   Output
@@ -383,9 +404,10 @@ export default function HashGenerator() {
               indicator="Result"
               indicatorColor="blue"
               error={!!error}
+              highlightOn={highlightOn}
             />
           )}
-        </div>
+        </ToolSplitPane>
       </div>
     </div>
   );

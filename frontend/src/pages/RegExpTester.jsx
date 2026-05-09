@@ -103,7 +103,7 @@ const highlightRegexPattern = (pattern) => {
 
       groupStack.push({ isCapturing, groupNum });
 
-      result += `<span style="background-color: ${color.bg}; color: #f4f4f5; border-radius: 2px; font-weight: 600;">(${groupPrefix}`;
+      result += `<span style="background-color: ${color.bg}; color: var(--foreground); border-radius: 2px; font-weight: 600;">(${groupPrefix}`;
       continue;
     }
 
@@ -224,24 +224,24 @@ const generateHighlightedHtml = (text, regex, flags) => {
         groupPositions.forEach((group) => {
           if (group.index > matchPos) {
             const beforeText = escapeHtml(fullMatchText.slice(matchPos, group.index));
-            matchResult += `<span style="background-color: ${fullMatchColor.bg}; color: #f4f4f5; border-radius: 2px;">${beforeText}</span>`;
+            matchResult += `<span style="background-color: ${fullMatchColor.bg}; color: var(--foreground); border-radius: 2px;">${beforeText}</span>`;
           }
 
           const groupColor = GROUP_COLORS[group.groupNum % GROUP_COLORS.length] || GROUP_COLORS[1];
-          matchResult += `<mark style="background-color: ${groupColor.bg}; color: #f4f4f5; border-radius: 2px; font-weight: 600;" title="${tooltipData}">${escapeHtml(group.text)}</mark>`;
+          matchResult += `<mark style="background-color: ${groupColor.bg}; color: var(--foreground); border-radius: 2px; font-weight: 600;" title="${tooltipData}">${escapeHtml(group.text)}</mark>`;
 
           matchPos = group.index + group.text.length;
         });
 
         if (matchPos < fullMatchText.length) {
           const afterText = escapeHtml(fullMatchText.slice(matchPos));
-          matchResult += `<span style="background-color: ${fullMatchColor.bg}; color: #f4f4f5; border-radius: 2px;">${afterText}</span>`;
+          matchResult += `<span style="background-color: ${fullMatchColor.bg}; color: var(--foreground); border-radius: 2px;">${afterText}</span>`;
         }
 
         result += matchResult;
       } else {
         const fullMatchColor = GROUP_COLORS[0];
-        result += `<mark style="background-color: ${fullMatchColor.bg}; color: #f4f4f5; border-radius: 2px; font-weight: 600;" title="${tooltipData}">${escapeHtml(fullMatchText)}</mark>`;
+        result += `<mark style="background-color: ${fullMatchColor.bg}; color: var(--foreground); border-radius: 2px; font-weight: 600;" title="${tooltipData}">${escapeHtml(fullMatchText)}</mark>`;
       }
 
       lastIndex = re.lastIndex;
@@ -265,11 +265,16 @@ function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
@@ -313,7 +318,7 @@ function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, 
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -339,10 +344,10 @@ function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, 
                       : 'rgba(113, 113, 122, 0.15)',
                 color:
                   indicatorColor === 'green'
-                    ? '#22c55e'
+                    ? 'var(--success)'
                     : indicatorColor === 'blue'
-                      ? '#3b82f6'
-                      : '#71717a',
+                      ? 'var(--primary)'
+                      : 'var(--muted-foreground)',
               }}
             >
               {indicator}
@@ -363,19 +368,19 @@ function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, 
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '4px',
-            color: text ? '#a1a1aa' : '#3f3f46',
+            color: text ? 'var(--muted-foreground)' : 'var(--border)',
             cursor: text ? 'pointer' : 'not-allowed',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
             if (text) {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
+              e.currentTarget.style.backgroundColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--foreground)';
             }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = text ? '#a1a1aa' : '#3f3f46';
+            e.currentTarget.style.color = text ? 'var(--muted-foreground)' : 'var(--border)';
           }}
         >
           <Copy style={{ width: '16px', height: '16px' }} />
@@ -394,15 +399,15 @@ function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, 
             bottom: 0,
             overflow: 'auto',
             padding: '12px',
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             lineHeight: 1.6,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
-            color: '#f4f4f5',
+            color: 'var(--foreground)',
             pointerEvents: 'none',
           }}
           dangerouslySetInnerHTML={{ __html: highlightedHtml }}
@@ -426,7 +431,7 @@ function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, 
             height: '100%',
             padding: '12px',
             background: 'transparent',
-            border: '1px solid #27272a',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
@@ -434,7 +439,7 @@ function LiveHighlightedEditor({ text, setText, regex, flags, label, indicator, 
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
             color: 'transparent',
-            caretColor: '#f4f4f5',
+            caretColor: 'var(--foreground)',
             resize: 'none',
             outline: 'none',
             zIndex: 1,
@@ -454,7 +459,7 @@ function MatchRow({ label, position, value, color, underline, isLast }) {
         gap: '12px',
         padding: '6px 0',
         alignItems: 'center',
-        borderBottom: isLast ? 'none' : '1px solid #27272a',
+        borderBottom: isLast ? 'none' : '1px solid var(--border)',
       }}
     >
       <div style={{ justifySelf: 'start', display: 'inline-block' }}>
@@ -476,7 +481,7 @@ function MatchRow({ label, position, value, color, underline, isLast }) {
         style={{
           fontSize: '12px',
           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
         }}
       >
         {position}
@@ -485,7 +490,7 @@ function MatchRow({ label, position, value, color, underline, isLast }) {
         style={{
           fontSize: '12px',
           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -598,7 +603,7 @@ function QuickReferencePanel() {
       }));
 
   return (
-    <div style={{ marginTop: '8px', borderTop: '1px solid #27272a', paddingTop: '8px' }}>
+    <div style={{ marginTop: '8px', borderTop: '1px solid var(--border)', paddingTop: '8px' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -609,7 +614,7 @@ function QuickReferencePanel() {
           padding: '8px 0',
           backgroundColor: 'transparent',
           border: 'none',
-          color: '#3b82f6',
+          color: 'var(--primary)',
           fontSize: '12px',
           fontWeight: 600,
           cursor: 'pointer',
@@ -642,14 +647,14 @@ function QuickReferencePanel() {
             gridTemplateColumns: '140px 1fr',
             gap: '16px',
             padding: '12px',
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
             marginTop: '8px',
           }}
         >
           {/* Left sidebar - Categories */}
-          <div style={{ borderRight: '1px solid #27272a', paddingRight: '8px' }}>
+          <div style={{ borderRight: '1px solid var(--border)', paddingRight: '8px' }}>
             <input
               type="text"
               placeholder="Search..."
@@ -659,10 +664,10 @@ function QuickReferencePanel() {
                 width: '100%',
                 padding: '6px 8px',
                 fontSize: '12px',
-                backgroundColor: '#27272a',
-                border: '1px solid #3f3f46',
+                backgroundColor: 'var(--border)',
+                border: '1px solid var(--border)',
                 borderRadius: '4px',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 marginBottom: '8px',
               }}
             />
@@ -682,10 +687,13 @@ function QuickReferencePanel() {
                     fontSize: '12px',
                     textAlign: 'left',
                     backgroundColor:
-                      activeCategory === key && !searchQuery ? '#27272a' : 'transparent',
+                      activeCategory === key && !searchQuery ? 'var(--border)' : 'transparent',
                     border: 'none',
                     borderRadius: '4px',
-                    color: activeCategory === key && !searchQuery ? '#3b82f6' : '#a1a1aa',
+                    color:
+                      activeCategory === key && !searchQuery
+                        ? 'var(--primary)'
+                        : 'var(--muted-foreground)',
                     cursor: 'pointer',
                   }}
                 >
@@ -702,7 +710,7 @@ function QuickReferencePanel() {
               <div
                 style={{
                   fontSize: '11px',
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   marginBottom: '8px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
@@ -724,26 +732,30 @@ function QuickReferencePanel() {
                       borderRadius: '4px',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#27272a';
+                      e.currentTarget.style.backgroundColor = 'var(--border)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = 'transparent';
                     }}
                   >
                     {searchQuery && (
-                      <span style={{ fontSize: '11px', color: '#3b82f6' }}>{token.category}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--primary)' }}>
+                        {token.category}
+                      </span>
                     )}
                     <span
                       style={{
                         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
-                        color: '#22c55e',
+                        color: 'var(--success)',
                         fontWeight: 600,
                       }}
                     >
                       {token.token}
                     </span>
-                    <span style={{ fontSize: '13px', color: '#a1a1aa' }}>{token.desc}</span>
+                    <span style={{ fontSize: '13px', color: 'var(--muted-foreground)' }}>
+                      {token.desc}
+                    </span>
                   </div>
                 ))
               ) : (
@@ -751,7 +763,7 @@ function QuickReferencePanel() {
                   style={{
                     padding: '12px',
                     fontSize: '13px',
-                    color: '#71717a',
+                    color: 'var(--muted-foreground)',
                     textAlign: 'center',
                   }}
                 >
@@ -841,7 +853,7 @@ function MatchCard({ match, index, isLastMatch }) {
       style={{
         paddingBottom: isLastMatch ? '0' : '8px',
         marginBottom: isLastMatch ? '0' : '8px',
-        borderBottom: isLastMatch ? 'none' : '1px solid #3f3f46',
+        borderBottom: isLastMatch ? 'none' : '1px solid var(--border)',
       }}
     >
       {rows}
@@ -872,7 +884,7 @@ function ResultPane({ label, matches, error, indicator, indicatorColor }) {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -898,10 +910,10 @@ function ResultPane({ label, matches, error, indicator, indicatorColor }) {
                       : 'rgba(113, 113, 122, 0.15)',
                 color:
                   indicatorColor === 'green'
-                    ? '#22c55e'
+                    ? 'var(--success)'
                     : indicatorColor === 'blue'
-                      ? '#3b82f6'
-                      : '#71717a',
+                      ? 'var(--primary)'
+                      : 'var(--muted-foreground)',
               }}
             >
               {indicator}
@@ -918,8 +930,8 @@ function ResultPane({ label, matches, error, indicator, indicatorColor }) {
           flex: 1,
           overflowY: 'auto',
           padding: '12px',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRadius: '8px',
         }}
       >
@@ -938,7 +950,7 @@ function ResultPane({ label, matches, error, indicator, indicatorColor }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '16px',
-              color: '#52525b',
+              color: 'var(--muted-foreground)',
             }}
           >
             <Regex style={{ width: '48px', height: '48px', opacity: 0.3 }} />
@@ -1008,8 +1020,8 @@ function FlagsDropdown({ flags, setFlags }) {
           height: '40px',
           minWidth: '80px',
           padding: '0 12px',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRadius: '6px',
           cursor: 'pointer',
           transition: 'all 0.15s ease',
@@ -1020,7 +1032,7 @@ function FlagsDropdown({ flags, setFlags }) {
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             fontWeight: 600,
-            color: flags ? '#3b82f6' : '#71717a',
+            color: flags ? 'var(--primary)' : 'var(--muted-foreground)',
           }}
         >
           {displayFlags}
@@ -1033,7 +1045,7 @@ function FlagsDropdown({ flags, setFlags }) {
           stroke="currentColor"
           strokeWidth="2"
           style={{
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             transition: 'transform 0.15s ease',
             transform: isOpen ? 'rotate(180deg)' : 'none',
           }}
@@ -1049,8 +1061,8 @@ function FlagsDropdown({ flags, setFlags }) {
             top: 'calc(100% + 4px)',
             right: 0,
             minWidth: '240px',
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
             zIndex: 50,
@@ -1071,12 +1083,12 @@ function FlagsDropdown({ flags, setFlags }) {
                   padding: '12px 16px',
                   backgroundColor: 'transparent',
                   border: 'none',
-                  borderTop: index > 0 ? '1px solid #27272a' : 'none',
+                  borderTop: index > 0 ? '1px solid var(--border)' : 'none',
                   cursor: 'pointer',
                   textAlign: 'left',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#27272a';
+                  e.currentTarget.style.backgroundColor = 'var(--border)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
@@ -1102,19 +1114,19 @@ function FlagsDropdown({ flags, setFlags }) {
                         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '14px',
                         fontWeight: 600,
-                        backgroundColor: isActive ? '#3b82f6' : '#27272a',
-                        color: isActive ? '#ffffff' : '#a1a1aa',
+                        backgroundColor: isActive ? 'var(--primary)' : 'var(--border)',
+                        color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
                       }}
                     >
                       {option.flag}
                     </span>
-                    <span style={{ fontWeight: 600, color: '#f4f4f5', fontSize: '14px' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--foreground)', fontSize: '14px' }}>
                       {option.name}
                     </span>
                   </div>
                   <span
                     style={{
-                      color: '#71717a',
+                      color: 'var(--muted-foreground)',
                       fontSize: '12px',
                       lineHeight: 1.4,
                       marginLeft: '32px',
@@ -1130,7 +1142,7 @@ function FlagsDropdown({ flags, setFlags }) {
                       height="16"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#22c55e"
+                      stroke="var(--success)"
                       strokeWidth="3"
                     >
                       <path d="M20 6L9 17l-5-5" />
@@ -1192,14 +1204,14 @@ export default function RegExpTester() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader
         title="RegExp Tester"
         description="Write and debug regular expressions with real-time feedback. Visualize matches, groups, and capture properties instantly."
       />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -1214,7 +1226,7 @@ export default function RegExpTester() {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               display: 'block',
@@ -1230,7 +1242,7 @@ export default function RegExpTester() {
                 left: '12px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: '#3b82f6',
+                color: 'var(--primary)',
                 fontWeight: 600,
                 opacity: 0.5,
                 fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
@@ -1252,10 +1264,10 @@ export default function RegExpTester() {
                 fontSize: '14px',
                 fontWeight: 500,
                 lineHeight: '40px',
-                backgroundColor: '#18181b',
-                border: error ? '1px solid #ef4444' : '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: error ? '1px solid var(--destructive)' : '1px solid var(--border)',
                 borderRadius: '6px',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 pointerEvents: 'none',
@@ -1280,7 +1292,7 @@ export default function RegExpTester() {
                 border: '1px solid transparent',
                 borderRadius: '6px',
                 color: 'transparent',
-                caretColor: '#f4f4f5',
+                caretColor: 'var(--foreground)',
                 outline: 'none',
                 zIndex: 1,
               }}
@@ -1291,7 +1303,7 @@ export default function RegExpTester() {
                 right: '12px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: '#3b82f6',
+                color: 'var(--primary)',
                 fontWeight: 600,
                 opacity: 0.5,
                 fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
@@ -1307,7 +1319,7 @@ export default function RegExpTester() {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               display: 'block',
@@ -1328,7 +1340,7 @@ export default function RegExpTester() {
             borderRadius: '8px',
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             border: '1px solid rgba(239, 68, 68, 0.2)',
-            color: '#ef4444',
+            color: 'var(--destructive)',
             fontSize: '13px',
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           }}

@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Columns } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { encrypterAPI } from './api/encrypterAPI';
+import CodeEditor from '../../components/inputs/CodeEditor';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
+import EditorToggle from '../../components/inputs/EditorToggle';
 
 const METHODS = [
   'AES',
@@ -36,16 +39,22 @@ const NEED_RSA = new Set(['RSA']);
 const PRESETS = ['AES', 'XOR', 'ChaCha20'];
 const STORAGE_KEY = 'tool-encrypter';
 const DEBOUNCE_MS = 400;
+const TOOL_KEY = 'code-encrypter';
 
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
@@ -59,6 +68,8 @@ function ToolPane({
   indicator,
   indicatorColor,
   error,
+  highlightOn,
+  language = 'plaintext',
 }) {
   const handleCopy = () => {
     if (value) navigator.clipboard.writeText(value);
@@ -78,7 +89,7 @@ function ToolPane({
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -122,7 +133,7 @@ function ToolPane({
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '4px',
-            color: value ? '#a1a1aa' : '#3f3f46',
+            color: value ? 'var(--muted-foreground)' : 'var(--border)',
             cursor: value ? 'pointer' : 'not-allowed',
           }}
         >
@@ -139,26 +150,39 @@ function ToolPane({
           </svg>
         </button>
       </div>
-      <textarea
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        style={{
-          flex: 1,
-          width: '100%',
-          padding: '12px',
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          fontSize: '14px',
-          lineHeight: 1.6,
-          backgroundColor: '#18181b',
-          border: error ? '1px solid #ef4444' : '1px solid #27272a',
-          borderRadius: '8px',
-          color: '#f4f4f5',
-          resize: 'none',
-          outline: 'none',
-        }}
-      />
+      {readOnly ? (
+        highlightOn ? (
+          <HighlightedCode code={value} language={language} copyable={false} />
+        ) : (
+          <textarea
+            value={value}
+            readOnly
+            placeholder={placeholder}
+            style={{
+              flex: 1,
+              width: '100%',
+              padding: '12px',
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+              fontSize: '14px',
+              lineHeight: 1.6,
+              backgroundColor: 'var(--background)',
+              border: error ? '1px solid #ef4444' : '1px solid var(--border)',
+              borderRadius: '8px',
+              color: 'var(--foreground)',
+              resize: 'none',
+              outline: 'none',
+            }}
+          />
+        )
+      ) : (
+        <CodeEditor
+          value={value}
+          onChange={(val) => onChange?.(val)}
+          language={language}
+          highlight={highlightOn}
+          placeholder={placeholder}
+        />
+      )}
     </div>
   );
 }
@@ -180,6 +204,9 @@ function ToolSplitPane({ children, isVertical }) {
 }
 
 export default function CodeEncrypter() {
+  const [highlightOn, setHighlightOn] = useState(
+    () => localStorage.getItem(`${TOOL_KEY}-editor-highlight`) !== 'false'
+  );
   const [method, setMethod] = useState(
     () => localStorage.getItem(`${STORAGE_KEY}-method`) || 'AES'
   );
@@ -241,31 +268,24 @@ export default function CodeEncrypter() {
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}-method`, method);
   }, [method]);
-
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}-mode`, isEncrypt ? 'encrypt' : 'decrypt');
   }, [isEncrypt]);
-
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}-layout`, isVertical ? 'vertical' : 'horizontal');
   }, [isVertical]);
-
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}-key`, key);
   }, [key]);
-
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}-iv`, iv);
   }, [iv]);
-
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}-autoRun`, String(autoRun));
   }, [autoRun]);
-
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}-publicKey`, publicKey);
   }, [publicKey]);
-
   useEffect(() => {
     localStorage.setItem(`${STORAGE_KEY}-privateKey`, privateKey);
   }, [privateKey]);
@@ -311,14 +331,14 @@ export default function CodeEncrypter() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader
         title="Code Encrypter"
         description="Encrypt and decrypt text using various algorithms"
       />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', marginBottom: '16px' }}>
         <div>
@@ -326,7 +346,7 @@ export default function CodeEncrypter() {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               display: 'block',
@@ -341,10 +361,10 @@ export default function CodeEncrypter() {
             style={{
               height: '40px',
               padding: '0 12px',
-              backgroundColor: '#18181b',
-              border: '1px solid #27272a',
+              backgroundColor: 'var(--background)',
+              border: '1px solid var(--border)',
               borderRadius: '6px',
-              color: '#f4f4f5',
+              color: 'var(--foreground)',
               fontSize: '14px',
               fontWeight: 500,
               outline: 'none',
@@ -365,7 +385,7 @@ export default function CodeEncrypter() {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               display: 'block',
@@ -378,7 +398,7 @@ export default function CodeEncrypter() {
             style={{
               display: 'inline-flex',
               borderRadius: '6px',
-              border: '1px solid #27272a',
+              border: '1px solid var(--border)',
               overflow: 'hidden',
             }}
           >
@@ -388,8 +408,8 @@ export default function CodeEncrypter() {
                 padding: '8px 16px',
                 fontSize: '12px',
                 fontWeight: 500,
-                backgroundColor: isEncrypt ? '#2563eb' : '#18181b',
-                color: isEncrypt ? '#ffffff' : '#a1a1aa',
+                backgroundColor: isEncrypt ? 'var(--primary)' : 'var(--background)',
+                color: isEncrypt ? '#ffffff' : 'var(--muted-foreground)',
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
@@ -403,10 +423,10 @@ export default function CodeEncrypter() {
                 padding: '8px 16px',
                 fontSize: '12px',
                 fontWeight: 500,
-                backgroundColor: !isEncrypt ? '#2563eb' : '#18181b',
-                color: !isEncrypt ? '#ffffff' : '#a1a1aa',
+                backgroundColor: !isEncrypt ? 'var(--primary)' : 'var(--background)',
+                color: !isEncrypt ? '#ffffff' : 'var(--muted-foreground)',
                 border: 'none',
-                borderLeft: '1px solid #27272a',
+                borderLeft: '1px solid var(--border)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
@@ -416,7 +436,8 @@ export default function CodeEncrypter() {
           </div>
         </div>
 
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'flex-end' }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
+          <EditorToggle enabled={highlightOn} onToggle={setHighlightOn} toolKey={TOOL_KEY} />
           <button
             onClick={() => setIsVertical(!isVertical)}
             title={isVertical ? 'Switch to horizontal layout' : 'Switch to vertical layout'}
@@ -427,10 +448,10 @@ export default function CodeEncrypter() {
               width: '40px',
               height: '40px',
               padding: '8px',
-              backgroundColor: '#18181b',
-              border: '1px solid #27272a',
+              backgroundColor: 'var(--background)',
+              border: '1px solid var(--border)',
               borderRadius: '6px',
-              color: '#a1a1aa',
+              color: 'var(--muted-foreground)',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
             }}
@@ -444,8 +465,8 @@ export default function CodeEncrypter() {
         style={{
           marginBottom: '12px',
           padding: '12px',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--background)',
+          border: '1px solid var(--border)',
           borderRadius: '8px',
         }}
       >
@@ -456,7 +477,7 @@ export default function CodeEncrypter() {
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                   display: 'block',
@@ -475,10 +496,10 @@ export default function CodeEncrypter() {
                   padding: '0 10px',
                   fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '13px',
-                  backgroundColor: '#09090b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--background)',
+                  border: '1px solid var(--border)',
                   borderRadius: '6px',
-                  color: '#f4f4f5',
+                  color: 'var(--foreground)',
                   outline: 'none',
                 }}
               />
@@ -490,7 +511,7 @@ export default function CodeEncrypter() {
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                   display: 'block',
@@ -509,10 +530,10 @@ export default function CodeEncrypter() {
                   padding: '0 10px',
                   fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '13px',
-                  backgroundColor: '#09090b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--background)',
+                  border: '1px solid var(--border)',
                   borderRadius: '6px',
-                  color: '#f4f4f5',
+                  color: 'var(--foreground)',
                   outline: 'none',
                 }}
               />
@@ -525,7 +546,7 @@ export default function CodeEncrypter() {
                   style={{
                     fontSize: '11px',
                     fontWeight: 600,
-                    color: '#71717a',
+                    color: 'var(--muted-foreground)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
                     display: 'block',
@@ -544,10 +565,10 @@ export default function CodeEncrypter() {
                     padding: '8px 10px',
                     fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                     fontSize: '12px',
-                    backgroundColor: '#09090b',
-                    border: '1px solid #27272a',
+                    backgroundColor: 'var(--background)',
+                    border: '1px solid var(--border)',
                     borderRadius: '6px',
-                    color: '#f4f4f5',
+                    color: 'var(--foreground)',
                     outline: 'none',
                     resize: 'vertical',
                   }}
@@ -558,7 +579,7 @@ export default function CodeEncrypter() {
                   style={{
                     fontSize: '11px',
                     fontWeight: 600,
-                    color: '#71717a',
+                    color: 'var(--muted-foreground)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
                     display: 'block',
@@ -577,10 +598,10 @@ export default function CodeEncrypter() {
                     padding: '8px 10px',
                     fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                     fontSize: '12px',
-                    backgroundColor: '#09090b',
-                    border: '1px solid #27272a',
+                    backgroundColor: 'var(--background)',
+                    border: '1px solid var(--border)',
                     borderRadius: '6px',
-                    color: '#f4f4f5',
+                    color: 'var(--foreground)',
                     outline: 'none',
                     resize: 'vertical',
                   }}
@@ -597,7 +618,7 @@ export default function CodeEncrypter() {
                 alignItems: 'center',
                 gap: '6px',
                 fontSize: '12px',
-                color: '#a1a1aa',
+                color: 'var(--muted-foreground)',
                 cursor: 'pointer',
               }}
             >
@@ -605,7 +626,7 @@ export default function CodeEncrypter() {
                 type="checkbox"
                 checked={autoRun}
                 onChange={(e) => setAutoRun(e.target.checked)}
-                style={{ accentColor: '#2563eb' }}
+                style={{ accentColor: 'var(--primary)' }}
               />
               Auto-run
             </label>
@@ -651,10 +672,11 @@ export default function CodeEncrypter() {
         <ToolPane
           label={inputLabel}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(val) => setInput(val)}
           placeholder="Enter text to encrypt or decrypt..."
           indicator={inputIndicator}
           indicatorColor="green"
+          highlightOn={highlightOn}
         />
         <ToolPane
           label={outputLabel}
@@ -664,6 +686,7 @@ export default function CodeEncrypter() {
           indicator={outputIndicator}
           indicatorColor="blue"
           error={!!error}
+          highlightOn={highlightOn}
         />
       </ToolSplitPane>
     </div>

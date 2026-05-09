@@ -61,13 +61,13 @@ export function CopyableHex({
     alignItems: 'center',
     gap: '6px',
     padding: '4px 8px',
-    backgroundColor: '#18181b',
-    border: '1px solid #27272a',
+    backgroundColor: 'var(--card)',
+    border: '1px solid var(--border)',
     borderRadius: '4px',
     cursor: 'pointer',
     fontFamily: 'monospace',
     fontSize: '13px',
-    color: '#f4f4f5',
+    color: 'var(--foreground)',
     transition: 'background-color 0.15s ease',
     position: 'relative',
     userSelect: 'none',
@@ -84,16 +84,16 @@ export function CopyableHex({
       className={cn('group', className)}
       style={baseStyle}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = '#27272a';
+        e.currentTarget.style.backgroundColor = 'var(--muted)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = '#18181b';
+        e.currentTarget.style.backgroundColor = 'var(--card)';
       }}
       onMouseDown={(e) => {
-        e.currentTarget.style.backgroundColor = '#09090b';
+        e.currentTarget.style.backgroundColor = 'var(--background)';
       }}
       onMouseUp={(e) => {
-        e.currentTarget.style.backgroundColor = '#27272a';
+        e.currentTarget.style.backgroundColor = 'var(--muted)';
       }}
     >
       {/* Color preview dot */}

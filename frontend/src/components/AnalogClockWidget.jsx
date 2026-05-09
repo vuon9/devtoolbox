@@ -37,7 +37,7 @@ export default function AnalogClockWidget({ date }) {
         y1={y1}
         x2={x2}
         y2={y2}
-        stroke="var(--cds-text-primary)"
+        stroke="var(--foreground)"
         strokeWidth={i % 3 === 0 ? 3 : 1}
       />
     );
@@ -60,7 +60,7 @@ export default function AnalogClockWidget({ date }) {
         y1={y1}
         x2={x2}
         y2={y2}
-        stroke="var(--cds-text-secondary)"
+        stroke="var(--muted-foreground)"
         strokeWidth={1}
       />
     );
@@ -93,7 +93,7 @@ export default function AnalogClockWidget({ date }) {
         flexDirection: 'column',
         alignItems: 'center',
         gap: '1rem',
-        background: 'var(--cds-layer)',
+        background: 'var(--card)',
         borderRadius: '4px',
         padding: '1rem',
         minWidth: '200px',
@@ -105,8 +105,8 @@ export default function AnalogClockWidget({ date }) {
           cx={center}
           cy={center}
           r={radius}
-          fill="var(--cds-background)"
-          stroke="var(--cds-border-strong)"
+          fill="var(--background)"
+          stroke="var(--border)"
           strokeWidth={2}
         />
 
@@ -122,7 +122,7 @@ export default function AnalogClockWidget({ date }) {
           y1={center}
           x2={hourX}
           y2={hourY}
-          stroke="var(--cds-text-primary)"
+          stroke="var(--foreground)"
           strokeWidth={4}
           strokeLinecap="round"
         />
@@ -133,7 +133,7 @@ export default function AnalogClockWidget({ date }) {
           y1={center}
           x2={minuteX}
           y2={minuteY}
-          stroke="var(--cds-text-primary)"
+          stroke="var(--foreground)"
           strokeWidth={3}
           strokeLinecap="round"
         />
@@ -144,13 +144,13 @@ export default function AnalogClockWidget({ date }) {
           y1={center}
           x2={secondX}
           y2={secondY}
-          stroke="var(--cds-support-error)"
+          stroke="var(--destructive)"
           strokeWidth={1}
           strokeLinecap="round"
         />
 
         {/* Center dot */}
-        <circle cx={center} cy={center} r={4} fill="var(--cds-text-primary)" />
+        <circle cx={center} cy={center} r={4} fill="var(--foreground)" />
       </svg>
 
       {/* Digital display */}
@@ -167,7 +167,7 @@ export default function AnalogClockWidget({ date }) {
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '1.5rem',
             fontWeight: 600,
-            color: 'var(--cds-text-primary)',
+            color: 'var(--foreground)',
           }}
         >
           {displayHours}:{displayMinutes}:{displaySeconds}
@@ -175,7 +175,7 @@ export default function AnalogClockWidget({ date }) {
         <div
           style={{
             fontSize: '0.875rem',
-            color: 'var(--cds-text-secondary)',
+            color: 'var(--muted-foreground)',
           }}
         >
           {ampm}

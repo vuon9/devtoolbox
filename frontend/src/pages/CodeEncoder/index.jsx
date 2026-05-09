@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Columns } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { encoderAPI } from './api/encoderAPI';
+import CodeEditor from '../../components/inputs/CodeEditor';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
+import EditorToggle from '../../components/inputs/EditorToggle';
 
 const ENCODE_METHODS = [
   'Base16 (Hex)',
@@ -26,16 +29,22 @@ const ESCAPE_METHODS = ['URL', 'HTML/XML', 'Regex'];
 
 const TOOL_TITLE = 'Code Encoder';
 const TOOL_DESCRIPTION = 'Encode, decode, and escape data using various schemes.';
+const TOOL_KEY = 'code-encoder';
 
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
@@ -49,8 +58,8 @@ function ModeToggle({ mode, onEncodeLabel, onDecodeLabel, onChange }) {
           alignItems: 'center',
           height: '32px',
           borderRadius: '6px',
-          backgroundColor: '#1c1917',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           padding: '4px',
         }}
       >
@@ -65,8 +74,8 @@ function ModeToggle({ mode, onEncodeLabel, onDecodeLabel, onChange }) {
             border: 'none',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
-            backgroundColor: mode === onEncodeLabel ? '#27272a' : 'transparent',
-            color: mode === onEncodeLabel ? '#f4f4f5' : '#71717a',
+            backgroundColor: mode === onEncodeLabel ? 'var(--border)' : 'transparent',
+            color: mode === onEncodeLabel ? 'var(--foreground)' : 'var(--muted-foreground)',
             boxShadow: mode === onEncodeLabel ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
           }}
         >
@@ -83,8 +92,8 @@ function ModeToggle({ mode, onEncodeLabel, onDecodeLabel, onChange }) {
             border: 'none',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
-            backgroundColor: mode === onDecodeLabel ? '#27272a' : 'transparent',
-            color: mode === onDecodeLabel ? '#f4f4f5' : '#71717a',
+            backgroundColor: mode === onDecodeLabel ? 'var(--border)' : 'transparent',
+            color: mode === onDecodeLabel ? 'var(--foreground)' : 'var(--muted-foreground)',
             boxShadow: mode === onDecodeLabel ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
           }}
         >
@@ -104,6 +113,8 @@ function ToolPane({
   indicator,
   indicatorColor,
   error,
+  highlightOn,
+  language = 'plaintext',
 }) {
   const handleCopy = () => {
     if (value) navigator.clipboard.writeText(value);
@@ -123,7 +134,7 @@ function ToolPane({
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -167,7 +178,7 @@ function ToolPane({
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '4px',
-            color: value ? '#a1a1aa' : '#3f3f46',
+            color: value ? 'var(--muted-foreground)' : 'var(--border)',
             cursor: value ? 'pointer' : 'not-allowed',
           }}
         >
@@ -184,26 +195,39 @@ function ToolPane({
           </svg>
         </button>
       </div>
-      <textarea
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        style={{
-          flex: 1,
-          width: '100%',
-          padding: '12px',
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          fontSize: '14px',
-          lineHeight: 1.6,
-          backgroundColor: '#18181b',
-          border: error ? '1px solid #ef4444' : '1px solid #27272a',
-          borderRadius: '8px',
-          color: '#f4f4f5',
-          resize: 'none',
-          outline: 'none',
-        }}
-      />
+      {readOnly ? (
+        highlightOn ? (
+          <HighlightedCode code={value} language={language} copyable={false} />
+        ) : (
+          <textarea
+            value={value}
+            readOnly
+            placeholder={placeholder}
+            style={{
+              flex: 1,
+              width: '100%',
+              padding: '12px',
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+              fontSize: '14px',
+              lineHeight: 1.6,
+              backgroundColor: 'var(--background)',
+              border: error ? '1px solid #ef4444' : '1px solid var(--border)',
+              borderRadius: '8px',
+              color: 'var(--foreground)',
+              resize: 'none',
+              outline: 'none',
+            }}
+          />
+        )
+      ) : (
+        <CodeEditor
+          value={value}
+          onChange={(val) => onChange?.(val)}
+          language={language}
+          highlight={highlightOn}
+          placeholder={placeholder}
+        />
+      )}
     </div>
   );
 }
@@ -227,6 +251,9 @@ function ToolSplitPane({ children, isVertical }) {
 const STORAGE_KEY = 'code-encoder-layout';
 
 export default function CodeEncoder() {
+  const [highlightOn, setHighlightOn] = useState(
+    () => localStorage.getItem(`${TOOL_KEY}-editor-highlight`) !== 'false'
+  );
   const [method, setMethod] = useState('Base64');
   const [mode, setMode] = useState('Encode');
   const [input, setInput] = useState('');
@@ -293,26 +320,24 @@ export default function CodeEncoder() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
         <select
           value={method}
-          onChange={(e) => {
-            setMethod(e.target.value);
-          }}
+          onChange={(e) => setMethod(e.target.value)}
           style={{
             height: '36px',
             padding: '0 12px',
             fontSize: '13px',
             borderRadius: '6px',
-            backgroundColor: '#1c1917',
-            border: '1px solid #27272a',
-            color: '#f4f4f5',
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
+            color: 'var(--foreground)',
             outline: 'none',
             minWidth: '180px',
           }}
@@ -341,6 +366,7 @@ export default function CodeEncoder() {
         />
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <EditorToggle enabled={highlightOn} onToggle={setHighlightOn} toolKey={TOOL_KEY} />
           <Button
             variant="secondary"
             onClick={() => setIsVertical(!isVertical)}
@@ -362,10 +388,11 @@ export default function CodeEncoder() {
           <ToolPane
             label="Input"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(val) => setInput(val)}
             placeholder="Enter text to encode, decode, or escape..."
             indicator="Source"
             indicatorColor="green"
+            highlightOn={highlightOn}
           />
           <ToolPane
             label="Output"
@@ -375,6 +402,7 @@ export default function CodeEncoder() {
             indicator="Result"
             indicatorColor="blue"
             error={!!error}
+            highlightOn={highlightOn}
           />
         </ToolSplitPane>
       </div>

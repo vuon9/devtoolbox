@@ -38,17 +38,17 @@ export default function EditorToggle({ enabled, onToggle, toolKey }) {
         backgroundColor: 'transparent',
         border: 'none',
         borderRadius: '4px',
-        color: enabled ? '#f4f4f5' : '#71717a',
+        color: enabled ? 'var(--foreground)' : 'var(--muted-foreground)',
         cursor: 'pointer',
         transition: 'all 0.15s ease',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = '#27272a';
-        e.currentTarget.style.color = '#f4f4f5';
+        e.currentTarget.style.backgroundColor = 'var(--muted)';
+        e.currentTarget.style.color = 'var(--foreground)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = 'transparent';
-        e.currentTarget.style.color = enabled ? '#f4f4f5' : '#71717a';
+        e.currentTarget.style.color = enabled ? 'var(--foreground)' : 'var(--muted-foreground)';
       }}
     >
       <Code style={{ width: '16px', height: '16px', opacity: enabled ? 1 : 0.4 }} />

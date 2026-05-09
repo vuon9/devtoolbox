@@ -1,17 +1,19 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button';
-import { Select, SelectItem } from '@carbon/react';
 import { Shield } from 'lucide-react';
 import { ToolCopyButton, ToolInput } from '../../../components/ToolUI';
 import { actions } from '../jwtReducer';
+
+const selectClass =
+  'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
 
 export default function SignatureVerification({ state, dispatch, verifySignature }) {
   return (
     <div
       style={{
         padding: '1rem',
-        border: '1px solid var(--cds-border-subtle)',
-        backgroundColor: 'var(--cds-layer-accent)',
+        border: '1px solid var(--border)',
+        backgroundColor: 'var(--card)',
         flex: '0 1 auto',
       }}
     >
@@ -20,7 +22,7 @@ export default function SignatureVerification({ state, dispatch, verifySignature
           fontSize: '0.875rem',
           fontWeight: 600,
           marginBottom: '1rem',
-          color: 'var(--cds-text-primary)',
+          color: 'var(--foreground)',
         }}
       >
         Signature Verification (Optional)
@@ -28,7 +30,7 @@ export default function SignatureVerification({ state, dispatch, verifySignature
       <p
         style={{
           fontSize: '0.875rem',
-          color: 'var(--cds-text-secondary)',
+          color: 'var(--muted-foreground)',
           marginBottom: '1rem',
         }}
       >
@@ -49,7 +51,7 @@ export default function SignatureVerification({ state, dispatch, verifySignature
               display: 'block',
               fontSize: '0.75rem',
               fontWeight: 400,
-              color: 'var(--cds-text-secondary)',
+              color: 'var(--muted-foreground)',
               marginBottom: '0.5rem',
               textTransform: 'uppercase',
             }}
@@ -75,22 +77,22 @@ export default function SignatureVerification({ state, dispatch, verifySignature
               display: 'block',
               fontSize: '0.75rem',
               fontWeight: 400,
-              color: 'var(--cds-text-secondary)',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               marginBottom: '0.5rem',
             }}
           >
             Encoding
           </label>
-          <Select
+          <select
             value={state.encoding}
-            noLabel={true}
             onChange={(e) => dispatch(actions.setEncoding(e.target.value))}
             id="encoding-select"
+            className={selectClass}
           >
-            <SelectItem value="utf-8" text="UTF-8" />
-            <SelectItem value="base64" text="Base64" />
-          </Select>
+            <option value="utf-8">UTF-8</option>
+            <option value="base64">Base64</option>
+          </select>
         </div>
       </div>
 
@@ -98,10 +100,10 @@ export default function SignatureVerification({ state, dispatch, verifySignature
         <div
           style={{
             paddingTop: '.5rem',
-            backgroundColor: 'var(--cds-ui-02)',
+            backgroundColor: 'var(--muted)',
             borderRadius: '4px',
             fontSize: '0.875rem',
-            color: 'var(--cds-text-secondary)',
+            color: 'var(--muted-foreground)',
           }}
         >
           {state.validationMessage}

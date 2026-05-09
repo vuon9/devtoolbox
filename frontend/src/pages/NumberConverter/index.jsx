@@ -40,7 +40,7 @@ function Column1Bases({ result, base }) {
       <h4
         style={{
           fontSize: '11px',
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
           textTransform: 'uppercase',
           margin: '0 0 8px 0',
           letterSpacing: '0.05em',
@@ -55,10 +55,10 @@ function Column1Bases({ result, base }) {
             key={b.id}
             onClick={() => handleCopy(b.id, b.value)}
             style={{
-              backgroundColor: '#18181b',
+              backgroundColor: 'var(--card)',
               padding: '8px 10px',
               borderRadius: '6px',
-              border: b.active ? '1px solid #3b82f6' : '1px solid #27272a',
+              border: b.active ? '1px solid var(--primary)' : '1px solid var(--border)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -69,7 +69,7 @@ function Column1Bases({ result, base }) {
             <span
               style={{
                 fontSize: '11px',
-                color: b.active ? '#3b82f6' : '#71717a',
+                color: b.active ? 'var(--primary)' : 'var(--muted-foreground)',
                 textTransform: 'uppercase',
               }}
             >
@@ -80,15 +80,15 @@ function Column1Bases({ result, base }) {
                 style={{
                   fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '14px',
-                  color: '#f4f4f5',
+                  color: 'var(--foreground)',
                 }}
               >
                 {b.value}
               </span>
               {copied[b.id] ? (
-                <Check size={12} style={{ color: '#22c55e' }} />
+                <Check size={12} style={{ color: 'var(--success)' }} />
               ) : (
-                <Copy size={12} style={{ color: '#71717a' }} />
+                <Copy size={12} style={{ color: 'var(--muted-foreground)' }} />
               )}
             </div>
           </div>
@@ -99,7 +99,7 @@ function Column1Bases({ result, base }) {
       <h4
         style={{
           fontSize: '11px',
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
           textTransform: 'uppercase',
           margin: '12px 0 6px 0',
           letterSpacing: '0.05em',
@@ -109,10 +109,10 @@ function Column1Bases({ result, base }) {
       </h4>
       <div
         style={{
-          backgroundColor: '#18181b',
+          backgroundColor: 'var(--card)',
           padding: '8px',
           borderRadius: '6px',
-          border: '1px solid #27272a',
+          border: '1px solid var(--border)',
         }}
       >
         <div style={{ display: 'flex', gap: '1px', marginBottom: '6px' }}>
@@ -130,21 +130,23 @@ function Column1Bases({ result, base }) {
                   <span
                     style={{
                       fontSize: '11px',
-                      color: bit === 1 ? '#3b82f6' : 'rgba(113,113,122,0.3)',
+                      color: bit === 1 ? 'var(--primary)' : 'rgba(113,113,122,0.3)',
                       fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                     }}
                   >
                     {bit}
                   </span>
                 </div>
-                <span style={{ fontSize: '8px', color: '#71717a' }}>{result.bitValues[i]}</span>
+                <span style={{ fontSize: '8px', color: 'var(--muted-foreground)' }}>
+                  {result.bitValues[i]}
+                </span>
               </div>
             ))}
         </div>
         <div
           style={{
             fontSize: '11px',
-            color: '#a1a1aa',
+            color: 'var(--muted-foreground)',
             textAlign: 'center',
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           }}
@@ -166,7 +168,7 @@ function Column2Data({ result }) {
       <h4
         style={{
           fontSize: '11px',
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
           textTransform: 'uppercase',
           margin: '0 0 8px 0',
           letterSpacing: '0.05em',
@@ -176,10 +178,10 @@ function Column2Data({ result }) {
       </h4>
       <div
         style={{
-          backgroundColor: '#18181b',
+          backgroundColor: 'var(--card)',
           padding: '10px',
           borderRadius: '6px',
-          border: '1px solid #27272a',
+          border: '1px solid var(--border)',
           marginBottom: '10px',
         }}
       >
@@ -190,7 +192,7 @@ function Column2Data({ result }) {
               style={{
                 flex: 1,
                 backgroundColor:
-                  i === result.bytes.highlighted ? 'rgba(59,130,246,0.2)' : '#27272a',
+                  i === result.bytes.highlighted ? 'rgba(59,130,246,0.2)' : 'var(--border)',
                 padding: '6px',
                 borderRadius: '4px',
                 textAlign: 'center',
@@ -201,18 +203,18 @@ function Column2Data({ result }) {
                 style={{
                   fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '14px',
-                  color: i === result.bytes.highlighted ? '#3b82f6' : '#f4f4f5',
+                  color: i === result.bytes.highlighted ? 'var(--primary)' : 'var(--foreground)',
                 }}
               >
                 {byte}
               </div>
-              <div style={{ fontSize: '8px', color: '#71717a', marginTop: '2px' }}>
+              <div style={{ fontSize: '8px', color: 'var(--muted-foreground)', marginTop: '2px' }}>
                 {i === 0 ? 'MSB' : i === 3 ? 'LSB' : ''}
               </div>
             </div>
           ))}
         </div>
-        <div style={{ fontSize: '11px', color: '#71717a', textAlign: 'center' }}>
+        <div style={{ fontSize: '11px', color: 'var(--muted-foreground)', textAlign: 'center' }}>
           32-bit big-endian
         </div>
       </div>
@@ -223,7 +225,7 @@ function Column2Data({ result }) {
           <h4
             style={{
               fontSize: '11px',
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               margin: '10px 0 6px 0',
               letterSpacing: '0.05em',
@@ -233,10 +235,10 @@ function Column2Data({ result }) {
           </h4>
           <div
             style={{
-              backgroundColor: '#18181b',
+              backgroundColor: 'var(--card)',
               padding: '10px',
               borderRadius: '6px',
-              border: '1px solid #27272a',
+              border: '1px solid var(--border)',
               marginBottom: '10px',
               textAlign: 'center',
             }}
@@ -244,14 +246,14 @@ function Column2Data({ result }) {
             <div
               style={{
                 fontSize: '24px',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 marginBottom: '4px',
               }}
             >
               {result.ascii.printable ? result.ascii.char : '•'}
             </div>
-            <div style={{ fontSize: '11px', color: '#71717a' }}>
+            <div style={{ fontSize: '11px', color: 'var(--muted-foreground)' }}>
               Code {result.ascii.code} {result.ascii.printable ? '' : '(non-printable)'}
             </div>
           </div>
@@ -264,7 +266,7 @@ function Column2Data({ result }) {
           <h4
             style={{
               fontSize: '11px',
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               margin: '10px 0 6px 0',
               letterSpacing: '0.05em',
@@ -274,10 +276,10 @@ function Column2Data({ result }) {
           </h4>
           <div
             style={{
-              backgroundColor: '#18181b',
+              backgroundColor: 'var(--card)',
               padding: '8px',
               borderRadius: '6px',
-              border: '1px solid #27272a',
+              border: '1px solid var(--border)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -289,7 +291,7 @@ function Column2Data({ result }) {
                 height: '28px',
                 backgroundColor: result.color.hex,
                 borderRadius: '4px',
-                border: '2px solid #27272a',
+                border: '2px solid var(--border)',
               }}
             />
             <div>
@@ -297,12 +299,14 @@ function Column2Data({ result }) {
                 style={{
                   fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '14px',
-                  color: '#f4f4f5',
+                  color: 'var(--foreground)',
                 }}
               >
                 {result.color.hex}
               </div>
-              <div style={{ fontSize: '9px', color: '#71717a' }}>RGB blue channel</div>
+              <div style={{ fontSize: '9px', color: 'var(--muted-foreground)' }}>
+                RGB blue channel
+              </div>
             </div>
           </div>
         </>
@@ -320,7 +324,7 @@ function Column3Context({ result }) {
           <h4
             style={{
               fontSize: '11px',
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               margin: '0 0 8px 0',
               letterSpacing: '0.05em',
@@ -330,10 +334,10 @@ function Column3Context({ result }) {
           </h4>
           <div
             style={{
-              backgroundColor: '#18181b',
+              backgroundColor: 'var(--card)',
               padding: '10px',
               borderRadius: '6px',
-              border: '1px solid #27272a',
+              border: '1px solid var(--border)',
               marginBottom: '10px',
             }}
           >
@@ -341,14 +345,19 @@ function Column3Context({ result }) {
               style={{
                 fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '15px',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 textAlign: 'center',
               }}
             >
               {result.ipv4.address}
             </div>
             <div
-              style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}
+              style={{
+                fontSize: '9px',
+                color: 'var(--muted-foreground)',
+                textAlign: 'center',
+                marginTop: '4px',
+              }}
             >
               {result.ipv4.type === 'broadcast'
                 ? 'Broadcast address'
@@ -364,7 +373,7 @@ function Column3Context({ result }) {
       <h4
         style={{
           fontSize: '11px',
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
           textTransform: 'uppercase',
           margin: '10px 0 6px 0',
           letterSpacing: '0.05em',
@@ -374,10 +383,10 @@ function Column3Context({ result }) {
       </h4>
       <div
         style={{
-          backgroundColor: '#18181b',
+          backgroundColor: 'var(--card)',
           padding: '10px',
           borderRadius: '6px',
-          border: '1px solid #27272a',
+          border: '1px solid var(--border)',
           marginBottom: '10px',
         }}
       >
@@ -385,13 +394,20 @@ function Column3Context({ result }) {
           style={{
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '15px',
-            color: '#f4f4f5',
+            color: 'var(--foreground)',
             textAlign: 'center',
           }}
         >
           {result.fileSize.human}
         </div>
-        <div style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}>
+        <div
+          style={{
+            fontSize: '9px',
+            color: 'var(--muted-foreground)',
+            textAlign: 'center',
+            marginTop: '4px',
+          }}
+        >
           {result.fileSize.kb.toFixed(2)} KB · {result.fileSize.mb.toFixed(5)} MB
         </div>
       </div>
@@ -402,7 +418,7 @@ function Column3Context({ result }) {
           <h4
             style={{
               fontSize: '11px',
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               margin: '10px 0 6px 0',
               letterSpacing: '0.05em',
@@ -412,10 +428,10 @@ function Column3Context({ result }) {
           </h4>
           <div
             style={{
-              backgroundColor: '#18181b',
+              backgroundColor: 'var(--card)',
               padding: '10px',
               borderRadius: '6px',
-              border: '1px solid #27272a',
+              border: '1px solid var(--border)',
               marginBottom: '10px',
             }}
           >
@@ -423,14 +439,19 @@ function Column3Context({ result }) {
               style={{
                 fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '14px',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 textAlign: 'center',
               }}
             >
               {result.timestamp.datetime}
             </div>
             <div
-              style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}
+              style={{
+                fontSize: '9px',
+                color: 'var(--muted-foreground)',
+                textAlign: 'center',
+                marginTop: '4px',
+              }}
             >
               {result.timestamp.duration} since epoch
             </div>
@@ -444,7 +465,7 @@ function Column3Context({ result }) {
           <h4
             style={{
               fontSize: '11px',
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               margin: '10px 0 6px 0',
               letterSpacing: '0.05em',
@@ -454,24 +475,29 @@ function Column3Context({ result }) {
           </h4>
           <div
             style={{
-              backgroundColor: '#18181b',
+              backgroundColor: 'var(--card)',
               padding: '10px',
               borderRadius: '6px',
-              border: '1px solid #27272a',
+              border: '1px solid var(--border)',
             }}
           >
             <div
               style={{
                 fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '15px',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 textAlign: 'center',
               }}
             >
               {result.percentage}%
             </div>
             <div
-              style={{ fontSize: '9px', color: '#71717a', textAlign: 'center', marginTop: '4px' }}
+              style={{
+                fontSize: '9px',
+                color: 'var(--muted-foreground)',
+                textAlign: 'center',
+                marginTop: '4px',
+              }}
             >
               of 8-bit max (255)
             </div>
@@ -544,18 +570,25 @@ export default function NumberConverter() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       {/* Header */}
       <div style={{ marginBottom: '12px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#f4f4f5', margin: '0 0 4px 0' }}>
+        <h2
+          style={{
+            fontSize: '24px',
+            fontWeight: 600,
+            color: 'var(--foreground)',
+            margin: '0 0 4px 0',
+          }}
+        >
           Number Converter
         </h2>
-        <p style={{ color: '#a1a1aa', fontSize: '14px', margin: 0 }}>
+        <p style={{ color: 'var(--muted-foreground)', fontSize: '14px', margin: 0 }}>
           Convert and interpret numbers in different contexts
         </p>
-        <hr style={{ border: 'none', borderTop: '1px solid #27272a', margin: '12px 0' }} />
+        <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '12px 0' }} />
       </div>
 
       {/* Input row */}
@@ -567,11 +600,11 @@ export default function NumberConverter() {
           placeholder="Enter number..."
           style={{
             flex: 1,
-            backgroundColor: error ? 'rgba(239, 68, 68, 0.1)' : '#18181b',
-            border: error ? '1px solid #ef4444' : '1px solid #3b82f6',
+            backgroundColor: error ? 'rgba(239, 68, 68, 0.1)' : 'var(--card)',
+            border: error ? '1px solid var(--destructive)' : '1px solid var(--primary)',
             borderRadius: '6px',
             padding: '10px 12px',
-            color: '#f4f4f5',
+            color: 'var(--foreground)',
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             fontSize: '14px',
             outline: 'none',
@@ -591,7 +624,7 @@ export default function NumberConverter() {
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             border: '1px solid rgba(239, 68, 68, 0.2)',
             borderRadius: '6px',
-            color: '#ef4444',
+            color: 'var(--destructive)',
             fontSize: '14px',
             marginBottom: '12px',
           }}

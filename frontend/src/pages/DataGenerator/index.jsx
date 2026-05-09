@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { Generate } from '../../services/dataGeneratorService';
 import { HELP_CONTENT } from './constants';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
+import EditorToggle from '../../components/inputs/EditorToggle';
 
 const formats = [
   { id: 'json', label: 'JSON', icon: FileJson },
@@ -24,25 +26,20 @@ const formats = [
   { id: 'yaml', label: 'YAML', icon: FileType },
 ];
 
-// Schema field types available in gofakeit
 const fieldTypes = [
-  // UUID & IDs
   'UUID',
   'ULID',
-  // Person
   'FirstName',
   'LastName',
   'Name',
   'Gender',
   'Email',
   'Phone',
-  // Internet
   'Username',
   'URL',
   'Domain',
   'IP',
   'Password',
-  // Address
   'Street',
   'City',
   'State',
@@ -50,46 +47,35 @@ const fieldTypes = [
   'Country',
   'Latitude',
   'Longitude',
-  // Company & Job
   'Company',
   'JobTitle',
-  // Date
   'Past',
   'Future',
   'Recent',
   'Birthday',
-  // Number
   'Int',
   'Float',
   'Price',
-  // Lorem
   'Word',
   'Sentence',
   'Paragraph',
-  // Other
   'Bool',
 ];
 
-// Map schema types to gofakeit template functions
-// Strings need quotes, numbers/bools don't
 const typeToTemplate = {
-  // UUID & IDs
   UUID: '"{{UUID}}"',
   ULID: '"{{ULID}}"',
-  // Person
   FirstName: '"{{FirstName}}"',
   LastName: '"{{LastName}}"',
   Name: '"{{Name}}"',
   Gender: '"{{Gender}}"',
   Email: '"{{Email}}"',
   Phone: '"{{Phone}}"',
-  // Internet
   Username: '"{{Username}}"',
   URL: '"{{URL}}"',
   Domain: '"{{Domain}}"',
   IP: '"{{IP}}"',
   Password: '"{{Password}}"',
-  // Address
   Street: '"{{Street}}"',
   City: '"{{City}}"',
   State: '"{{State}}"',
@@ -97,27 +83,21 @@ const typeToTemplate = {
   Country: '"{{Country}}"',
   Latitude: '{{Latitude}}',
   Longitude: '{{Longitude}}',
-  // Company & Job
   Company: '"{{Company}}"',
   JobTitle: '"{{JobTitle}}"',
-  // Date
   Past: '"{{Past}}"',
   Future: '"{{Future}}"',
   Recent: '"{{Recent}}"',
   Birthday: '"{{Birthday}}"',
-  // Number (no quotes for non-strings)
   Int: '{{Int 1 100}}',
   Float: '{{Float 1.0 100.0}}',
   Price: '{{Price 1.0 100.0}}',
-  // Lorem
   Word: '"{{Word}}"',
   Sentence: '"{{Sentence}}"',
   Paragraph: '"{{Paragraph}}"',
-  // Other
   Bool: '{{Bool}}',
 };
 
-// Default schema fields
 const defaultSchemaFields = [
   { label: 'id', type: 'UUID' },
   { label: 'name', type: 'Name' },
@@ -126,56 +106,147 @@ const defaultSchemaFields = [
   { label: 'created_at', type: 'Recent' },
 ];
 
-// Inline styled components
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
 
-function ToolTextArea({ label, value, onChange, placeholder, readOnly }) {
+function ToolTextArea({
+  label,
+  value,
+  onChange,
+  placeholder,
+  readOnly,
+  highlightOn,
+  language = 'plaintext',
+}) {
+  const handleCopy = () => {
+    if (value) navigator.clipboard.writeText(value);
+  };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-      <label
+      <div
         style={{
-          fontSize: '11px',
-          fontWeight: 600,
-          color: '#71717a',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           marginBottom: '8px',
         }}
       >
-        {label}
-      </label>
-      <textarea
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        style={{
-          flex: 1,
-          width: '100%',
-          minHeight: '300px',
-          padding: '12px',
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          fontSize: '13px',
-          lineHeight: 1.5,
-          backgroundColor: readOnly ? '#1c1917' : '#18181b',
-          border: '1px solid #27272a',
-          borderRadius: '8px',
-          color: '#f4f4f5',
-          resize: 'none',
-          outline: 'none',
-        }}
-      />
+        <label
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: 'var(--muted-foreground)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
+          {label}
+        </label>
+        <button
+          onClick={handleCopy}
+          title="Copy to clipboard"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '28px',
+            height: '28px',
+            padding: '6px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '4px',
+            color: value ? 'var(--muted-foreground)' : 'var(--border)',
+            cursor: value ? 'pointer' : 'not-allowed',
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            if (value) {
+              e.currentTarget.style.backgroundColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--foreground)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = value ? 'var(--muted-foreground)' : 'var(--border)';
+          }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+      {readOnly ? (
+        highlightOn ? (
+          <HighlightedCode code={value} language={language} copyable={false} />
+        ) : (
+          <textarea
+            value={value}
+            readOnly
+            placeholder={placeholder}
+            style={{
+              flex: 1,
+              width: '100%',
+              minHeight: '300px',
+              padding: '12px',
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+              fontSize: '13px',
+              lineHeight: 1.5,
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              color: 'var(--foreground)',
+              resize: 'none',
+              outline: 'none',
+            }}
+          />
+        )
+      ) : (
+        <textarea
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          style={{
+            flex: 1,
+            width: '100%',
+            minHeight: '300px',
+            padding: '12px',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+            fontSize: '13px',
+            lineHeight: 1.5,
+            backgroundColor: 'var(--background)',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+            color: 'var(--foreground)',
+            resize: 'none',
+            outline: 'none',
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -197,11 +268,9 @@ function ToolSplitPane({ children, isVertical }) {
   );
 }
 
-// Inline styled Select dropdown (like TextConverter)
 function SelectDropdown({ label, value, onChange, options, width = '160px' }) {
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find((o) => o.id === value || o.value === value);
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
@@ -209,7 +278,7 @@ function SelectDropdown({ label, value, onChange, options, width = '160px' }) {
           style={{
             fontSize: '11px',
             fontWeight: 600,
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -224,27 +293,25 @@ function SelectDropdown({ label, value, onChange, options, width = '160px' }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            width: width,
+            width,
             height: '32px',
             padding: '0 12px',
-            backgroundColor: isOpen ? '#27272a' : '#18181b',
-            border: '1px solid #3f3f46',
+            backgroundColor: isOpen ? 'var(--border)' : 'var(--background)',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
-            color: '#f4f4f5',
+            color: 'var(--foreground)',
             fontSize: '14px',
             cursor: 'pointer',
             outline: 'none',
           }}
           onMouseEnter={(e) => {
             if (!isOpen) {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.borderColor = '#52525b';
+              e.currentTarget.style.backgroundColor = 'var(--border)';
             }
           }}
           onMouseLeave={(e) => {
             if (!isOpen) {
-              e.currentTarget.style.backgroundColor = '#18181b';
-              e.currentTarget.style.borderColor = '#3f3f46';
+              e.currentTarget.style.backgroundColor = 'var(--background)';
             }
           }}
         >
@@ -276,8 +343,8 @@ function SelectDropdown({ label, value, onChange, options, width = '160px' }) {
               left: 0,
               right: 0,
               marginTop: '4px',
-              backgroundColor: '#1c1917',
-              border: '1px solid #27272a',
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
               borderRadius: '6px',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
               zIndex: 50,
@@ -297,21 +364,26 @@ function SelectDropdown({ label, value, onChange, options, width = '160px' }) {
                   style={{
                     padding: '8px 12px',
                     fontSize: '14px',
-                    color: value === opt.id || value === opt.value ? '#f4f4f5' : '#a1a1aa',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
+                    color:
+                      value === opt.id || value === opt.value
+                        ? 'var(--foreground)'
+                        : 'var(--muted-foreground)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#27272a';
-                    e.currentTarget.style.color = '#f4f4f5';
+                    e.currentTarget.style.backgroundColor = 'var(--border)';
+                    e.currentTarget.style.color = 'var(--foreground)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.color =
-                      value === opt.id || value === opt.value ? '#f4f4f5' : '#a1a1aa';
+                      value === opt.id || value === opt.value
+                        ? 'var(--foreground)'
+                        : 'var(--muted-foreground)';
                   }}
                 >
                   {Icon && <Icon style={{ width: '16px', height: '16px' }} />}
@@ -326,17 +398,10 @@ function SelectDropdown({ label, value, onChange, options, width = '160px' }) {
   );
 }
 
-// Grouped select dropdown for field types
 function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px' }) {
   const [isOpen, setIsOpen] = useState(false);
-
-  // Find current value across all groups
   const allOptions = groups.flatMap((g) => g.items);
   const selectedOption = allOptions.find((o) => o === value);
-
-  // Find group name for selected value
-  const selectedGroup = groups.find((g) => g.items.includes(value));
-
   return (
     <div style={{ position: 'relative', width }}>
       <button
@@ -348,24 +413,22 @@ function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px'
           width: '100%',
           height: '32px',
           padding: '0 8px',
-          backgroundColor: isOpen ? '#27272a' : '#18181b',
-          border: '1px solid #3f3f46',
+          backgroundColor: isOpen ? 'var(--border)' : 'var(--background)',
+          border: '1px solid var(--border)',
           borderRadius: '4px',
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
           fontSize: '13px',
           cursor: 'pointer',
           outline: 'none',
         }}
         onMouseEnter={(e) => {
           if (!isOpen) {
-            e.currentTarget.style.backgroundColor = '#27272a';
-            e.currentTarget.style.borderColor = '#52525b';
+            e.currentTarget.style.backgroundColor = 'var(--border)';
           }
         }}
         onMouseLeave={(e) => {
           if (!isOpen) {
-            e.currentTarget.style.backgroundColor = '#18181b';
-            e.currentTarget.style.borderColor = '#3f3f46';
+            e.currentTarget.style.backgroundColor = 'var(--background)';
           }
         }}
       >
@@ -405,8 +468,8 @@ function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px'
             left: 0,
             right: 0,
             marginTop: '4px',
-            backgroundColor: '#1c1917',
-            border: '1px solid #27272a',
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
             zIndex: 50,
@@ -421,11 +484,11 @@ function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px'
                   padding: '6px 10px',
                   fontSize: '10px',
                   fontWeight: 600,
-                  color: '#52525b',
+                  color: 'var(--border)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  borderBottom: '1px solid #27272a',
-                  backgroundColor: '#09090b',
+                  borderBottom: '1px solid var(--border)',
+                  backgroundColor: 'var(--card)',
                 }}
               >
                 {group.name}
@@ -441,21 +504,21 @@ function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px'
                     padding: '6px 10px',
                     fontSize: '13px',
                     fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-                    color: value === item ? '#22c55e' : '#a1a1aa',
+                    color: value === item ? '#22c55e' : 'var(--muted-foreground)',
                     cursor: 'pointer',
                     transition: 'all 0.1s ease',
                     backgroundColor: value === item ? 'rgba(34, 197, 94, 0.1)' : 'transparent',
                   }}
                   onMouseEnter={(e) => {
                     if (value !== item) {
-                      e.currentTarget.style.backgroundColor = '#27272a';
-                      e.currentTarget.style.color = '#f4f4f5';
+                      e.currentTarget.style.backgroundColor = 'var(--border)';
+                      e.currentTarget.style.color = 'var(--foreground)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (value !== item) {
                       e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = '#a1a1aa';
+                      e.currentTarget.style.color = 'var(--muted-foreground)';
                     }
                   }}
                 >
@@ -470,7 +533,6 @@ function GroupedSelectDropdown({ label, value, onChange, groups, width = '200px'
   );
 }
 
-// Field type groups for grouped dropdown
 const fieldTypeGroups = [
   { name: 'Identity', items: ['UUID', 'ULID'] },
   {
@@ -494,7 +556,7 @@ function Input({ label, type, value, onChange, placeholder, min, max, style }) {
         style={{
           fontSize: '11px',
           fontWeight: 600,
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
         }}
@@ -512,10 +574,10 @@ function Input({ label, type, value, onChange, placeholder, min, max, style }) {
           padding: '0 12px',
           height: '32px',
           width: '80px',
-          backgroundColor: '#18181b',
-          border: '1px solid #3f3f46',
+          backgroundColor: 'var(--background)',
+          border: '1px solid var(--border)',
           borderRadius: '6px',
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
           fontSize: '14px',
           outline: 'none',
         }}
@@ -533,8 +595,8 @@ function SchemaField({ field, index, onUpdate, onRemove }) {
         gap: '12px',
         padding: '8px 12px',
         borderRadius: '6px',
-        border: '1px solid #27272a',
-        backgroundColor: '#1c1917',
+        border: '1px solid var(--border)',
+        backgroundColor: 'var(--card)',
       }}
     >
       <input
@@ -546,7 +608,7 @@ function SchemaField({ field, index, onUpdate, onRemove }) {
           fontSize: '13px',
           background: 'transparent',
           border: 'none',
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
           width: '120px',
           outline: 'none',
         }}
@@ -562,7 +624,7 @@ function SchemaField({ field, index, onUpdate, onRemove }) {
         style={{
           background: 'transparent',
           border: 'none',
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
           cursor: 'pointer',
           padding: '4px',
         }}
@@ -570,7 +632,7 @@ function SchemaField({ field, index, onUpdate, onRemove }) {
           e.currentTarget.style.color = '#ef4444';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.color = '#71717a';
+          e.currentTarget.style.color = 'var(--muted-foreground)';
         }}
       >
         <Trash2 style={{ width: '14px', height: '14px' }} />
@@ -581,7 +643,6 @@ function SchemaField({ field, index, onUpdate, onRemove }) {
 
 function HelpModal({ open, onClose }) {
   if (!open) return null;
-
   return (
     <div
       style={{
@@ -596,13 +657,13 @@ function HelpModal({ open, onClose }) {
     >
       <div
         style={{
-          backgroundColor: '#18181b',
+          backgroundColor: 'var(--background)',
           borderRadius: '12px',
           maxWidth: '800px',
           width: '90%',
           maxHeight: '80vh',
           overflow: 'auto',
-          border: '1px solid #27272a',
+          border: '1px solid var(--border)',
         }}
       >
         <div
@@ -611,10 +672,10 @@ function HelpModal({ open, onClose }) {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '16px 24px',
-            borderBottom: '1px solid #27272a',
+            borderBottom: '1px solid var(--border)',
           }}
         >
-          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#f4f4f5' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--foreground)' }}>
             Documentation & Help
           </h3>
           <button
@@ -622,7 +683,7 @@ function HelpModal({ open, onClose }) {
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               cursor: 'pointer',
             }}
           >
@@ -631,16 +692,18 @@ function HelpModal({ open, onClose }) {
         </div>
         <div style={{ padding: '24px' }}>
           <section style={{ marginBottom: '32px' }}>
-            <h4 style={{ marginBottom: '8px', color: '#f4f4f5' }}>{HELP_CONTENT.syntax.title}</h4>
-            <p style={{ marginBottom: '16px', color: '#a1a1aa' }}>
+            <h4 style={{ marginBottom: '8px', color: 'var(--foreground)' }}>
+              {HELP_CONTENT.syntax.title}
+            </h4>
+            <p style={{ marginBottom: '16px', color: 'var(--muted-foreground)' }}>
               {HELP_CONTENT.syntax.description}
             </p>
             <div
               style={{
-                backgroundColor: '#09090b',
+                backgroundColor: 'var(--background)',
                 padding: '16px',
                 borderRadius: '8px',
-                border: '1px solid #27272a',
+                border: '1px solid var(--border)',
               }}
             >
               {HELP_CONTENT.syntax.examples.map((ex, idx) => (
@@ -655,7 +718,7 @@ function HelpModal({ open, onClose }) {
                 >
                   <code
                     style={{
-                      backgroundColor: '#27272a',
+                      backgroundColor: 'var(--border)',
                       padding: '4px 8px',
                       borderRadius: '4px',
                       fontFamily: 'monospace',
@@ -666,13 +729,15 @@ function HelpModal({ open, onClose }) {
                   >
                     {ex.syntax}
                   </code>
-                  <span style={{ color: '#a1a1aa', fontSize: '13px' }}>{ex.desc}</span>
+                  <span style={{ color: 'var(--muted-foreground)', fontSize: '13px' }}>
+                    {ex.desc}
+                  </span>
                 </div>
               ))}
             </div>
           </section>
           <section>
-            <h4 style={{ marginBottom: '8px', color: '#f4f4f5' }}>Available Functions</h4>
+            <h4 style={{ marginBottom: '8px', color: 'var(--foreground)' }}>Available Functions</h4>
             <div
               style={{
                 display: 'grid',
@@ -685,22 +750,24 @@ function HelpModal({ open, onClose }) {
                   key={idx}
                   style={{
                     padding: '12px',
-                    backgroundColor: '#1c1917',
+                    backgroundColor: 'var(--card)',
                     borderRadius: '6px',
-                    border: '1px solid #27272a',
+                    border: '1px solid var(--border)',
                   }}
                 >
                   <div
                     style={{
                       fontSize: '12px',
                       fontWeight: 600,
-                      color: '#f4f4f5',
+                      color: 'var(--foreground)',
                       marginBottom: '4px',
                     }}
                   >
                     {func.category}
                   </div>
-                  <code style={{ fontSize: '11px', color: '#a1a1aa' }}>{func.items}</code>
+                  <code style={{ fontSize: '11px', color: 'var(--muted-foreground)' }}>
+                    {func.items}
+                  </code>
                 </div>
               ))}
             </div>
@@ -711,7 +778,12 @@ function HelpModal({ open, onClose }) {
   );
 }
 
+const TOOL_KEY = 'data-generator';
+
 export default function DataGenerator() {
+  const [highlightOn, setHighlightOn] = useState(
+    () => localStorage.getItem(`${TOOL_KEY}-editor-highlight`) !== 'false'
+  );
   const [format, setFormat] = useState('json');
   const [count, setCount] = useState(10);
   const [output, setOutput] = useState('');
@@ -726,7 +798,6 @@ export default function DataGenerator() {
     localStorage.setItem('datagen-layout', isVertical ? 'vertical' : 'horizontal');
   }, [isVertical]);
 
-  // Build template from schema
   const buildTemplate = (schemaFields) => {
     const fields = schemaFields
       .map((field) => {
@@ -734,7 +805,6 @@ export default function DataGenerator() {
         return `  "${field.label}": ${template}`;
       })
       .join(',\n');
-
     return `{\n${fields}\n}`;
   };
 
@@ -743,12 +813,9 @@ export default function DataGenerator() {
     try {
       const template = buildTemplate(schema);
       const res = await Generate({ format, count, template });
-
       if (res && res.output) {
         try {
           const parsed = JSON.parse(res.output);
-
-          // If it's an array of strings, parse each one
           if (Array.isArray(parsed) && typeof parsed[0] === 'string') {
             const objects = parsed.map((str) => {
               try {
@@ -770,7 +837,6 @@ export default function DataGenerator() {
         setOutput(JSON.stringify(res, null, 2));
       }
     } catch (err) {
-      console.error(err);
       setOutput(`Error: ${err.message}`);
     } finally {
       setIsGenerating(false);
@@ -778,24 +844,17 @@ export default function DataGenerator() {
   };
 
   const handleCopy = () => {
-    if (output) {
-      navigator.clipboard.writeText(output);
-    }
+    if (output) navigator.clipboard.writeText(output);
   };
 
-  const addField = () => {
+  const addField = () =>
     setSchema([...schema, { label: `field_${schema.length + 1}`, type: 'String' }]);
-  };
-
   const updateField = (index, key, value) => {
     const updated = [...schema];
     updated[index] = { ...updated[index], [key]: value };
     setSchema(updated);
   };
-
-  const removeField = (index) => {
-    setSchema(schema.filter((_, i) => i !== index));
-  };
+  const removeField = (index) => setSchema(schema.filter((_, i) => i !== index));
 
   return (
     <div
@@ -805,14 +864,14 @@ export default function DataGenerator() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader
         title="Data Generator"
         description="Generate mock data for testing and development. Create realistic datasets in JSON, CSV, or raw formats."
       />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -835,19 +894,23 @@ export default function DataGenerator() {
             max={1000}
           />
         </div>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Button onClick={handleGenerate} disabled={isGenerating}>
-            <Play style={{ width: '14px', height: '14px' }} />
+            <Play style={{ width: '14px', height: '14px' }} />{' '}
             {isGenerating ? 'Generating...' : 'Generate'}
           </Button>
           <Button variant="secondary" onClick={() => setShowHelp(true)}>
-            <HelpCircle style={{ width: '14px', height: '14px' }} />
-            Help
+            <HelpCircle style={{ width: '14px', height: '14px' }} /> Help
           </Button>
           <div
-            style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }}
+            style={{
+              width: '1px',
+              height: '16px',
+              backgroundColor: 'var(--border)',
+              margin: '0 8px',
+            }}
           />
+          <EditorToggle enabled={highlightOn} onToggle={setHighlightOn} toolKey={TOOL_KEY} />
           <Button
             variant="secondary"
             onClick={() => setIsVertical(!isVertical)}
@@ -870,7 +933,7 @@ export default function DataGenerator() {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               marginBottom: '8px',
@@ -884,8 +947,8 @@ export default function DataGenerator() {
               minHeight: 0,
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: '#18181b',
-              border: '1px solid #27272a',
+              backgroundColor: 'var(--background)',
+              border: '1px solid var(--border)',
               borderRadius: '8px',
               overflow: 'hidden',
             }}
@@ -893,8 +956,8 @@ export default function DataGenerator() {
             <div
               style={{
                 padding: '12px',
-                borderBottom: '1px solid #27272a',
-                backgroundColor: '#1c1917',
+                borderBottom: '1px solid var(--border)',
+                backgroundColor: 'var(--card)',
               }}
             >
               <Button
@@ -902,8 +965,7 @@ export default function DataGenerator() {
                 onClick={addField}
                 style={{ width: '100%', justifyContent: 'center' }}
               >
-                <Plus style={{ width: '14px', height: '14px' }} />
-                Add Field
+                <Plus style={{ width: '14px', height: '14px' }} /> Add Field
               </Button>
             </div>
             <div
@@ -936,18 +998,18 @@ export default function DataGenerator() {
             value={output}
             readOnly
             placeholder="Generated data will appear here..."
+            highlightOn={highlightOn}
+            language="json"
           />
           {output && (
             <div style={{ marginTop: '12px' }}>
-              <Button onClick={handleCopy} style={{ backgroundColor: '#059669' }}>
-                <Copy style={{ width: '14px', height: '14px' }} />
-                Copy to Clipboard
+              <Button onClick={handleCopy} style={{ backgroundColor: 'var(--success)' }}>
+                <Copy style={{ width: '14px', height: '14px' }} /> Copy to Clipboard
               </Button>
             </div>
           )}
         </div>
       </ToolSplitPane>
-
       <HelpModal open={showHelp} onClose={() => setShowHelp(false)} />
     </div>
   );

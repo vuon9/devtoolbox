@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FileText, Zap, Filter, Braces, Code2, Code } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-xml-doc';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-markup';
-import 'prismjs/themes/prism-tomorrow.css';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
 import { Format } from '../../generated';
 
 const languages = [
@@ -46,12 +41,19 @@ function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px', fontSize: '14px' }}>{description}</p>
-      <hr style={{ marginTop: '16px', border: 'none', borderTop: '1px solid #27272a' }} />
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px', fontSize: '14px' }}>
+        {description}
+      </p>
+      <hr style={{ marginTop: '16px', border: 'none', borderTop: '1px solid var(--border)' }} />
     </div>
   );
 }
@@ -70,10 +72,10 @@ function LanguageSelect({ value, onChange }) {
           gap: '8px',
           height: '36px',
           padding: '0 12px',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRadius: '6px',
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
           fontSize: '14px',
           cursor: 'pointer',
           minWidth: '140px',
@@ -105,8 +107,8 @@ function LanguageSelect({ value, onChange }) {
             left: 0,
             right: 0,
             marginTop: '4px',
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
             overflow: 'hidden',
             zIndex: 10,
@@ -125,9 +127,9 @@ function LanguageSelect({ value, onChange }) {
                 gap: '8px',
                 width: '100%',
                 padding: '8px 12px',
-                backgroundColor: value === lang.id ? '#27272a' : 'transparent',
+                backgroundColor: value === lang.id ? 'var(--muted)' : 'transparent',
                 border: 'none',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 fontSize: '14px',
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -158,7 +160,7 @@ function InputPane({ value, onChange, placeholder }) {
           style={{
             fontSize: '11px',
             textTransform: 'uppercase',
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             fontWeight: 600,
             letterSpacing: '0.05em',
           }}
@@ -172,11 +174,11 @@ function InputPane({ value, onChange, placeholder }) {
         placeholder={placeholder}
         style={{
           flex: 1,
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRadius: '8px',
           padding: '8px',
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '13px',
           lineHeight: 1.5,
@@ -189,27 +191,6 @@ function InputPane({ value, onChange, placeholder }) {
 }
 
 function OutputPane({ content, language, error, filterComponent }) {
-  useEffect(() => {
-    if (content) {
-      Prism.highlightAll();
-    }
-  }, [content]);
-
-  const getPrismLanguage = (lang) => {
-    switch (lang) {
-      case 'json':
-        return 'json';
-      case 'xml':
-        return 'xml';
-      case 'html':
-        return 'markup';
-      case 'css':
-        return 'css';
-      default:
-        return 'text';
-    }
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
       <div
@@ -224,7 +205,7 @@ function OutputPane({ content, language, error, filterComponent }) {
           style={{
             fontSize: '11px',
             textTransform: 'uppercase',
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             fontWeight: 600,
             letterSpacing: '0.05em',
           }}
@@ -236,30 +217,14 @@ function OutputPane({ content, language, error, filterComponent }) {
       <div
         style={{
           flex: 1,
-          backgroundColor: '#18181b',
-          border: error ? '1px solid #ef4444' : '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: error ? '1px solid #ef4444' : '1px solid var(--border)',
           borderRadius: '8px',
-          padding: '0',
           overflow: 'auto',
           marginBottom: '8px',
         }}
       >
-        {content && (
-          <pre style={{ margin: 0, background: 'transparent' }}>
-            <code
-              className={`language-${getPrismLanguage(language)}`}
-              style={{
-                background: 'transparent',
-                padding: 0,
-                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-                fontSize: '13px',
-                lineHeight: 1.5,
-              }}
-            >
-              {content}
-            </code>
-          </pre>
-        )}
+        {content && <HighlightedCode code={content} language={language} showLineNumbers />}
       </div>
 
       {filterComponent}
@@ -293,9 +258,9 @@ function FilterBar({ value, onChange, placeholder, show, error }) {
         flexDirection: 'column',
         gap: '6px',
         padding: '8px 12px',
-        backgroundColor: error ? 'rgba(239, 68, 68, 0.1)' : '#27272a',
+        backgroundColor: error ? 'rgba(239, 68, 68, 0.1)' : 'var(--muted)',
         borderRadius: '6px',
-        border: error ? '1px solid #ef4444' : '1px solid #3f3f46',
+        border: error ? '1px solid #ef4444' : '1px solid var(--border)',
         marginBottom: '8px',
       }}
     >
@@ -304,7 +269,7 @@ function FilterBar({ value, onChange, placeholder, show, error }) {
           style={{
             width: '16px',
             height: '16px',
-            color: error ? '#ef4444' : '#a1a1aa',
+            color: error ? '#ef4444' : 'var(--muted-foreground)',
             flexShrink: 0,
           }}
         />
@@ -317,7 +282,7 @@ function FilterBar({ value, onChange, placeholder, show, error }) {
             flex: 1,
             backgroundColor: 'transparent',
             border: 'none',
-            color: error ? '#ef4444' : '#f4f4f5',
+            color: error ? '#ef4444' : 'var(--foreground)',
             padding: '4px 0',
             fontSize: '13px',
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
@@ -408,7 +373,7 @@ export default function CodeFormatter() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader
@@ -431,7 +396,7 @@ export default function CodeFormatter() {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}

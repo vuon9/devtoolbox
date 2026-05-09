@@ -2,26 +2,45 @@ import React, { useState, useCallback } from 'react';
 import { Undo2, Copy, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { textUtilitiesAPI } from './api/textUtilitiesAPI';
+import CodeEditor from '../../components/inputs/CodeEditor';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
+import EditorToggle from '../../components/inputs/EditorToggle';
 
 const ESCAPE_METHODS = ['String Literal', 'Unicode/Hex'];
 
 const TOOL_TITLE = 'Text Utilities';
 const TOOL_DESCRIPTION = 'Sort, deduplicate, case-convert, escape, and inspect text.';
+const TOOL_KEY = 'text-utilities';
 
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
 
-function ToolPane({ label, value, onChange, readOnly, placeholder, indicator, indicatorColor }) {
+function ToolPane({
+  label,
+  value,
+  onChange,
+  readOnly,
+  placeholder,
+  indicator,
+  indicatorColor,
+  highlightOn,
+  language = 'plaintext',
+}) {
   const handleCopy = () => {
     if (value) navigator.clipboard.writeText(value);
   };
@@ -40,7 +59,7 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, indicator, in
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -84,33 +103,46 @@ function ToolPane({ label, value, onChange, readOnly, placeholder, indicator, in
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '4px',
-            color: value ? '#a1a1aa' : '#3f3f46',
+            color: value ? 'var(--muted-foreground)' : 'var(--border)',
             cursor: value ? 'pointer' : 'not-allowed',
           }}
         >
           <Copy style={{ width: '16px', height: '16px' }} />
         </button>
       </div>
-      <textarea
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        style={{
-          flex: 1,
-          width: '100%',
-          padding: '12px',
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          fontSize: '14px',
-          lineHeight: 1.6,
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
-          borderRadius: '8px',
-          color: '#f4f4f5',
-          resize: 'none',
-          outline: 'none',
-        }}
-      />
+      {readOnly ? (
+        highlightOn ? (
+          <HighlightedCode code={value} language={language} copyable={false} />
+        ) : (
+          <textarea
+            value={value}
+            readOnly
+            placeholder={placeholder}
+            style={{
+              flex: 1,
+              width: '100%',
+              padding: '12px',
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+              fontSize: '14px',
+              lineHeight: 1.6,
+              backgroundColor: 'var(--background)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              color: 'var(--foreground)',
+              resize: 'none',
+              outline: 'none',
+            }}
+          />
+        )
+      ) : (
+        <CodeEditor
+          value={value}
+          onChange={(val) => onChange?.(val)}
+          language={language}
+          highlight={highlightOn}
+          placeholder={placeholder}
+        />
+      )}
     </div>
   );
 }
@@ -123,18 +155,20 @@ function StatBadge({ label, value }) {
         alignItems: 'center',
         gap: '8px',
         padding: '6px 12px',
-        backgroundColor: '#18181b',
+        backgroundColor: 'var(--background)',
         borderRadius: '6px',
-        border: '1px solid #27272a',
+        border: '1px solid var(--border)',
       }}
     >
-      <span style={{ fontSize: '11px', color: '#71717a', fontWeight: 500 }}>{label}</span>
+      <span style={{ fontSize: '11px', color: 'var(--muted-foreground)', fontWeight: 500 }}>
+        {label}
+      </span>
       <span
         style={{
           fontSize: '14px',
           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontWeight: 600,
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
         }}
       >
         {value}
@@ -154,6 +188,9 @@ const cases = [
 ];
 
 export default function TextUtilities() {
+  const [highlightOn, setHighlightOn] = useState(
+    () => localStorage.getItem(`${TOOL_KEY}-editor-highlight`) !== 'false'
+  );
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [stats, setStats] = useState({ chars: 0, words: 0, lines: 0, bytes: 0, sentences: 0 });
@@ -173,8 +210,7 @@ export default function TextUtilities() {
   }, []);
 
   const handleInputChange = useCallback(
-    (e) => {
-      const text = e.target.value;
+    (text) => {
       setInput(text);
       updateOutput(text);
     },
@@ -250,26 +286,26 @@ export default function TextUtilities() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader title={TOOL_TITLE} description={TOOL_DESCRIPTION} />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div
         style={{
           marginBottom: '16px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-end',
           gap: '12px',
+          flexWrap: 'wrap',
         }}
       >
         <span
           style={{
             fontSize: '11px',
             fontWeight: 600,
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -291,7 +327,8 @@ export default function TextUtilities() {
         <Button size="sm" onClick={handleRemoveEmpty}>
           Rm Empty
         </Button>
-        <div style={{ width: '1px', height: '16px', backgroundColor: '#27272a' }} />
+        <div style={{ width: '1px', height: '16px', backgroundColor: 'var(--border)' }} />
+        <EditorToggle enabled={highlightOn} onToggle={setHighlightOn} toolKey={TOOL_KEY} />
         <Button variant="danger" onClick={handleReset}>
           <Undo2 style={{ width: '14px', height: '14px' }} /> Reset
         </Button>
@@ -313,6 +350,7 @@ export default function TextUtilities() {
           placeholder="Paste or type text here..."
           indicator="Source"
           indicatorColor="green"
+          highlightOn={highlightOn}
         />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflow: 'auto' }}>
           <div style={{ flex: '0 0 40%', display: 'flex', flexDirection: 'column' }}>
@@ -323,6 +361,7 @@ export default function TextUtilities() {
               placeholder="Transformed text will appear here..."
               indicator="Output"
               indicatorColor="blue"
+              highlightOn={highlightOn}
             />
           </div>
 
@@ -346,8 +385,8 @@ export default function TextUtilities() {
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
-              backgroundColor: '#1c1917',
-              border: '1px solid #27272a',
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
               flexShrink: 0,
             }}
           >
@@ -356,7 +395,7 @@ export default function TextUtilities() {
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                 }}
@@ -377,8 +416,8 @@ export default function TextUtilities() {
             style={{
               padding: '8px 12px',
               borderRadius: '8px',
-              backgroundColor: '#1c1917',
-              border: '1px solid #27272a',
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--border)',
               flexShrink: 0,
             }}
           >
@@ -387,7 +426,7 @@ export default function TextUtilities() {
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                 }}
@@ -404,9 +443,9 @@ export default function TextUtilities() {
                   padding: '0 8px',
                   fontSize: '12px',
                   borderRadius: '6px',
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
-                  color: '#f4f4f5',
+                  backgroundColor: 'var(--background)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--foreground)',
                   outline: 'none',
                 }}
               >
@@ -422,8 +461,8 @@ export default function TextUtilities() {
                   alignItems: 'center',
                   height: '32px',
                   borderRadius: '6px',
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--background)',
+                  border: '1px solid var(--border)',
                   padding: '3px',
                 }}
               >
@@ -437,8 +476,9 @@ export default function TextUtilities() {
                     borderRadius: '4px',
                     border: 'none',
                     cursor: 'pointer',
-                    backgroundColor: escapeMode === 'Escape' ? '#27272a' : 'transparent',
-                    color: escapeMode === 'Escape' ? '#f4f4f5' : '#71717a',
+                    backgroundColor: escapeMode === 'Escape' ? 'var(--border)' : 'transparent',
+                    color:
+                      escapeMode === 'Escape' ? 'var(--foreground)' : 'var(--muted-foreground)',
                   }}
                 >
                   Escape
@@ -453,8 +493,9 @@ export default function TextUtilities() {
                     borderRadius: '4px',
                     border: 'none',
                     cursor: 'pointer',
-                    backgroundColor: escapeMode === 'Unescape' ? '#27272a' : 'transparent',
-                    color: escapeMode === 'Unescape' ? '#f4f4f5' : '#71717a',
+                    backgroundColor: escapeMode === 'Unescape' ? 'var(--border)' : 'transparent',
+                    color:
+                      escapeMode === 'Unescape' ? 'var(--foreground)' : 'var(--muted-foreground)',
                   }}
                 >
                   Unescape

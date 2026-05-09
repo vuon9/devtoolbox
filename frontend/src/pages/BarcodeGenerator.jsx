@@ -48,11 +48,16 @@ function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
@@ -64,7 +69,7 @@ function ToolTextArea({ label, value, onChange, placeholder }) {
         style={{
           fontSize: '11px',
           fontWeight: 600,
-          color: '#71717a',
+          color: 'var(--muted-foreground)',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
           marginBottom: '8px',
@@ -84,10 +89,10 @@ function ToolTextArea({ label, value, onChange, placeholder }) {
           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '14px',
           lineHeight: 1.5,
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRadius: '8px',
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
           resize: 'none',
           outline: 'none',
         }}
@@ -119,10 +124,10 @@ function TypeToggle({ types, value, onChange }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: '#1c1917',
+        backgroundColor: 'var(--card)',
         borderRadius: '8px',
         padding: '4px',
-        border: '1px solid #27272a',
+        border: '1px solid var(--border)',
         flexWrap: 'wrap',
       }}
     >
@@ -138,10 +143,10 @@ function TypeToggle({ types, value, onChange }) {
               alignItems: 'center',
               gap: '8px',
               padding: '8px 16px',
-              backgroundColor: isActive ? '#27272a' : 'transparent',
+              backgroundColor: isActive ? 'var(--border)' : 'transparent',
               border: 'none',
               borderRadius: '6px',
-              color: isActive ? '#f4f4f5' : '#71717a',
+              color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
               fontSize: '13px',
               fontWeight: 500,
               cursor: 'pointer',
@@ -149,14 +154,14 @@ function TypeToggle({ types, value, onChange }) {
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = '#27272a';
-                e.currentTarget.style.color = '#a1a1aa';
+                e.currentTarget.style.backgroundColor = 'var(--border)';
+                e.currentTarget.style.color = 'var(--muted-foreground)';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#71717a';
+                e.currentTarget.style.color = 'var(--muted-foreground)';
               }
             }}
           >
@@ -261,14 +266,14 @@ export default function BarcodeGenerator() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader
         title="Barcode / QR Code"
         description="Generate high-quality QR codes and barcodes for various standards. Customize appearance and download directly as PNG."
       />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -288,7 +293,12 @@ export default function BarcodeGenerator() {
             Clear
           </Button>
           <div
-            style={{ width: '1px', height: '16px', backgroundColor: '#27272a', margin: '0 8px' }}
+            style={{
+              width: '1px',
+              height: '16px',
+              backgroundColor: 'var(--border)',
+              margin: '0 8px',
+            }}
           />
           <Button
             variant="secondary"
@@ -314,7 +324,7 @@ export default function BarcodeGenerator() {
             borderRadius: '8px',
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             border: '1px solid rgba(239, 68, 68, 0.3)',
-            color: '#ef4444',
+            color: 'var(--destructive)',
             fontSize: '14px',
           }}
         >
@@ -337,7 +347,7 @@ export default function BarcodeGenerator() {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               marginBottom: '8px',
@@ -352,15 +362,15 @@ export default function BarcodeGenerator() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '1px solid #27272a',
+              border: '1px solid var(--border)',
               borderRadius: '8px',
-              backgroundColor: '#18181b',
+              backgroundColor: 'var(--card)',
               padding: '24px',
             }}
           >
             <div
               style={{
-                backgroundColor: '#09090b',
+                backgroundColor: 'var(--background)',
                 padding: '24px',
                 borderRadius: '12px',
                 border: '4px solid rgba(59, 130, 246, 0.2)',
@@ -387,7 +397,7 @@ export default function BarcodeGenerator() {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: '#18181b',
+                    backgroundColor: 'var(--card)',
                     borderRadius: '8px',
                   }}
                 >

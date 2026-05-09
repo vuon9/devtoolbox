@@ -3,7 +3,7 @@ import React from 'react';
 export default function DiffView({ diffs }) {
   const renderDiff = () => {
     if (diffs.length === 0) {
-      return <span style={{ color: 'var(--cds-text-secondary)' }}>No differences</span>;
+      return <span style={{ color: 'var(--muted-foreground)' }}>No differences</span>;
     }
 
     return diffs.map((part, index) => {
@@ -19,14 +19,14 @@ export default function DiffView({ diffs }) {
       if (isAdded) {
         style = {
           ...style,
-          backgroundColor: 'var(--cds-support-success-inverse)',
-          color: 'var(--cds-text-on-color)',
+          backgroundColor: 'rgb(from var(--success) r g b / 0.2)',
+          color: '#fff',
         };
       } else if (isRemoved) {
         style = {
           ...style,
-          backgroundColor: 'var(--cds-support-error-inverse)',
-          color: 'var(--cds-text-on-color)',
+          backgroundColor: 'rgb(from var(--destructive) r g b / 0.2)',
+          color: '#fff',
         };
       }
 
@@ -67,7 +67,7 @@ export default function DiffView({ diffs }) {
             fontWeight: 400,
             lineHeight: 1.5,
             letterSpacing: '0.32px',
-            color: 'var(--cds-text-secondary)',
+            color: 'var(--muted-foreground)',
             textTransform: 'uppercase',
           }}
         >
@@ -79,9 +79,9 @@ export default function DiffView({ diffs }) {
           flex: 1,
           overflowY: 'auto',
           padding: '0.75rem',
-          backgroundColor: 'var(--cds-layer)',
-          border: '1px solid var(--cds-border-strong)',
-          color: 'var(--cds-text-primary)',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
+          color: 'var(--foreground)',
           whiteSpace: 'pre-wrap',
           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '0.875rem',

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button';
-import { Grid, Column } from '@carbon/react';
 import { X } from 'lucide-react';
 import DateTimeOutputField from './DateTimeOutputField';
 import { OUTPUT_FORMATS } from '../constants';
@@ -20,14 +19,14 @@ export function ResultsGrid({
   onRemoveTimezone,
 }) {
   return (
-    <Grid>
+    <div style={{ display: 'grid', gridTemplateColumns: '4fr 4fr 8fr', gap: '1rem' }}>
       {/* Column 1: Custom Timezones */}
-      <Column lg={4} md={8} sm={4}>
+      <div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <div
             style={{
               fontSize: '0.75rem',
-              color: 'var(--cds-text-secondary)',
+              color: 'var(--muted-foreground)',
               marginBottom: '0.25rem',
               textTransform: 'uppercase',
             }}
@@ -39,7 +38,7 @@ export function ResultsGrid({
             <div
               style={{
                 fontSize: '0.875rem',
-                color: 'var(--cds-text-secondary)',
+                color: 'var(--muted-foreground)',
                 fontStyle: 'italic',
               }}
             >
@@ -69,21 +68,20 @@ export function ResultsGrid({
             </div>
           ))}
         </div>
-      </Column>
+      </div>
 
       {/* Column 2: Primary Outputs */}
-      <Column lg={4} md={4} sm={4}>
+      <div>
         <div
           style={{
             fontSize: '0.75rem',
-            color: 'var(--cds-text-secondary)',
+            color: 'var(--muted-foreground)',
             marginBottom: '0.5rem',
             textTransform: 'uppercase',
           }}
         >
           Format
         </div>
-        {/* Three fields in a row */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <DateTimeOutputField label="Local" value={formatDate(parsedDate, 'sql', 'local')} />
           <DateTimeOutputField
@@ -96,17 +94,16 @@ export function ResultsGrid({
             value={Math.floor(parsedDate.getTime() / 1000).toString()}
           />
         </div>
-      </Column>
+      </div>
 
       {/* Column 3: Metadata + Other Formats */}
-      <Column lg={8} md={4} sm={4}>
+      <div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {/* Other formats section - 2 per row */}
           <div style={{ marginTop: '0.5rem' }}>
             <div
               style={{
                 fontSize: '0.75rem',
-                color: 'var(--cds-text-secondary)',
+                color: 'var(--muted-foreground)',
                 marginBottom: '0.5rem',
                 textTransform: 'uppercase',
               }}
@@ -125,7 +122,7 @@ export function ResultsGrid({
             <div
               style={{
                 fontSize: '0.75rem',
-                color: 'var(--cds-text-secondary)',
+                color: 'var(--muted-foreground)',
                 marginBottom: '0.5rem',
                 marginTop: '1rem',
                 textTransform: 'uppercase',
@@ -149,7 +146,7 @@ export function ResultsGrid({
             </div>
           </div>
         </div>
-      </Column>
-    </Grid>
+      </div>
+    </div>
   );
 }

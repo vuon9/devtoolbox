@@ -1,6 +1,74 @@
 import { ViewPlugin, Decoration } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/rangeset';
-import { sqlKeywordCategories } from './carbonCodeMirrorTheme';
+
+const sqlKeywordCategories = {
+  ddl: new Set([
+    'CREATE',
+    'DROP',
+    'ALTER',
+    'TABLE',
+    'DATABASE',
+    'INDEX',
+    'VIEW',
+    'TRIGGER',
+    'SCHEMA',
+    'SEQUENCE',
+  ]),
+  dml: new Set(['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'UPSERT', 'MERGE', 'REPLACE']),
+  conditional: new Set([
+    'WHERE',
+    'AND',
+    'OR',
+    'NOT',
+    'IN',
+    'EXISTS',
+    'BETWEEN',
+    'LIKE',
+    'IS',
+    'NULL',
+    'CASE',
+    'WHEN',
+    'THEN',
+    'ELSE',
+    'END',
+  ]),
+  join: new Set([
+    'JOIN',
+    'INNER',
+    'LEFT',
+    'RIGHT',
+    'FULL',
+    'CROSS',
+    'OUTER',
+    'ON',
+    'USING',
+    'NATURAL',
+  ]),
+  aggregate: new Set([
+    'COUNT',
+    'SUM',
+    'AVG',
+    'MAX',
+    'MIN',
+    'GROUP_CONCAT',
+    'STRING_AGG',
+    'ARRAY_AGG',
+    'DISTINCT',
+    'ALL',
+  ]),
+  ordering: new Set([
+    'ORDER',
+    'BY',
+    'GROUP',
+    'HAVING',
+    'LIMIT',
+    'OFFSET',
+    'TOP',
+    'FETCH',
+    'FIRST',
+    'ROWS',
+  ]),
+};
 
 /**
  * Create a view plugin that categorizes SQL keywords and applies CSS classes
