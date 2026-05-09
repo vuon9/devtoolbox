@@ -4,7 +4,8 @@ import { Input } from '../../../components/ui/input';
 import { Plus } from 'lucide-react';
 import { ToolControls } from '../../../components/ToolUI';
 
-const selectClass = "flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+const selectClass =
+  'flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
 
 export function InputSection({
   availableTimezones,
@@ -38,11 +39,11 @@ export function InputSection({
             disabled={availableTimezones.length === 0}
             style={{ minWidth: '200px' }}
           >
-            {availableTimezones.length === 0 && (
-              <option value="">Loading...</option>
-            )}
+            {availableTimezones.length === 0 && <option value="">Loading...</option>}
             {availableTimezones.map((tz) => (
-              <option key={tz.id} value={tz.id}>{tz.label}</option>
+              <option key={tz.id} value={tz.id}>
+                {tz.label}
+              </option>
             ))}
           </select>
         </div>
@@ -61,7 +62,9 @@ export function InputSection({
           >
             <option value="">{disabled ? 'Loading timezones...' : 'Search timezone...'}</option>
             {availableTimezones.map((tz) => (
-              <option key={tz.id} value={tz.id}>{tz.label}</option>
+              <option key={tz.id} value={tz.id}>
+                {tz.label}
+              </option>
             ))}
           </select>
         </div>

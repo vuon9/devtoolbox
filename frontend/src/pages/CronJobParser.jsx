@@ -199,11 +199,16 @@ function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
@@ -296,14 +301,14 @@ export default function CronJobParser() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader
         title="Cron Job Parser"
         description="Build and validate cron expressions with an interactive visual builder."
       />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       <div
         style={{
@@ -321,7 +326,7 @@ export default function CronJobParser() {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
                 marginBottom: '8px',
@@ -356,7 +361,7 @@ export default function CronJobParser() {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
                 marginBottom: '8px',
@@ -375,16 +380,20 @@ export default function CronJobParser() {
                 fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 fontSize: '14px',
                 fontWeight: 500,
-                backgroundColor: '#18181b',
-                border: error ? '1px solid #ef4444' : '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: error ? '1px solid var(--destructive)' : '1px solid var(--border)',
                 borderRadius: '8px',
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
                 outline: 'none',
                 boxSizing: 'border-box',
               }}
             />
             <div
-              style={{ marginTop: '6px', fontSize: '12px', color: error ? '#ef4444' : '#71717a' }}
+              style={{
+                marginTop: '6px',
+                fontSize: '12px',
+                color: error ? 'var(--destructive)' : 'var(--muted-foreground)',
+              }}
             >
               {error || description}
             </div>
@@ -395,7 +404,7 @@ export default function CronJobParser() {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
                 marginBottom: '8px',
@@ -405,22 +414,22 @@ export default function CronJobParser() {
             </div>
             <div
               style={{
-                backgroundColor: '#18181b',
-                border: '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
                 overflow: 'hidden',
               }}
             >
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #27272a' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     <th
                       style={{
                         padding: '8px 12px',
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 600,
-                        color: '#52525b',
+                        color: 'var(--muted-foreground)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                       }}
@@ -433,7 +442,7 @@ export default function CronJobParser() {
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 600,
-                        color: '#52525b',
+                        color: 'var(--muted-foreground)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                       }}
@@ -446,7 +455,7 @@ export default function CronJobParser() {
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 600,
-                        color: '#52525b',
+                        color: 'var(--muted-foreground)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                       }}
@@ -459,7 +468,7 @@ export default function CronJobParser() {
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 600,
-                        color: '#52525b',
+                        color: 'var(--muted-foreground)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                       }}
@@ -476,7 +485,7 @@ export default function CronJobParser() {
                     return (
                       <tr
                         key={fieldName}
-                        style={{ borderBottom: index < 4 ? '1px solid #27272a' : 'none' }}
+                        style={{ borderBottom: index < 4 ? '1px solid var(--border)' : 'none' }}
                       >
                         <td style={{ padding: '10px 12px', verticalAlign: 'middle' }}>
                           <span
@@ -497,14 +506,14 @@ export default function CronJobParser() {
                               fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                               fontSize: '13px',
                               fontWeight: 500,
-                              color: '#3b82f6',
+                              color: 'var(--primary)',
                             }}
                           >
                             {value}
                           </span>
                         </td>
                         <td style={{ padding: '10px 12px', verticalAlign: 'middle' }}>
-                          <span style={{ fontSize: '12px', color: '#a1a1aa' }}>
+                          <span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
                             {getFieldDescription(value, config.label)}
                           </span>
                         </td>
@@ -514,12 +523,14 @@ export default function CronJobParser() {
                               fontSize: '12px',
                               fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                               fontWeight: 500,
-                              color: '#71717a',
+                              color: 'var(--muted-foreground)',
                             }}
                           >
                             {config.validRange}
                           </div>
-                          <div style={{ fontSize: '11px', color: '#3f3f46', marginTop: '4px' }}>
+                          <div
+                            style={{ fontSize: '11px', color: 'var(--border)', marginTop: '4px' }}
+                          >
                             e.g. {config.examples}
                           </div>
                         </td>
@@ -538,7 +549,7 @@ export default function CronJobParser() {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
                 marginBottom: '12px',
@@ -548,22 +559,22 @@ export default function CronJobParser() {
             </div>
             <div
               style={{
-                backgroundColor: '#18181b',
-                border: '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
                 overflow: 'hidden',
               }}
             >
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #27272a' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     <th
                       style={{
                         padding: '8px 12px',
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 600,
-                        color: '#52525b',
+                        color: 'var(--muted-foreground)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                         width: '28px',
@@ -575,7 +586,7 @@ export default function CronJobParser() {
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 600,
-                        color: '#52525b',
+                        color: 'var(--muted-foreground)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                       }}
@@ -588,7 +599,7 @@ export default function CronJobParser() {
                         textAlign: 'left',
                         fontSize: '10px',
                         fontWeight: 600,
-                        color: '#52525b',
+                        color: 'var(--muted-foreground)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                       }}
@@ -598,7 +609,7 @@ export default function CronJobParser() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr style={{ borderBottom: '1px solid #27272a' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
                       <button
                         onClick={() =>
@@ -616,9 +627,10 @@ export default function CronJobParser() {
                           height: '28px',
                           padding: '6px',
                           backgroundColor: 'transparent',
-                          border: '1px solid #27272a',
+                          border: '1px solid var(--border)',
                           borderRadius: '6px',
-                          color: prevExecutions.length > 0 ? '#71717a' : '#3f3f46',
+                          color:
+                            prevExecutions.length > 0 ? 'var(--muted-foreground)' : 'var(--border)',
                           cursor: prevExecutions.length > 0 ? 'pointer' : 'not-allowed',
                         }}
                       >
@@ -626,11 +638,23 @@ export default function CronJobParser() {
                       </button>
                     </td>
                     <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
-                      <div style={{ fontSize: '11px', fontWeight: 500, color: '#71717a' }}>
+                      <div
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 500,
+                          color: 'var(--muted-foreground)',
+                        }}
+                      >
                         Previous
                       </div>
                       {prevExecutions[1] && (
-                        <div style={{ fontSize: '10px', color: '#52525b', marginTop: '4px' }}>
+                        <div
+                          style={{
+                            fontSize: '10px',
+                            color: 'var(--muted-foreground)',
+                            marginTop: '4px',
+                          }}
+                        >
                           2 ago
                         </div>
                       )}
@@ -641,7 +665,7 @@ export default function CronJobParser() {
                           fontSize: '12px',
                           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontWeight: 500,
-                          color: '#a1a1aa',
+                          color: 'var(--muted-foreground)',
                         }}
                       >
                         {prevExecutions[0] ? formatDate(prevExecutions[0]) : '—'}
@@ -651,7 +675,7 @@ export default function CronJobParser() {
                           style={{
                             fontSize: '11px',
                             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-                            color: '#52525b',
+                            color: 'var(--muted-foreground)',
                             marginTop: '4px',
                           }}
                         >
@@ -680,7 +704,7 @@ export default function CronJobParser() {
                           backgroundColor: 'transparent',
                           border: 'none',
                           borderRadius: '6px',
-                          color: '#3b82f6',
+                          color: 'var(--primary)',
                           cursor: 'pointer',
                         }}
                       >
@@ -688,10 +712,10 @@ export default function CronJobParser() {
                       </button>
                     </td>
                     <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
-                      <div style={{ fontSize: '11px', fontWeight: 500, color: '#3b82f6' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--primary)' }}>
                         Current
                       </div>
-                      <div style={{ fontSize: '10px', color: '#22c55e', marginTop: '4px' }}>
+                      <div style={{ fontSize: '10px', color: 'var(--success)', marginTop: '4px' }}>
                         Next in
                       </div>
                     </td>
@@ -701,7 +725,7 @@ export default function CronJobParser() {
                           fontSize: '12px',
                           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontWeight: 500,
-                          color: '#3b82f6',
+                          color: 'var(--primary)',
                         }}
                       >
                         {formatDate(now)}
@@ -711,7 +735,7 @@ export default function CronJobParser() {
                           fontSize: '11px',
                           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontWeight: 500,
-                          color: '#22c55e',
+                          color: 'var(--success)',
                           marginTop: '4px',
                         }}
                       >
@@ -737,9 +761,9 @@ export default function CronJobParser() {
                           height: '28px',
                           padding: '6px',
                           backgroundColor: 'transparent',
-                          border: '1px solid #27272a',
+                          border: '1px solid var(--border)',
                           borderRadius: '6px',
-                          color: nextExecutions.length > 0 ? '#22c55e' : '#3f3f46',
+                          color: nextExecutions.length > 0 ? 'var(--success)' : 'var(--border)',
                           cursor: nextExecutions.length > 0 ? 'pointer' : 'not-allowed',
                         }}
                       >
@@ -747,11 +771,17 @@ export default function CronJobParser() {
                       </button>
                     </td>
                     <td style={{ padding: '10px 12px', verticalAlign: 'top' }}>
-                      <div style={{ fontSize: '11px', fontWeight: 500, color: '#22c55e' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--success)' }}>
                         Next
                       </div>
                       {nextExecutions[1] && (
-                        <div style={{ fontSize: '10px', color: '#52525b', marginTop: '4px' }}>
+                        <div
+                          style={{
+                            fontSize: '10px',
+                            color: 'var(--muted-foreground)',
+                            marginTop: '4px',
+                          }}
+                        >
                           2 later
                         </div>
                       )}
@@ -762,7 +792,7 @@ export default function CronJobParser() {
                           fontSize: '12px',
                           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                           fontWeight: 500,
-                          color: '#f4f4f5',
+                          color: 'var(--foreground)',
                         }}
                       >
                         {nextExecutions[0] ? formatDate(nextExecutions[0]) : '—'}
@@ -772,7 +802,7 @@ export default function CronJobParser() {
                           style={{
                             fontSize: '11px',
                             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-                            color: '#52525b',
+                            color: 'var(--muted-foreground)',
                             marginTop: '4px',
                           }}
                         >

@@ -38,7 +38,7 @@ const ColorSwatch = ({ color, onClick, size = 40, showHex = true }) => (
         height: size,
         backgroundColor: color,
         borderRadius: '6px',
-        border: '2px solid #27272a',
+        border: '2px solid var(--border)',
       }}
     />
     {showHex && <CopyableHex hex={color} showColorPreview={false} style={{ fontSize: '10px' }} />}
@@ -289,10 +289,10 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
     height: '28px',
     padding: '0 6px',
     fontSize: '12px',
-    backgroundColor: '#09090b',
-    border: '1px solid #27272a',
+    backgroundColor: 'var(--background)',
+    border: '1px solid var(--border)',
     borderRadius: '4px',
-    color: '#f4f4f5',
+    color: 'var(--foreground)',
     textAlign: 'center',
     outline: 'none',
     fontFamily: 'monospace',
@@ -304,7 +304,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       {/* Sticky Header */}
@@ -313,7 +313,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
           position: 'sticky',
           top: 0,
           zIndex: 10,
-          backgroundColor: '#09090b',
+          backgroundColor: 'var(--background)',
           padding: '24px 24px 2px',
         }}
       >
@@ -323,12 +323,12 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
               fontSize: '24px',
               fontWeight: 600,
               letterSpacing: '-0.025em',
-              color: '#f4f4f5',
+              color: 'var(--foreground)',
             }}
           >
             Color Converter
           </h2>
-          <p style={{ color: '#a1a1aa', marginTop: '2px', marginBottom: 0 }}>
+          <p style={{ color: 'var(--muted-foreground)', marginTop: '2px', marginBottom: 0 }}>
             Convert between Hex, RGB, HSL, CMYK, and HSB. Generate palettes and export code.
           </p>
         </div>
@@ -337,7 +337,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
             marginTop: '16px',
             marginLeft: '4px',
             marginRight: '4px',
-            borderTop: '1px solid #27272a',
+            borderTop: '1px solid var(--border)',
           }}
         />
       </div>
@@ -373,23 +373,23 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
-              backgroundColor: '#18181b',
+              backgroundColor: 'var(--card)',
               padding: '6px 12px',
               borderRadius: '8px',
-              border: '1px solid #27272a',
+              border: '1px solid var(--border)',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
             }}
             onClick={() => copyToClipboard(currentColor.toUpperCase(), 'header')}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#27272a')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#18181b')}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--border)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--card)')}
           >
             <span
               style={{
                 fontFamily: 'monospace',
                 fontSize: '16px',
                 fontWeight: 600,
-                color: '#f4f4f5',
+                color: 'var(--foreground)',
               }}
             >
               {currentColor.toUpperCase()}
@@ -398,7 +398,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
               style={{
                 marginLeft: 'auto',
                 fontSize: '12px',
-                color: copiedFormat === 'header' ? '#22c55e' : '#71717a',
+                color: copiedFormat === 'header' ? 'var(--success)' : 'var(--muted-foreground)',
               }}
             >
               {copiedFormat === 'header' ? 'Copied!' : 'Click to copy'}
@@ -423,7 +423,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   display: 'block',
                   marginBottom: '16px',
@@ -433,8 +433,8 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
               </span>
               <div
                 style={{
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: '8px',
                   padding: '8px',
                 }}
@@ -448,9 +448,9 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                           padding: '6px 8px',
                           fontSize: '10px',
                           fontWeight: 600,
-                          color: '#71717a',
+                          color: 'var(--muted-foreground)',
                           textTransform: 'uppercase',
-                          borderBottom: '1px solid #27272a',
+                          borderBottom: '1px solid var(--border)',
                           width: '50px',
                         }}
                       >
@@ -462,9 +462,9 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                           padding: '6px 8px',
                           fontSize: '10px',
                           fontWeight: 600,
-                          color: '#71717a',
+                          color: 'var(--muted-foreground)',
                           textTransform: 'uppercase',
-                          borderBottom: '1px solid #27272a',
+                          borderBottom: '1px solid var(--border)',
                         }}
                       >
                         Value
@@ -475,9 +475,9 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                           padding: '6px 8px',
                           fontSize: '10px',
                           fontWeight: 600,
-                          color: '#71717a',
+                          color: 'var(--muted-foreground)',
                           textTransform: 'uppercase',
-                          borderBottom: '1px solid #27272a',
+                          borderBottom: '1px solid var(--border)',
                           width: '40px',
                         }}
                       >
@@ -487,9 +487,15 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                   </thead>
                   <tbody>
                     {/* HEX Row */}
-                    <tr style={{ borderBottom: '1px solid #27272a' }}>
+                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: '8px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            color: 'var(--muted-foreground)',
+                          }}
+                        >
                           HEX
                         </span>
                       </td>
@@ -503,10 +509,10 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                             height: '28px',
                             padding: '0 8px',
                             fontSize: '12px',
-                            backgroundColor: '#09090b',
-                            border: '1px solid #27272a',
+                            backgroundColor: 'var(--background)',
+                            border: '1px solid var(--border)',
                             borderRadius: '4px',
-                            color: '#f4f4f5',
+                            color: 'var(--foreground)',
                             fontFamily: 'monospace',
                             outline: 'none',
                           }}
@@ -519,7 +525,8 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                             padding: '4px',
                             backgroundColor: 'transparent',
                             border: 'none',
-                            color: copiedFormat === 'hex' ? '#22c55e' : '#71717a',
+                            color:
+                              copiedFormat === 'hex' ? 'var(--success)' : 'var(--muted-foreground)',
                             cursor: 'pointer',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -535,9 +542,15 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                     </tr>
 
                     {/* RGB Row */}
-                    <tr style={{ borderBottom: '1px solid #27272a' }}>
+                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: '8px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            color: 'var(--muted-foreground)',
+                          }}
+                        >
                           RGB
                         </span>
                       </td>
@@ -587,7 +600,8 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                             padding: '4px',
                             backgroundColor: 'transparent',
                             border: 'none',
-                            color: copiedFormat === 'rgb' ? '#22c55e' : '#71717a',
+                            color:
+                              copiedFormat === 'rgb' ? 'var(--success)' : 'var(--muted-foreground)',
                             cursor: 'pointer',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -603,9 +617,15 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                     </tr>
 
                     {/* HSL Row */}
-                    <tr style={{ borderBottom: '1px solid #27272a' }}>
+                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: '8px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            color: 'var(--muted-foreground)',
+                          }}
+                        >
                           HSL
                         </span>
                       </td>
@@ -655,7 +675,8 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                             padding: '4px',
                             backgroundColor: 'transparent',
                             border: 'none',
-                            color: copiedFormat === 'hsl' ? '#22c55e' : '#71717a',
+                            color:
+                              copiedFormat === 'hsl' ? 'var(--success)' : 'var(--muted-foreground)',
                             cursor: 'pointer',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -671,9 +692,15 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                     </tr>
 
                     {/* CMYK Row */}
-                    <tr style={{ borderBottom: '1px solid #27272a' }}>
+                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: '8px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            color: 'var(--muted-foreground)',
+                          }}
+                        >
                           CMYK
                         </span>
                       </td>
@@ -733,7 +760,10 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                             padding: '4px',
                             backgroundColor: 'transparent',
                             border: 'none',
-                            color: copiedFormat === 'cmyk' ? '#22c55e' : '#71717a',
+                            color:
+                              copiedFormat === 'cmyk'
+                                ? 'var(--success)'
+                                : 'var(--muted-foreground)',
                             cursor: 'pointer',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -751,7 +781,13 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                     {/* HSB Row */}
                     <tr>
                       <td style={{ padding: '8px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#a1a1aa' }}>
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            color: 'var(--muted-foreground)',
+                          }}
+                        >
                           HSB
                         </span>
                       </td>
@@ -801,7 +837,8 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                             padding: '4px',
                             backgroundColor: 'transparent',
                             border: 'none',
-                            color: copiedFormat === 'hsb' ? '#22c55e' : '#71717a',
+                            color:
+                              copiedFormat === 'hsb' ? 'var(--success)' : 'var(--muted-foreground)',
                             cursor: 'pointer',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -834,7 +871,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                   style={{
                     fontSize: '11px',
                     fontWeight: 600,
-                    color: '#71717a',
+                    color: 'var(--muted-foreground)',
                     textTransform: 'uppercase',
                   }}
                 >
@@ -849,8 +886,8 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
               </div>
               <div
                 style={{
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: '8px',
                   padding: '16px',
                   minHeight: '120px',
@@ -863,7 +900,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                       alignItems: 'center',
                       justifyContent: 'center',
                       height: '88px',
-                      color: '#71717a',
+                      color: 'var(--muted-foreground)',
                       fontSize: '13px',
                     }}
                   >
@@ -893,9 +930,9 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                             width: '18px',
                             height: '18px',
                             borderRadius: '50%',
-                            backgroundColor: '#27272a',
-                            border: '1px solid #3f3f46',
-                            color: '#a1a1aa',
+                            backgroundColor: 'var(--border)',
+                            border: '1px solid var(--border)',
+                            color: 'var(--muted-foreground)',
                             fontSize: '10px',
                             display: 'flex',
                             alignItems: 'center',
@@ -928,7 +965,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   display: 'block',
                   marginBottom: '16px',
@@ -938,8 +975,8 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
               </span>
               <div
                 style={{
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: '8px',
                   padding: '16px',
                 }}
@@ -963,20 +1000,20 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                 <div style={{ position: 'relative' }}>
                   <pre
                     style={{
-                      backgroundColor: '#09090b',
-                      border: '1px solid #27272a',
+                      backgroundColor: 'var(--background)',
+                      border: '1px solid var(--border)',
                       borderRadius: '6px',
                       padding: '16px',
                       fontFamily: 'monospace',
                       fontSize: '12px',
-                      color: '#a1a1aa',
+                      color: 'var(--muted-foreground)',
                       overflow: 'auto',
                       maxHeight: '200px',
                       whiteSpace: 'pre-wrap',
                       wordBreak: 'break-word',
                     }}
                   >
-                    <code style={{ color: '#f4f4f5' }}>{generateCodeOutput}</code>
+                    <code style={{ color: 'var(--foreground)' }}>{generateCodeOutput}</code>
                   </pre>
                   <button
                     onClick={() => copyToClipboard(generateCodeOutput, 'code')}
@@ -985,10 +1022,10 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                       top: '8px',
                       right: '8px',
                       padding: '6px',
-                      backgroundColor: '#27272a',
-                      border: '1px solid #3f3f46',
+                      backgroundColor: 'var(--border)',
+                      border: '1px solid var(--border)',
                       borderRadius: '4px',
-                      color: copiedFormat === 'code' ? '#22c55e' : '#a1a1aa',
+                      color: copiedFormat === 'code' ? 'var(--success)' : 'var(--muted-foreground)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -1010,7 +1047,7 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   display: 'block',
                   marginBottom: '16px',
@@ -1020,8 +1057,8 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
               </span>
               <div
                 style={{
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: '8px',
                   padding: '16px',
                 }}
@@ -1050,16 +1087,16 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                         alignItems: 'center',
                         gap: '12px',
                         padding: '8px 12px',
-                        backgroundColor: '#09090b',
+                        backgroundColor: 'var(--background)',
                         borderRadius: '6px',
                         cursor: 'pointer',
                         transition: 'background-color 0.15s ease',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#27272a';
+                        e.currentTarget.style.backgroundColor = 'var(--border)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#09090b';
+                        e.currentTarget.style.backgroundColor = 'var(--background)';
                       }}
                     >
                       <div
@@ -1068,20 +1105,20 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                           height: '24px',
                           borderRadius: '4px',
                           backgroundColor: color,
-                          border: '1px solid #27272a',
+                          border: '1px solid var(--border)',
                         }}
                       />
                       <span
                         style={{
                           fontFamily: 'monospace',
                           fontSize: '13px',
-                          color: '#f4f4f5',
+                          color: 'var(--foreground)',
                           flex: 1,
                         }}
                       >
                         {color.toUpperCase()}
                       </span>
-                      <span style={{ fontSize: '11px', color: '#71717a' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--muted-foreground)' }}>
                         {palettePercentages[i]}
                       </span>
                       <button
@@ -1093,7 +1130,10 @@ HSB: ${hsb.h}, ${hsb.s}%, ${hsb.b}%`;
                           padding: '4px',
                           backgroundColor: 'transparent',
                           border: 'none',
-                          color: copiedPaletteColor === color ? '#22c55e' : '#71717a',
+                          color:
+                            copiedPaletteColor === color
+                              ? 'var(--success)'
+                              : 'var(--muted-foreground)',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',

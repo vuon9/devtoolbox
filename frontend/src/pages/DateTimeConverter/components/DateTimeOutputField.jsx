@@ -16,7 +16,13 @@ export default function DateTimeOutputField({ label, value, className, style }) 
   return (
     <div
       className={className}
-      style={{ padding: '0.75rem', background: 'var(--card)', borderRadius: '4px', border: '1px solid var(--border)', ...style }}
+      style={{
+        padding: '0.75rem',
+        background: 'var(--card)',
+        borderRadius: '4px',
+        border: '1px solid var(--border)',
+        ...style,
+      }}
     >
       <div
         style={{

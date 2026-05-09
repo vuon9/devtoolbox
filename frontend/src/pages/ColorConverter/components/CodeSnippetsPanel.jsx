@@ -41,7 +41,8 @@ export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChan
               fontSize: '0.75rem',
               fontWeight: 500,
               border: 'none',
-              borderBottom: selectedTab === idx ? '2px solid var(--primary)' : '2px solid transparent',
+              borderBottom:
+                selectedTab === idx ? '2px solid var(--primary)' : '2px solid transparent',
               background: 'transparent',
               color: selectedTab === idx ? 'var(--foreground)' : 'var(--muted-foreground)',
               cursor: 'pointer',

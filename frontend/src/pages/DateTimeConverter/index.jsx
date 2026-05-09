@@ -379,8 +379,8 @@ export default function DateTimeConverter() {
           alignItems: 'center',
           gap: '8px',
           padding: '8px 12px',
-          backgroundColor: '#09090b',
-          borderBottom: '1px solid #27272a',
+          backgroundColor: 'var(--background)',
+          borderBottom: '1px solid var(--border)',
           cursor: isDragging ? 'grabbing' : 'grab',
         }}
         {...attributes}
@@ -388,7 +388,7 @@ export default function DateTimeConverter() {
         {/* Drag handle */}
         <div
           style={{
-            color: '#3f3f46',
+            color: 'var(--border)',
             display: 'flex',
             alignItems: 'center',
             cursor: 'grab',
@@ -402,8 +402,10 @@ export default function DateTimeConverter() {
 
         {/* City and timezone info */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '12px', fontWeight: 600, color: '#f4f4f5' }}>{info.city}</div>
-          <div style={{ fontSize: '10px', color: '#71717a' }}>{info.timezone}</div>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--foreground)' }}>
+            {info.city}
+          </div>
+          <div style={{ fontSize: '10px', color: 'var(--muted-foreground)' }}>{info.timezone}</div>
         </div>
 
         {/* Time */}
@@ -411,7 +413,7 @@ export default function DateTimeConverter() {
           style={{
             fontSize: '12px',
             fontWeight: 600,
-            color: '#f4f4f5',
+            color: 'var(--foreground)',
             fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
             flexShrink: 0,
           }}
@@ -423,9 +425,9 @@ export default function DateTimeConverter() {
         <div
           style={{
             fontSize: '10px',
-            color: '#a1a1aa',
+            color: 'var(--muted-foreground)',
             padding: '2px 6px',
-            backgroundColor: '#18181b',
+            backgroundColor: 'var(--card)',
             borderRadius: '4px',
             flexShrink: 0,
           }}
@@ -441,7 +443,7 @@ export default function DateTimeConverter() {
             border: 'none',
             cursor: 'pointer',
             padding: '4px',
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             display: 'flex',
             alignItems: 'center',
             flexShrink: 0,
@@ -516,20 +518,25 @@ export default function DateTimeConverter() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       {/* Header */}
       <div style={{ marginBottom: '20px' }}>
         <h2
-          style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+          style={{
+            fontSize: '24px',
+            fontWeight: 600,
+            letterSpacing: '-0.025em',
+            color: 'var(--foreground)',
+          }}
         >
           DateTime Converter
         </h2>
-        <p style={{ color: '#a1a1aa', marginTop: '4px', fontSize: '14px' }}>
+        <p style={{ color: 'var(--muted-foreground)', marginTop: '4px', fontSize: '14px' }}>
           Convert between Unix timestamps, ISO dates, and timezones
         </p>
-        <div style={{ marginTop: '16px', borderBottom: '1px solid #27272a' }} />
+        <div style={{ marginTop: '16px', borderBottom: '1px solid var(--border)' }} />
       </div>
 
       {/* Main 2-column layout */}
@@ -559,7 +566,7 @@ export default function DateTimeConverter() {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 display: 'block',
                 marginBottom: '12px',
@@ -573,8 +580,8 @@ export default function DateTimeConverter() {
             </span>
             <div
               style={{
-                backgroundColor: '#18181b',
-                border: '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
                 padding: '16px',
               }}
@@ -583,7 +590,7 @@ export default function DateTimeConverter() {
                 style={{
                   fontSize: '14px',
                   fontWeight: 600,
-                  color: '#3b82f6',
+                  color: 'var(--primary)',
                   fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   letterSpacing: '-0.02em',
                 }}
@@ -595,7 +602,7 @@ export default function DateTimeConverter() {
                   hour12: true,
                 })}
               </div>
-              <div style={{ fontSize: '12px', color: '#a1a1aa', marginTop: '6px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--muted-foreground)', marginTop: '6px' }}>
                 {currentTime.toLocaleDateString('en-US', {
                   weekday: 'long',
                   month: 'long',
@@ -612,7 +619,7 @@ export default function DateTimeConverter() {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 display: 'block',
                 marginBottom: '12px',
@@ -622,8 +629,8 @@ export default function DateTimeConverter() {
             </span>
             <div
               style={{
-                backgroundColor: '#18181b',
-                border: '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
                 padding: '16px',
               }}
@@ -655,24 +662,26 @@ export default function DateTimeConverter() {
                   padding: '12px',
                   fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                   fontSize: '14px',
-                  backgroundColor: '#09090b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--background)',
+                  border: '1px solid var(--border)',
                   borderRadius: '6px',
-                  color: '#f4f4f5',
+                  color: 'var(--foreground)',
                   outline: 'none',
                 }}
               />
 
               {/* Format detection badge */}
               <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '12px', color: '#a1a1aa' }}>Recognized as:</span>
+                <span style={{ fontSize: '12px', color: 'var(--muted-foreground)' }}>
+                  Recognized as:
+                </span>
                 <span
                   style={{
                     fontSize: '11px',
                     fontWeight: 500,
                     padding: '4px 10px',
                     backgroundColor: 'rgba(59, 130, 246, 0.15)',
-                    color: '#3b82f6',
+                    color: 'var(--primary)',
                     borderRadius: '4px',
                     border: '1px solid rgba(59, 130, 246, 0.3)',
                   }}
@@ -690,7 +699,7 @@ export default function DateTimeConverter() {
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#71717a',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   display: 'block',
                   marginBottom: '12px',
@@ -704,8 +713,8 @@ export default function DateTimeConverter() {
               </span>
               <div
                 style={{
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: '8px',
                   padding: '16px',
                 }}
@@ -718,18 +727,24 @@ export default function DateTimeConverter() {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '8px 12px',
-                      backgroundColor: '#09090b',
+                      backgroundColor: 'var(--background)',
                       borderRadius: '6px',
                     }}
                   >
-                    <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '100px' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--muted-foreground)',
+                        minWidth: '100px',
+                      }}
+                    >
                       Seconds
                     </span>
                     <code
                       style={{
                         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
-                        color: '#f4f4f5',
+                        color: 'var(--foreground)',
                         flex: 1,
                         textAlign: 'right',
                         marginRight: '12px',
@@ -746,7 +761,8 @@ export default function DateTimeConverter() {
                         padding: '4px',
                         display: 'flex',
                         alignItems: 'center',
-                        color: copiedFormat === 'seconds' ? '#22c55e' : '#71717a',
+                        color:
+                          copiedFormat === 'seconds' ? 'var(--success)' : 'var(--muted-foreground)',
                       }}
                     >
                       {copiedFormat === 'seconds' ? <Check size={14} /> : <Copy size={14} />}
@@ -760,18 +776,24 @@ export default function DateTimeConverter() {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '8px 12px',
-                      backgroundColor: '#09090b',
+                      backgroundColor: 'var(--background)',
                       borderRadius: '6px',
                     }}
                   >
-                    <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '100px' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--muted-foreground)',
+                        minWidth: '100px',
+                      }}
+                    >
                       Milliseconds
                     </span>
                     <code
                       style={{
                         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
-                        color: '#f4f4f5',
+                        color: 'var(--foreground)',
                         flex: 1,
                         textAlign: 'right',
                         marginRight: '12px',
@@ -790,7 +812,10 @@ export default function DateTimeConverter() {
                         padding: '4px',
                         display: 'flex',
                         alignItems: 'center',
-                        color: copiedFormat === 'milliseconds' ? '#22c55e' : '#71717a',
+                        color:
+                          copiedFormat === 'milliseconds'
+                            ? 'var(--success)'
+                            : 'var(--muted-foreground)',
                       }}
                     >
                       {copiedFormat === 'milliseconds' ? <Check size={14} /> : <Copy size={14} />}
@@ -804,18 +829,24 @@ export default function DateTimeConverter() {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '8px 12px',
-                      backgroundColor: '#09090b',
+                      backgroundColor: 'var(--background)',
                       borderRadius: '6px',
                     }}
                   >
-                    <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '100px' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--muted-foreground)',
+                        minWidth: '100px',
+                      }}
+                    >
                       ISO 8601
                     </span>
                     <code
                       style={{
                         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
-                        color: '#f4f4f5',
+                        color: 'var(--foreground)',
                         flex: 1,
                         textAlign: 'right',
                         marginRight: '12px',
@@ -834,7 +865,8 @@ export default function DateTimeConverter() {
                         padding: '4px',
                         display: 'flex',
                         alignItems: 'center',
-                        color: copiedFormat === 'iso' ? '#22c55e' : '#71717a',
+                        color:
+                          copiedFormat === 'iso' ? 'var(--success)' : 'var(--muted-foreground)',
                       }}
                     >
                       {copiedFormat === 'iso' ? <Check size={14} /> : <Copy size={14} />}
@@ -848,18 +880,24 @@ export default function DateTimeConverter() {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '8px 12px',
-                      backgroundColor: '#09090b',
+                      backgroundColor: 'var(--background)',
                       borderRadius: '6px',
                     }}
                   >
-                    <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '100px' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--muted-foreground)',
+                        minWidth: '100px',
+                      }}
+                    >
                       Local Time
                     </span>
                     <code
                       style={{
                         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
-                        color: '#f4f4f5',
+                        color: 'var(--foreground)',
                         flex: 1,
                         textAlign: 'right',
                         marginRight: '12px',
@@ -878,7 +916,8 @@ export default function DateTimeConverter() {
                         padding: '4px',
                         display: 'flex',
                         alignItems: 'center',
-                        color: copiedFormat === 'local' ? '#22c55e' : '#71717a',
+                        color:
+                          copiedFormat === 'local' ? 'var(--success)' : 'var(--muted-foreground)',
                       }}
                     >
                       {copiedFormat === 'local' ? <Check size={14} /> : <Copy size={14} />}
@@ -892,18 +931,24 @@ export default function DateTimeConverter() {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '8px 12px',
-                      backgroundColor: '#09090b',
+                      backgroundColor: 'var(--background)',
                       borderRadius: '6px',
                     }}
                   >
-                    <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '100px' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--muted-foreground)',
+                        minWidth: '100px',
+                      }}
+                    >
                       UTC
                     </span>
                     <code
                       style={{
                         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         fontSize: '13px',
-                        color: '#f4f4f5',
+                        color: 'var(--foreground)',
                         flex: 1,
                         textAlign: 'right',
                         marginRight: '12px',
@@ -922,7 +967,8 @@ export default function DateTimeConverter() {
                         padding: '4px',
                         display: 'flex',
                         alignItems: 'center',
-                        color: copiedFormat === 'utc' ? '#22c55e' : '#71717a',
+                        color:
+                          copiedFormat === 'utc' ? 'var(--success)' : 'var(--muted-foreground)',
                       }}
                     >
                       {copiedFormat === 'utc' ? <Check size={14} /> : <Copy size={14} />}
@@ -936,17 +982,23 @@ export default function DateTimeConverter() {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '8px 12px',
-                      backgroundColor: '#09090b',
+                      backgroundColor: 'var(--background)',
                       borderRadius: '6px',
                     }}
                   >
-                    <span style={{ fontSize: '12px', color: '#a1a1aa', minWidth: '100px' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--muted-foreground)',
+                        minWidth: '100px',
+                      }}
+                    >
                       Relative
                     </span>
                     <span
                       style={{
                         fontSize: '13px',
-                        color: '#a1a1aa',
+                        color: 'var(--muted-foreground)',
                         flex: 1,
                         textAlign: 'right',
                         marginRight: '12px',
@@ -976,7 +1028,7 @@ export default function DateTimeConverter() {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 display: 'block',
                 marginBottom: '12px',
@@ -990,8 +1042,8 @@ export default function DateTimeConverter() {
             </span>
             <div
               style={{
-                backgroundColor: '#18181b',
-                border: '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
                 padding: '16px',
               }}
@@ -1004,7 +1056,7 @@ export default function DateTimeConverter() {
                   <label
                     style={{
                       fontSize: '11px',
-                      color: '#71717a',
+                      color: 'var(--muted-foreground)',
                       marginBottom: '4px',
                       display: 'block',
                     }}
@@ -1017,10 +1069,10 @@ export default function DateTimeConverter() {
                     style={{
                       width: '100%',
                       padding: '10px 12px',
-                      backgroundColor: '#09090b',
-                      border: '1px solid #27272a',
+                      backgroundColor: 'var(--background)',
+                      border: '1px solid var(--border)',
                       borderRadius: '6px',
-                      color: '#f4f4f5',
+                      color: 'var(--foreground)',
                       fontSize: '12px',
                       cursor: 'pointer',
                     }}
@@ -1046,14 +1098,17 @@ export default function DateTimeConverter() {
                   </select>
                 </div>
 
-                <ArrowRight size={20} style={{ color: '#71717a', marginTop: '16px' }} />
+                <ArrowRight
+                  size={20}
+                  style={{ color: 'var(--muted-foreground)', marginTop: '16px' }}
+                />
 
                 {/* To timezone */}
                 <div style={{ flex: 1 }}>
                   <label
                     style={{
                       fontSize: '11px',
-                      color: '#71717a',
+                      color: 'var(--muted-foreground)',
                       marginBottom: '4px',
                       display: 'block',
                     }}
@@ -1066,10 +1121,10 @@ export default function DateTimeConverter() {
                     style={{
                       width: '100%',
                       padding: '10px 12px',
-                      backgroundColor: '#09090b',
-                      border: '1px solid #27272a',
+                      backgroundColor: 'var(--background)',
+                      border: '1px solid var(--border)',
                       borderRadius: '6px',
-                      color: '#f4f4f5',
+                      color: 'var(--foreground)',
                       fontSize: '12px',
                       cursor: 'pointer',
                     }}
@@ -1118,23 +1173,35 @@ export default function DateTimeConverter() {
                     gridTemplateColumns: '1fr 1fr',
                     gap: '16px',
                     padding: '12px',
-                    backgroundColor: '#09090b',
+                    backgroundColor: 'var(--background)',
                     borderRadius: '6px',
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '11px', color: '#71717a', marginBottom: '4px' }}>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--muted-foreground)',
+                        marginBottom: '4px',
+                      }}
+                    >
                       {timezoneResult.fromTz} ({timezoneResult.fromOffset})
                     </div>
-                    <div style={{ fontSize: '13px', color: '#f4f4f5', fontWeight: 500 }}>
+                    <div style={{ fontSize: '13px', color: 'var(--foreground)', fontWeight: 500 }}>
                       {timezoneResult.from}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '11px', color: '#71717a', marginBottom: '4px' }}>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--muted-foreground)',
+                        marginBottom: '4px',
+                      }}
+                    >
                       {timezoneResult.toTz} ({timezoneResult.toOffset})
                     </div>
-                    <div style={{ fontSize: '13px', color: '#3b82f6', fontWeight: 500 }}>
+                    <div style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: 500 }}>
                       {timezoneResult.to}
                     </div>
                   </div>
@@ -1149,7 +1216,7 @@ export default function DateTimeConverter() {
               style={{
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#71717a',
+                color: 'var(--muted-foreground)',
                 textTransform: 'uppercase',
                 display: 'block',
                 marginBottom: '12px',
@@ -1163,8 +1230,8 @@ export default function DateTimeConverter() {
             </span>
             <div
               style={{
-                backgroundColor: '#18181b',
-                border: '1px solid #27272a',
+                backgroundColor: 'var(--card)',
+                border: '1px solid var(--border)',
                 borderRadius: '8px',
                 overflow: 'hidden',
               }}
@@ -1174,7 +1241,7 @@ export default function DateTimeConverter() {
                   style={{
                     textAlign: 'center',
                     padding: '24px',
-                    color: '#71717a',
+                    color: 'var(--muted-foreground)',
                     fontSize: '13px',
                   }}
                 >

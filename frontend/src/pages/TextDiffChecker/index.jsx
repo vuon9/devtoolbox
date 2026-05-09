@@ -2,17 +2,23 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Undo2, Split, Rows, Eye, Edit3 } from 'lucide-react';
 import { computeDiffResult } from './diffUtils';
+import CodeEditor from '../../components/inputs/CodeEditor';
 
 // Inline-styled components
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
@@ -39,7 +45,7 @@ function ToolTextArea({ label, value, onChange, placeholder, indicator, indicato
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#71717a',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -62,7 +68,7 @@ function ToolTextArea({ label, value, onChange, placeholder, indicator, indicato
                   indicatorColor === 'green'
                     ? 'rgba(34, 197, 94, 0.15)'
                     : 'rgba(59, 130, 246, 0.15)',
-                color: indicatorColor === 'green' ? '#22c55e' : '#3b82f6',
+                color: indicatorColor === 'green' ? 'var(--success)' : 'var(--primary)',
               }}
             >
               {indicator}
@@ -82,19 +88,19 @@ function ToolTextArea({ label, value, onChange, placeholder, indicator, indicato
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '4px',
-            color: value ? '#a1a1aa' : '#3f3f46',
+            color: value ? 'var(--muted-foreground)' : 'var(--border)',
             cursor: value ? 'pointer' : 'not-allowed',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
             if (value) {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
+              e.currentTarget.style.backgroundColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--foreground)';
             }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = value ? '#a1a1aa' : '#3f3f46';
+            e.currentTarget.style.color = value ? 'var(--muted-foreground)' : 'var(--border)';
           }}
         >
           <svg
@@ -124,10 +130,10 @@ function ToolTextArea({ label, value, onChange, placeholder, indicator, indicato
           fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
           fontSize: '14px',
           lineHeight: 1.6,
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRadius: '8px',
-          color: '#f4f4f5',
+          color: 'var(--foreground)',
           resize: 'none',
           outline: 'none',
         }}
@@ -142,10 +148,10 @@ function ToggleGroup({ options, value, onChange, size = 'default' }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: '#1c1917',
+        backgroundColor: 'var(--card)',
         borderRadius: '8px',
         padding: '4px',
-        border: '1px solid #27272a',
+        border: '1px solid var(--border)',
       }}
     >
       {options.map((option) => {
@@ -159,10 +165,10 @@ function ToggleGroup({ options, value, onChange, size = 'default' }) {
               alignItems: 'center',
               gap: '6px',
               padding: size === 'sm' ? '6px 12px' : '8px 16px',
-              backgroundColor: isActive ? '#27272a' : 'transparent',
+              backgroundColor: isActive ? 'var(--border)' : 'transparent',
               border: 'none',
               borderRadius: '6px',
-              color: isActive ? '#f4f4f5' : '#71717a',
+              color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
               fontSize: '13px',
               fontWeight: 500,
               cursor: 'pointer',
@@ -170,14 +176,14 @@ function ToggleGroup({ options, value, onChange, size = 'default' }) {
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = '#27272a';
-                e.currentTarget.style.color = '#a1a1aa';
+                e.currentTarget.style.backgroundColor = 'var(--border)';
+                e.currentTarget.style.color = 'var(--muted-foreground)';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#71717a';
+                e.currentTarget.style.color = 'var(--muted-foreground)';
               }
             }}
           >
@@ -254,17 +260,17 @@ function DiffLine({ item, showLineNum = true }) {
     unchanged: {
       backgroundColor: 'transparent',
       borderLeft: '3px solid transparent',
-      color: '#a1a1aa',
+      color: 'var(--muted-foreground)',
     },
     added: {
       backgroundColor: 'rgba(34, 197, 94, 0.15)',
-      borderLeft: '3px solid #22c55e',
-      color: '#22c55e',
+      borderLeft: '3px solid var(--success)',
+      color: 'var(--success)',
     },
     removed: {
       backgroundColor: 'rgba(239, 68, 68, 0.15)',
-      borderLeft: '3px solid #ef4444',
-      color: '#ef4444',
+      borderLeft: '3px solid var(--destructive)',
+      color: 'var(--destructive)',
     },
     gap: {
       backgroundColor: 'rgba(39, 39, 42, 0.3)',
@@ -295,7 +301,7 @@ function DiffLine({ item, showLineNum = true }) {
             minWidth: '40px',
             paddingRight: '12px',
             textAlign: 'right',
-            color: '#52525b',
+            color: 'var(--muted-foreground)',
             userSelect: 'none',
             flexShrink: 0,
           }}
@@ -350,8 +356,8 @@ function DiffSplitView({ leftLines, rightLines }) {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRight: 'none',
           borderRadius: '8px 0 0 8px',
           overflow: 'hidden',
@@ -360,11 +366,11 @@ function DiffSplitView({ leftLines, rightLines }) {
         <div
           style={{
             padding: '8px 12px',
-            borderBottom: '1px solid #27272a',
-            backgroundColor: '#09090b',
+            borderBottom: '1px solid var(--border)',
+            backgroundColor: 'var(--background)',
             fontSize: '11px',
             fontWeight: 600,
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -389,8 +395,8 @@ function DiffSplitView({ leftLines, rightLines }) {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
+          backgroundColor: 'var(--card)',
+          border: '1px solid var(--border)',
           borderRadius: '0 8px 8px 0',
           overflow: 'hidden',
         }}
@@ -398,11 +404,11 @@ function DiffSplitView({ leftLines, rightLines }) {
         <div
           style={{
             padding: '8px 12px',
-            borderBottom: '1px solid #27272a',
-            backgroundColor: '#09090b',
+            borderBottom: '1px solid var(--border)',
+            backgroundColor: 'var(--background)',
             fontSize: '11px',
             fontWeight: 600,
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -441,8 +447,8 @@ function DiffUnifiedView({ lines }) {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#18181b',
-        border: '1px solid #27272a',
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border)',
         borderRadius: '8px',
         overflow: 'hidden',
         flex: 1,
@@ -452,13 +458,15 @@ function DiffUnifiedView({ lines }) {
       <div
         style={{
           padding: '8px 12px',
-          borderBottom: '1px solid #27272a',
+          borderBottom: '1px solid var(--border)',
           display: 'flex',
           gap: '16px',
         }}
       >
-        <span style={{ fontSize: '12px', color: '#22c55e', fontWeight: 500 }}>+{stats.added}</span>
-        <span style={{ fontSize: '12px', color: '#ef4444', fontWeight: 500 }}>
+        <span style={{ fontSize: '12px', color: 'var(--success)', fontWeight: 500 }}>
+          +{stats.added}
+        </span>
+        <span style={{ fontSize: '12px', color: 'var(--destructive)', fontWeight: 500 }}>
           -{stats.removed}
         </span>
       </div>
@@ -525,14 +533,14 @@ export default function TextDiffChecker() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-        backgroundColor: '#09090b',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader
         title="Text Diff"
         description="Compare two pieces of text and visualize differences instantly. Supports line, word, and character-level diffs."
       />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
       {/* Controls */}
       <div
@@ -579,22 +587,86 @@ export default function TextDiffChecker() {
               minHeight: 0,
             }}
           >
-            <ToolTextArea
-              label="Original Text"
-              value={original}
-              onChange={(e) => setOriginal(e.target.value)}
-              placeholder="Paste original version here..."
-              indicator="Base Version"
-              indicatorColor="green"
-            />
-            <ToolTextArea
-              label="Modified Text"
-              value={modified}
-              onChange={(e) => setModified(e.target.value)}
-              placeholder="Paste modified version here..."
-              indicator="Comparison Target"
-              indicatorColor="blue"
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}
+              >
+                <label
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: 'var(--muted-foreground)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  Original Text
+                </label>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                    color: '#22c55e',
+                  }}
+                >
+                  Base Version
+                </span>
+              </div>
+              <CodeEditor
+                value={original}
+                onChange={(val) => setOriginal(val)}
+                language="plaintext"
+                placeholder="Paste original version here..."
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}
+              >
+                <label
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: 'var(--muted-foreground)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  Modified Text
+                </label>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    color: '#3b82f6',
+                  }}
+                >
+                  Comparison Target
+                </span>
+              </div>
+              <CodeEditor
+                value={modified}
+                onChange={(val) => setModified(val)}
+                language="plaintext"
+                placeholder="Paste modified version here..."
+              />
+            </div>
           </div>
         ) : (
           /* Diff mode */
