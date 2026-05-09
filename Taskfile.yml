@@ -14,6 +14,11 @@ vars:
   VITE_PORT: '{{.WAILS_VITE_PORT | default 9245}}'
 
 tasks:
+  generate:
+    summary: Regenerate Wails bindings (wails3 generate bindings)
+    cmds:
+      - wails3 generate bindings -clean=true
+
   build:
     summary: Builds the application
     cmds:

@@ -18,6 +18,14 @@ import {
   LayoutGrid,
   ChevronLeft,
   ChevronRight,
+  ArrowLeftRight,
+  Fingerprint,
+  CaseSensitive,
+  Hash,
+  Key,
+  Code2,
+  Timer,
+  FileCode,
 } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
 
@@ -30,16 +38,19 @@ const CATEGORY_ICONS = {
 };
 
 const TOOL_ICONS = {
-  'text-converter': Type,
-  'string-utilities': Type,
-  'number-converter': Binary,
+  'code-encoder': FileCode,
+  'code-encrypter': ShieldCheck,
+  'hash-generator': Fingerprint,
+  'code-converter': ArrowLeftRight,
+  'text-utilities': CaseSensitive,
+  'number-converter': Hash,
   'datetime-converter': Clock,
-  jwt: ShieldCheck,
+  jwt: Key,
   barcode: QrCode,
   'data-generator': LayoutGrid,
-  'code-formatter': Wrench,
+  'code-formatter': Code2,
   'color-converter': Palette,
-  cron: Clock,
+  cron: Timer,
   regexp: Regex,
   diff: FileDiff,
 };
@@ -127,8 +138,11 @@ export function Sidebar({ isVisible, onOpenSettings }) {
   });
 
   const tools = [
-    { id: 'text-converter', name: 'Text Converter', category: 'Text' },
-    { id: 'string-utilities', name: 'String Utilities', category: 'Text' },
+    { id: 'code-encoder', name: 'Code Encoder', category: 'Text' },
+    { id: 'code-encrypter', name: 'Code Encrypter', category: 'Security' },
+    { id: 'hash-generator', name: 'Hash Generator', category: 'Security' },
+    { id: 'code-converter', name: 'Code Converter', category: 'Developer' },
+    { id: 'text-utilities', name: 'Text Utilities', category: 'Text' },
     { id: 'number-converter', name: 'Number Converter', category: 'Data' },
     { id: 'datetime-converter', name: 'DateTime Converter', category: 'Data' },
     { id: 'jwt', name: 'JWT Debugger', category: 'Security' },
@@ -329,8 +343,11 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                     icon={TOOL_ICONS[tool.id] || Box}
                     disabled={
                       ![
-                        'text-converter',
-                        'string-utilities',
+                        'code-encoder',
+                        'code-encrypter',
+                        'hash-generator',
+                        'code-converter',
+                        'text-utilities',
                         'diff',
                         'jwt',
                         'barcode',

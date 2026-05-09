@@ -18,9 +18,48 @@ type Generator struct {
 	tmpl      *template.Template
 }
 
+// toTSType converts Go type names to TypeScript types
+func toTSType(goType string) string {
+	switch {
+	case goType == "string":
+		return "string"
+	case goType == "bool":
+		return "boolean"
+	case goType == "int" || goType == "int64" || goType == "float64" || goType == "float32":
+		return "number"
+	case strings.HasPrefix(goType, "map["):
+		return "Record<string, any>"
+	case strings.HasPrefix(goType, "[]"):
+		return "any[]"
+	case goType == "interface{}" || goType == "interface {}" || goType == "":
+		return "any"
+	case goType == "error":
+		return "string"
+	default:
+		return "any"
+	}
+}
+
+// isPrimitiveType returns true for primitive Go types that should be wrapped in { value: ... }
+func isPrimitiveType(goType string) bool {
+	switch {
+	case goType == "string", goType == "bool", goType == "int", goType == "int64", goType == "float64", goType == "float32", goType == "interface{}", goType == "interface {}", goType == "":
+		return true
+	case strings.HasPrefix(goType, "map["), strings.HasPrefix(goType, "[]"):
+		return true
+	default:
+		return false
+	}
+}
+
 // NewGenerator creates a new generator
 func NewGenerator(outputDir string) (*Generator, error) {
-	tmpl, err := template.New("typescript").Parse(typescriptTemplate)
+	funcMap := template.FuncMap{
+		"tsType":       toTSType,
+		"toKebabCase":  toKebabCase,
+		"isPrimitive":  isPrimitiveType,
+	}
+	tmpl, err := template.New("typescript").Funcs(funcMap).Parse(typescriptTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -40,46 +79,19 @@ func (g *Generator) Generate(services []Service) error {
 	os.MkdirAll(wailsDir, 0755)
 	os.MkdirAll(httpDir, 0755)
 
-	// Generate individual service files
+	// Generate individual service files (HTTP only — Wails bindings require `wails generate`)
 	for _, service := range services {
-		if err := g.generateWailsService(wailsDir, service); err != nil {
-			return err
-		}
 		if err := g.generateHTTPService(httpDir, service); err != nil {
 			return err
 		}
 	}
 
 	// Generate index files
-	if err := g.generateWailsIndex(wailsDir, services); err != nil {
-		return err
-	}
 	if err := g.generateHTTPIndex(httpDir, services); err != nil {
 		return err
 	}
 
-	// Generate unified facade
-	return g.generateUnifiedFacade(g.outputDir, services)
-}
-
-func (g *Generator) generateWailsService(dir string, service Service) error {
-	filename := filepath.Join(dir, toCamelCase(service.Name)+".ts")
-
-	data := struct {
-		ServiceName string
-		Methods     []ServiceMethod
-	}{
-		ServiceName: service.Name,
-		Methods:     service.Methods,
-	}
-
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	return g.tmpl.ExecuteTemplate(file, "wails", data)
+	return nil
 }
 
 func (g *Generator) generateHTTPService(dir string, service Service) error {
@@ -102,19 +114,6 @@ func (g *Generator) generateHTTPService(dir string, service Service) error {
 	return g.tmpl.ExecuteTemplate(file, "http", data)
 }
 
-func (g *Generator) generateWailsIndex(dir string, services []Service) error {
-	filename := filepath.Join(dir, "index.ts")
-
-	var exports []string
-	for _, svc := range services {
-		exports = append(exports, fmt.Sprintf("export * as %s from './%s';",
-			toCamelCase(svc.Name), toCamelCase(svc.Name)))
-	}
-
-	content := strings.Join(exports, "\n")
-	return os.WriteFile(filename, []byte(content), 0644)
-}
-
 func (g *Generator) generateHTTPIndex(dir string, services []Service) error {
 	filename := filepath.Join(dir, "index.ts")
 
@@ -128,41 +127,7 @@ func (g *Generator) generateHTTPIndex(dir string, services []Service) error {
 	return os.WriteFile(filename, []byte(content), 0644)
 }
 
-func (g *Generator) generateUnifiedFacade(dir string, services []Service) error {
-	filename := filepath.Join(dir, "index.ts")
 
-	var serviceImports []string
-	var serviceMappings []string
-
-	for _, svc := range services {
-		camelName := toCamelCase(svc.Name)
-		serviceImports = append(serviceImports, fmt.Sprintf(
-			"import { %s as Wails%s } from './wails/%s';\n"+
-				"import { %s as HTTP%s } from './http/%s';",
-			svc.Name, svc.Name, camelName,
-			svc.Name, svc.Name, camelName))
-
-		serviceMappings = append(serviceMappings, fmt.Sprintf(
-			"export const %s = isWails() ? Wails%s : HTTP%s;",
-			camelName, svc.Name, svc.Name))
-	}
-
-	content := fmt.Sprintf(`// Auto-generated unified service facade
-// Detects runtime environment and uses appropriate implementation
-
-const isWails = () => {
-  return typeof window !== 'undefined' && 
-         window.runtime && 
-         window.runtime.EventsOn !== undefined;
-};
-
-%s
-
-%s
-`, strings.Join(serviceImports, "\n"), strings.Join(serviceMappings, "\n"))
-
-	return os.WriteFile(filename, []byte(content), 0644)
-}
 
 // toCamelCase converts PascalCase to camelCase
 func toCamelCase(s string) string {
@@ -170,4 +135,25 @@ func toCamelCase(s string) string {
 		return s
 	}
 	return strings.ToLower(s[:1]) + s[1:]
+}
+
+// toKebabCase converts PascalCase to kebab-case
+func toKebabCase(s string) string {
+	var result strings.Builder
+	var prevUpper bool
+
+	for i, r := range s {
+		isUpper := r >= 'A' && r <= 'Z'
+
+		if isUpper && i > 0 {
+			nextIsLower := i+1 < len(s) && s[i+1] >= 'a' && s[i+1] <= 'z'
+			if !prevUpper || nextIsLower {
+				result.WriteRune('-')
+			}
+		}
+
+		result.WriteRune(r | 0x20) // to lower
+		prevUpper = isUpper
+	}
+	return result.String()
 }

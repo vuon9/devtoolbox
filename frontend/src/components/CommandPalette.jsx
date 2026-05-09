@@ -15,22 +15,33 @@ import {
   Regex,
   FileDiff,
   LayoutGrid,
+  ArrowLeftRight,
+  Fingerprint,
+  CaseSensitive,
+  Hash,
+  Key,
+  Code2,
+  Timer,
+  FileCode,
 } from 'lucide-react';
 import { Events } from '@wailsio/runtime';
 import './CommandPalette.css';
 
 // Icon mapping matching the sidebar
 const TOOL_ICONS = {
-  'text-converter': Type,
-  'string-utilities': Type,
-  'number-converter': Binary,
+  'code-encoder': FileCode,
+  'code-encrypter': ShieldCheck,
+  'hash-generator': Fingerprint,
+  'code-converter': ArrowLeftRight,
+  'text-utilities': CaseSensitive,
+  'number-converter': Hash,
   'datetime-converter': Clock,
-  jwt: ShieldCheck,
+  jwt: Key,
   barcode: QrCode,
   'data-generator': LayoutGrid,
-  'code-formatter': Wrench,
+  'code-formatter': Code2,
   'color-converter': Palette,
-  cron: Clock,
+  cron: Timer,
   regexp: Regex,
   diff: FileDiff,
 };
@@ -74,70 +85,70 @@ const COMMANDS = [
     path: '/tool/code-formatter?format=css',
   },
 
-  // Text Converter - Encoding
+  // Code Encoder presets
   {
-    id: 'converter-base64',
-    label: 'Text Converter > Base64',
-    path: '/tool/text-converter?category=Encode%20-%20Decode&method=Base64',
+    id: 'encoder-base64',
+    label: 'Code Encoder > Base64',
+    path: '/tool/code-encoder',
   },
   {
-    id: 'converter-url',
-    label: 'Text Converter > URL Encode',
-    path: '/tool/text-converter?category=Encode%20-%20Decode&method=URL',
+    id: 'encoder-url',
+    label: 'Code Encoder > URL Encode',
+    path: '/tool/code-encoder',
   },
   {
-    id: 'converter-hex',
-    label: 'Text Converter > Hex',
-    path: '/tool/text-converter?category=Encode%20-%20Decode&method=Base16%20(Hex)',
+    id: 'encoder-hex',
+    label: 'Code Encoder > Hex',
+    path: '/tool/code-encoder',
   },
   {
-    id: 'converter-html',
-    label: 'Text Converter > HTML Entities',
-    path: '/tool/text-converter?category=Encode%20-%20Decode&method=HTML%20Entities',
-  },
-
-  // Text Converter - Hashing
-  {
-    id: 'converter-md5',
-    label: 'Text Converter > MD5',
-    path: '/tool/text-converter?category=Hash&method=MD5',
-  },
-  {
-    id: 'converter-sha256',
-    label: 'Text Converter > SHA-256',
-    path: '/tool/text-converter?category=Hash&method=SHA-256',
-  },
-  {
-    id: 'converter-all-hashes',
-    label: 'Text Converter > All Hashes',
-    path: '/tool/text-converter?category=Hash&method=All',
+    id: 'encoder-html',
+    label: 'Code Encoder > HTML Entities',
+    path: '/tool/code-encoder',
   },
 
-  // Text Converter - Conversions
+  // Hash Generator presets
+  {
+    id: 'hash-md5',
+    label: 'Hash Generator > MD5',
+    path: '/tool/hash-generator',
+  },
+  {
+    id: 'hash-sha256',
+    label: 'Hash Generator > SHA-256',
+    path: '/tool/hash-generator',
+  },
+  {
+    id: 'hash-all',
+    label: 'Hash Generator > All Hashes',
+    path: '/tool/hash-generator',
+  },
+
+  // Code Converter presets
   {
     id: 'converter-json-yaml',
-    label: 'Text Converter > JSON ↔ YAML',
-    path: '/tool/text-converter?category=Convert&method=JSON%20%E2%86%94%20YAML',
+    label: 'Code Converter > JSON ↔ YAML',
+    path: '/tool/code-converter',
   },
   {
     id: 'converter-json-xml',
-    label: 'Text Converter > JSON ↔ XML',
-    path: '/tool/text-converter?category=Convert&method=JSON%20%E2%86%94%20XML',
+    label: 'Code Converter > JSON ↔ XML',
+    path: '/tool/code-converter',
   },
   {
     id: 'converter-markdown-html',
-    label: 'Text Converter > Markdown ↔ HTML',
-    path: '/tool/text-converter?category=Convert&method=Markdown%20%E2%86%94%20HTML',
+    label: 'Code Converter > Markdown ↔ HTML',
+    path: '/tool/code-converter',
   },
   {
     id: 'converter-csv-tsv',
-    label: 'Text Converter > CSV ↔ TSV',
-    path: '/tool/text-converter?category=Convert&method=CSV%20%E2%86%94%20TSV',
+    label: 'Code Converter > CSV ↔ TSV',
+    path: '/tool/code-converter',
   },
   {
     id: 'converter-case-swap',
-    label: 'Text Converter > Case Swap',
-    path: '/tool/text-converter?category=Convert&method=Case%20Swapping',
+    label: 'Code Converter > Case Swap',
+    path: '/tool/code-converter',
   },
 
   // Direct navigation
@@ -148,13 +159,16 @@ const COMMANDS = [
   { id: 'diff', label: 'Text Diff Checker', path: '/tool/diff' },
   { id: 'number', label: 'Number Converter', path: '/tool/number-converter' },
   { id: 'color', label: 'Color Converter', path: '/tool/color-converter' },
-  { id: 'string', label: 'String Utilities', path: '/tool/string-utilities' },
   {
     id: 'datetime',
     label: 'DateTime Converter',
     path: '/tool/datetime-converter',
   },
-  { id: 'text', label: 'Text Converter', path: '/tool/text-converter' },
+  { id: 'encoder', label: 'Code Encoder', path: '/tool/code-encoder' },
+  { id: 'encrypter', label: 'Code Encrypter', path: '/tool/code-encrypter' },
+  { id: 'hash', label: 'Hash Generator', path: '/tool/hash-generator' },
+  { id: 'converter', label: 'Code Converter', path: '/tool/code-converter' },
+  { id: 'textutils', label: 'Text Utilities', path: '/tool/text-utilities' },
 
   // Data Generator
   {

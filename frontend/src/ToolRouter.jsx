@@ -8,16 +8,22 @@ import RegExpTester from './pages/RegExpTester';
 import CronJobParser from './pages/CronJobParser';
 import TextDiffChecker from './pages/TextDiffChecker';
 import NumberConverter from './pages/NumberConverter';
-import TextConverter from './pages/TextConverter';
-import StringUtilities from './pages/StringUtilities';
+import CodeEncrypter from './pages/CodeEncrypter';
+import CodeEncoder from './pages/CodeEncoder';
+import HashGenerator from './pages/HashGenerator';
+import CodeConverter from './pages/CodeConverter';
+import TextUtilities from './pages/TextUtilities';
 import BarcodeGenerator from './pages/BarcodeGenerator';
 import DataGenerator from './pages/DataGenerator';
 import CodeFormatter from './pages/CodeFormatter';
 import ColorConverter from './pages/ColorConverter';
 
 const toolComponents = {
-  'text-converter': TextConverter,
-  'string-utilities': StringUtilities,
+  'code-encrypter': CodeEncrypter,
+  'code-encoder': CodeEncoder,
+  'hash-generator': HashGenerator,
+  'code-converter': CodeConverter,
+  'text-utilities': TextUtilities,
   'datetime-converter': DateTimeConverter,
   jwt: JwtDebugger,
   barcode: BarcodeGenerator,

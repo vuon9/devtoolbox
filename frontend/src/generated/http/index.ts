@@ -1,6 +1,13 @@
+export * as codeConverterService from './codeConverterService';
+export * as textUtilitiesService from './textUtilitiesService';
+export * as encoderService from './encoderService';
+export * as hashGeneratorService from './hashGeneratorService';
+export * as jWTService from './jWTService';
+export * as numberConverterService from './numberConverterService';
 export * as barcodeService from './barcodeService';
 export * as codeFormatterService from './codeFormatterService';
-export * as conversionService from './conversionService';
 export * as dataGeneratorService from './dataGeneratorService';
 export * as dateTimeService from './dateTimeService';
-export * as jWTService from './jWTService';
+export * as spotlightService from './spotlightService';
+export * as encrypterService from './encrypterService';
+export * as settingsService from './settingsService';

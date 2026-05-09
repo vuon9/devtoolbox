@@ -52,32 +52,27 @@ Here are principles and guidelines for developing tools and agents in this proje
 
 ## Development workflow
 
-### Running the app
+### Desktop app
 
-| Mode | Command |
+| Command | What |
+|---------|------|
+| `task run` | Full build + run (generates bindings, builds frontend, runs) |
+| `task dev` | Dev mode with hot reload & auto-binding generation |
+| `go generate ./... && go run .` | Quick dev — generates bindings then runs |
+| `task generate` | Regenerate bindings only (`wails3 generate bindings`) |
+
+### Web mode (backend + frontend + tests)
+
+| Step | Command |
 |------|---------|
-| Desktop app (GUI) | `go run .` or `task dev` |
-| Server-only (no GUI) | `go run . --server-only` |
-| Custom port | `go run . --server-only --port 8081` (default 8081) |
-| Hot reload (server-only) | `task dev:server` |
-| Custom port with hot reload | `PORT=3000 task dev:server` |
+| Start backend | `go run . --server-only` (default :8081) |
+| Start frontend | `cd frontend && bun run dev` (default :3000) |
+| Run E2E tests | `cd frontend && bun run test:e2e` |
+| Run backend tests | `go test ./internal/...` |
+| Run frontend tests | `cd frontend && bun test` |
+| Format frontend | `cd frontend && bun run format` |
 
-### Running tests
-
-| Scope | Command |
-|-------|---------|
-| All Go tests | `go test ./...` |
-| Go tests (verbose) | `go test -v ./...` |
-| Frontend unit tests | `cd frontend && npm test` |
-| Frontend E2E (Playwright) | Start backend + frontend first, then `cd frontend && npm run test:e2e` |
-| E2E with UI mode | Start backend + frontend first, then `cd frontend && npm run test:e2e:ui` |
-
-### Linting & formatting
-
-| Scope | Command |
-|-------|---------|
-| Frontend format check | `cd frontend && npm run format:check` |
-| Frontend format fix | `cd frontend && npm run format` |
+> **Tip:** `task run:server` builds & runs the combined binary (frontend embedded in backend, port 8081).
 
 ## Final note
 - This document is a concise set of rules and intent. For implementation details and examples, read the code and shared UI helpers; the code is the authoritative source.

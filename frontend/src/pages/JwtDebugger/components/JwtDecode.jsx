@@ -6,7 +6,7 @@ import SignatureVerification from './SignatureVerification';
 import { Button } from '../../../components/ui/Button';
 import { FileText } from 'lucide-react';
 import { EXAMPLE_SECRET } from '../jwtUtils';
-import { Encode } from '../../../services/api';
+import { Encode } from '../../../services/jwtService';
 
 export default function JwtDecode({ state, dispatch, layout, verifySignature }) {
   // Tab change handlers

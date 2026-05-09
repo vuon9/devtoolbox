@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Copy, Check, Dice5 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { Convert as ConvertNumber } from '../../generated/http/numberConverterService';
+import { numberConverterAPI } from './api/numberConverterAPI';
 
 function debounce(func, wait) {
   let timeout;
@@ -496,7 +496,7 @@ export default function NumberConverter() {
     }
 
     try {
-      const response = await ConvertNumber({
+      const response = await numberConverterAPI.Convert({
         value: value,
         base: currentBase,
       });

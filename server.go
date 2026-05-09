@@ -9,7 +9,11 @@ import (
 func StartHTTPServer(port int) {
 	// Create services
 	jwtSvc := service.NewJWTService(nil)
-	conversionSvc := service.NewConversionService(nil)
+	encrypterSvc := service.NewEncrypterService(nil)
+	encoderSvc := service.NewEncoderService(nil)
+	hashGenSvc := service.NewHashGeneratorService(nil)
+	codeConvSvc := service.NewCodeConverterService(nil)
+	textUtilsSvc := service.NewTextUtilitiesService(nil)
 	barcodeSvc := service.NewBarcodeService(nil)
 	dataGenSvc := service.NewDataGeneratorService(nil)
 	codeFmtSvc := service.NewCodeFormatterService(nil)
@@ -19,7 +23,11 @@ func StartHTTPServer(port int) {
 	// Create server and register services
 	server := router.NewServer()
 	server.Register(jwtSvc)
-	server.Register(conversionSvc)
+	server.Register(encrypterSvc)
+	server.Register(encoderSvc)
+	server.Register(hashGenSvc)
+	server.Register(codeConvSvc)
+	server.Register(textUtilsSvc)
 	server.Register(barcodeSvc)
 	server.Register(dataGenSvc)
 	server.Register(codeFmtSvc)
