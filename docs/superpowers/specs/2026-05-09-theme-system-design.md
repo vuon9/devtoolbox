@@ -15,6 +15,8 @@ The app currently hardcodes dark-only colors for both the UI chrome and code syn
 4. Users can pick from a curated gallery of popular themes (One Dark, Dracula, Nord, etc.).
 5. Existing code infrastructure (CodeMirror 6, CSS variables) is reused, not rewritten.
 6. Carbon Design System is fully removed.
+7. All tool pages migrate from plain `<textarea>` to CodeMirror-based `CodeEditor`/`HighlightedCode`.
+8. Prism.js is removed entirely (replaced by CodeMirror in CodeFormatter).
 
 ## Non-Goals
 
@@ -28,9 +30,15 @@ The app currently hardcodes dark-only colors for both the UI chrome and code syn
 ### Data Flow
 
 ```
-Theme JSON (bundled .js files)
+Theme definitions (bundled .js files)
   → ThemeProvider (React Context)
-    → App UI: sets CSS custom properties on :root / .dark
+    → UI mode: localStorage key "themeMode"
+        "system"            → auto-detect OS preference
+        "github-dark"       → built-in dark (Radix Colors via CSS)
+        "github-light"      → built-in light (Radix Colors via CSS)
+        "one-dark-pro"      → gallery theme (JS override CSS vars)
+        ...
+    → App UI: sets CSS custom properties on :root
       → Tailwind v4 @theme references CSS vars
         → Components use bg-background, text-foreground, etc.
     → Syntax: generates CodeMirror HighlightStyle
@@ -44,24 +52,40 @@ Each theme is a JS object with two sections — `colors` for the UI and `tokenCo
 ```js
 {
   name: "One Dark Pro",
-  type: "dark",           // "dark" | "light"
+  type: "dark",                // "dark" | "light"
   colors: {
-    background: "#282c34",
-    foreground: "#abb2bf",
-    card: "#2c323c",
-    "card-foreground": "#abb2bf",
-    primary: "#61afef",
-    "primary-foreground": "#ffffff",
-    muted: "#3b4048",
-    "muted-foreground": "#818896",
-    destructive: "#e06c75",
-    border: "#3b4048",
-    surface: "#21252b",
-    input: "#3b4048",
-    ring: "#61afef",
-    accent: "#61afef",
-    "accent-hover": "#528bff",
-    // plus sidebar, titlebar specific tokens
+    // Core surface (cover ~85% of hardcoded colors)
+    "background":              "#282c34",
+    "foreground":              "#abb2bf",
+    "card":                    "#2c323c",
+    "card-foreground":         "#abb2bf",
+    "popover":                 "#2c323c",
+    "popover-foreground":      "#abb2bf",
+    "primary":                 "#61afef",
+    "primary-foreground":      "#ffffff",
+    "secondary":               "#3b4048",
+    "secondary-foreground":    "#abb2bf",
+    "muted":                   "#3b4048",
+    "muted-foreground":        "#818896",
+    "accent":                  "#61afef",
+    "accent-foreground":       "#ffffff",
+    "destructive":             "#e06c75",
+    "destructive-foreground":  "#ffffff",
+    "border":                  "#3b4048",
+    "input":                   "#3b4048",
+    "ring":                    "#61afef",
+
+    // Extended surface (cover remaining 15%)
+    "sidebar-background":      "#21252b",
+    "sidebar-foreground":      "#abb2bf",
+    "sidebar-accent":          "#61afef",
+    "titlebar-background":     "#21252b",
+    "scrollbar-thumb":         "#3b4048",
+    "scrollbar-track":         "#21252b",
+    "success":                 "#98c379",
+    "success-foreground":      "#ffffff",
+    "warning":                 "#e5c07b",
+    "warning-foreground":      "#282c34",
   },
   tokenColors: [
     { scope: "keyword",       color: "#c678dd" },
@@ -110,22 +134,45 @@ Radix Colors provides automatic light/dark switching via `.dark` class:
 
 The `.dark` class is already handled by Radix's dark CSS files — same variable name resolves to dark value when the class is present.
 
-Tailwind v4 `@theme` block maps these to utilities:
+Tailwind v4 `@theme` block maps all tokens to utilities:
 
 ```css
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
-  --color-border: var(--border);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
 }
 ```
 
-### Theme Engine — Runtime Override for Custom Themes
+Sidebar/Titlebar/Scrollbar tokens use `var(--sidebar-background)` etc. directly in their respective component CSS, not through Tailwind utilities (they're component-specific, not general-purpose).
 
-When a gallery theme is active, ThemeProvider applies its `colors` directly:
+### Theme Engine — Runtime Override for Gallery Themes
+
+When a gallery theme is active, ThemeProvider applies its `colors` directly. The single `localStorage.themeMode` key stores both mode and theme selection:
+
+| Stored value | Behavior |
+|---|---|
+| `"system"` | Auto-detect `prefers-color-scheme`, apply matching built-in theme |
+| `"github-dark"` / `"github-light"` | Built-in: `.dark` class toggle, CSS does the rest |
+| `"one-dark-pro"` / any gallery name | JS override of CSS vars on `:root` |
 
 ```js
 function applyTheme(theme) {
@@ -136,7 +183,16 @@ function applyTheme(theme) {
 }
 ```
 
-This overrides the CSS-defined variables. When switching back to a built-in theme, we clear the inline styles and let CSS take over.
+When switching back to a built-in theme, clear the inline style overrides and let CSS take over via `.dark` class:
+
+```js
+function clearThemeOverrides() {
+  const root = document.documentElement;
+  // Tokens set by gallery themes are removed; CSS defaults take over
+  THEME_TOKENS.forEach(token => root.style.removeProperty(`--${token}`));
+}
+```</parameter>
+
 
 ### CodeMirror Syntax Bridge
 
@@ -181,29 +237,28 @@ function buildEditorExtensions(theme) {
 
 ### React State — ThemeProvider
 
+Uses a single localStorage key `themeMode`. No separate "mode" vs "theme" — the stored value IS the selection.
+
 ```jsx
 // types
-type Mode = "system" | "light" | "dark";
-type ThemeName = "github-dark" | "github-light" | "one-dark-pro" | "dracula" | ...;
+type ThemeMode = "system" | "github-dark" | "github-light" | "one-dark-pro" | "dracula" | ...;
 
 interface ThemeContextValue {
-  mode: Mode;
-  setMode: (m: Mode) => void;
-  activeTheme: ThemeName;
-  setTheme: (t: ThemeName) => void;
-  actualType: "light" | "dark";    // resolved after system detection
-  themeData: ThemeDefinition;       // current theme object
-  allThemes: ThemeDefinition[];     // available themes
+  themeMode: ThemeMode;
+  setThemeMode: (t: ThemeMode) => void;
+  actualTheme: ThemeDefinition;       // resolved theme object
+  actualType: "light" | "dark";       // resolved after system/gallery type
+  allThemes: ThemeDefinition[];       // available themes
 }
 ```
 
 **State flow:**
-1. User picks theme in Settings → `setTheme("one-dark-pro")`
-2. ThemeProvider loads bundled theme JSON
-3. Applies UI colors to `document.documentElement.style.*`
-4. Generates CodeMirror HighlightStyle, caches in context
-5. CodeEditor/HighlightedCode re-render with new extensions
-6. Preference saved to `localStorage.theme` and `localStorage.themeMode`
+1. User picks theme in Settings → `setThemeMode("one-dark-pro")`
+2. ThemeProvider saves to `localStorage.themeMode`, triggers effect
+3. If gallery theme → loads bundled JSON, applies CSS vars via JS
+4. If built-in → toggles `.dark` class on `<html>`, clears JS CSS vars
+5. Generates CodeMirror HighlightStyle for the resolved theme, caches in context
+6. CodeEditor/HighlightedCode re-render with new extensions
 
 **System mode detection:**
 ```jsx
@@ -219,12 +274,12 @@ useEffect(() => {
 
 ```
 frontend/src/
-├── App.jsx                                    // Replace inline styles, consume ThemeProvider
+├── App.jsx                                    // Replace inline styles, wrap ThemeProvider
 ├── globals.css                                // Add @theme block, Radix Colors imports
 ├── index.scss                                 // DELETE (Carbon removal)
 ├── style.css                                  // DELETE (legacy CSS)
-├── App.css                                    // DELETE (legacy CSS, inline Carbon references)
-├── spotlight.css                              // UPDATE: remove forced dark
+├── App.css                                    // DELETE (legacy CSS)
+├── spotlight.css                              // UPDATE: remove forced dark values
 │
 ├── context/
 │   └── ThemeContext.jsx                       // NEW: ThemeProvider, useTheme hook
@@ -242,33 +297,69 @@ frontend/src/
 │
 ├── components/
 │   ├── inputs/
-│   │   ├── carbonCodeMirrorTheme.js          // REPLACE: dynamic theme via context
+│   │   ├── carbonCodeMirrorTheme.js          // DELETE — replaced by dynamic theme
 │   │   ├── CodeEditor.jsx                    // UPDATE: consume theme from context
 │   │   ├── HighlightedCode.jsx               // UPDATE: consume theme from context
 │   │   └── EditorToggle.jsx                  // (unchanged)
-│   ├── SettingsModal.jsx                     // UPDATE: theme picker UI
+│   ├── SettingsModal.jsx                     // REWRITE: Carbon → Radix (Dialog + RadioGroup + Checkbox)
 │   └── CommandPalette.jsx                    // UPDATE: theme switch commands
+│
+├── pages/
+│   ├── CodeFormatter/
+│   │   └── index.jsx                         // REWRITE: Prism → HighlightedCode
+│   ├── CodeEncoder/
+│   │   └── index.jsx                         // MIGRATE: textarea → CodeEditor
+│   ├── CodeEncrypter/
+│   │   └── index.jsx                         // MIGRATE: textarea → CodeEditor
+│   ├── HashGenerator/
+│   │   └── index.jsx                         // MIGRATE: textarea → CodeEditor
+│   ├── CodeConverter/
+│   │   └── index.jsx                         // MIGRATE: textarea → CodeEditor
+│   ├── TextUtilities/
+│   │   └── index.jsx                         // MIGRATE: textarea → CodeEditor
+│   ├── JwtDebugger/
+│   │   └── index.jsx                         // MIGRATE: textarea → CodeEditor, Carbon icons → Lucide
+│   ├── NumberConverter/
+│   │   └── index.jsx, ConversionCard.jsx     // MIGRATE: Carbon TextInput → input.jsx
+│   └── ...                                   // other pages: textarea → ToolTextArea (theme-aware)
+│
+├── dependencies                              // REMOVE: @carbon/react, @carbon/styles, @carbon/icons-react, prismjs
+│                                              // ADD: @radix-ui/react-dialog, @radix-ui/react-radio-group
 ```
 
 ### Carbon Removal — Files to Delete
 
 | File | Replacement |
 |------|-------------|
-| `src/index.scss` | inline styles removed or moved to globals.css |
-| `src/App.css` | all styles migrated to Tailwind classes |
-| `src/style.css` | tokens replaced by Radix Colors CSS vars |
-| `package.json` deps | `@carbon/react`, `@carbon/styles`, `@carbon/icons-react` removed |
+| `src/index.scss` | SQL keyword styles → `globals.css`. Carbon imports → removed. |
+| `src/App.css` | All styles migrated to Tailwind classes |
+| `src/style.css` | Tokens replaced by Radix Colors CSS vars |
+| `package.json` deps | `@carbon/react`, `@carbon/styles`, `@carbon/icons-react`, `prismjs` → removed |
+| | `@radix-ui/react-dialog`, `@radix-ui/react-radio-group` → added |
+
+### Component Rebuilds — Hotspots
+
+| Component | Action |
+|-----------|--------|
+| `SettingsModal.jsx` | Rewritten: Carbon `ComposedModal` → Radix `Dialog`, `RadioButtonGroup` → Radix `RadioGroup`, `@carbon/icons-react` → `lucide-react` |
+| `ConversionCard.jsx` | Carbon `TextInput` → `src/components/ui/input.jsx` |
+| `StatusMessages.jsx` | Carbon `CheckmarkFilled`/`CloseFilled` → Lucide `Check`/`X` |
 
 ### Component Migration — Hardcoded Colors → Tailwind Tokens
 
-Current hardcoded inline colors that must be replaced:
+All inline `backgroundColor` and `color` values across the app are replaced with Tailwind semantic tokens. Key files:
 
-- `App.jsx` root div: `backgroundColor: '#09090b'` → `bg-background`, `color: '#fafafa'` → `text-foreground`
-- `App.jsx` `<main>`: `backgroundColor: '#09090b'` → `bg-background`
-- `Sidebar.jsx` background `#18181b` → `bg-card`, border `#27272a` → `border-border`
-- `Button.jsx` inline colors → Tailwind `bg-primary`, `bg-muted`, etc.
-- `prism-tomorrow.css` in CodeFormatter → generate prism stylesheet from theme tokenColors
-- `spotlight.css` forced `#18181b` → use CSS variable
+| File | Replace | with |
+|------|---------|------|
+| `App.jsx` root div | `backgroundColor: '#09090b'` + `color: '#fafafa'` | `bg-background text-foreground` (Tailwind classes, no inline styles) |
+| `App.jsx` `<main>` | `backgroundColor: '#09090b'` | `bg-background` |
+| `Sidebar.jsx` | `#18181b` bg / `#27272a` border | `var(--sidebar-background)` / `border-border` |
+| `TitleBar.jsx` | `#18181b` bg | `var(--titlebar-background)` |
+| `Button.jsx` | inline hex colors | `bg-primary`, `bg-muted`, `bg-secondary` variants |
+| `spotlight.css` | forced `#18181b` | `var(--background)` |
+| `globals.css` scrollbar | `#27272a` / transparent | `var(--scrollbar-thumb)` / `var(--scrollbar-track)` |
+
+All 15+ tool pages: `<textarea>` → `CodeEditor` (if editable) or `HighlightedCode` (if read-only output). EditorToggle controls syntax highlighting per-tool, persisted in `localStorage`.
 
 ### Theme Gallery — Bundled Themes
 
@@ -291,14 +382,15 @@ Each is a JS file exporting the full theme object. Colors are extracted from off
 
 | Case | Behavior |
 |------|----------|
-| First visit, no localStorage | System mode → `matchMedia` detects OS preference → built-in theme |
-| User picks a theme | Saved to localStorage, applied on next load |
-| System preference changes | If mode=system, theme switches automatically between built-in dark/light |
-| User picks custom theme (e.g. Dracula) | Custom themes override system/light/dark mode — you can be in "light" mode with a dark theme |
-| Switching back to built-in | Clear inline style overrides, CSS takes over |
-| CodeMirror not yet initialized | Theme context caches the last highlight style → applied on mount |
-| Theme JSON missing a color | Fall back to default value (white/dark) — no crash |
-| Carbon removed, component still uses Carbon class | Caught by visual QA — replace with Tailwind equivalent |
+| First visit, no localStorage | Defaults to `"system"` → `matchMedia` detects OS → apply built-in theme |
+| User picks built-in (GitHub Dark/Light) | Save to localStorage. Toggle `.dark` class on `<html>`. Clear any JS CSS vars. |
+| User picks gallery theme (Dracula) | Save to localStorage. Apply all colors via JS `style.setProperty()`. Ignore `.dark` class. |
+| System preference changes | If localStorage is `"system"`, auto-switch between built-in themes. If a gallery theme, no auto-switch. |
+| Switching from gallery back to built-in | Clear all inline CSS var overrides. Let `.dark` class and Radix CSS take back over. |
+| CodeMirror not yet initialized | Context caches `HighlightStyle` → applied on CodeEditor mount |
+| Theme JSON missing a color token | Skip missing token. A fallback CSS var value (`inherit`/`initial`) prevents crash. |
+| Tool page with plain textarea | Textarea inherits background/foreground from CSS vars. No syntax highlighting until migrated to CodeEditor. |
+| Page migrated to CodeEditor | Receives theme's `HighlightStyle` via context. Both app chrome + code syntax match. |
 
 ### Out of Scope (for v1)
 
@@ -311,7 +403,11 @@ Each is a JS file exporting the full theme object. Colors are extracted from off
 
 1. **Unit:** ThemeProvider renders children, applies CSS vars, generates HighlightStyle.
 2. **Unit:** scope-mapping covers all VS Code scopes used in bundled themes.
-3. **Visual:** Each bundled theme renders correct colors in CodeEditor on both input and output panes.
-4. **Edge:** System mode toggles automatically when OS preference changes.
-5. **Edge:** Missing token color in theme JSON doesn't crash CodeMirror.
-6. **UX:** Light/dark/system radio buttons update the app immediately.
+3. **Visual:** Each bundled theme renders correct colors in CodeEditor input + output panes.
+4. **Visual:** Each tool page migrates correctly from textarea to CodeEditor/HighlightedCode.
+5. **Edge:** System mode auto-toggles when OS preference changes.
+6. **Edge:** Switching from gallery theme → built-in clears JS overrides, `.dark` class works.
+7. **Edge:** Missing token color in theme JSON doesn't crash CodeMirror.
+8. **Edge:** Carbon-removed components (SettingsModal, ConversionCard, StatusMessages) render correctly.
+9. **UX:** Theme picker in Settings updates app + all open CodeMirror editors immediately.
+10. **UX:** EditorToggle persists per-tool preference across sessions.
