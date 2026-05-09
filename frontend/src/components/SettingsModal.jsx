@@ -6,9 +6,16 @@ import { Settings, Check } from 'lucide-react';
 import { GetCloseMinimizesToTray, SetCloseMinimizesToTray } from '../generated';
 import { useTheme } from '../context/ThemeContext';
 import { BUILT_IN_THEME_KEYS } from '../theme';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from './ui/select';
 
 export function SettingsModal({ isOpen, onClose }) {
-  const { themeMode, setThemeMode, allThemes } = useTheme();
+  const { themeMode, setThemeMode, themeName, setThemeName, allThemes } = useTheme();
   const [closeMinimizesToTray, setCloseMinimizesToTray] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,11 +34,16 @@ export function SettingsModal({ isOpen, onClose }) {
     }
   };
 
-  const galleryThemes = allThemes.filter(t => !t.isBuiltIn);
-  const isBuiltInActive = themeMode === 'system' || BUILT_IN_THEME_KEYS.includes(themeMode);
+  const galleryThemes = allThemes.filter((t) => !t.isBuiltIn);
+  const isBuiltInActive = BUILT_IN_THEME_KEYS.includes(themeName);
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog.Root
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50" />
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card text-card-foreground border border-border rounded-lg shadow-lg p-6 w-full max-w-md">
@@ -43,17 +55,8 @@ export function SettingsModal({ isOpen, onClose }) {
           <div className="mb-6">
             <label className="text-sm font-medium mb-2 block text-foreground">Appearance</label>
             <RadioGroup.Root
-              value={
-                themeMode === 'system' ? 'system' :
-                themeMode === 'github-dark' ? 'dark' :
-                themeMode === 'github-light' ? 'light' :
-                'system'
-              }
-              onValueChange={(val) => {
-                if (val === 'system') setThemeMode('system');
-                else if (val === 'dark') setThemeMode('github-dark');
-                else if (val === 'light') setThemeMode('github-light');
-              }}
+              value={themeMode}
+              onValueChange={setThemeMode}
               className="flex gap-4"
             >
               {['system', 'dark', 'light'].map((mode) => (
@@ -72,23 +75,24 @@ export function SettingsModal({ isOpen, onClose }) {
 
           <div className="mb-6">
             <label className="text-sm font-medium mb-2 block text-foreground">Theme</label>
-            <select
-              value={!isBuiltInActive ? themeMode : 'default'}
-              onChange={(e) => {
-                if (e.target.value !== 'default') setThemeMode(e.target.value);
-              }}
-              className="w-full bg-input text-foreground border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            <Select
+              value={themeName}
+              onValueChange={setThemeName}
             >
-              <option value="default" disabled>
-                {isBuiltInActive ? 'Select a gallery theme...' : 'Switch to built-in'}
-              </option>
-              {galleryThemes.map((t) => {
-                const key = t.name.toLowerCase().replace(/\s+/g, '-');
-                return (
-                  <option key={key} value={key}>{t.name}</option>
-                );
-              })}
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a theme..." />
+              </SelectTrigger>
+              <SelectContent>
+                {allThemes.map((t) => {
+                  const key = t.name.toLowerCase().replace(/\s+/g, '-');
+                  return (
+                    <SelectItem key={key} value={key}>
+                      {t.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="mb-6">
@@ -115,12 +119,11 @@ export function SettingsModal({ isOpen, onClose }) {
                   <Check className="w-3 h-3 text-primary-foreground" />
                 </Checkbox.Indicator>
               </Checkbox.Root>
-              <span className="text-sm text-muted-foreground">
-                Close button minimizes to tray
-              </span>
+              <span className="text-sm text-muted-foreground">Close button minimizes to tray</span>
             </label>
             <p className="text-xs text-muted-foreground mt-1 ml-6">
-              When enabled, clicking the close button will minimize the app to the system tray instead of quitting.
+              When enabled, clicking the close button will minimize the app to the system tray
+              instead of quitting.
             </p>
           </div>
 

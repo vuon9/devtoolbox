@@ -18,10 +18,11 @@ const TOOLS = [
   { slug: 'diff',               name: 'Diff' },
 ];
 
-async function setThemeMode(page, mode) {
-  await page.evaluate((m) => {
-    localStorage.setItem('themeMode', m);
-  }, mode);
+async function setTheme(page, mode, name) {
+  await page.evaluate(({ m, n }) => {
+    localStorage.setItem('dt-mode', m);
+    localStorage.setItem('dt-name', n);
+  }, { m: mode, n: name });
 }
 
 test.describe('Every page — dark/light rendering', () => {
@@ -29,11 +30,10 @@ test.describe('Every page — dark/light rendering', () => {
     test(`${tool.name} — light mode`, async ({ page }) => {
       await page.goto(`/tool/${tool.slug}`);
       await page.waitForLoadState('networkidle');
-      await setThemeMode(page, 'github-light');
+      await setTheme(page, 'light', 'github-light');
       await page.goto(`/tool/${tool.slug}`);
       await page.waitForLoadState('networkidle');
 
-      // Check dark class is NOT present
       const hasDark = await page.evaluate(() =>
         document.documentElement.classList.contains('dark')
       );
@@ -49,7 +49,7 @@ test.describe('Every page — dark/light rendering', () => {
     test(`${tool.name} — dark mode`, async ({ page }) => {
       await page.goto(`/tool/${tool.slug}`);
       await page.waitForLoadState('networkidle');
-      await setThemeMode(page, 'github-dark');
+      await setTheme(page, 'dark', 'github-dark');
       await page.goto(`/tool/${tool.slug}`);
       await page.waitForLoadState('networkidle');
 

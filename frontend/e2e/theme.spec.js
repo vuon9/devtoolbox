@@ -5,8 +5,25 @@ test.describe('Theme System', () => {
     await page.goto('/tool/code-encoder');
   });
 
+  async function setDarkMode(page) {
+    await page.evaluate(() => {
+      localStorage.setItem('dt-mode', 'dark');
+      localStorage.setItem('dt-name', 'github-dark');
+    });
+  }
+
+  async function setLightMode(page) {
+    await page.evaluate(() => {
+      localStorage.setItem('dt-mode', 'light');
+      localStorage.setItem('dt-name', 'github-light');
+    });
+  }
+
   test('default — system mode', async ({ page }) => {
-    await page.evaluate(() => localStorage.removeItem('themeMode'));
+    await page.evaluate(() => {
+      localStorage.removeItem('dt-mode');
+      localStorage.removeItem('dt-name');
+    });
     await page.reload();
     await page.goto('/tool/code-encoder');
 
@@ -23,6 +40,7 @@ test.describe('Theme System', () => {
   test('switch to light mode', async ({ page }) => {
     await page.getByRole('button', { name: 'Settings' }).first().click();
     await page.getByText('light', { exact: true }).click();
+    await page.waitForTimeout(100);
 
     const hasDark = await page.evaluate(() => document.documentElement.classList.contains('dark'));
     expect(hasDark).toBe(false);
@@ -31,6 +49,7 @@ test.describe('Theme System', () => {
   test('switch to dark mode', async ({ page }) => {
     await page.getByRole('button', { name: 'Settings' }).first().click();
     await page.getByText('dark', { exact: true }).click();
+    await page.waitForTimeout(100);
 
     const hasDark = await page.evaluate(() => document.documentElement.classList.contains('dark'));
     expect(hasDark).toBe(true);
@@ -39,6 +58,7 @@ test.describe('Theme System', () => {
   test('theme persists across reload', async ({ page }) => {
     await page.getByRole('button', { name: 'Settings' }).first().click();
     await page.getByText('dark', { exact: true }).click();
+    await page.waitForTimeout(100);
 
     await page.reload();
     await page.goto('/tool/code-encoder');
@@ -47,36 +67,35 @@ test.describe('Theme System', () => {
     expect(hasDark).toBe(true);
   });
 
+  async function pickGalleryTheme(page, themeName) {
+    await page.getByRole('dialog').getByRole('combobox').click();
+    await page.getByRole('option', { name: themeName }).click();
+  }
+
   test('theme dropdown contains gallery themes', async ({ page }) => {
     await page.getByRole('button', { name: 'Settings' }).first().click();
 
-    // Scope select to the dialog content (Radix Portal renders at end of body)
-    const select = page.getByRole('dialog').locator('select');
-    await expect(select).toBeVisible();
+    await page.getByRole('dialog').getByRole('combobox').click();
 
-    const options = await select.locator('option').evaluateAll(list =>
-      list.map(o => ({ value: o.value, text: o.textContent }))
-    );
-
+    // allThemes includes built-in + gallery
+    const optionTexts = await page.getByRole('option').allTextContents();
     const expected = [
-      'One Dark Pro',
-      'Dracula',
-      'Nord',
-      'Catppuccin Mocha',
-      'Solarized Dark',
-      'Solarized Light',
+      'GitHub Dark', 'GitHub Light',
+      'One Dark Pro', 'Dracula', 'Nord',
+      'Catppuccin Mocha', 'Solarized Dark', 'Solarized Light',
     ];
     for (const theme of expected) {
-      expect(options.some((o) => o.text.includes(theme))).toBeTruthy();
+      expect(optionTexts.some((t) => t.includes(theme))).toBeTruthy();
     }
   });
 
   test('select gallery theme applies colors', async ({ page }) => {
-    await page.getByRole('button', { name: 'Settings' }).first().click();
+    await setDarkMode(page);
+    await page.reload();
+    await page.goto('/tool/code-encoder');
 
-    const select = page.getByRole('dialog').locator('select');
-    await expect(select.locator('option[value="one-dark-pro"]')).toBeAttached();
-    await select.selectOption('one-dark-pro');
+    await page.getByRole('button', { name: 'Settings' }).first().click();
+    await pickGalleryTheme(page, 'One Dark Pro');
     await page.waitForTimeout(100);
 
     const bg = await page.evaluate(() =>
@@ -86,11 +105,12 @@ test.describe('Theme System', () => {
   });
 
   test('gallery theme persists across reload', async ({ page }) => {
-    await page.getByRole('button', { name: 'Settings' }).first().click();
+    await setDarkMode(page);
+    await page.reload();
+    await page.goto('/tool/code-encoder');
 
-    const select = page.getByRole('dialog').locator('select');
-    await expect(select.locator('option[value="dracula"]')).toBeAttached();
-    await select.selectOption('dracula');
+    await page.getByRole('button', { name: 'Settings' }).first().click();
+    await pickGalleryTheme(page, 'Dracula');
     await page.waitForTimeout(100);
 
     await page.reload();
@@ -103,14 +123,17 @@ test.describe('Theme System', () => {
   });
 
   test('switch from gallery to built-in clears overrides', async ({ page }) => {
-    await page.getByRole('button', { name: 'Settings' }).first().click();
+    await setDarkMode(page);
+    await page.reload();
+    await page.goto('/tool/code-encoder');
 
-    const select = page.getByRole('dialog').locator('select');
-    await expect(select.locator('option[value="nord"]')).toBeAttached();
-    await select.selectOption('nord');
+    await page.getByRole('button', { name: 'Settings' }).first().click();
+    await pickGalleryTheme(page, 'Nord');
     await page.waitForTimeout(100);
 
-    await page.getByText('light', { exact: true }).click();
+    // Select a built-in theme from the dropdown (clears JS overrides)
+    await page.getByRole('dialog').getByRole('combobox').click();
+    await page.getByRole('option', { name: 'GitHub Light' }).click();
     await page.waitForTimeout(100);
 
     const inlineOverride = await page.evaluate(() =>

@@ -2,7 +2,40 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
 import { SCOPE_TO_TAG } from '../theme/scope-mapping';
-import { THEME_TOKENS, resolveTheme, allThemes, BUILT_IN_THEME_KEYS } from '../theme';
+import { THEME_TOKENS, getThemeByKey, resolveActualType, allThemes, BUILT_IN_THEME_KEYS, loadUserThemes } from '../theme';
+
+const DEFAULT_MODE = 'system';
+const DEFAULT_NAME = 'github-dark';
+
+function migrateLegacyKey() {
+  const old = localStorage.getItem('themeMode');
+  if (old && !localStorage.getItem('dt-mode')) {
+    if (old === 'system') {
+      localStorage.setItem('dt-mode', 'system');
+      localStorage.setItem('dt-name', 'github-dark');
+    } else if (old === 'github-dark') {
+      localStorage.setItem('dt-mode', 'dark');
+      localStorage.setItem('dt-name', 'github-dark');
+    } else if (old === 'github-light') {
+      localStorage.setItem('dt-mode', 'light');
+      localStorage.setItem('dt-name', 'github-light');
+    } else {
+      localStorage.setItem('dt-mode', 'system');
+      localStorage.setItem('dt-name', old);
+    }
+    localStorage.removeItem('themeMode');
+  }
+}
+
+function readMode() {
+  migrateLegacyKey();
+  return localStorage.getItem('dt-mode') || DEFAULT_MODE;
+}
+
+function readName() {
+  migrateLegacyKey();
+  return localStorage.getItem('dt-name') || DEFAULT_NAME;
+}
 
 const ThemeContext = createContext(null);
 
@@ -12,24 +45,38 @@ export function useTheme() {
   return ctx;
 }
 
-function buildHighlightStyle(theme) {
-  if (!theme?.tokenColors?.length) return null;
+function buildHighlightStyle(tokenColors) {
+  if (!tokenColors?.length) return null;
   return HighlightStyle.define(
-    theme.tokenColors.map(tc => ({
+    tokenColors.map((tc) => ({
       tag: SCOPE_TO_TAG[tc.scope] || tc.scope,
       color: tc.color,
     }))
   );
 }
 
+function resolvePalette(theme, actualType) {
+  if (theme.colors?.dark && theme.colors?.light) {
+    return {
+      colors: theme.colors[actualType],
+      tokenColors: theme.tokenColors?.[actualType] || theme.tokenColors,
+    };
+  }
+  return { colors: theme.colors, tokenColors: theme.tokenColors };
+}
+
 export function ThemeProvider({ children }) {
-  const [themeMode, setThemeModeState] = useState(() => {
-    return localStorage.getItem('themeMode') || 'system';
-  });
+  const [themeMode, setThemeModeState] = useState(readMode);
+  const [themeName, setThemeNameState] = useState(readName);
 
   const setThemeMode = useCallback((mode) => {
-    localStorage.setItem('themeMode', mode);
+    localStorage.setItem('dt-mode', mode);
     setThemeModeState(mode);
+  }, []);
+
+  const setThemeName = useCallback((name) => {
+    localStorage.setItem('dt-name', name);
+    setThemeNameState(name);
   }, []);
 
   const [systemPrefersDark, setSystemPrefersDark] = useState(() => {
@@ -44,37 +91,34 @@ export function ThemeProvider({ children }) {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  const resolved = useMemo(() => {
-    if (themeMode === 'system') {
-      return {
-        theme: systemPrefersDark ? allThemes[0] : allThemes[1],
-        actualType: systemPrefersDark ? 'dark' : 'light',
-      };
-    }
-    return resolveTheme(themeMode);
-  }, [themeMode, systemPrefersDark]);
+  // Load user themes from ~/.config/devtoolbox/themes/
+  useEffect(() => { loadUserThemes(); }, []);
 
-  const { theme } = resolved;
+  const actualType = useMemo(() => resolveActualType(themeMode, systemPrefersDark), [themeMode, systemPrefersDark]);
+
+  const theme = useMemo(() => getThemeByKey(themeName) || getThemeByKey(DEFAULT_NAME), [themeName]);
+
+  const palette = useMemo(() => resolvePalette(theme, actualType), [theme, actualType]);
 
   useEffect(() => {
     const root = document.documentElement;
 
     if (theme.isBuiltIn) {
-      THEME_TOKENS.forEach(token => root.style.removeProperty(`--${token}`));
-      if (theme.type === 'dark') {
+      THEME_TOKENS.forEach((token) => root.style.removeProperty(`--${token}`));
+      if (actualType === 'dark') {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
       }
     } else {
       root.classList.remove('dark');
-      for (const [token, value] of Object.entries(theme.colors)) {
+      for (const [token, value] of Object.entries(palette.colors)) {
         root.style.setProperty(`--${token}`, value);
       }
     }
-  }, [theme]);
+  }, [theme, actualType, palette]);
 
-  const highlightStyle = useMemo(() => buildHighlightStyle(theme), [theme]);
+  const highlightStyle = useMemo(() => buildHighlightStyle(palette.tokenColors), [palette.tokenColors]);
 
   const editorExtensions = useMemo(() => {
     if (!highlightStyle) return [];
@@ -92,17 +136,11 @@ export function ThemeProvider({ children }) {
   }, [highlightStyle]);
 
   const value = useMemo(() => ({
-    themeMode,
-    setThemeMode,
-    theme,
-    actualType: resolved.actualType,
-    editorExtensions,
-    allThemes,
-  }), [themeMode, setThemeMode, theme, resolved.actualType, editorExtensions]);
+    themeMode, setThemeMode,
+    themeName, setThemeName,
+    theme, actualType,
+    editorExtensions, allThemes,
+  }), [themeMode, setThemeMode, themeName, setThemeName, theme, actualType, editorExtensions]);
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
