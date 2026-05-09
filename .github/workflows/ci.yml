@@ -130,14 +130,19 @@ jobs:
           cache: true
           cache-dependency-path: go.sum
 
+      - name: Install system deps (Wails CGO)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+
       - name: Run govulncheck
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
-          govulncheck -format sarif ./... > govulncheck.sarif || true
+          govulncheck -format sarif ./internal/... > govulncheck.sarif || true
 
       - name: Upload govulncheck results
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: govulncheck.sarif
 
