@@ -8,3 +8,4 @@ src/generated/
 bindings/
 test-results/
 playwright-report/
+dist-test
