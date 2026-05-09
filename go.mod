@@ -9,7 +9,7 @@ require (
 	github.com/gin-contrib/cors v1.7.6
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/gomarkdown/markdown v0.0.0-20260417124207-7d523f7318df
-	github.com/itchyny/gojq v0.12.18
+	github.com/itchyny/gojq v0.12.19
 	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.11.1
@@ -73,7 +73,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/itchyny/timefmt-go v0.1.7 // indirect
+	github.com/itchyny/timefmt-go v0.1.8 // indirect
 	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.1 // indirect
 	github.com/leaanthony/u v1.1.1 // indirect
