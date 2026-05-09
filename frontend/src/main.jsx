@@ -1,8 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import './globals.css'; // Tailwind CSS styles
-import './index.scss'; // Carbon Design System styles (transitioning)
+import './globals.css';
+import './index.scss';
+import { ThemeProvider } from './context/ThemeContext';
 import App from './App';
 
 const container = document.getElementById('root');
@@ -11,8 +12,10 @@ const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ThemeProvider>
   </React.StrictMode>
 );
