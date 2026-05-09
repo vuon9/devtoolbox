@@ -1,5 +1,7 @@
 # DevToolbox
 
+[![CI](https://github.com/vuon9/devtoolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/vuon9/devtoolbox/actions/workflows/ci.yml) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/vuon9/devtoolbox)
+
 > [Download for macOS](https://github.com/vuon9/devtoolbox/releases) · [Windows](https://github.com/vuon9/devtoolbox/releases) · [Linux](https://github.com/vuon9/devtoolbox/releases)
 
 A single app for 45+ common development tasks. Works offline, zero setup.
