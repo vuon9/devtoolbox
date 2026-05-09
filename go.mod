@@ -1,6 +1,6 @@
 module devtoolbox
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/boombuler/barcode v1.1.0
@@ -15,8 +15,8 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.68
 	golang.design/x/hotkey v0.4.1
-	golang.org/x/crypto v0.47.0
-	golang.org/x/net v0.49.0
+	golang.org/x/crypto v0.51.0
+	golang.org/x/net v0.53.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -83,8 +83,8 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/samber/lo v1.52.0 // indirect
 	github.com/wailsapp/go-webview2 v1.0.23 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 )
 
 // replace github.com/wailsapp/wails/v2 v2.11.0 => /Users/vuong/.gvm/pkgsets/go1.24/global/pkg/mod
