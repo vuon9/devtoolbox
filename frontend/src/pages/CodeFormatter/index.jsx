@@ -41,11 +41,18 @@ function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
       <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em',         color: 'var(--foreground)' }}
+        style={{
+          fontSize: '24px',
+          fontWeight: 600,
+          letterSpacing: '-0.025em',
+          color: 'var(--foreground)',
+        }}
       >
         {title}
       </h2>
-      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px', fontSize: '14px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px', fontSize: '14px' }}>
+        {description}
+      </p>
       <hr style={{ marginTop: '16px', border: 'none', borderTop: '1px solid var(--border)' }} />
     </div>
   );
@@ -389,7 +396,7 @@ export default function CodeFormatter() {
             style={{
               fontSize: '11px',
               fontWeight: 600,
-            color: 'var(--muted-foreground)',
+              color: 'var(--muted-foreground)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}

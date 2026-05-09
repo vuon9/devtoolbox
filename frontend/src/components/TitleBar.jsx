@@ -104,7 +104,7 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
               alignItems: 'center',
               marginLeft: '8px',
               paddingLeft: '8px',
-               borderLeft: '1px solid var(--border)',
+              borderLeft: '1px solid var(--border)',
               gap: '2px',
             }}
           >

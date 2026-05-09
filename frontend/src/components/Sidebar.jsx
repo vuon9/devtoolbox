@@ -265,8 +265,12 @@ export function Sidebar({ isVisible, onOpenSettings }) {
               }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--ring)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--ring)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }}
             />
           </div>
         </div>

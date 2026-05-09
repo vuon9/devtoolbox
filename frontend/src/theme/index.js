@@ -8,28 +8,43 @@ import solarizedLight from './solarized-light.json';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
-const BUNDLED_GALLERY = [
-  oneDarkPro, dracula, nord, catppuccinMocha, solarizedDark, solarizedLight,
-];
+const BUNDLED_GALLERY = [oneDarkPro, dracula, nord, catppuccinMocha, solarizedDark, solarizedLight];
 
 export const THEME_TOKENS = [
-  'background', 'foreground', 'card', 'card-foreground',
-  'popover', 'popover-foreground', 'primary', 'primary-foreground',
-  'secondary', 'secondary-foreground', 'muted', 'muted-foreground',
-  'accent', 'accent-foreground', 'destructive', 'destructive-foreground',
-  'border', 'input', 'ring', 'success', 'success-foreground',
-  'warning', 'warning-foreground',
-  'sidebar-background', 'sidebar-foreground', 'sidebar-accent',
-  'titlebar-background', 'scrollbar-thumb', 'scrollbar-track',
+  'background',
+  'foreground',
+  'card',
+  'card-foreground',
+  'popover',
+  'popover-foreground',
+  'primary',
+  'primary-foreground',
+  'secondary',
+  'secondary-foreground',
+  'muted',
+  'muted-foreground',
+  'accent',
+  'accent-foreground',
+  'destructive',
+  'destructive-foreground',
+  'border',
+  'input',
+  'ring',
+  'success',
+  'success-foreground',
+  'warning',
+  'warning-foreground',
+  'sidebar-background',
+  'sidebar-foreground',
+  'sidebar-accent',
+  'titlebar-background',
+  'scrollbar-thumb',
+  'scrollbar-track',
 ];
 
 export const BUILT_IN_THEME_KEYS = ['github-dark', 'github-light'];
 
-export const allThemes = [
-  builtins['github-dark'],
-  builtins['github-light'],
-  ...BUNDLED_GALLERY,
-];
+export const allThemes = [builtins['github-dark'], builtins['github-light'], ...BUNDLED_GALLERY];
 
 function makeKey(name) {
   return name.toLowerCase().replace(/\s+/g, '-');
@@ -41,7 +56,7 @@ async function fetchUserThemes() {
     if (!res.ok) return [];
     const data = await res.json();
     if (!Array.isArray(data)) return [];
-    return data.filter(t => t && t.name);
+    return data.filter((t) => t && t.name);
   } catch {
     return [];
   }
@@ -54,7 +69,7 @@ export async function loadUserThemes() {
   userThemesLoaded = true;
 
   const userThemes = await fetchUserThemes();
-  const bundledNames = new Set(allThemes.map(t => t.name));
+  const bundledNames = new Set(allThemes.map((t) => t.name));
 
   for (const ut of userThemes) {
     if (!bundledNames.has(ut.name)) {

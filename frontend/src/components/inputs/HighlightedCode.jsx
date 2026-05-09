@@ -7,27 +7,36 @@ import ToolCopyButton from './ToolCopyButton';
 const languageLoaders = {
   json: () => import('@codemirror/lang-json').then((m) => m.json()),
   javascript: () => import('@codemirror/lang-javascript').then((m) => m.javascript()),
-  typescript: () => import('@codemirror/lang-javascript').then((m) => m.javascript({ typescript: true })),
+  typescript: () =>
+    import('@codemirror/lang-javascript').then((m) => m.javascript({ typescript: true })),
   html: () => import('@codemirror/lang-html').then((m) => m.html()),
   xml: () => import('@codemirror/lang-xml').then((m) => m.xml()),
   css: () => import('@codemirror/lang-css').then((m) => m.css()),
   sql: () => import('@codemirror/lang-sql').then((m) => m.sql()),
   java: () => import('@codemirror/lang-java').then((m) => m.java()),
-  swift: () => import('@codemirror/legacy-modes/mode/swift').then((m) =>
-    import('@codemirror/language').then((lang) => lang.StreamLanguage.define(m.swift))
-  ),
+  swift: () =>
+    import('@codemirror/legacy-modes/mode/swift').then((m) =>
+      import('@codemirror/language').then((lang) => lang.StreamLanguage.define(m.swift))
+    ),
 };
 
 async function loadLanguageExtension(language) {
   const loader = languageLoaders[language?.toLowerCase()];
   if (!loader) return null;
-  try { return await loader(); }
-  catch { return null; }
+  try {
+    return await loader();
+  } catch {
+    return null;
+  }
 }
 
 export default function HighlightedCode({
-  code, language, copyable = true,
-  showLineNumbers = false, className = '', label,
+  code,
+  language,
+  copyable = true,
+  showLineNumbers = false,
+  className = '',
+  label,
 }) {
   const containerRef = useRef(null);
   const viewRef = useRef(null);
@@ -39,17 +48,25 @@ export default function HighlightedCode({
 
   const { editorExtensions } = useTheme();
 
-  useEffect(() => { codeRef.current = code; languageRef.current = language; showLineNumbersRef.current = showLineNumbers; });
+  useEffect(() => {
+    codeRef.current = code;
+    languageRef.current = language;
+    showLineNumbersRef.current = showLineNumbers;
+  });
 
   // Destroy and re-create on theme or code change
   useEffect(() => {
-    if (viewRef.current) { viewRef.current.destroy(); viewRef.current = null; }
+    if (viewRef.current) {
+      viewRef.current.destroy();
+      viewRef.current = null;
+    }
     if (!containerRef.current || !codeRef.current) return;
     let isCancelled = false;
 
     const initEditor = async () => {
       try {
-        setIsLoading(true); setLoadError(false);
+        setIsLoading(true);
+        setLoadError(false);
         const langExtension = await loadLanguageExtension(languageRef.current);
         if (isCancelled) return;
 
@@ -66,15 +83,31 @@ export default function HighlightedCode({
 
         const state = EditorState.create({ doc: codeRef.current, extensions });
         const view = new EditorView({ state, parent: containerRef.current });
-        if (!isCancelled) { viewRef.current = view; setIsLoading(false); }
-        else view.destroy();
-      } catch { if (!isCancelled) { setLoadError(true); setIsLoading(false); } }
+        if (!isCancelled) {
+          viewRef.current = view;
+          setIsLoading(false);
+        } else view.destroy();
+      } catch {
+        if (!isCancelled) {
+          setLoadError(true);
+          setIsLoading(false);
+        }
+      }
     };
     initEditor();
-    return () => { isCancelled = true; };
+    return () => {
+      isCancelled = true;
+    };
   }, [editorExtensions]);
 
-  useEffect(() => { return () => { if (viewRef.current) { viewRef.current.destroy(); viewRef.current = null; } }; }, []);
+  useEffect(() => {
+    return () => {
+      if (viewRef.current) {
+        viewRef.current.destroy();
+        viewRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const view = viewRef.current;
@@ -86,17 +119,29 @@ export default function HighlightedCode({
   }, [code]);
 
   const containerStyle = {
-    display: 'flex', flexDirection: 'column', height: '100%', minHeight: '60px',
-    border: '1px solid var(--border)', backgroundColor: 'var(--background)', position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    minHeight: '60px',
+    border: '1px solid var(--border)',
+    backgroundColor: 'var(--background)',
+    position: 'relative',
   };
   const headerStyle = {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '0.5rem 1rem', borderBottom: '1px solid var(--border)',
-    backgroundColor: 'var(--card)', minHeight: '40px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0.5rem 1rem',
+    borderBottom: '1px solid var(--border)',
+    backgroundColor: 'var(--card)',
+    minHeight: '40px',
   };
   const labelStyle = {
-    fontSize: '0.75rem', fontWeight: 400, textTransform: 'uppercase',
-    letterSpacing: '0.32px', color: 'var(--muted-foreground)',
+    fontSize: '0.75rem',
+    fontWeight: 400,
+    textTransform: 'uppercase',
+    letterSpacing: '0.32px',
+    color: 'var(--muted-foreground)',
   };
   const editorContainerStyle = { flex: 1, overflow: 'auto', position: 'relative', minHeight: 0 };
 
@@ -110,7 +155,18 @@ export default function HighlightedCode({
           </div>
         )}
         <div style={{ flex: 1, padding: '1rem', overflow: 'auto' }}>
-          <pre style={{ fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace", fontSize: '0.875rem', margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--foreground)' }}>{code}</pre>
+          <pre
+            style={{
+              fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+              fontSize: '0.875rem',
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-all',
+              color: 'var(--foreground)',
+            }}
+          >
+            {code}
+          </pre>
         </div>
       </div>
     );

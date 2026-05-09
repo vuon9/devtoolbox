@@ -8,28 +8,40 @@ import { createSQLKeywordHighlighter } from './sqlHighlighter';
 const languageLoaders = {
   json: () => import('@codemirror/lang-json').then((m) => m.json()),
   javascript: () => import('@codemirror/lang-javascript').then((m) => m.javascript()),
-  typescript: () => import('@codemirror/lang-javascript').then((m) => m.javascript({ typescript: true })),
+  typescript: () =>
+    import('@codemirror/lang-javascript').then((m) => m.javascript({ typescript: true })),
   html: () => import('@codemirror/lang-html').then((m) => m.html()),
   xml: () => import('@codemirror/lang-xml').then((m) => m.xml()),
   css: () => import('@codemirror/lang-css').then((m) => m.css()),
   sql: () => import('@codemirror/lang-sql').then((m) => m.sql()),
   java: () => import('@codemirror/lang-java').then((m) => m.java()),
-  swift: () => import('@codemirror/legacy-modes/mode/swift').then((m) =>
-    import('@codemirror/language').then((lang) => lang.StreamLanguage.define(m.swift))
-  ),
+  swift: () =>
+    import('@codemirror/legacy-modes/mode/swift').then((m) =>
+      import('@codemirror/language').then((lang) => lang.StreamLanguage.define(m.swift))
+    ),
 };
 
 async function loadLanguageExtension(language) {
   const loader = languageLoaders[language?.toLowerCase()];
   if (!loader) return null;
-  try { return await loader(); }
-  catch { return null; }
+  try {
+    return await loader();
+  } catch {
+    return null;
+  }
 }
 
 export default function CodeEditor({
-  value = '', onChange, language, highlight = true,
-  readOnly = false, placeholder, label,
-  showLineNumbers = false, className = '', style = {},
+  value = '',
+  onChange,
+  language,
+  highlight = true,
+  readOnly = false,
+  placeholder,
+  label,
+  showLineNumbers = false,
+  className = '',
+  style = {},
 }) {
   const containerRef = useRef(null);
   const viewRef = useRef(null);
@@ -53,12 +65,16 @@ export default function CodeEditor({
 
   // Destroy existing view on theme change, then re-init
   useEffect(() => {
-    if (viewRef.current) { viewRef.current.destroy(); viewRef.current = null; }
+    if (viewRef.current) {
+      viewRef.current.destroy();
+      viewRef.current = null;
+    }
     if (!highlight || !containerRef.current) return;
     let isCancelled = false;
     const initEditor = async () => {
       try {
-        setIsLoading(true); setLoadError(false);
+        setIsLoading(true);
+        setLoadError(false);
         const langExtension = await loadLanguageExtension(languageRef.current);
         if (isCancelled) return;
 
@@ -66,26 +82,52 @@ export default function CodeEditor({
           ...editorExtensions,
           keymap.of(defaultKeymap),
           EditorView.updateListener.of((update) => {
-            if (update.docChanged && onChangeRef.current) onChangeRef.current(update.state.doc.toString());
+            if (update.docChanged && onChangeRef.current)
+              onChangeRef.current(update.state.doc.toString());
           }),
         ];
-        if (readOnlyRef.current) { extensions.push(EditorState.readOnly.of(true)); extensions.push(EditorView.editable.of(false)); }
+        if (readOnlyRef.current) {
+          extensions.push(EditorState.readOnly.of(true));
+          extensions.push(EditorView.editable.of(false));
+        }
         if (langExtension) extensions.push(langExtension);
-        if (languageRef.current?.toLowerCase() === 'sql') extensions.push(createSQLKeywordHighlighter());
+        if (languageRef.current?.toLowerCase() === 'sql')
+          extensions.push(createSQLKeywordHighlighter());
         if (showLineNumbersRef.current) extensions.push(lineNumbers());
 
         const state = EditorState.create({ doc: valueRef.current, extensions });
         const view = new EditorView({ state, parent: containerRef.current });
-        if (!isCancelled) { viewRef.current = view; setIsLoading(false); }
-        else view.destroy();
-      } catch { if (!isCancelled) { setLoadError(true); setIsLoading(false); } }
+        if (!isCancelled) {
+          viewRef.current = view;
+          setIsLoading(false);
+        } else view.destroy();
+      } catch {
+        if (!isCancelled) {
+          setLoadError(true);
+          setIsLoading(false);
+        }
+      }
     };
     initEditor();
-    return () => { isCancelled = true; };
+    return () => {
+      isCancelled = true;
+    };
   }, [highlight, editorExtensions]);
 
-  useEffect(() => { return () => { if (viewRef.current) { viewRef.current.destroy(); viewRef.current = null; } }; }, []);
-  useEffect(() => { if (!highlight && viewRef.current) { viewRef.current.destroy(); viewRef.current = null; } }, [highlight]);
+  useEffect(() => {
+    return () => {
+      if (viewRef.current) {
+        viewRef.current.destroy();
+        viewRef.current = null;
+      }
+    };
+  }, []);
+  useEffect(() => {
+    if (!highlight && viewRef.current) {
+      viewRef.current.destroy();
+      viewRef.current = null;
+    }
+  }, [highlight]);
 
   useEffect(() => {
     const view = viewRef.current;
@@ -97,26 +139,52 @@ export default function CodeEditor({
   }, [value]);
 
   const containerStyle = {
-    display: 'flex', flexDirection: 'column', height: '100%', minHeight: '120px',
-    border: '1px solid var(--border)', backgroundColor: 'var(--background)',
-    borderRadius: '8px', overflow: 'hidden', ...style,
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    minHeight: '120px',
+    border: '1px solid var(--border)',
+    backgroundColor: 'var(--background)',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    ...style,
   };
   const labelStyle = {
-    fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em',
-    color: 'var(--muted-foreground)', padding: '8px 12px',
-    borderBottom: '1px solid var(--border)', backgroundColor: 'var(--card)', flexShrink: 0,
+    fontSize: '12px',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    color: 'var(--muted-foreground)',
+    padding: '8px 12px',
+    borderBottom: '1px solid var(--border)',
+    backgroundColor: 'var(--card)',
+    flexShrink: 0,
   };
 
   if (!highlight || loadError) {
     return (
       <div className={className} style={containerStyle}>
         {label && <div style={labelStyle}>{label}</div>}
-        <textarea value={value} onChange={(e) => onChange?.(e.target.value)} readOnly={readOnly} placeholder={placeholder}
+        <textarea
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          readOnly={readOnly}
+          placeholder={placeholder}
           style={{
-            flex: 1, width: '100%', height: '100%', padding: '12px',
-            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace", fontSize: '14px', lineHeight: 1.5,
-            backgroundColor: 'transparent', border: 'none', color: 'var(--foreground)', resize: 'none', outline: 'none',
-          }} />
+            flex: 1,
+            width: '100%',
+            height: '100%',
+            padding: '12px',
+            fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+            fontSize: '14px',
+            lineHeight: 1.5,
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: 'var(--foreground)',
+            resize: 'none',
+            outline: 'none',
+          }}
+        />
       </div>
     );
   }
@@ -124,8 +192,24 @@ export default function CodeEditor({
   return (
     <div className={className} style={containerStyle}>
       {label && <div style={labelStyle}>{label}</div>}
-      <div style={{ flex: 1, overflow: 'auto', position: 'relative', minHeight: 0 }} ref={containerRef} />
-      {isLoading && <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--muted-foreground)', fontSize: '14px' }}>Loading editor...</div>}
+      <div
+        style={{ flex: 1, overflow: 'auto', position: 'relative', minHeight: 0 }}
+        ref={containerRef}
+      />
+      {isLoading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            color: 'var(--muted-foreground)',
+            fontSize: '14px',
+          }}
+        >
+          Loading editor...
+        </div>
+      )}
     </div>
   );
 }

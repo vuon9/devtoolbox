@@ -1,28 +1,31 @@
 import { test, expect } from '@playwright/test';
 
 const TOOLS = [
-  { slug: 'code-encoder',       name: 'Code Encoder' },
-  { slug: 'code-encrypter',     name: 'Code Encrypter' },
-  { slug: 'hash-generator',     name: 'Hash Generator' },
-  { slug: 'code-converter',     name: 'Code Converter' },
-  { slug: 'text-utilities',     name: 'Text Utilities' },
-  { slug: 'number-converter',   name: 'Number Converter' },
+  { slug: 'code-encoder', name: 'Code Encoder' },
+  { slug: 'code-encrypter', name: 'Code Encrypter' },
+  { slug: 'hash-generator', name: 'Hash Generator' },
+  { slug: 'code-converter', name: 'Code Converter' },
+  { slug: 'text-utilities', name: 'Text Utilities' },
+  { slug: 'number-converter', name: 'Number Converter' },
   { slug: 'datetime-converter', name: 'DateTime Converter' },
-  { slug: 'jwt',                name: 'JWT Debugger' },
-  { slug: 'barcode',            name: 'Barcode' },
-  { slug: 'data-generator',     name: 'Data Generator' },
-  { slug: 'code-formatter',     name: 'Code Formatter' },
-  { slug: 'color-converter',    name: 'Color Converter' },
-  { slug: 'cron',               name: 'Cron' },
-  { slug: 'regexp',             name: 'RegExp' },
-  { slug: 'diff',               name: 'Diff' },
+  { slug: 'jwt', name: 'JWT Debugger' },
+  { slug: 'barcode', name: 'Barcode' },
+  { slug: 'data-generator', name: 'Data Generator' },
+  { slug: 'code-formatter', name: 'Code Formatter' },
+  { slug: 'color-converter', name: 'Color Converter' },
+  { slug: 'cron', name: 'Cron' },
+  { slug: 'regexp', name: 'RegExp' },
+  { slug: 'diff', name: 'Diff' },
 ];
 
 async function setTheme(page, mode, name) {
-  await page.evaluate(({ m, n }) => {
-    localStorage.setItem('dt-mode', m);
-    localStorage.setItem('dt-name', n);
-  }, { m: mode, n: name });
+  await page.evaluate(
+    ({ m, n }) => {
+      localStorage.setItem('dt-mode', m);
+      localStorage.setItem('dt-name', n);
+    },
+    { m: mode, n: name }
+  );
 }
 
 test.describe('Every page — dark/light rendering', () => {

@@ -102,10 +102,12 @@ export function Button({
       onMouseEnter={(e) => {
         if (disabled) return;
         if (variant === 'secondary' || variant === 'outline') {
-          e.currentTarget.style.backgroundColor = variant === 'secondary' ? 'var(--border)' : 'var(--muted)';
+          e.currentTarget.style.backgroundColor =
+            variant === 'secondary' ? 'var(--border)' : 'var(--muted)';
           e.currentTarget.style.color = 'var(--foreground)';
         } else if (variant === 'danger') {
-          e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--destructive) 10%, transparent)';
+          e.currentTarget.style.backgroundColor =
+            'color-mix(in srgb, var(--destructive) 10%, transparent)';
         } else {
           e.currentTarget.style.backgroundColor = 'var(--primary)';
         }

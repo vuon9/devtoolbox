@@ -36,7 +36,9 @@ function App() {
     } catch (err) {
       console.error('[App] Failed to register navigation listener:', err);
     }
-    return () => { if (unsubscribe) unsubscribe(); };
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [navigate]);
 
   return (
@@ -59,10 +61,7 @@ function App() {
         </main>
       </div>
 
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={closeSettings}
-      />
+      <SettingsModal isOpen={isSettingsOpen} onClose={closeSettings} />
     </div>
   );
 }

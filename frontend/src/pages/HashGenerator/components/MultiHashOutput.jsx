@@ -19,12 +19,18 @@ export default function MultiHashOutput({ value, error }) {
   try {
     data = typeof value === 'string' ? JSON.parse(value) : value;
   } catch {
-    return <div style={{ color: 'var(--muted-foreground)', padding: '12px', fontSize: '13px' }}>{value}</div>;
+    return (
+      <div style={{ color: 'var(--muted-foreground)', padding: '12px', fontSize: '13px' }}>
+        {value}
+      </div>
+    );
   }
 
   if (!data || typeof data !== 'object') {
     return (
-      <div style={{ color: 'var(--muted-foreground)', padding: '12px', fontSize: '13px' }}>No hash results</div>
+      <div style={{ color: 'var(--muted-foreground)', padding: '12px', fontSize: '13px' }}>
+        No hash results
+      </div>
     );
   }
 

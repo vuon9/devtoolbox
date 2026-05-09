@@ -80,9 +80,14 @@ test.describe('Theme System', () => {
     // allThemes includes built-in + gallery
     const optionTexts = await page.getByRole('option').allTextContents();
     const expected = [
-      'GitHub Dark', 'GitHub Light',
-      'One Dark Pro', 'Dracula', 'Nord',
-      'Catppuccin Mocha', 'Solarized Dark', 'Solarized Light',
+      'GitHub Dark',
+      'GitHub Light',
+      'One Dark Pro',
+      'Dracula',
+      'Nord',
+      'Catppuccin Mocha',
+      'Solarized Dark',
+      'Solarized Light',
     ];
     for (const theme of expected) {
       expect(optionTexts.some((t) => t.includes(theme))).toBeTruthy();

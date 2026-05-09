@@ -864,7 +864,7 @@ export default function DataGenerator() {
         height: '100%',
         padding: '24px',
         overflow: 'hidden',
-          backgroundColor: 'var(--background)',
+        backgroundColor: 'var(--background)',
       }}
     >
       <ToolHeader

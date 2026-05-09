@@ -6,13 +6,7 @@ import { Settings, Check } from 'lucide-react';
 import { GetCloseMinimizesToTray, SetCloseMinimizesToTray } from '../generated';
 import { useTheme } from '../context/ThemeContext';
 import { BUILT_IN_THEME_KEYS } from '../theme';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from './ui/select';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/select';
 
 export function SettingsModal({ isOpen, onClose }) {
   const { themeMode, setThemeMode, themeName, setThemeName, allThemes } = useTheme();
@@ -54,11 +48,7 @@ export function SettingsModal({ isOpen, onClose }) {
 
           <div className="mb-6">
             <label className="text-sm font-medium mb-2 block text-foreground">Appearance</label>
-            <RadioGroup.Root
-              value={themeMode}
-              onValueChange={setThemeMode}
-              className="flex gap-4"
-            >
+            <RadioGroup.Root value={themeMode} onValueChange={setThemeMode} className="flex gap-4">
               {['system', 'dark', 'light'].map((mode) => (
                 <label key={mode} className="flex items-center gap-2 cursor-pointer">
                   <RadioGroup.Item
@@ -75,10 +65,7 @@ export function SettingsModal({ isOpen, onClose }) {
 
           <div className="mb-6">
             <label className="text-sm font-medium mb-2 block text-foreground">Theme</label>
-            <Select
-              value={themeName}
-              onValueChange={setThemeName}
-            >
+            <Select value={themeName} onValueChange={setThemeName}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a theme..." />
               </SelectTrigger>

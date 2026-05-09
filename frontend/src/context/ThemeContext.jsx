@@ -2,7 +2,14 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
 import { SCOPE_TO_TAG } from '../theme/scope-mapping';
-import { THEME_TOKENS, getThemeByKey, resolveActualType, allThemes, BUILT_IN_THEME_KEYS, loadUserThemes } from '../theme';
+import {
+  THEME_TOKENS,
+  getThemeByKey,
+  resolveActualType,
+  allThemes,
+  BUILT_IN_THEME_KEYS,
+  loadUserThemes,
+} from '../theme';
 
 const DEFAULT_MODE = 'system';
 const DEFAULT_NAME = 'github-dark';
@@ -92,9 +99,14 @@ export function ThemeProvider({ children }) {
   }, []);
 
   // Load user themes from ~/.config/devtoolbox/themes/
-  useEffect(() => { loadUserThemes(); }, []);
+  useEffect(() => {
+    loadUserThemes();
+  }, []);
 
-  const actualType = useMemo(() => resolveActualType(themeMode, systemPrefersDark), [themeMode, systemPrefersDark]);
+  const actualType = useMemo(
+    () => resolveActualType(themeMode, systemPrefersDark),
+    [themeMode, systemPrefersDark]
+  );
 
   const theme = useMemo(() => getThemeByKey(themeName) || getThemeByKey(DEFAULT_NAME), [themeName]);
 
@@ -118,29 +130,48 @@ export function ThemeProvider({ children }) {
     }
   }, [theme, actualType, palette]);
 
-  const highlightStyle = useMemo(() => buildHighlightStyle(palette.tokenColors), [palette.tokenColors]);
+  const highlightStyle = useMemo(
+    () => buildHighlightStyle(palette.tokenColors),
+    [palette.tokenColors]
+  );
 
   const editorExtensions = useMemo(() => {
     if (!highlightStyle) return [];
     return [
       EditorView.theme({
         '&': { backgroundColor: 'var(--background)', color: 'var(--foreground)' },
-        '.cm-content': { caretColor: 'var(--foreground)', fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace" },
-        '.cm-gutters': { backgroundColor: 'var(--card)', borderRight: '1px solid var(--border)', color: 'var(--muted-foreground)' },
+        '.cm-content': {
+          caretColor: 'var(--foreground)',
+          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+        },
+        '.cm-gutters': {
+          backgroundColor: 'var(--card)',
+          borderRight: '1px solid var(--border)',
+          color: 'var(--muted-foreground)',
+        },
         '.cm-activeLineGutter': { backgroundColor: 'var(--muted)' },
         '&.cm-focused .cm-cursor': { borderLeftColor: 'var(--foreground)' },
-        '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': { backgroundColor: 'var(--accent)' },
+        '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
+          backgroundColor: 'var(--accent)',
+        },
       }),
       syntaxHighlighting(highlightStyle),
     ];
   }, [highlightStyle]);
 
-  const value = useMemo(() => ({
-    themeMode, setThemeMode,
-    themeName, setThemeName,
-    theme, actualType,
-    editorExtensions, allThemes,
-  }), [themeMode, setThemeMode, themeName, setThemeName, theme, actualType, editorExtensions]);
+  const value = useMemo(
+    () => ({
+      themeMode,
+      setThemeMode,
+      themeName,
+      setThemeName,
+      theme,
+      actualType,
+      editorExtensions,
+      allThemes,
+    }),
+    [themeMode, setThemeMode, themeName, setThemeName, theme, actualType, editorExtensions]
+  );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
