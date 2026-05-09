@@ -1,13 +1,15 @@
-// Auto-generated unified service facade
-// Detects runtime environment and uses appropriate implementation
+// Auto-generated HTTP-only service facade
 
-// For browser mode testing, we're using HTTP only
-export * from './http/jWTService';
-export * from './http/barcodeService';
-export * from './http/codeFormatterService';
-export * from './http/conversionService';
-export * from './http/dataGeneratorService';
 export * from './http/dateTimeService';
 export * from './http/numberConverterService';
+export * from './http/textUtilitiesService';
+export * from './http/jWTService';
+export * from './http/barcodeService';
+export * from './http/dataGeneratorService';
+export * from './http/encoderService';
+export * from './http/encrypterService';
+export * from './http/hashGeneratorService';
 export * from './http/settingsService';
-export * from './http/windowControlsService';
+export * from './http/spotlightService';
+export * from './http/codeConverterService';
+export * from './http/codeFormatterService';

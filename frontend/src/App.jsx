@@ -106,9 +106,9 @@ function App() {
           }}
         >
           <Routes>
-            <Route path="/" element={<Navigate to="/tool/text-converter" replace />} />
+            <Route path="/" element={<Navigate to="/tool/code-encoder" replace />} />
             <Route path="/tool/:toolId/*" element={<ToolRouter />} />
-            <Route path="*" element={<Navigate to="/tool/text-converter" replace />} />
+            <Route path="*" element={<Navigate to="/tool/code-encoder" replace />} />
           </Routes>
         </main>
       </div>

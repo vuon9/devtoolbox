@@ -110,6 +110,11 @@ func (p *Parser) findMethods(file *ast.File, typeName string) []ServiceMethod {
 			continue
 		}
 
+		// Skip lifecycle methods
+		if isLifecycleMethod(funcDecl.Name.Name) {
+			continue
+		}
+
 		// Check if this method belongs to our type
 		for _, recv := range funcDecl.Recv.List {
 			recvType := p.getTypeString(recv.Type)
@@ -149,6 +154,11 @@ func (p *Parser) findMethods(file *ast.File, typeName string) []ServiceMethod {
 	return methods
 }
 
+// isLifecycleMethod checks if method is a Wails lifecycle method
+func isLifecycleMethod(name string) bool {
+	return name == "ServiceStartup" || name == "ServiceShutdown"
+}
+
 // getTypeString converts an AST type to a string
 func (p *Parser) getTypeString(expr ast.Expr) string {
 	switch t := expr.(type) {
@@ -158,6 +168,12 @@ func (p *Parser) getTypeString(expr ast.Expr) string {
 		return "*" + p.getTypeString(t.X)
 	case *ast.SelectorExpr:
 		return p.getTypeString(t.X) + "." + t.Sel.Name
+	case *ast.MapType:
+		return "map[" + p.getTypeString(t.Key) + "]" + p.getTypeString(t.Value)
+	case *ast.ArrayType:
+		return "[]" + p.getTypeString(t.Elt)
+	case *ast.InterfaceType:
+		return "interface{}"
 	default:
 		return ""
 	}

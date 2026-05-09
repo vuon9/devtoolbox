@@ -1,3 +1,4 @@
+//go:generate wails3 generate bindings
 package main
 
 import (
@@ -17,7 +18,6 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 	"github.com/wailsapp/wails/v3/pkg/icons"
-	"golang.design/x/hotkey"
 )
 
 //go:embed all:frontend/dist
@@ -322,31 +322,7 @@ func main() {
 	}
 }
 
-// registerGlobalHotkey registers a system-wide global hotkey
-func registerGlobalHotkey(spotlightService *service.SpotlightService) {
-	// Use Cmd+Shift+Space for macOS, Ctrl+Shift+Space for others
-	var hk *hotkey.Hotkey
-	if runtime.GOOS == "darwin" {
-		hk = hotkey.New([]hotkey.Modifier{hotkey.ModCmd, hotkey.ModShift}, hotkey.KeySpace)
-	} else {
-		hk = hotkey.New([]hotkey.Modifier{hotkey.ModCtrl, hotkey.ModShift}, hotkey.KeySpace)
-	}
 
-	log.Printf("Registering global hotkey: %s", hk)
-
-	if err := hk.Register(); err != nil {
-		log.Printf("Failed to register hotkey: %v", err)
-		return
-	}
-
-	log.Println("Global hotkey registered successfully. Press Cmd/Ctrl+Shift+Space to toggle spotlight.")
-
-	// Listen for hotkey events
-	for range hk.Keydown() {
-		log.Println("Global hotkey pressed, toggling spotlight")
-		spotlightService.Toggle()
-	}
-}
 
 func GinMiddleware(ginEngine *gin.Engine) application.Middleware {
 	return func(next http.Handler) http.Handler {

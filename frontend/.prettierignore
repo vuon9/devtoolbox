@@ -6,3 +6,5 @@ coverage/
 *.min.css
 src/generated/
 bindings/
+test-results/
+playwright-report/

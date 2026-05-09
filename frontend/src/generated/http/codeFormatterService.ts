@@ -3,11 +3,17 @@
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
+
+
 export async function Format(req: any): Promise<any> {
+  let body;
+  
+  body = JSON.stringify(req);
+  
   const response = await fetch(`${API_BASE}/api/code-formatter-service/format`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(req)
+    body
   });
   
   if (!response.ok) {
@@ -16,3 +22,4 @@ export async function Format(req: any): Promise<any> {
   
   return await response.json();
 }
+
