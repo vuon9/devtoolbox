@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { CommandPalette } from './components/CommandPalette';
+import { ThemeProvider } from './context/ThemeContext';
 import './index.scss';
 import './spotlight.css';
 
@@ -22,6 +23,8 @@ function CommandPaletteApp() {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <CommandPaletteApp />
+    <ThemeProvider>
+      <CommandPaletteApp />
+    </ThemeProvider>
   </React.StrictMode>
 );

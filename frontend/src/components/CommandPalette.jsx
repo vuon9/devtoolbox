@@ -25,6 +25,7 @@ import {
   FileCode,
 } from 'lucide-react';
 import { Events } from '@wailsio/runtime';
+import { useTheme } from '../context/ThemeContext';
 import './CommandPalette.css';
 
 // Icon mapping matching the sidebar
@@ -198,6 +199,7 @@ const COMMANDS = [
 ];
 
 export function CommandPalette() {
+  const { themeMode, setThemeMode } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [commands, setCommands] = useState(COMMANDS);
@@ -277,7 +279,8 @@ export function CommandPalette() {
         switch (command.action) {
           case 'toggle-theme':
             try {
-              Events.Emit('spotlight:theme:toggle');
+              const next = themeMode === 'github-dark' ? 'github-light' : 'github-dark';
+              setThemeMode(next);
             } catch (e) {}
             break;
           case 'toggle-window':
