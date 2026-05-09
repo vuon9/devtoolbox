@@ -401,13 +401,40 @@ Each is a JS file exporting the full theme object. Colors are extracted from off
 
 ## Testing Strategy
 
-1. **Unit:** ThemeProvider renders children, applies CSS vars, generates HighlightStyle.
-2. **Unit:** scope-mapping covers all VS Code scopes used in bundled themes.
-3. **Visual:** Each bundled theme renders correct colors in CodeEditor input + output panes.
-4. **Visual:** Each tool page migrates correctly from textarea to CodeEditor/HighlightedCode.
-5. **Edge:** System mode auto-toggles when OS preference changes.
-6. **Edge:** Switching from gallery theme → built-in clears JS overrides, `.dark` class works.
-7. **Edge:** Missing token color in theme JSON doesn't crash CodeMirror.
-8. **Edge:** Carbon-removed components (SettingsModal, ConversionCard, StatusMessages) render correctly.
-9. **UX:** Theme picker in Settings updates app + all open CodeMirror editors immediately.
-10. **UX:** EditorToggle persists per-tool preference across sessions.
+### Unit Tests
+
+1. ThemeProvider renders children, applies CSS vars, generates HighlightStyle.
+2. scope-mapping covers all VS Code scopes used in bundled themes.
+3. Each bundled theme object has all required color tokens + tokenColors.
+4. `buildEditorExtensions` produces valid CodeMirror extensions for each theme.
+
+### E2E Tests — `e2e/theme.spec.js`
+
+Follows the same self-contained pattern as existing tool tests (no page objects, no shared helpers). Covers the full theme lifecycle — default state, switching, persistence, and integration with code display.
+
+| # | Test | Verification |
+|---|------|-------------|
+| 1 | **Default — system mode** | First visit: `<html>` has no `class="dark"` or has it based on OS preference. Settings modal shows "System" selected. |
+| 2 | **Settings modal opens** | Click settings gear → modal visible with Appearance + Behavior sections. |
+| 3 | **Switch to light** | Click "Light" in settings → `<html>` class removed (or `dark` removed). Background changes from dark to light. Verifiable via `getComputedStyle`. |
+| 4 | **Switch to dark** | Click "Dark" → `<html class="dark">` added. Background changes back. |
+| 5 | **Switch back to system** | Click "System" → `<html>` class matches `matchMedia('prefers-color-scheme: dark')` result. |
+| 6 | **Persistence across reload** | Switch to "Light", reload page. Settings still shows "Light" selected. Page renders light colors. |
+| 7 | **Gallery theme list** | Open settings. Theme picker contains all 8 expected entries (GitHub Dark, GitHub Light, One Dark Pro, Dracula, Nord, Catppuccin Mocha, Solarized Dark, Solarized Light). |
+| 8 | **Switch to gallery theme (One Dark Pro)** | Select "One Dark Pro" → CSS vars on `<html>` overridden. `var(--background)` resolves to `#282c34`. |
+| 9 | **Gallery theme persists** | Switch to "Dracula", reload page. Theme stays "Dracula". Colors still applied. |
+| 10 | **Switch gallery → built-in clears overrides** | Select Dracula → switch to GitHub Light → inline style overrides removed. `var(--background)` reverts to CSS-defined light value. |
+| 11 | **Syntax highlighting in CodeEditor** | Navigate to any migrated tool. Input code. Output shows syntax-colored tokens matching active theme's `tokenColors`. |
+| 12 | **Syntax theme changes with app theme** | Switch from GitHub Dark → One Dark Pro. CodeEditor colors update immediately to One Dark's keyword/string/etc. colors. |
+| 13 | **EditorToggle on/off** | Toggle syntax highlighting off → CodeEditor falls back to plain monospace display. Toggle on → syntax returns. |
+| 14 | **EditorToggle persists** | Turn off highlighting for a tool, reload page, navigate to that tool → highlighting still off. |
+| 15 | **Settings modal closes correctly** | Open modal → click close/outside → modal hidden. Theme still applied. |
+
+### Visual / Edge Cases
+
+16. Each bundled theme renders correct colors in CodeEditor input + output panes.
+17. Each tool page migrates correctly from textarea to CodeEditor/HighlightedCode.
+18. System mode auto-toggles when OS preference changes (manual test or mock matchMedia).
+19. Missing token color in theme JSON doesn't crash CodeMirror.
+20. Carbon-removed components (SettingsModal, ConversionCard, StatusMessages) render correctly.
+21. Theme picker in Settings updates app + all open CodeMirror editors immediately.
