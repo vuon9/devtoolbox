@@ -7,7 +7,7 @@ require (
 	github.com/brianvoe/gofakeit/v7 v7.14.0
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/gin-contrib/cors v1.7.6
-	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gomarkdown/markdown v0.0.0-20260417124207-7d523f7318df
 	github.com/itchyny/gojq v0.12.18
 	github.com/pelletier/go-toml/v2 v2.2.4
