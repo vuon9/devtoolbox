@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button';
-import { TextInput } from '@carbon/react';
+import { Input } from '../../../components/ui/input';
 import { Copy, ArrowUp } from 'lucide-react';
 import { BASES } from '../constants';
 import { formatNumber } from '../utils';
@@ -51,9 +51,9 @@ const ConversionCard = ({
       style={{
         marginBottom: '1rem',
         padding: '1rem',
-        backgroundColor: 'var(--cds-layer-01)',
+        backgroundColor: 'var(--card)',
         borderRadius: '4px',
-        border: error ? '1px solid var(--cds-support-error)' : '1px solid transparent',
+        border: error ? '1px solid var(--destructive)' : '1px solid transparent',
       }}
     >
       {/* Header with label and actions */}
@@ -71,7 +71,7 @@ const ConversionCard = ({
               fontSize: '0.75rem',
               fontWeight: 600,
               textTransform: 'uppercase',
-              color: 'var(--cds-text-primary)',
+              color: 'var(--foreground)',
               letterSpacing: '0.32px',
             }}
           >
@@ -81,7 +81,7 @@ const ConversionCard = ({
             <span
               style={{
                 fontSize: '0.65rem',
-                color: 'var(--cds-text-secondary)',
+                color: 'var(--muted-foreground)',
               }}
             >
               {`(Base ${base})`}
@@ -107,10 +107,8 @@ const ConversionCard = ({
       </div>
 
       {/* Input field */}
-      <TextInput
+      <Input
         id={`conversion-${label.toLowerCase().replace(/\s+/g, '-')}`}
-        labelText={label}
-        hideLabel
         value={displayValue}
         onChange={handleInputChange}
         placeholder={
@@ -120,12 +118,13 @@ const ConversionCard = ({
             : BASES[Object.keys(BASES).find((k) => BASES[k].base === base)]?.placeholder ||
               `Enter ${label.toLowerCase()}...`)
         }
-        invalid={!!error}
-        invalidText={error}
-        style={{
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-        }}
+        className="font-mono"
       />
+      {error && (
+        <div style={{ fontSize: '0.75rem', color: 'var(--destructive)', marginTop: '0.25rem' }}>
+          {error}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,42 +1,22 @@
 import React from 'react';
-import { CheckmarkFilled, CloseFilled } from '@carbon/icons-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 export const ErrorMessage = ({ error }) =>
   error ? (
-    <div
-      style={{
-        padding: '0.5rem',
-        backgroundColor: 'var(--cds-support-error-light)',
-        color: 'var(--cds-support-error)',
-        borderRadius: '4px',
-        fontSize: '0.875rem',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        flexShrink: 0,
-      }}
+    <div className="flex items-center gap-2 rounded p-2 text-sm text-destructive shrink-0"
+      style={{ backgroundColor: 'rgb(from var(--destructive) r g b / 0.1)' }}
     >
-      <CloseFilled size={16} />
+      <XCircle className="text-destructive" size={16} />
       {error}
     </div>
   ) : null;
 
 export const SuccessMessage = ({ isValid }) =>
   isValid === true ? (
-    <div
-      style={{
-        padding: '0.5rem',
-        backgroundColor: 'var(--cds-support-success-light)',
-        color: 'var(--cds-support-success)',
-        borderRadius: '4px',
-        fontSize: '0.875rem',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        flexShrink: 0,
-      }}
+    <div className="flex items-center gap-2 rounded p-2 text-sm shrink-0"
+      style={{ backgroundColor: 'rgb(from var(--success) r g b / 0.1)', color: 'var(--success)' }}
     >
-      <CheckmarkFilled size={16} />
+      <CheckCircle className="text-success" size={16} />
       Valid JWT structure
     </div>
   ) : null;

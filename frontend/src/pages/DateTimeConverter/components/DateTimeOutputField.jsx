@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button';
-import { Tile } from '@carbon/react';
 import { Copy } from 'lucide-react';
 import { getMonospaceFontFamily, getDataFontSize } from '../../../utils/inputUtils';
 
@@ -15,14 +14,14 @@ import { getMonospaceFontFamily, getDataFontSize } from '../../../utils/inputUti
  */
 export default function DateTimeOutputField({ label, value, className, style }) {
   return (
-    <Tile
+    <div
       className={className}
-      style={{ padding: '0.75rem', background: 'var(--cds-layer)', ...style }}
+      style={{ padding: '0.75rem', background: 'var(--card)', borderRadius: '4px', border: '1px solid var(--border)', ...style }}
     >
       <div
         style={{
           fontSize: '0.75rem',
-          color: 'var(--cds-text-secondary)',
+          color: 'var(--muted-foreground)',
           marginBottom: '0.25rem',
           textTransform: 'uppercase',
         }}
@@ -56,6 +55,6 @@ export default function DateTimeOutputField({ label, value, className, style }) 
           <Copy size={14} />
         </Button>
       </div>
-    </Tile>
+    </div>
   );
 }

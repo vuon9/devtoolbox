@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button';
-import { Tile, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { Copy } from 'lucide-react';
 
 const languageTabs = [
@@ -19,85 +18,105 @@ const languageTabs = [
 
 export default function CodeSnippetsPanel({ codeSnippets, selectedTab, onTabChange, onCopy }) {
   return (
-    <Tabs selectedIndex={selectedTab} onChange={({ selectedIndex }) => onTabChange(selectedIndex)}>
-      <TabList aria-label="Language tabs" contained>
-        {languageTabs.map((tab) => (
-          <Tab key={tab.id} style={{ flexShrink: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '2px',
+          borderBottom: '1px solid var(--border)',
+          overflowX: 'auto',
+          flexShrink: 0,
+        }}
+        role="tablist"
+        aria-label="Language tabs"
+      >
+        {languageTabs.map((tab, idx) => (
+          <button
+            key={tab.id}
+            role="tab"
+            aria-selected={selectedTab === idx}
+            onClick={() => onTabChange(idx)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              border: 'none',
+              borderBottom: selectedTab === idx ? '2px solid var(--primary)' : '2px solid transparent',
+              background: 'transparent',
+              color: selectedTab === idx ? 'var(--foreground)' : 'var(--muted-foreground)',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              transition: 'color 0.15s, border-color 0.15s',
+            }}
+          >
             {tab.label}
-          </Tab>
+          </button>
         ))}
-      </TabList>
+      </div>
 
-      <TabPanels style={{ flex: 1, minWidth: 0 }}>
-        {languageTabs.map((tab) => (
-          <TabPanel key={tab.id} style={{ overflow: 'auto', padding: '0.75rem', minWidth: 0 }}>
+      <div style={{ flex: 1, overflow: 'auto', padding: '0.75rem', minWidth: 0 }} role="tabpanel">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {(codeSnippets[languageTabs[selectedTab]?.id] || []).map((snippet, idx) => (
             <div
+              key={idx}
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
+                padding: '0.75rem',
+                backgroundColor: 'var(--card)',
+                borderRadius: '4px',
+                border: '1px solid var(--border)',
               }}
             >
-              {(codeSnippets[tab.id] || []).map((snippet, idx) => (
-                <Tile
-                  key={idx}
-                  style={{
-                    padding: '0.75rem',
-                    backgroundColor: 'var(--cds-layer-hover)',
-                  }}
-                >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  gap: '1rem',
+                  minWidth: 0,
+                }}
+              >
+                <div style={{ flex: 1 }}>
                   <div
                     style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      gap: '1rem',
-                      minWidth: 0,
+                      fontSize: '0.75rem',
+                      color: 'var(--muted-foreground)',
+                      marginBottom: '0.5rem',
+                      textTransform: 'uppercase',
+                      fontWeight: 500,
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          fontSize: '0.75rem',
-                          color: 'var(--cds-text-secondary)',
-                          marginBottom: '0.5rem',
-                          textTransform: 'uppercase',
-                          fontWeight: 500,
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {snippet.name}
-                      </div>
-
-                      <pre
-                        style={{
-                          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-                          fontSize: '0.8rem',
-                          margin: 0,
-                          whiteSpace: 'pre-wrap',
-                          wordBreak: 'break-all',
-                          color: 'var(--cds-text-primary)',
-                        }}
-                      >
-                        {snippet.code}
-                      </pre>
-                    </div>
-
-                    <Button
-                      variant="secondary"
-                      onClick={() => onCopy(snippet.code)}
-                      style={{ flexShrink: 0, padding: '4px' }}
-                    >
-                      <Copy size={14} />
-                    </Button>
+                    {snippet.name}
                   </div>
-                </Tile>
-              ))}
+
+                  <pre
+                    style={{
+                      fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                      fontSize: '0.8rem',
+                      margin: 0,
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-all',
+                      color: 'var(--foreground)',
+                    }}
+                  >
+                    {snippet.code}
+                  </pre>
+                </div>
+
+                <Button
+                  variant="secondary"
+                  onClick={() => onCopy(snippet.code)}
+                  style={{ flexShrink: 0, padding: '4px' }}
+                >
+                  <Copy size={14} />
+                </Button>
+              </div>
             </div>
-          </TabPanel>
-        ))}
-      </TabPanels>
-    </Tabs>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }

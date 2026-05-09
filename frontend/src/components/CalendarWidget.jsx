@@ -100,7 +100,7 @@ export default function CalendarWidget({ date, onDateSelect }) {
   return (
     <div
       style={{
-        background: 'var(--cds-layer)',
+        background: 'var(--card)',
         borderRadius: '4px',
         padding: '1rem',
         minWidth: '280px',
@@ -122,7 +122,7 @@ export default function CalendarWidget({ date, onDateSelect }) {
             border: 'none',
             cursor: 'pointer',
             padding: '0.25rem 0.5rem',
-            color: 'var(--cds-text-primary)',
+            color: 'var(--foreground)',
             fontSize: '1rem',
           }}
         >
@@ -145,7 +145,7 @@ export default function CalendarWidget({ date, onDateSelect }) {
             border: 'none',
             cursor: 'pointer',
             padding: '0.25rem 0.5rem',
-            color: 'var(--cds-text-primary)',
+            color: 'var(--foreground)',
             fontSize: '1rem',
           }}
         >
@@ -168,7 +168,7 @@ export default function CalendarWidget({ date, onDateSelect }) {
             style={{
               textAlign: 'center',
               fontSize: '0.75rem',
-              color: 'var(--cds-text-secondary)',
+              color: 'var(--muted-foreground)',
               padding: '0.25rem',
             }}
           >
@@ -198,15 +198,15 @@ export default function CalendarWidget({ date, onDateSelect }) {
               borderRadius: '4px',
               cursor: dayInfo.currentMonth ? 'pointer' : 'default',
               background: dayInfo.isSelected
-                ? 'var(--cds-button-primary)'
+                ? 'var(--primary)'
                 : dayInfo.isToday
-                  ? 'var(--cds-layer-hover)'
+                  ? 'var(--muted)'
                   : 'transparent',
               color: dayInfo.isSelected
-                ? 'var(--cds-button-primary-text)'
+                ? 'var(--primary-foreground)'
                 : dayInfo.currentMonth
-                  ? 'var(--cds-text-primary)'
-                  : 'var(--cds-text-disabled)',
+                  ? 'var(--foreground)'
+                  : 'var(--muted-foreground)',
               fontSize: '0.875rem',
               fontWeight: dayInfo.isToday || dayInfo.isSelected ? 600 : 400,
             }}
@@ -221,10 +221,10 @@ export default function CalendarWidget({ date, onDateSelect }) {
         style={{
           marginTop: '1rem',
           paddingTop: '0.75rem',
-          borderTop: '1px solid var(--cds-border-subtle)',
+          borderTop: '1px solid var(--border)',
           textAlign: 'center',
           fontSize: '0.875rem',
-          color: 'var(--cds-text-secondary)',
+          color: 'var(--muted-foreground)',
         }}
       >
         Selected:{' '}

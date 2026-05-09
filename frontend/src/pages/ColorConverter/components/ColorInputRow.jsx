@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../components/ui/Button';
-import { TextInput } from '@carbon/react';
+import { Input } from '../../../components/ui/input';
 import { Copy } from 'lucide-react';
 
 export default function ColorInputRow({ label, value, onChange, copyValue, onCopy, placeholder }) {
@@ -42,13 +42,13 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
-        borderBottom: '1px solid var(--cds-border-subtle)',
+        borderBottom: '1px solid var(--border)',
       }}
     >
       <span
         style={{
           fontSize: '11px',
-          color: 'var(--cds-text-secondary)',
+          color: 'var(--muted-foreground)',
           fontWeight: 500,
           textTransform: 'uppercase',
         }}
@@ -56,24 +56,20 @@ export default function ColorInputRow({ label, value, onChange, copyValue, onCop
         {label}
       </span>
 
-      <TextInput
+      <Input
         id={`input-${label}`}
-        labelText=""
-        hideLabel
         value={isEditing ? localValue : value}
         onChange={handleChange}
         onBlur={handleBlur}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        className="font-mono border-none bg-transparent"
         style={{
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          border: 'none',
-          background: 'transparent',
           padding: '0.5rem',
           margin: '0.5rem 0',
+          boxShadow: 'none',
         }}
-        size="md"
       />
 
       <Button variant="secondary" onClick={() => onCopy(copyValue)} style={{ padding: '4px' }}>

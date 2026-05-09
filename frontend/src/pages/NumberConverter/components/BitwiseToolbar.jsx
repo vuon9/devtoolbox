@@ -23,7 +23,7 @@ const BitwiseToolbar = ({ onOperation }) => {
       style={{
         marginBottom: '1rem',
         padding: '0.75rem',
-        backgroundColor: 'var(--cds-layer-01)',
+        backgroundColor: 'var(--card)',
         borderRadius: '4px',
       }}
     >
@@ -32,7 +32,7 @@ const BitwiseToolbar = ({ onOperation }) => {
           fontSize: '0.75rem',
           fontWeight: 600,
           textTransform: 'uppercase',
-          color: 'var(--cds-text-secondary)',
+          color: 'var(--muted-foreground)',
           marginBottom: '0.75rem',
           letterSpacing: '0.32px',
         }}

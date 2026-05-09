@@ -1,8 +1,12 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button';
-import { Dropdown, NumberInput, Toggle, TextInput } from '@carbon/react';
+import { Input } from '../../../components/ui/input';
+import { Switch } from '../../../components/ui/switch';
 import { Play, HelpCircle } from 'lucide-react';
 import { SEPARATOR_OPTIONS, OUTPUT_FORMAT_OPTIONS } from '../constants';
+
+const selectClass = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+const labelClass = { display: 'block', fontSize: '0.75rem', fontWeight: 400, color: 'var(--muted-foreground)', marginBottom: '0.25rem' };
 
 export default function GeneratorControls({
   state,
@@ -14,85 +18,88 @@ export default function GeneratorControls({
 }) {
   return (
     <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-      {/* Preset Dropdown */}
+      {/* Preset Select */}
       <div style={{ width: '220px' }}>
-        <Dropdown
+        <label style={labelClass}>Template Preset</label>
+        <select
           id="preset-select"
-          titleText="Template Preset"
-          label="Select preset"
-          items={presetItems}
-          itemToString={(item) => presetLabels[item] || item}
-          selectedItem={state.selectedPreset}
-          onChange={onPresetChange}
-        />
+          value={state.selectedPreset}
+          onChange={(e) => onPresetChange({ selectedItem: e.target.value })}
+          className={selectClass}
+        >
+          {presetItems.map((item) => (
+            <option key={item} value={item}>{presetLabels[item] || item}</option>
+          ))}
+        </select>
       </div>
 
       {/* Mode Toggle */}
-      <div style={{ paddingBottom: '6px', minWidth: '120px' }}>
-        <Toggle
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingBottom: '6px', minWidth: '120px' }}>
+        <span style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Single</span>
+        <Switch
           id="mode-toggle"
-          labelA="Single"
-          labelB="Batch"
-          toggled={state.mode === 'batch'}
-          onToggle={(checked) =>
+          checked={state.mode === 'batch'}
+          onCheckedChange={(checked) =>
             dispatch({ type: 'SET_MODE', payload: checked ? 'batch' : 'single' })
           }
-          size="md"
         />
+        <span style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Batch</span>
       </div>
 
       {/* Batch Count - Only in batch mode */}
       {state.mode === 'batch' && (
         <div style={{ width: '140px' }}>
-          <NumberInput
+          <label style={labelClass}>Count (10-1000)</label>
+          <input
             id="batch-count"
-            label="Count (10-1000)"
+            type="number"
             min={10}
             max={1000}
             value={state.batchCount}
-            onChange={(e, { value }) => dispatch({ type: 'SET_BATCH_COUNT', payload: value })}
+            onChange={(e) => dispatch({ type: 'SET_BATCH_COUNT', payload: parseInt(e.target.value, 10) })}
+            className={selectClass}
           />
         </div>
       )}
 
-      {/* Output Format Dropdown */}
+      {/* Output Format Select */}
       <div style={{ width: '150px' }}>
-        <Dropdown
+        <label style={labelClass}>Output Format</label>
+        <select
           id="output-format"
-          titleText="Output Format"
-          label="Select format"
-          items={OUTPUT_FORMAT_OPTIONS.map((o) => o.id)}
-          itemToString={(item) => OUTPUT_FORMAT_OPTIONS.find((o) => o.id === item)?.label || item}
-          selectedItem={state.outputFormat}
-          onChange={({ selectedItem }) =>
-            dispatch({ type: 'SET_OUTPUT_FORMAT', payload: selectedItem })
-          }
-        />
+          value={state.outputFormat}
+          onChange={(e) => dispatch({ type: 'SET_OUTPUT_FORMAT', payload: e.target.value })}
+          className={selectClass}
+        >
+          {OUTPUT_FORMAT_OPTIONS.map((o) => (
+            <option key={o.id} value={o.id}>{o.label}</option>
+          ))}
+        </select>
       </div>
 
-      {/* Separator Dropdown - Only for raw format */}
+      {/* Separator Select - Only for raw format */}
       {state.outputFormat === 'raw' && (
         <div style={{ width: '150px' }}>
-          <Dropdown
+          <label style={labelClass}>Separator</label>
+          <select
             id="separator-select"
-            titleText="Separator"
-            label="Select separator"
-            items={SEPARATOR_OPTIONS.map((o) => o.id)}
-            itemToString={(item) => SEPARATOR_OPTIONS.find((o) => o.id === item)?.label || item}
-            selectedItem={state.separator}
-            onChange={({ selectedItem }) =>
-              dispatch({ type: 'SET_SEPARATOR', payload: selectedItem })
-            }
-          />
+            value={state.separator}
+            onChange={(e) => dispatch({ type: 'SET_SEPARATOR', payload: e.target.value })}
+            className={selectClass}
+          >
+            {SEPARATOR_OPTIONS.map((o) => (
+              <option key={o.id} value={o.id}>{o.label}</option>
+            ))}
+          </select>
         </div>
       )}
 
       {/* Custom Separator Input */}
       {state.outputFormat === 'raw' && state.separator === 'custom' && (
         <div style={{ width: '200px' }}>
-          <TextInput
+          <label style={labelClass}>Custom Separator</label>
+          <Input
             id="custom-separator"
-            labelText="Custom Separator"
             placeholder="e.g. | or ;;"
             value={state.customSeparator || ''}
             onChange={(e) => dispatch({ type: 'SET_CUSTOM_SEPARATOR', payload: e.target.value })}

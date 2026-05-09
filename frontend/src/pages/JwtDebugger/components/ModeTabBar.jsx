@@ -1,12 +1,12 @@
 import React from 'react';
-import { Search, Edit } from '@carbon/icons-react';
+import { Search, Edit } from 'lucide-react';
 
 const ModeTabBar = ({ activeMode, onChange }) => (
   <div
     style={{
       display: 'flex',
       alignItems: 'center',
-      backgroundColor: 'var(--cds-layer-02)',
+      backgroundColor: 'var(--card)',
       borderRadius: '20px',
       padding: '4px',
       width: 'fit-content',
@@ -29,10 +29,10 @@ const ModeTabBar = ({ activeMode, onChange }) => (
             alignItems: 'center',
             gap: '8px',
             padding: '8px 20px',
-            background: isActive ? 'var(--cds-layer)' : 'transparent',
+            background: isActive ? 'var(--background)' : 'transparent',
             border: 'none',
             borderRadius: '16px',
-            color: isActive ? 'var(--cds-text-primary)' : 'var(--cds-text-secondary)',
+            color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)',
             fontSize: '0.875rem',
             fontWeight: 600,
             cursor: 'pointer',
@@ -44,7 +44,7 @@ const ModeTabBar = ({ activeMode, onChange }) => (
           }}
           onMouseEnter={(e) => {
             if (!isActive) {
-              e.currentTarget.style.backgroundColor = 'var(--cds-layer-hover)';
+              e.currentTarget.style.backgroundColor = 'var(--muted)';
             }
           }}
           onMouseLeave={(e) => {

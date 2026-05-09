@@ -45,7 +45,7 @@ const BitCell = ({ bitValue, position, onToggle, isActive = false }) => {
         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
         fontSize: '14px',
         fontWeight: 600,
-        color: isSet ? 'var(--cds-text-inverse)' : 'var(--cds-text-primary)',
+        color: isSet ? '#fff' : 'var(--foreground)',
         transition: 'all 0.15s ease',
         transform: isActive ? `scale(${BIT_CELL_CONFIG.HOVER_SCALE})` : 'scale(1)',
         boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.3)' : 'none',
@@ -60,7 +60,7 @@ const BitCell = ({ bitValue, position, onToggle, isActive = false }) => {
         e.currentTarget.style.boxShadow = 'none';
       }}
       onFocus={(e) => {
-        e.currentTarget.style.outline = '2px solid var(--cds-focus)';
+        e.currentTarget.style.outline = '2px solid var(--ring)';
         e.currentTarget.style.outlineOffset = '2px';
       }}
       onBlur={(e) => {

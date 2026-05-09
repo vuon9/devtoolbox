@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button';
-import { Select, SelectItem } from '@carbon/react';
 import { Play } from 'lucide-react';
 import {
   ToolLayout,
@@ -12,8 +11,9 @@ import {
 import { actions } from '../jwtReducer';
 import { ErrorMessage } from './StatusMessages';
 
+const selectClass = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+
 export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
-  // Tab change handlers
   const handleEncodeHeaderTabChange = (tab) => dispatch(actions.setTab('encodeHeader', tab));
   const handleEncodePayloadTabChange = (tab) => dispatch(actions.setTab('encodePayload', tab));
 
@@ -58,8 +58,8 @@ export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
         <div
           style={{
             padding: '1rem',
-            border: '1px solid var(--cds-border-subtle)',
-            backgroundColor: 'var(--cds-layer-accent)',
+            border: '1px solid var(--border)',
+            backgroundColor: 'var(--card)',
             flex: '0 1 auto',
           }}
         >
@@ -68,7 +68,7 @@ export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
               fontSize: '0.875rem',
               fontWeight: 600,
               marginBottom: '1rem',
-              color: 'var(--cds-text-primary)',
+              color: 'var(--foreground)',
             }}
           >
             Signing Configuration
@@ -81,23 +81,23 @@ export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
                   display: 'block',
                   fontSize: '0.75rem',
                   fontWeight: 400,
-                  color: 'var(--cds-text-secondary)',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   marginBottom: '0.5rem',
                 }}
               >
                 Algorithm
               </label>
-              <Select
+              <select
                 value={state.algorithm}
-                noLabel={true}
                 onChange={(e) => dispatch(actions.setAlgorithm(e.target.value))}
                 id="algorithm-select"
+                className={selectClass}
               >
-                <SelectItem value="HS256" text="HS256" />
-                <SelectItem value="HS384" text="HS384" />
-                <SelectItem value="HS512" text="HS512" />
-              </Select>
+                <option value="HS256">HS256</option>
+                <option value="HS384">HS384</option>
+                <option value="HS512">HS512</option>
+              </select>
             </div>
 
             <div>
@@ -106,7 +106,7 @@ export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
                   display: 'block',
                   fontSize: '0.75rem',
                   fontWeight: 400,
-                  color: 'var(--cds-text-secondary)',
+                  color: 'var(--muted-foreground)',
                   textTransform: 'uppercase',
                   marginBottom: '0.5rem',
                 }}
@@ -149,7 +149,6 @@ export default function JwtEncode({ state, dispatch, layout, encodeJWT }) {
           style={{ flex: 1 }}
         />
 
-        {/* Error Message */}
         <ErrorMessage error={state.error} />
       </div>
     </ToolLayout>

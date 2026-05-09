@@ -43,7 +43,7 @@ const BitGrid = ({ value, onToggleBit, layout = 'horizontal' }) => {
                 width: '60px',
                 marginRight: '12px',
                 fontSize: '0.75rem',
-                color: 'var(--cds-text-secondary)',
+                color: 'var(--muted-foreground)',
                 fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                 display: 'flex',
                 flexDirection: 'column',
@@ -90,8 +90,8 @@ const BitGrid = ({ value, onToggleBit, layout = 'horizontal' }) => {
                         fontSize: '0.6rem',
                         color:
                           hoveredBit === bitPosition
-                            ? 'var(--cds-text-primary)'
-                            : 'var(--cds-text-secondary)',
+                            ? 'var(--foreground)'
+                            : 'var(--muted-foreground)',
                         marginTop: '2px',
                         fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
                         transition: 'color 0.15s ease',
@@ -112,10 +112,10 @@ const BitGrid = ({ value, onToggleBit, layout = 'horizontal' }) => {
         style={{
           marginTop: '16px',
           padding: '12px',
-          backgroundColor: 'var(--cds-layer-01)',
+          backgroundColor: 'var(--card)',
           borderRadius: '4px',
           fontSize: '0.75rem',
-          color: 'var(--cds-text-secondary)',
+          color: 'var(--muted-foreground)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
