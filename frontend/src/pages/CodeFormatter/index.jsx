@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FileText, Zap, Filter, Braces, Code2, Code } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-xml-doc';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-markup';
-import 'prismjs/themes/prism-tomorrow.css';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
 import { Format } from '../../generated';
 
 const languages = [
@@ -189,27 +184,6 @@ function InputPane({ value, onChange, placeholder }) {
 }
 
 function OutputPane({ content, language, error, filterComponent }) {
-  useEffect(() => {
-    if (content) {
-      Prism.highlightAll();
-    }
-  }, [content]);
-
-  const getPrismLanguage = (lang) => {
-    switch (lang) {
-      case 'json':
-        return 'json';
-      case 'xml':
-        return 'xml';
-      case 'html':
-        return 'markup';
-      case 'css':
-        return 'css';
-      default:
-        return 'text';
-    }
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
       <div
@@ -239,26 +213,12 @@ function OutputPane({ content, language, error, filterComponent }) {
           backgroundColor: '#18181b',
           border: error ? '1px solid #ef4444' : '1px solid #27272a',
           borderRadius: '8px',
-          padding: '0',
           overflow: 'auto',
           marginBottom: '8px',
         }}
       >
         {content && (
-          <pre style={{ margin: 0, background: 'transparent' }}>
-            <code
-              className={`language-${getPrismLanguage(language)}`}
-              style={{
-                background: 'transparent',
-                padding: 0,
-                fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-                fontSize: '13px',
-                lineHeight: 1.5,
-              }}
-            >
-              {content}
-            </code>
-          </pre>
+          <HighlightedCode code={content} language={language} showLineNumbers />
         )}
       </div>
 
