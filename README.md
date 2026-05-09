@@ -8,8 +8,7 @@ Base64, JWT, JSON formatting, hashing, encoding, escaping, color conversion, reg
 
 **Features Spotlight-like Command Palette:** Press `Cmd+Ctrl+M` (macOS) or `Ctrl+Alt+M` (Windows/Linux) from anywhere to open the floating command palette. Works even over fullscreen apps!
 
-<img width="1552" height="922" alt="SCR-20260329-qrkw" src="https://github.com/user-attachments/assets/22a79bde-03cc-4605-a705-67ad986635df" />
-
+<img width="1552" height="922" alt="image" src="https://github.com/user-attachments/assets/86a44961-3559-4ab0-848f-df817742e20f" />
 
 No browser tabs. No data sent to servers. Just open and use.
 
