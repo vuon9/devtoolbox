@@ -29,7 +29,7 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
     backgroundColor: 'transparent',
     border: 'none',
     borderRadius: '4px',
-    color: '#a1a1aa',
+    color: 'var(--muted-foreground)',
     cursor: 'pointer',
     transition: 'background-color 0.15s ease, color 0.15s ease',
     WebkitAppRegion: 'no-drag',
@@ -39,8 +39,8 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
     <header
       style={{
         height: '40px',
-        borderBottom: '1px solid #27272a',
-        backgroundColor: '#18181b',
+        borderBottom: '1px solid var(--border)',
+        backgroundColor: 'var(--titlebar-background)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -70,7 +70,7 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
             fontSize: '12px',
             fontWeight: 600,
             letterSpacing: '-0.025em',
-            color: '#71717a',
+            color: 'var(--muted-foreground)',
             textTransform: 'uppercase',
           }}
         >
@@ -86,12 +86,12 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
           onClick={onOpenSettings}
           style={buttonStyle}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#27272a';
-            e.currentTarget.style.color = '#f4f4f5';
+            e.currentTarget.style.backgroundColor = 'var(--muted)';
+            e.currentTarget.style.color = 'var(--foreground)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#a1a1aa';
+            e.currentTarget.style.color = 'var(--muted-foreground)';
           }}
         >
           <Settings style={{ width: '16px', height: '16px' }} />
@@ -104,7 +104,7 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
               alignItems: 'center',
               marginLeft: '8px',
               paddingLeft: '8px',
-              borderLeft: '1px solid #27272a',
+               borderLeft: '1px solid var(--border)',
               gap: '2px',
             }}
           >
@@ -112,7 +112,7 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
               onClick={handleMinimize}
               style={buttonStyle}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#27272a';
+                e.currentTarget.style.backgroundColor = 'var(--muted)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
@@ -124,7 +124,7 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
               onClick={handleMaximize}
               style={buttonStyle}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#27272a';
+                e.currentTarget.style.backgroundColor = 'var(--muted)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
@@ -134,14 +134,14 @@ export function TitleBar({ appName = 'DevToolbox', onOpenSettings }) {
             </button>
             <button
               onClick={handleClose}
-              style={{ ...buttonStyle, color: '#ef4444' }}
+              style={{ ...buttonStyle, color: 'var(--destructive)' }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#dc2626';
-                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.backgroundColor = 'var(--destructive)';
+                e.currentTarget.style.color = 'var(--primary-foreground)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#ef4444';
+                e.currentTarget.style.color = 'var(--destructive)';
               }}
             >
               <X style={{ width: '16px', height: '16px' }} />
