@@ -1,148 +1,74 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import {
-  Key,
-  ShieldCheck,
-  Lock,
-  CheckCircle2,
-  AlertCircle,
-  Hash,
-  Binary,
-  Eye,
-  EyeOff,
-  FileText,
+  Key, ShieldCheck, Lock, CheckCircle2, AlertCircle, Hash, Binary, Eye, EyeOff, FileText,
 } from 'lucide-react';
 import { Decode, Encode, Verify } from '../../services/jwtService';
+import CodeEditor from '../../components/inputs/CodeEditor';
+import HighlightedCode from '../../components/inputs/HighlightedCode';
+import EditorToggle from '../../components/inputs/EditorToggle';
 
-// Sample data for testing
 const SAMPLE_JWT =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 const SAMPLE_HEADER = '{"alg": "HS256", "typ": "JWT"}';
 const SAMPLE_PAYLOAD = '{"sub": "1234567890", "name": "John Doe", "iat": 1516239022}';
 const SAMPLE_SECRET = 'your-256-bit-secret';
+const TOOL_KEY = 'jwt-debugger';
 
-// Inline-styled components
 function ToolHeader({ title, description }) {
   return (
     <div style={{ marginBottom: '16px' }}>
-      <h2
-        style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: '#f4f4f5' }}
-      >
+      <h2 style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.025em', color: 'var(--foreground)' }}>
         {title}
       </h2>
-      <p style={{ color: '#a1a1aa', marginTop: '4px' }}>{description}</p>
+      <p style={{ color: 'var(--muted-foreground)', marginTop: '4px' }}>{description}</p>
     </div>
   );
 }
 
-function ToolTextArea({ label, value, onChange, placeholder, readOnly, style = {} }) {
+function ToolTextArea({ label, value, onChange, placeholder, readOnly, highlightOn, language = 'plaintext', style = {} }) {
   const handleCopy = () => {
-    if (value) {
-      navigator.clipboard.writeText(value);
-    }
+    if (value) navigator.clipboard.writeText(value);
   };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, ...style }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '8px',
-        }}
-      >
-        <label
-          style={{
-            fontSize: '11px',
-            fontWeight: 600,
-            color: '#71717a',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-          }}
-        >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {label}
         </label>
-        <button
-          onClick={handleCopy}
-          title="Copy to clipboard"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '28px',
-            height: '28px',
-            padding: '6px',
-            backgroundColor: 'transparent',
-            border: 'none',
-            borderRadius: '4px',
-            color: value ? '#a1a1aa' : '#3f3f46',
-            cursor: value ? 'pointer' : 'not-allowed',
-            transition: 'all 0.15s ease',
+        <button onClick={handleCopy} title="Copy to clipboard"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', padding: '6px',
+            backgroundColor: 'transparent', border: 'none', borderRadius: '4px',
+            color: value ? 'var(--muted-foreground)' : 'var(--border)', cursor: value ? 'pointer' : 'not-allowed', transition: 'all 0.15s ease',
           }}
-          onMouseEnter={(e) => {
-            if (value) {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.color = '#f4f4f5';
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = value ? '#a1a1aa' : '#3f3f46';
-          }}
+          onMouseEnter={(e) => { if (value) { e.currentTarget.style.backgroundColor = 'var(--border)'; e.currentTarget.style.color = 'var(--foreground)'; } }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = value ? 'var(--muted-foreground)' : 'var(--border)'; }}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
         </button>
       </div>
-      <textarea
-        value={value}
-        onChange={onChange}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        style={{
-          flex: 1,
-          width: '100%',
-          minHeight: '150px',
-          padding: '12px',
-          fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
-          fontSize: '13px',
-          lineHeight: 1.5,
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
-          borderRadius: '8px',
-          color: '#f4f4f5',
-          resize: 'none',
-          outline: 'none',
-        }}
-      />
+      {readOnly ? (
+        highlightOn ? (
+          <HighlightedCode code={value} language={language} copyable={false} />
+        ) : (
+          <textarea value={value} readOnly placeholder={placeholder}
+            style={{ flex: 1, width: '100%', minHeight: '150px', padding: '12px', fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace", fontSize: '13px', lineHeight: 1.5,
+              backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--foreground)', resize: 'none', outline: 'none',
+            }} />
+        )
+      ) : (
+        <CodeEditor value={value} onChange={(val) => onChange?.({ target: { value: val } })} language={language} highlight={highlightOn} placeholder={placeholder} />
+      )}
     </div>
   );
 }
 
 function ToolSplitPane({ children }) {
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '16px',
-        flex: 1,
-        minHeight: 0,
-        overflow: 'hidden',
-      }}
-    >
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flex: 1, minHeight: 0, overflow: 'hidden' }}>
       {children}
     </div>
   );
@@ -150,49 +76,19 @@ function ToolSplitPane({ children }) {
 
 function ToggleGroup({ options, value, onChange }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        backgroundColor: '#1c1917',
-        borderRadius: '8px',
-        padding: '4px',
-        border: '1px solid #27272a',
-      }}
-    >
+    <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--card)', borderRadius: '8px', padding: '4px', border: '1px solid var(--border)' }}>
       {options.map((option) => {
         const isActive = value === option.id;
         const Icon = option.icon;
         return (
-          <button
-            key={option.id}
-            onClick={() => onChange(option.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 16px',
-              backgroundColor: isActive ? '#27272a' : 'transparent',
-              border: 'none',
-              borderRadius: '6px',
-              color: isActive ? '#f4f4f5' : '#71717a',
-              fontSize: '13px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
+          <button key={option.id} onClick={() => onChange(option.id)}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px',
+              backgroundColor: isActive ? 'var(--border)' : 'transparent', border: 'none', borderRadius: '6px',
+              color: isActive ? 'var(--foreground)' : 'var(--muted-foreground)', fontSize: '13px', fontWeight: 500,
+              cursor: 'pointer', transition: 'all 0.15s ease',
             }}
-            onMouseEnter={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.backgroundColor = '#27272a';
-                e.currentTarget.style.color = '#a1a1aa';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#71717a';
-              }
-            }}
+            onMouseEnter={(e) => { if (!isActive) { e.currentTarget.style.backgroundColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted-foreground)'; } }}
+            onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--muted-foreground)'; } }}
           >
             {Icon && <Icon style={{ width: '14px', height: '14px' }} />}
             {option.label}
@@ -205,35 +101,14 @@ function ToggleGroup({ options, value, onChange }) {
 
 function StatusMessage({ type, children }) {
   const styles = {
-    success: {
-      backgroundColor: 'rgba(34, 197, 94, 0.1)',
-      borderColor: 'rgba(34, 197, 94, 0.2)',
-      color: '#22c55e',
-    },
-    error: {
-      backgroundColor: 'rgba(239, 68, 68, 0.1)',
-      borderColor: 'rgba(239, 68, 68, 0.2)',
-      color: '#ef4444',
-    },
+    success: { backgroundColor: 'rgba(34, 197, 94, 0.1)', borderColor: 'rgba(34, 197, 94, 0.2)', color: '#22c55e' },
+    error: { backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.2)', color: '#ef4444' },
   };
-
   const style = styles[type] || styles.error;
-
   return (
-    <div
-      style={{
-        padding: '12px',
-        borderRadius: '8px',
-        border: `1px solid ${style.borderColor}`,
-        backgroundColor: style.backgroundColor,
-        color: style.color,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        fontSize: '12px',
-        fontWeight: 600,
-      }}
-    >
+    <div style={{ padding: '12px', borderRadius: '8px', border: `1px solid ${style.borderColor}`, backgroundColor: style.backgroundColor,
+      color: style.color, display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 600,
+    }}>
       {children}
     </div>
   );
@@ -241,55 +116,21 @@ function StatusMessage({ type, children }) {
 
 function SecretInput({ label, value, onChange, placeholder }) {
   const [showSecret, setShowSecret] = useState(false);
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-      <label
-        style={{
-          fontSize: '11px',
-          fontWeight: 600,
-          color: '#71717a',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-        }}
-      >
+      <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
         {label}
       </label>
       <div style={{ display: 'flex', gap: '8px' }}>
-        <input
-          type={showSecret ? 'text' : 'password'}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          style={{
-            flex: 1,
-            padding: '8px 12px',
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
-            borderRadius: '6px',
-            color: '#f4f4f5',
-            fontSize: '14px',
-            outline: 'none',
-          }}
+        <input type={showSecret ? 'text' : 'password'} value={value} onChange={onChange} placeholder={placeholder}
+          style={{ flex: 1, padding: '8px 12px', backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--foreground)', fontSize: '14px', outline: 'none' }}
         />
-        <button
-          onClick={() => setShowSecret(!showSecret)}
-          style={{
-            padding: '8px',
-            backgroundColor: '#18181b',
-            border: '1px solid #27272a',
-            borderRadius: '6px',
-            color: '#71717a',
-            cursor: 'pointer',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#f4f4f5')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#71717a')}
+        <button onClick={() => setShowSecret(!showSecret)}
+          style={{ padding: '8px', backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--muted-foreground)', cursor: 'pointer' }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--foreground)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--muted-foreground)')}
         >
-          {showSecret ? (
-            <EyeOff style={{ width: '16px', height: '16px' }} />
-          ) : (
-            <Eye style={{ width: '16px', height: '16px' }} />
-          )}
+          {showSecret ? <EyeOff style={{ width: '16px', height: '16px' }} /> : <Eye style={{ width: '16px', height: '16px' }} />}
         </button>
       </div>
     </div>
@@ -299,112 +140,38 @@ function SecretInput({ label, value, onChange, placeholder }) {
 function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find((o) => o.value === value);
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
-        <label
-          style={{
-            fontSize: '11px',
-            fontWeight: 600,
-            color: '#71717a',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-          }}
-        >
+        <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {label}
         </label>
       )}
       <div style={{ position: 'relative' }}>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: width,
-            height: '32px',
-            padding: '0 12px',
-            backgroundColor: isOpen ? '#27272a' : '#18181b',
-            border: '1px solid #3f3f46',
-            borderRadius: '6px',
-            color: '#f4f4f5',
-            fontSize: '14px',
-            cursor: 'pointer',
-            outline: 'none',
+        <button onClick={() => setIsOpen(!isOpen)}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width, height: '32px', padding: '0 12px',
+            backgroundColor: isOpen ? 'var(--border)' : 'var(--background)', border: '1px solid var(--border)', borderRadius: '6px',
+            color: 'var(--foreground)', fontSize: '14px', cursor: 'pointer', outline: 'none',
           }}
-          onMouseEnter={(e) => {
-            if (!isOpen) {
-              e.currentTarget.style.backgroundColor = '#27272a';
-              e.currentTarget.style.borderColor = '#52525b';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isOpen) {
-              e.currentTarget.style.backgroundColor = '#18181b';
-              e.currentTarget.style.borderColor = '#3f3f46';
-            }
-          }}
+          onMouseEnter={(e) => { if (!isOpen) { e.currentTarget.style.backgroundColor = 'var(--border)'; } }}
+          onMouseLeave={(e) => { if (!isOpen) { e.currentTarget.style.backgroundColor = 'var(--background)'; } }}
         >
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {selectedOption?.label || value}
-          </span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            style={{
-              marginLeft: '8px',
-              opacity: 0.7,
-              transform: isOpen ? 'rotate(180deg)' : 'none',
-              transition: 'transform 0.15s ease',
-            }}
-          >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedOption?.label || value}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+            style={{ marginLeft: '8px', opacity: 0.7, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s ease' }}>
             <path d="M6 9l6 6 6-6" />
           </svg>
         </button>
         {isOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              marginTop: '4px',
-              backgroundColor: '#1c1917',
-              border: '1px solid #27272a',
-              borderRadius: '6px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
-              zIndex: 50,
-              maxHeight: '200px',
-              overflowY: 'auto',
-            }}
-          >
+          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px',
+            backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '6px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)', zIndex: 50, maxHeight: '200px', overflowY: 'auto',
+          }}>
             {options.map((opt) => (
-              <div
-                key={opt.value}
-                onClick={() => {
-                  onChange(opt.value);
-                  setIsOpen(false);
-                }}
-                style={{
-                  padding: '8px 12px',
-                  fontSize: '14px',
-                  color: value === opt.value ? '#f4f4f5' : '#a1a1aa',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#27272a';
-                  e.currentTarget.style.color = '#f4f4f5';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = value === opt.value ? '#f4f4f5' : '#a1a1aa';
-                }}
+              <div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }}
+                style={{ padding: '8px 12px', fontSize: '14px', color: value === opt.value ? 'var(--foreground)' : 'var(--muted-foreground)', cursor: 'pointer', transition: 'all 0.15s ease' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--border)'; e.currentTarget.style.color = 'var(--foreground)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = value === opt.value ? 'var(--foreground)' : 'var(--muted-foreground)'; }}
               >
                 {opt.label}
               </div>
@@ -417,6 +184,7 @@ function SelectDropdown({ label, value, onChange, options, width = '140px' }) {
 }
 
 export default function JwtDebugger() {
+  const [highlightOn, setHighlightOn] = useState(() => localStorage.getItem(`${TOOL_KEY}-editor-highlight`) !== 'false');
   const [jwt, setJwt] = useState('');
   const [payload, setPayload] = useState('');
   const [header, setHeader] = useState('');
@@ -443,22 +211,15 @@ export default function JwtDebugger() {
   const handleDecode = async (token = jwt) => {
     if (!token.trim()) return;
     try {
-      // Always decode to get header and payload
       const decodeRes = await Decode(token);
       setPayload(JSON.stringify(decodeRes.payload, null, 2));
       setHeader(JSON.stringify(decodeRes.header, null, 2));
-
-      // If secret is provided, verify the signature
       if (verifySecret.trim()) {
         const verifyRes = await Verify(token, verifySecret, verifyEncoding);
         setIsValid(verifyRes.valid || verifyRes.isValid);
-        if (verifyRes.error) {
-          setError(verifyRes.error);
-        } else {
-          setError('');
-        }
+        setError(verifyRes.error || '');
       } else {
-        setIsValid(null); // Can't verify without secret
+        setIsValid(null);
         setError('');
       }
     } catch (err) {
@@ -481,21 +242,14 @@ export default function JwtDebugger() {
 
   useEffect(() => {
     if (jwt && activeMode === 'decode') handleDecode(jwt);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jwt, activeMode, verifySecret, verifyEncoding]);
 
-  // Auto-encode when inputs change in encode mode (with debounce)
   useEffect(() => {
     if (activeMode !== 'encode') return;
-
     const timeoutId = setTimeout(() => {
-      if (header.trim() && payload.trim()) {
-        handleEncode();
-      }
-    }, 500); // 500ms debounce
-
+      if (header.trim() && payload.trim()) handleEncode();
+    }, 500);
     return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [header, payload, algorithm, secret, activeMode]);
 
   const modes = [
@@ -504,41 +258,20 @@ export default function JwtDebugger() {
   ];
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        padding: '24px',
-        overflow: 'hidden',
-        backgroundColor: '#09090b',
-      }}
-    >
-      <ToolHeader
-        title="JWT Debugger"
-        description="Inspect, decode, and encode JSON Web Tokens. Verify signatures and visualize payload contents with ease."
-      />
-      <div style={{ borderBottom: '1px solid #27272a', marginBottom: '16px' }} />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', overflow: 'hidden', backgroundColor: '#09090b' }}>
+      <ToolHeader title="JWT Debugger" description="Inspect, decode, and encode JSON Web Tokens. Verify signatures and visualize payload contents with ease." />
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '16px' }} />
 
-      <div
-        style={{
-          marginBottom: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
+      <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <ToggleGroup options={modes} value={activeMode} onChange={setActiveMode} />
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <EditorToggle enabled={highlightOn} onToggle={setHighlightOn} toolKey={TOOL_KEY} />
           <Button variant="secondary" onClick={fillSample}>
-            <FileText style={{ width: '14px', height: '14px' }} />
-            Sample
+            <FileText style={{ width: '14px', height: '14px' }} /> Sample
           </Button>
           {activeMode === 'encode' && (
             <Button onClick={handleEncode}>
-              <Lock style={{ width: '14px', height: '14px' }} />
-              Sign & Encode
+              <Lock style={{ width: '14px', height: '14px' }} /> Sign & Encode
             </Button>
           )}
         </div>
@@ -547,167 +280,50 @@ export default function JwtDebugger() {
       {activeMode === 'decode' ? (
         <ToolSplitPane>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <ToolTextArea
-              label="Encoded Token"
-              value={jwt}
-              onChange={(e) => setJwt(e.target.value)}
-              placeholder="Paste encoded JWT here..."
-            />
-
-            <div
-              style={{
-                padding: '16px',
-                backgroundColor: '#1c1917',
-                border: '1px solid #27272a',
-                borderRadius: '8px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '12px',
-                }}
-              >
-                <Key style={{ width: '14px', height: '14px', color: '#71717a' }} />
-                <span
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    color: '#f4f4f5',
-                  }}
-                >
-                  Signature Verification (Optional)
-                </span>
+            <ToolTextArea label="Encoded Token" value={jwt} onChange={(e) => setJwt(e.target.value)} placeholder="Paste encoded JWT here..." highlightOn={highlightOn} />
+            <div style={{ padding: '16px', backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <Key style={{ width: '14px', height: '14px', color: 'var(--muted-foreground)' }} />
+                <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--foreground)' }}>Signature Verification (Optional)</span>
               </div>
               <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                <SelectDropdown
-                  label="Encoding"
-                  value={verifyEncoding}
-                  onChange={setVerifyEncoding}
-                  options={[
-                    { value: 'base64', label: 'Base64' },
-                    { value: 'hex', label: 'Hex' },
-                    { value: 'raw', label: 'Raw' },
-                  ]}
-                  width="120px"
-                />
+                <SelectDropdown label="Encoding" value={verifyEncoding} onChange={setVerifyEncoding}
+                  options={[{ value: 'base64', label: 'Base64' }, { value: 'hex', label: 'Hex' }, { value: 'raw', label: 'Raw' }]} width="120px" />
               </div>
-              <SecretInput
-                label="Secret"
-                value={verifySecret}
-                onChange={(e) => setVerifySecret(e.target.value)}
-                placeholder="Enter secret to verify signature..."
-              />
+              <SecretInput label="Secret" value={verifySecret} onChange={(e) => setVerifySecret(e.target.value)} placeholder="Enter secret to verify signature..." />
             </div>
-
             {isValid !== null && (
               <StatusMessage type={isValid ? 'success' : 'error'}>
-                {isValid ? (
-                  <>
-                    <CheckCircle2 style={{ width: '16px', height: '16px' }} />
-                    Signature Verified
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle style={{ width: '16px', height: '16px' }} />
-                    Invalid Signature / Format
-                  </>
-                )}
+                {isValid ? <><CheckCircle2 style={{ width: '16px', height: '16px' }} /> Signature Verified</>
+                  : <><AlertCircle style={{ width: '16px', height: '16px' }} /> Invalid Signature / Format</>}
               </StatusMessage>
             )}
             {error && !isValid && <StatusMessage type="error">{error}</StatusMessage>}
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <ToolTextArea
-              label="Header (Algorithm & Type)"
-              value={header}
-              readOnly
-              placeholder="{ 'alg': 'HS256', 'typ': 'JWT' }"
-            />
-            <ToolTextArea
-              label="Payload (Data)"
-              value={payload}
-              readOnly
-              placeholder="{ 'sub': '1234567890', 'name': 'John Doe' }"
-            />
+            <ToolTextArea label="Header (Algorithm & Type)" value={header} readOnly placeholder="{ 'alg': 'HS256', 'typ': 'JWT' }" highlightOn={highlightOn} language="json" />
+            <ToolTextArea label="Payload (Data)" value={payload} readOnly placeholder="{ 'sub': '1234567890', 'name': 'John Doe' }" highlightOn={highlightOn} language="json" />
           </div>
         </ToolSplitPane>
       ) : (
         <ToolSplitPane>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <ToolTextArea
-              label="Header (JSON)"
-              value={header}
-              onChange={(e) => setHeader(e.target.value)}
-              placeholder='{"alg": "HS256", "typ": "JWT"}'
-            />
-            <ToolTextArea
-              label="Payload (JSON)"
-              value={payload}
-              onChange={(e) => setPayload(e.target.value)}
-              placeholder='{"sub": "1234567890", "name": "John Doe"}'
-            />
-
-            <div
-              style={{
-                padding: '16px',
-                backgroundColor: '#1c1917',
-                border: '1px solid #27272a',
-                borderRadius: '8px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '12px',
-                }}
-              >
-                <Key style={{ width: '14px', height: '14px', color: '#71717a' }} />
-                <span
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    color: '#f4f4f5',
-                  }}
-                >
-                  Signing Configuration
-                </span>
+            <ToolTextArea label="Header (JSON)" value={header} onChange={(e) => setHeader(e.target.value)} placeholder='{"alg": "HS256", "typ": "JWT"}' highlightOn={highlightOn} language="json" />
+            <ToolTextArea label="Payload (JSON)" value={payload} onChange={(e) => setPayload(e.target.value)} placeholder='{"sub": "1234567890", "name": "John Doe"}' highlightOn={highlightOn} language="json" />
+            <div style={{ padding: '16px', backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <Key style={{ width: '14px', height: '14px', color: 'var(--muted-foreground)' }} />
+                <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--foreground)' }}>Signing Configuration</span>
               </div>
-              <SelectDropdown
-                label="Algorithm"
-                value={algorithm}
-                onChange={setAlgorithm}
-                options={[
-                  { value: 'HS256', label: 'HS256' },
-                  { value: 'HS384', label: 'HS384' },
-                  { value: 'HS512', label: 'HS512' },
-                  { value: 'RS256', label: 'RS256' },
-                ]}
-                width="120px"
-              />
+              <SelectDropdown label="Algorithm" value={algorithm} onChange={setAlgorithm}
+                options={[{ value: 'HS256', label: 'HS256' }, { value: 'HS384', label: 'HS384' }, { value: 'HS512', label: 'HS512' }, { value: 'RS256', label: 'RS256' }]} width="120px" />
               <div style={{ marginTop: '12px' }}>
-                <SecretInput
-                  label="Secret"
-                  value={secret}
-                  onChange={(e) => setSecret(e.target.value)}
-                  placeholder="Enter secret for signing..."
-                />
+                <SecretInput label="Secret" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Enter secret for signing..." />
               </div>
             </div>
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <ToolTextArea
-              label="Encoded Token"
-              value={jwt}
-              readOnly
-              placeholder="Encoded JWT will appear here..."
-            />
+            <ToolTextArea label="Encoded Token" value={jwt} readOnly placeholder="Encoded JWT will appear here..." highlightOn={highlightOn} />
             {error && <StatusMessage type="error">{error}</StatusMessage>}
           </div>
         </ToolSplitPane>
