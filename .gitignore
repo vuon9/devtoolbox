@@ -18,3 +18,4 @@ frontend/test-results/
 test-results/
 frontend/playwright-report/
 playwright-report/
+package-lock.json
