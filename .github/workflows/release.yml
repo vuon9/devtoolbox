@@ -187,14 +187,14 @@ jobs:
               --window-size 800 400 \
               --icon-size 100 \
               --app-drop-link 600 185 \
-              "release/DevToolbox.dmg" \
+              "release/DevToolbox-${{ matrix.build }}.dmg" \
               "bin/$BINARY_NAME.app"
           elif [ "${{ matrix.os }}" = "windows-latest" ]; then
             # Windows: copy .exe
-            cp "bin/$BINARY_NAME" "release/DevToolbox.exe"
+            cp "bin/$BINARY_NAME" "release/DevToolbox-${{ matrix.build }}.exe"
           else
             # Linux or macOS binary (no .app): create tar.gz
-            tar -czf "release/DevToolbox.tar.gz" -C bin "$BINARY_NAME"
+            tar -czf "release/DevToolbox-${{ matrix.build }}.tar.gz" -C bin "$BINARY_NAME"
           fi
 
           echo "=== Release contents ==="
