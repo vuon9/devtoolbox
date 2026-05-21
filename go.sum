@@ -202,6 +202,8 @@ github.com/wailsapp/wails/v3 v3.0.0-alpha.8.3 h1:9aCL0IXD60A5iscQ/ps6f3ti3IlaoG6
 github.com/wailsapp/wails/v3 v3.0.0-alpha.8.3/go.mod h1:9Ca1goy5oqxmy8Oetb8Tchkezcx4tK03DK+SqYByu5Y=
 github.com/wailsapp/wails/v3 v3.0.0-alpha.88 h1:ygKZGv0FxJfji2KCLZZE+BYDE/UHaW9Ca5c8UEFx7Iw=
 github.com/wailsapp/wails/v3 v3.0.0-alpha.88/go.mod h1:5exzAEkyvbCcdowFevzZf23SYEEvmf+pkx7gg1gOR0Q=
+github.com/wailsapp/wails/v3 v3.0.0-alpha.95 h1:Rve8djRSldn6381q2l8gw8XEnzPX/4So6VsRM6bc7Vs=
+github.com/wailsapp/wails/v3 v3.0.0-alpha.95/go.mod h1:3euiK0wb6vnXvxiHysRYYbukCa060bLSsfrvN7sZg4k=
 github.com/wailsapp/wails/webview2 v1.0.24 h1:uULnjCSaRfMlU84mS3kjLgPsRosEOIusVK1nFOHZHzs=
 github.com/wailsapp/wails/webview2 v1.0.24/go.mod h1:sdf+s0nAdxlzVWf9SCxC15XaxnQPJeY+uU1Ucn3jHQM=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
