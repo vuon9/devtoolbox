@@ -72,7 +72,7 @@ test.describe('RegExp Tester', () => {
 
     const errorMessage = page.getByText(/Invalid regular expression/).first();
     await expect(errorMessage).toBeVisible();
-    await expect(errorMessage).toHaveCSS('color', 'rgb(239, 68, 68)');
+    await expect(errorMessage).toContainText('SyntaxError');
   });
 
   test('quick reference panel toggles open and closed', async ({ page }) => {

@@ -1,4 +1,11 @@
 import { test, expect } from '@playwright/test';
+import {
+  fillEditor,
+  readEditorText,
+  expectEditorText,
+  expectEditorContains,
+  expectEditorNotEmpty,
+} from './helpers/editor';
 
 test.describe('Code Converter', () => {
   test.beforeEach(async ({ page }) => {
@@ -9,142 +16,104 @@ test.describe('Code Converter', () => {
   test('loads with default method JSON ↔ YAML', async ({ page }) => {
     const select = page.locator('select');
     await expect(select).toHaveValue('JSON ↔ YAML');
-    await expect(page.locator('textarea')).toHaveCount(2);
+    await expect(page.getByTestId('code-converter-input')).toBeVisible();
+    await expect(page.getByTestId('code-converter-output')).toBeVisible();
   });
 
   test('converts JSON to YAML', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('{"name": "test", "value": 42}');
-    await expect(output).toHaveValue(/name:\s*test/);
-    await expect(output).toHaveValue(/value:\s*42/);
+    await fillEditor(page, 'code-converter-input', '{"name": "test", "value": 42}');
+    await expectEditorContains(page, 'code-converter-output', /name:\s*test/);
+    await expectEditorContains(page, 'code-converter-output', /value:\s*42/);
   });
 
   test('converts YAML to JSON', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('name: hello\nitems:\n  - a\n  - b');
-    await expect(output).toHaveValue(/\"name\":\s*\"hello\"/);
+    await fillEditor(page, 'code-converter-input', 'name: hello\nitems:\n  - a\n  - b');
+    await expectEditorContains(page, 'code-converter-output', /"name":\s*"hello"/);
   });
 
   test('converts JSON to XML', async ({ page }) => {
     await page.locator('select').selectOption('JSON ↔ XML');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('{"hello": "world"}');
-    await expect(output).toHaveValue(/<hello>/);
-    await expect(output).toHaveValue(/world/);
+    await fillEditor(page, 'code-converter-input', '{"hello": "world"}');
+    await expectEditorContains(page, 'code-converter-output', /<hello>/);
+    await expectEditorContains(page, 'code-converter-output', /world/);
   });
 
   test('converts XML to JSON', async ({ page }) => {
     await page.locator('select').selectOption('JSON ↔ XML');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('<root><name>test</name></root>');
-    await expect(output).toHaveValue(/\"name\"/);
+    await fillEditor(page, 'code-converter-input', '<root><name>test</name></root>');
+    await expectEditorContains(page, 'code-converter-output', /"name"/);
   });
 
   test('case swapping', async ({ page }) => {
     await page.locator('select').selectOption('Case Swapping');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('Hello World');
-    await expect(output).toHaveValue('hELLO wORLD');
+    await fillEditor(page, 'code-converter-input', 'Hello World');
+    await expectEditorText(page, 'code-converter-output', 'hELLO wORLD');
   });
 
   test('converts CSV to JSON', async ({ page }) => {
     await page.locator('select').selectOption('JSON ↔ CSV / TSV');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('name,age\nAlice,30\nBob,25');
-    await expect(output).toHaveValue(/\"name\":\s*\"Alice\"/);
-    await expect(output).toHaveValue(/\"age\":\s*\"30\"/);
+    await fillEditor(page, 'code-converter-input', 'name,age\nAlice,30\nBob,25');
+    await expectEditorContains(page, 'code-converter-output', /"name":\s*"Alice"/);
+    await expectEditorContains(page, 'code-converter-output', /"age":\s*"30"/);
   });
 
   test('converts CSV to TSV', async ({ page }) => {
     await page.locator('select').selectOption('CSV ↔ TSV');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('name,age\nAlice,30');
-    await expect(output).toHaveValue(/name\tage/);
+    await fillEditor(page, 'code-converter-input', 'name,age\nAlice,30');
+    await expectEditorContains(page, 'code-converter-output', /name\tage/);
   });
 
   test('converts Key-Value to Query String', async ({ page }) => {
     await page.locator('select').selectOption('Key-Value ↔ Query String');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('foo=bar\nbaz=qux');
-    await expect(output).not.toHaveValue('');
-    const value = await output.inputValue();
+    await fillEditor(page, 'code-converter-input', 'foo=bar\nbaz=qux');
+    await expectEditorNotEmpty(page, 'code-converter-output');
+    const value = await readEditorText(page, 'code-converter-output');
     expect(value).toContain('baz=qux');
     expect(value).toContain('foo=bar');
   });
 
   test('converts Properties to JSON', async ({ page }) => {
     await page.locator('select').selectOption('Properties ↔ JSON');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('app.name=MyApp\napp.version=1.0');
-    await expect(output).toHaveValue(/\"app.name\":\s*\"MyApp\"/);
+    await fillEditor(page, 'code-converter-input', 'app.name=MyApp\napp.version=1.0');
+    await expectEditorContains(page, 'code-converter-output', /"app.name":\s*"MyApp"/);
   });
 
   test('converts INI to JSON', async ({ page }) => {
     await page.locator('select').selectOption('INI ↔ JSON');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('[section]\nkey=value');
-    await expect(output).toHaveValue(/\"section\"/);
-    await expect(output).toHaveValue(/\"key\":\s*\"value\"/);
+    await fillEditor(page, 'code-converter-input', '[section]\nkey=value');
+    await expectEditorContains(page, 'code-converter-output', /"section"/);
+    await expectEditorContains(page, 'code-converter-output', /"key":\s*"value"/);
   });
 
   test('converts curl to fetch', async ({ page }) => {
     await page.locator('select').selectOption('CURL ↔ Fetch');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill(
+    await fillEditor(
+      page,
+      'code-converter-input',
       'curl -X POST https://api.example.com/data -H \'Content-Type: application/json\' -d \'{"key":"value"}\''
     );
-    await expect(output).toHaveValue(/fetch\(/);
-    await expect(output).toHaveValue(/method:\s*'POST'/);
+    await expectEditorContains(page, 'code-converter-output', /fetch\(/);
+    await expectEditorContains(page, 'code-converter-output', /method:\s*'POST'/);
   });
 
   test('converts cron expression to text', async ({ page }) => {
     await page.locator('select').selectOption('Cron ↔ Text');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('0 9 * * 1');
-    await expect(output).toHaveValue(/Monday/);
+    await fillEditor(page, 'code-converter-input', '0 9 * * 1');
+    await expectEditorContains(page, 'code-converter-output', /Monday/);
   });
 
   test('shows error for invalid JSON with YAML method', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('not valid json');
+    await fillEditor(page, 'code-converter-input', 'not valid json');
     // Error should appear in the output pane (border turns red)
-    const outputPane = page.locator('textarea').nth(1);
-    await expect(outputPane).toHaveValue('');
+    await expectEditorText(page, 'code-converter-output', '');
   });
 
   test('clears output when input is cleared', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
+    await fillEditor(page, 'code-converter-input', '{"test": true}');
+    await expectEditorNotEmpty(page, 'code-converter-output');
 
-    await input.fill('{"test": true}');
-    await expect(output).not.toHaveValue('');
-
-    await input.fill('');
-    await expect(output).toHaveValue('');
+    await fillEditor(page, 'code-converter-input', '');
+    await expectEditorText(page, 'code-converter-output', '');
   });
 
   test('layout toggle switches between horizontal and vertical', async ({ page }) => {
@@ -169,8 +138,7 @@ test.describe('Code Converter', () => {
   test('copy button copies output to clipboard', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
-    const input = page.locator('textarea').first();
-    await input.fill('{"copied": true}');
+    await fillEditor(page, 'code-converter-input', '{"copied": true}');
 
     const copyButton = page.locator('button[title="Copy to clipboard"]').first();
     await copyButton.click();

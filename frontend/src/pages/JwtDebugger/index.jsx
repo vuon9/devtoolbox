@@ -51,6 +51,7 @@ function ToolTextArea({
   highlightOn,
   language = 'plaintext',
   style = {},
+  dataTestId,
 }) {
   const handleCopy = () => {
     if (value) navigator.clipboard.writeText(value);
@@ -121,9 +122,17 @@ function ToolTextArea({
       </div>
       {readOnly ? (
         highlightOn ? (
-          <HighlightedCode code={value} language={language} copyable={false} />
+          <HighlightedCode
+            code={value}
+            language={language}
+            copyable={false}
+            dataTestId={dataTestId}
+            ariaLabel={label}
+          />
         ) : (
           <textarea
+            data-testid={dataTestId ? `${dataTestId}-content` : undefined}
+            aria-label={label}
             value={value}
             readOnly
             placeholder={placeholder}
@@ -151,6 +160,8 @@ function ToolTextArea({
           language={language}
           highlight={highlightOn}
           placeholder={placeholder}
+          dataTestId={dataTestId}
+          ariaLabel={label}
         />
       )}
     </div>
@@ -561,6 +572,7 @@ export default function JwtDebugger() {
               onChange={(e) => setJwt(e.target.value)}
               placeholder="Paste encoded JWT here..."
               highlightOn={highlightOn}
+              dataTestId="jwt-decode-token"
             />
             <div
               style={{
@@ -622,6 +634,7 @@ export default function JwtDebugger() {
               placeholder="{ 'alg': 'HS256', 'typ': 'JWT' }"
               highlightOn={highlightOn}
               language="json"
+              dataTestId="jwt-decode-header"
             />
             <ToolTextArea
               label="Payload (Data)"
@@ -630,6 +643,7 @@ export default function JwtDebugger() {
               placeholder="{ 'sub': '1234567890', 'name': 'John Doe' }"
               highlightOn={highlightOn}
               language="json"
+              dataTestId="jwt-decode-payload"
             />
           </div>
         </ToolSplitPane>
@@ -643,6 +657,7 @@ export default function JwtDebugger() {
               placeholder='{"alg": "HS256", "typ": "JWT"}'
               highlightOn={highlightOn}
               language="json"
+              dataTestId="jwt-encode-header"
             />
             <ToolTextArea
               label="Payload (JSON)"
@@ -651,6 +666,7 @@ export default function JwtDebugger() {
               placeholder='{"sub": "1234567890", "name": "John Doe"}'
               highlightOn={highlightOn}
               language="json"
+              dataTestId="jwt-encode-payload"
             />
             <div
               style={{
@@ -697,6 +713,7 @@ export default function JwtDebugger() {
               readOnly
               placeholder="Encoded JWT will appear here..."
               highlightOn={highlightOn}
+              dataTestId="jwt-encode-token"
             />
             {error && <StatusMessage type="error">{error}</StatusMessage>}
           </div>

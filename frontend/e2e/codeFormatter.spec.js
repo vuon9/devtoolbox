@@ -1,4 +1,11 @@
 import { test, expect } from '@playwright/test';
+import {
+  fillEditor,
+  readEditorText,
+  expectEditorContains,
+  expectEditorNotEmpty,
+  expectEditorText,
+} from './helpers/editor';
 
 test.describe('Code Formatter', () => {
   test.beforeEach(async ({ page }) => {
@@ -8,40 +15,36 @@ test.describe('Code Formatter', () => {
 
   test('loads with JSON default and empty panes', async ({ page }) => {
     await expect(page.getByRole('button', { name: 'JSON' }).first()).toBeVisible();
-    await expect(page.locator('textarea').first()).toHaveValue('');
-    await expect(page.locator('pre code')).not.toBeVisible();
+    await expectEditorText(page, 'code-formatter-input', '');
+    await expect(page.getByTestId('code-formatter-output')).not.toBeVisible();
     await expect(page.locator('input[placeholder=".users[].name"]')).toBeVisible();
   });
 
   test('load sample fills input', async ({ page }) => {
     await page.getByRole('button', { name: 'Load Sample' }).click();
 
-    const input = page.locator('textarea').first();
-    await expect(input).not.toHaveValue('');
-    await expect(input).toContainText('users');
+    await expectEditorNotEmpty(page, 'code-formatter-input');
+    await expectEditorContains(page, 'code-formatter-input', 'users');
   });
 
   test('format produces output', async ({ page }) => {
     await page.getByRole('button', { name: 'Load Sample' }).click();
 
-    const outputCode = page.locator('pre code');
-    await expect(outputCode).toBeVisible();
-    await expect(outputCode).not.toHaveText('');
+    await expectEditorNotEmpty(page, 'code-formatter-output');
   });
 
   test('minify toggle changes output', async ({ page }) => {
     await page.getByRole('button', { name: 'Load Sample' }).click();
 
-    const outputCode = page.locator('pre code');
-    await expect(outputCode).toBeVisible();
+    await expectEditorNotEmpty(page, 'code-formatter-output');
 
-    const formattedText = await outputCode.textContent();
+    const formattedText = await readEditorText(page, 'code-formatter-output');
     expect(formattedText).toContain('\n');
 
     await page.getByRole('button', { name: 'Minify' }).click();
     await page.waitForTimeout(400);
 
-    const minifiedText = await outputCode.textContent();
+    const minifiedText = await readEditorText(page, 'code-formatter-output');
     const formattedNewlines = (formattedText.match(/\n/g) || []).length;
     const minifiedNewlines = (minifiedText.match(/\n/g) || []).length;
     expect(minifiedNewlines).toBeLessThan(formattedNewlines);
@@ -58,13 +61,11 @@ test.describe('Code Formatter', () => {
 
     await page.getByRole('button', { name: 'Load Sample' }).click();
 
-    const input = page.locator('textarea').first();
-    await expect(input).toContainText('<?xml');
+    await expectEditorContains(page, 'code-formatter-input', '<?xml');
   });
 
   test('invalid JSON shows error', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('{ invalid json }');
+    await fillEditor(page, 'code-formatter-input', '{ invalid json }');
 
     await expect(page.getByText(/invalid JSON/i)).toBeVisible({ timeout: 2000 });
   });
@@ -91,9 +92,11 @@ test.describe('Code Formatter', () => {
   test('output has syntax highlighting', async ({ page }) => {
     await page.getByRole('button', { name: 'Load Sample' }).click();
 
-    const codeBlock = page.locator('pre code');
-    await expect(codeBlock).toBeVisible();
-    await expect(codeBlock).toHaveClass(/language-json/);
+    await expect(page.getByTestId('code-formatter-output')).toBeVisible();
+    await expect(page.getByTestId('code-formatter-output-content')).toHaveAttribute(
+      'aria-label',
+      'Formatted Output'
+    );
   });
 
   test('filter input filters JSON output', async ({ page }) => {
@@ -103,8 +106,7 @@ test.describe('Code Formatter', () => {
     await filterInput.fill('.users[].name');
     await page.waitForTimeout(500);
 
-    const outputCode = page.locator('pre code');
-    const text = await outputCode.textContent();
+    const text = await readEditorText(page, 'code-formatter-output');
     expect(text).toContain('Alice');
     expect(text).toContain('Bob');
     expect(text).not.toContain('age');

@@ -37,6 +37,8 @@ export default function HighlightedCode({
   showLineNumbers = false,
   className = '',
   label,
+  dataTestId,
+  ariaLabel,
 }) {
   const containerRef = useRef(null);
   const viewRef = useRef(null);
@@ -45,6 +47,9 @@ export default function HighlightedCode({
   const codeRef = useRef(code);
   const languageRef = useRef(language);
   const showLineNumbersRef = useRef(showLineNumbers);
+  const dataTestIdRef = useRef(dataTestId);
+  const ariaLabelRef = useRef(ariaLabel);
+  const labelRef = useRef(label);
 
   const { editorExtensions } = useTheme();
 
@@ -52,6 +57,9 @@ export default function HighlightedCode({
     codeRef.current = code;
     languageRef.current = language;
     showLineNumbersRef.current = showLineNumbers;
+    dataTestIdRef.current = dataTestId;
+    ariaLabelRef.current = ariaLabel;
+    labelRef.current = label;
   });
 
   // Destroy and re-create on theme or code change
@@ -60,7 +68,7 @@ export default function HighlightedCode({
       viewRef.current.destroy();
       viewRef.current = null;
     }
-    if (!containerRef.current || !codeRef.current) return;
+    if (!containerRef.current) return;
     let isCancelled = false;
 
     const initEditor = async () => {
@@ -73,6 +81,11 @@ export default function HighlightedCode({
         const extensions = [
           ...editorExtensions,
           EditorView.editable.of(false),
+          EditorView.contentAttributes.of({
+            'aria-label': ariaLabelRef.current || labelRef.current || 'Read-only code output',
+            ...(dataTestIdRef.current ? { 'data-testid': `${dataTestIdRef.current}-content` } : {}),
+            'aria-readonly': 'true',
+          }),
           EditorState.readOnly.of(true),
         ];
         if (langExtension) extensions.push(langExtension);
@@ -98,7 +111,7 @@ export default function HighlightedCode({
     return () => {
       isCancelled = true;
     };
-  }, [editorExtensions]);
+  }, [editorExtensions, dataTestId, ariaLabel, label, language, showLineNumbers]);
 
   useEffect(() => {
     return () => {
@@ -147,7 +160,7 @@ export default function HighlightedCode({
 
   if (loadError) {
     return (
-      <div className={className} style={containerStyle}>
+      <div className={className} style={containerStyle} data-testid={dataTestId}>
         {(label || copyable) && (
           <div style={headerStyle}>
             {label && <span style={labelStyle}>{label}</span>}
@@ -173,7 +186,7 @@ export default function HighlightedCode({
   }
 
   return (
-    <div className={className} style={containerStyle}>
+    <div className={className} style={containerStyle} data-testid={dataTestId}>
       {(label || copyable) && (
         <div style={headerStyle}>
           {label && <span style={labelStyle}>{label}</span>}

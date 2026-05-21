@@ -6,7 +6,7 @@ test.describe('Barcode / QR Code Generator', () => {
   });
 
   test('should load with QR Code type selected', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Barcode / QR Code' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Barcode \/ QR Code/ })).toBeVisible();
     await expect(page.getByText('Generate high-quality QR codes and barcodes')).toBeVisible();
     // QR type should be active
     await expect(page.getByRole('button', { name: 'QR Code' })).toBeVisible();
@@ -77,15 +77,10 @@ test.describe('Barcode / QR Code Generator', () => {
   });
 
   test('should toggle layout orientation', async ({ page }) => {
-    // Layout toggle button should exist (Columns icon)
-    const layoutButton = page
-      .locator('button')
-      .filter({ has: page.locator('svg') })
-      .filter({ hasNotText: /Clear|PNG|SVG|QR|Code|EAN/ })
-      .first();
+    const layoutButton = page.getByRole('button', { name: 'Toggle layout orientation' });
     await layoutButton.click();
     // After toggle, the layout should be vertical (single column grid)
     // Just verify the button is clickable and no error occurs
-    await expect(page.getByRole('heading', { name: 'Barcode / QR Code' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Barcode \/ QR Code/ })).toBeVisible();
   });
 });

@@ -132,6 +132,7 @@ function ToolTextArea({
   readOnly,
   highlightOn,
   language = 'plaintext',
+  dataTestId,
 }) {
   const handleCopy = () => {
     if (value) navigator.clipboard.writeText(value);
@@ -159,6 +160,7 @@ function ToolTextArea({
         </label>
         <button
           onClick={handleCopy}
+          disabled={!value}
           title="Copy to clipboard"
           style={{
             display: 'inline-flex',
@@ -202,9 +204,17 @@ function ToolTextArea({
       </div>
       {readOnly ? (
         highlightOn ? (
-          <HighlightedCode code={value} language={language} copyable={false} />
+          <HighlightedCode
+            code={value}
+            language={language}
+            copyable={false}
+            dataTestId={dataTestId}
+            ariaLabel={label}
+          />
         ) : (
           <textarea
+            data-testid={dataTestId ? `${dataTestId}-content` : undefined}
+            aria-label={label}
             value={value}
             readOnly
             placeholder={placeholder}
@@ -227,6 +237,8 @@ function ToolTextArea({
         )
       ) : (
         <textarea
+          data-testid={dataTestId ? `${dataTestId}-content` : undefined}
+          aria-label={label}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
@@ -1000,6 +1012,7 @@ export default function DataGenerator() {
             placeholder="Generated data will appear here..."
             highlightOn={highlightOn}
             language="json"
+            dataTestId="data-generator-output"
           />
           {output && (
             <div style={{ marginTop: '12px' }}>
