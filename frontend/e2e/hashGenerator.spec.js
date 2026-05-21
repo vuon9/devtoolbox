@@ -1,4 +1,10 @@
 import { test, expect } from '@playwright/test';
+import {
+  fillEditor,
+  readEditorText,
+  expectEditorText,
+  expectEditorNotEmpty,
+} from './helpers/editor';
 
 test.describe('Hash Generator', () => {
   test.beforeEach(async ({ page }) => {
@@ -8,40 +14,30 @@ test.describe('Hash Generator', () => {
 
   test('loads with default method MD5', async ({ page }) => {
     await expect(page.locator('select')).toHaveValue('MD5');
-    await expect(page.locator('textarea')).toHaveCount(2);
+    await expect(page.getByTestId('hash-generator-input')).toBeVisible();
+    await expect(page.getByTestId('hash-generator-output')).toBeVisible();
   });
 
   test('generates MD5 hash', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello');
-    await expect(output).toHaveValue('5d41402abc4b2a76b9719d911017c592');
+    await fillEditor(page, 'hash-generator-input', 'hello');
+    await expectEditorText(page, 'hash-generator-output', '5d41402abc4b2a76b9719d911017c592');
   });
 
   test('generates SHA-256 hash', async ({ page }) => {
     await page.locator('select').selectOption('SHA-256');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello');
-    await expect(output).toHaveValue(/[a-f0-9]{64}/);
+    await fillEditor(page, 'hash-generator-input', 'hello');
+    await expectEditorText(page, 'hash-generator-output', /[a-f0-9]{64}/);
   });
 
   test('generates SHA-1 hash', async ({ page }) => {
     await page.locator('select').selectOption('SHA-1');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello');
-    await expect(output).toHaveValue(/[a-f0-9]{40}/);
+    await fillEditor(page, 'hash-generator-input', 'hello');
+    await expectEditorText(page, 'hash-generator-output', /[a-f0-9]{40}/);
   });
 
   test('generates all hashes at once', async ({ page }) => {
     await page.locator('select').selectOption('All');
-    const input = page.locator('textarea').first();
-
-    await input.fill('hello');
+    await fillEditor(page, 'hash-generator-input', 'hello');
 
     // All hashes mode shows a multi-hash output panel instead of textarea
     await expect(page.locator('span').filter({ hasText: 'All Hashes' })).toBeVisible();
@@ -58,35 +54,27 @@ test.describe('Hash Generator', () => {
 
   test('generates HMAC with key', async ({ page }) => {
     await page.locator('select').selectOption('HMAC');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
     const hmacInput = page.locator('input[placeholder="HMAC Key"]');
 
     await hmacInput.fill('secretkey');
-    await input.fill('hello');
+    await fillEditor(page, 'hash-generator-input', 'hello');
 
-    await expect(output).not.toHaveValue('');
-    const hash = await output.inputValue();
+    await expectEditorNotEmpty(page, 'hash-generator-output');
+    const hash = await readEditorText(page, 'hash-generator-output');
     expect(hash.length).toBeGreaterThan(0);
   });
 
   test('generates CRC32 hash', async ({ page }) => {
     await page.locator('select').selectOption('CRC32');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello');
-    await expect(output).not.toHaveValue('');
+    await fillEditor(page, 'hash-generator-input', 'hello');
+    await expectEditorNotEmpty(page, 'hash-generator-output');
   });
 
   test('generates bcrypt hash', async ({ page }) => {
     await page.locator('select').selectOption('bcrypt');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('password123');
-    await expect(output).not.toHaveValue('');
-    const hash = await output.inputValue();
+    await fillEditor(page, 'hash-generator-input', 'password123');
+    await expectEditorNotEmpty(page, 'hash-generator-output');
+    const hash = await readEditorText(page, 'hash-generator-output');
     expect(hash).toContain('$');
   });
 
@@ -109,8 +97,7 @@ test.describe('Hash Generator', () => {
   test('copy button copies output to clipboard', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
-    const input = page.locator('textarea').first();
-    await input.fill('copy hash test');
+    await fillEditor(page, 'hash-generator-input', 'copy hash test');
 
     const copyButton = page.locator('button[title="Copy to clipboard"]').nth(1);
     await copyButton.click();
@@ -120,58 +107,48 @@ test.describe('Hash Generator', () => {
   });
 
   test('clears output when input is cleared', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
+    await fillEditor(page, 'hash-generator-input', 'test');
+    await expectEditorNotEmpty(page, 'hash-generator-output');
 
-    await input.fill('test');
-    await expect(output).not.toHaveValue('');
-
-    await input.fill('');
-    await expect(output).toHaveValue('');
+    await fillEditor(page, 'hash-generator-input', '');
+    await expectEditorText(page, 'hash-generator-output', '');
   });
 
   test('different inputs produce different hashes', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('input1');
-    await expect(output).not.toHaveValue('');
-    const hash1 = await output.inputValue();
+    await fillEditor(page, 'hash-generator-input', 'input1');
+    await expectEditorNotEmpty(page, 'hash-generator-output');
+    const hash1 = await readEditorText(page, 'hash-generator-output');
 
     // Wait for debounce to settle before second input
     await page.waitForTimeout(500);
-    await input.fill('something-completely-different');
+    await fillEditor(page, 'hash-generator-input', 'something-completely-different');
     // Wait for output to actually change to a new value
-    await expect.poll(async () => await output.inputValue()).not.toBe(hash1);
-    const hash2 = await output.inputValue();
+    await expect
+      .poll(async () => await readEditorText(page, 'hash-generator-output'))
+      .not.toBe(hash1);
+    const hash2 = await readEditorText(page, 'hash-generator-output');
 
     expect(hash1).not.toBe(hash2);
   });
 
   test('same input produces same hash', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
+    await fillEditor(page, 'hash-generator-input', 'consistent');
+    await expectEditorNotEmpty(page, 'hash-generator-output');
+    const hash1 = await readEditorText(page, 'hash-generator-output');
 
-    await input.fill('consistent');
-    await expect(output).not.toHaveValue('');
-    const hash1 = await output.inputValue();
-
-    await input.fill('');
-    await input.fill('consistent');
-    await expect(output).not.toHaveValue('');
-    const hash2 = await output.inputValue();
+    await fillEditor(page, 'hash-generator-input', '');
+    await fillEditor(page, 'hash-generator-input', 'consistent');
+    await expectEditorNotEmpty(page, 'hash-generator-output');
+    const hash2 = await readEditorText(page, 'hash-generator-output');
 
     expect(hash1).toBe(hash2);
   });
 
   test('generates BLAKE3 hash', async ({ page }) => {
     await page.locator('select').selectOption('BLAKE3');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello');
-    await expect(output).not.toHaveValue('');
-    const hash = await output.inputValue();
+    await fillEditor(page, 'hash-generator-input', 'hello');
+    await expectEditorNotEmpty(page, 'hash-generator-output');
+    const hash = await readEditorText(page, 'hash-generator-output');
     expect(hash.length).toBeGreaterThanOrEqual(32);
   });
 });

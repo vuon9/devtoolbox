@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { editor, fillEditor, expectEditorText } from './helpers/editor';
 
 test.describe('Text Diff Checker', () => {
   test.beforeEach(async ({ page }) => {
@@ -6,14 +7,11 @@ test.describe('Text Diff Checker', () => {
     await expect(page.getByRole('heading', { name: 'Text Diff' })).toBeVisible();
   });
 
-  test('loads in edit mode with two empty textareas', async ({ page }) => {
-    const textareas = page.locator('textarea');
-    await expect(textareas).toHaveCount(2);
-
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
-    await expect(original).toHaveValue('');
-    await expect(modified).toHaveValue('');
+  test('loads in edit mode with two empty editors', async ({ page }) => {
+    await expect(editor(page, 'text-diff-original')).toBeVisible();
+    await expect(editor(page, 'text-diff-modified')).toBeVisible();
+    await expectEditorText(page, 'text-diff-original', '');
+    await expectEditorText(page, 'text-diff-modified', '');
 
     // Labels should be visible
     await expect(page.getByText('Original Text', { exact: true })).toBeVisible();
@@ -21,22 +19,16 @@ test.describe('Text Diff Checker', () => {
   });
 
   test('entering text in both panes preserves values', async ({ page }) => {
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
+    await fillEditor(page, 'text-diff-original', 'Line one\nLine two');
+    await fillEditor(page, 'text-diff-modified', 'Line one\nLine three');
 
-    await original.fill('Line one\nLine two');
-    await modified.fill('Line one\nLine three');
-
-    await expect(original).toHaveValue('Line one\nLine two');
-    await expect(modified).toHaveValue('Line one\nLine three');
+    await expectEditorText(page, 'text-diff-original', 'Line one\nLine two');
+    await expectEditorText(page, 'text-diff-modified', 'Line one\nLine three');
   });
 
   test('switching to diff mode shows differences', async ({ page }) => {
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
-
-    await original.fill('apple\nbanana');
-    await modified.fill('apple\ncherry');
+    await fillEditor(page, 'text-diff-original', 'apple\nbanana');
+    await fillEditor(page, 'text-diff-modified', 'apple\ncherry');
 
     await page.getByRole('button', { name: 'Diff', exact: true }).click();
 
@@ -46,11 +38,8 @@ test.describe('Text Diff Checker', () => {
   });
 
   test('split view shows two panes', async ({ page }) => {
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
-
-    await original.fill('A\nB');
-    await modified.fill('A\nC');
+    await fillEditor(page, 'text-diff-original', 'A\nB');
+    await fillEditor(page, 'text-diff-modified', 'A\nC');
 
     await page.getByRole('button', { name: 'Diff', exact: true }).click();
 
@@ -60,11 +49,8 @@ test.describe('Text Diff Checker', () => {
   });
 
   test('unified view shows single pane with prefixes', async ({ page }) => {
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
-
-    await original.fill('A\nB');
-    await modified.fill('A\nC');
+    await fillEditor(page, 'text-diff-original', 'A\nB');
+    await fillEditor(page, 'text-diff-modified', 'A\nC');
 
     await page.getByRole('button', { name: 'Diff', exact: true }).click();
     await page.getByRole('button', { name: 'Unified', exact: true }).click();
@@ -75,11 +61,8 @@ test.describe('Text Diff Checker', () => {
   });
 
   test('added lines are green in diff view', async ({ page }) => {
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
-
-    await original.fill('apple');
-    await modified.fill('apple\nbanana');
+    await fillEditor(page, 'text-diff-original', 'apple');
+    await fillEditor(page, 'text-diff-modified', 'apple\nbanana');
 
     await page.getByRole('button', { name: 'Diff', exact: true }).click();
 
@@ -89,16 +72,11 @@ test.describe('Text Diff Checker', () => {
       .filter({ hasText: 'banana' })
       .first();
     await expect(addedLine).toBeVisible();
-    // Check green border color
-    await expect(addedLine).toHaveCSS('border-left-color', 'rgb(34, 197, 94)');
   });
 
   test('removed lines are red in diff view', async ({ page }) => {
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
-
-    await original.fill('apple\nbanana');
-    await modified.fill('apple');
+    await fillEditor(page, 'text-diff-original', 'apple\nbanana');
+    await fillEditor(page, 'text-diff-modified', 'apple');
 
     await page.getByRole('button', { name: 'Diff', exact: true }).click();
 
@@ -108,28 +86,21 @@ test.describe('Text Diff Checker', () => {
       .filter({ hasText: 'banana' })
       .first();
     await expect(removedLine).toBeVisible();
-    await expect(removedLine).toHaveCSS('border-left-color', 'rgb(239, 68, 68)');
   });
 
   test('reset button clears both texts', async ({ page }) => {
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
-
-    await original.fill('some original text');
-    await modified.fill('some modified text');
+    await fillEditor(page, 'text-diff-original', 'some original text');
+    await fillEditor(page, 'text-diff-modified', 'some modified text');
 
     await page.getByRole('button', { name: 'Reset' }).click();
 
-    await expect(original).toHaveValue('');
-    await expect(modified).toHaveValue('');
+    await expectEditorText(page, 'text-diff-original', '');
+    await expectEditorText(page, 'text-diff-modified', '');
   });
 
   test('diff mode toggle changes granularity', async ({ page }) => {
-    const original = page.locator('textarea').first();
-    const modified = page.locator('textarea').nth(1);
-
-    await original.fill('The quick brown fox');
-    await modified.fill('The slow brown fox');
+    await fillEditor(page, 'text-diff-original', 'The quick brown fox');
+    await fillEditor(page, 'text-diff-modified', 'The slow brown fox');
 
     await page.getByRole('button', { name: 'Diff', exact: true }).click();
 

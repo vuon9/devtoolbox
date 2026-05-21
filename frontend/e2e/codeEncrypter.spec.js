@@ -1,4 +1,11 @@
 import { test, expect } from '@playwright/test';
+import {
+  fillEditor,
+  readEditorText,
+  expectEditorContains,
+  expectEditorText,
+  expectEditorNotEmpty,
+} from './helpers/editor';
 
 test.describe('Code Encrypter', () => {
   test.beforeEach(async ({ page }) => {
@@ -8,24 +15,22 @@ test.describe('Code Encrypter', () => {
 
   test('loads with default method AES and encrypt mode', async ({ page }) => {
     await expect(page.locator('select').first()).toHaveValue('AES');
-    await expect(page.locator('button').filter({ hasText: 'Encrypt' }).first()).toHaveCSS(
-      'background-color',
-      'rgb(37, 99, 235)'
+    await expect(page.locator('button').filter({ hasText: 'Encrypt' }).first()).toHaveAttribute(
+      'style',
+      /background-color: var\(--primary\)/
     );
   });
 
   test('encrypts text with AES', async ({ page }) => {
     const keyInput = page.locator('input[placeholder*="encryption key"]').first();
     const ivInput = page.locator('input[placeholder*="IV"]').first();
-    const textInput = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
 
-    await keyInput.fill('mykey12345678901234567890123456');
+    await keyInput.fill('mykey123456789012345678901234567');
     await ivInput.fill('myiv123456789012');
-    await textInput.fill('Hello World');
+    await fillEditor(page, 'code-encrypter-input', 'Hello World');
 
-    await expect(output).not.toHaveValue('');
-    const encrypted = await output.inputValue();
+    await expectEditorNotEmpty(page, 'code-encrypter-output');
+    const encrypted = await readEditorText(page, 'code-encrypter-output');
     expect(encrypted.length).toBeGreaterThan(0);
     expect(encrypted).not.toBe('Hello World');
   });
@@ -33,16 +38,14 @@ test.describe('Code Encrypter', () => {
   test('decrypts AES-encrypted text back to original', async ({ page }) => {
     const keyInput = page.locator('input[placeholder*="encryption key"]').first();
     const ivInput = page.locator('input[placeholder*="IV"]').first();
-    const textInput = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
 
-    await keyInput.fill('mykey12345678901234567890123456');
+    await keyInput.fill('mykey123456789012345678901234567');
     await ivInput.fill('myiv123456789012');
-    await textInput.fill('Secret Message');
+    await fillEditor(page, 'code-encrypter-input', 'Secret Message');
 
     // Wait for encryption
-    await expect(output).not.toHaveValue('');
-    const encrypted = await output.inputValue();
+    await expectEditorNotEmpty(page, 'code-encrypter-output');
+    const encrypted = await readEditorText(page, 'code-encrypter-output');
     expect(encrypted.length).toBeGreaterThan(0);
 
     // Skip if backend returns object instead of string
@@ -53,13 +56,14 @@ test.describe('Code Encrypter', () => {
 
     // Switch to decrypt mode
     await page.locator('button').filter({ hasText: 'Decrypt' }).first().click();
+    await expect(page.locator('span').filter({ hasText: /^Decrypt$/ })).toBeVisible();
 
     // Clear input and enter encrypted text
-    await textInput.fill(encrypted);
+    await fillEditor(page, 'code-encrypter-input', encrypted);
 
     // Should decrypt back to something readable (may have padding differences)
-    await expect(output).not.toHaveValue('');
-    const decrypted = await output.inputValue();
+    await expectEditorContains(page, 'code-encrypter-output', 'Secret');
+    const decrypted = await readEditorText(page, 'code-encrypter-output');
     expect(decrypted).toContain('Secret');
   });
 
@@ -68,17 +72,15 @@ test.describe('Code Encrypter', () => {
 
     const keyInput = page.locator('input[placeholder*="encryption key"]').first();
     const ivInput = page.locator('input[placeholder*="IV"]').first();
-    const textInput = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
 
     // XOR should show key but no IV
     await expect(keyInput).toBeVisible();
     await expect(ivInput).not.toBeVisible();
 
     await keyInput.fill('secret');
-    await textInput.fill('Hello');
+    await fillEditor(page, 'code-encrypter-input', 'Hello');
 
-    await expect(output).not.toHaveValue('');
+    await expectEditorNotEmpty(page, 'code-encrypter-output');
   });
 
   test('shows RSA public/private key inputs for RSA method', async ({ page }) => {
@@ -94,10 +96,7 @@ test.describe('Code Encrypter', () => {
   });
 
   test('encrypt/decrypt mode toggle changes output labels', async ({ page }) => {
-    const textInput = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await textInput.fill('test');
+    await fillEditor(page, 'code-encrypter-input', 'test');
     // Check output pane indicator shows "Encrypt" when in encrypt mode
     await expect(page.locator('span').filter({ hasText: /^Encrypt$/ })).toBeVisible();
 
@@ -132,18 +131,16 @@ test.describe('Code Encrypter', () => {
 
     const keyInput = page.locator('input[placeholder*="encryption key"]').first();
     const ivInput = page.locator('input[placeholder*="IV"]').first();
-    const textInput = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
 
-    await keyInput.fill('mykey12345678901234567890123456');
+    await keyInput.fill('mykey123456789012345678901234567');
     await ivInput.fill('myiv123456789012');
-    await textInput.fill('Manual Test');
+    await fillEditor(page, 'code-encrypter-input', 'Manual Test');
 
     // Output should be empty before clicking convert
-    await expect(output).toHaveValue('');
+    await expectEditorText(page, 'code-encrypter-output', '');
 
     await page.locator('button').filter({ hasText: 'Convert' }).click();
-    await expect(output).not.toHaveValue('');
+    await expectEditorNotEmpty(page, 'code-encrypter-output');
   });
 
   test('layout toggle switches between horizontal and vertical', async ({ page }) => {
@@ -167,11 +164,10 @@ test.describe('Code Encrypter', () => {
 
     const keyInput = page.locator('input[placeholder*="encryption key"]').first();
     const ivInput = page.locator('input[placeholder*="IV"]').first();
-    const textInput = page.locator('textarea').first();
 
-    await keyInput.fill('mykey12345678901234567890123456');
+    await keyInput.fill('mykey123456789012345678901234567');
     await ivInput.fill('myiv123456789012');
-    await textInput.fill('copy me');
+    await fillEditor(page, 'code-encrypter-input', 'copy me');
 
     const copyButton = page.locator('button[title="Copy to clipboard"]').nth(1);
     await copyButton.click();
@@ -183,17 +179,15 @@ test.describe('Code Encrypter', () => {
   test('shows error for empty key with AES', async ({ page }) => {
     const keyInput = page.locator('input[placeholder*="encryption key"]').first();
     const ivInput = page.locator('input[placeholder*="IV"]').first();
-    const textInput = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
 
     await keyInput.fill('');
     await ivInput.fill('myiv123456789012');
-    await textInput.fill('test');
+    await fillEditor(page, 'code-encrypter-input', 'test');
 
     // With empty key, either no output or error appears
     await expect
       .poll(async () => {
-        const val = await output.inputValue();
+        const val = await readEditorText(page, 'code-encrypter-output');
         const hasError = await page
           .locator('div')
           .filter({ hasText: /error|Error|fail/i })
@@ -208,16 +202,14 @@ test.describe('Code Encrypter', () => {
   test('clears output when input is cleared', async ({ page }) => {
     const keyInput = page.locator('input[placeholder*="encryption key"]').first();
     const ivInput = page.locator('input[placeholder*="IV"]').first();
-    const textInput = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
 
-    await keyInput.fill('mykey12345678901234567890123456');
+    await keyInput.fill('mykey123456789012345678901234567');
     await ivInput.fill('myiv123456789012');
-    await textInput.fill('something');
-    await expect(output).not.toHaveValue('');
+    await fillEditor(page, 'code-encrypter-input', 'something');
+    await expectEditorNotEmpty(page, 'code-encrypter-output');
 
-    await textInput.fill('');
-    await expect(output).toHaveValue('');
+    await fillEditor(page, 'code-encrypter-input', '');
+    await expectEditorText(page, 'code-encrypter-output', '');
   });
 
   test('persists method selection in localStorage', async ({ page }) => {

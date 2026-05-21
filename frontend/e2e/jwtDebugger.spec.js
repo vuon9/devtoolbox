@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { expectEditorContains, expectEditorNotEmpty } from './helpers/editor';
 
 test.describe('JWT Debugger', () => {
   test.beforeEach(async ({ page }) => {
@@ -14,18 +15,16 @@ test.describe('JWT Debugger', () => {
 
   test('should fill sample data in decode mode', async ({ page }) => {
     await page.getByRole('button', { name: 'Sample' }).click();
-    const tokenArea = page.locator('textarea').first();
-    await expect(tokenArea).not.toHaveValue('');
-    await expect(tokenArea).toContainText('eyJ');
+    await expectEditorNotEmpty(page, 'jwt-decode-token');
+    await expectEditorContains(page, 'jwt-decode-token', 'eyJ');
   });
 
   test('should decode sample JWT and show header + payload', async ({ page }) => {
     await page.getByRole('button', { name: 'Sample' }).click();
-    // Wait for decode (decode mode has 3 textareas: token, header, payload)
-    await expect(page.locator('textarea').nth(1)).not.toHaveValue(''); // Header
-    await expect(page.locator('textarea').nth(2)).not.toHaveValue(''); // Payload
-    await expect(page.locator('textarea').nth(1)).toContainText('alg');
-    await expect(page.locator('textarea').nth(2)).toContainText('sub');
+    await expectEditorNotEmpty(page, 'jwt-decode-header');
+    await expectEditorNotEmpty(page, 'jwt-decode-payload');
+    await expectEditorContains(page, 'jwt-decode-header', 'alg');
+    await expectEditorContains(page, 'jwt-decode-payload', 'sub');
   });
 
   test('should switch to encode mode', async ({ page }) => {
@@ -38,20 +37,16 @@ test.describe('JWT Debugger', () => {
   test('should fill sample data in encode mode', async ({ page }) => {
     await page.getByRole('button', { name: 'Encode' }).click();
     await page.getByRole('button', { name: 'Sample' }).click();
-    const headerArea = page.locator('textarea').first();
-    const payloadArea = page.locator('textarea').nth(1);
-    await expect(headerArea).toContainText('alg');
-    await expect(payloadArea).toContainText('sub');
+    await expectEditorContains(page, 'jwt-encode-header', 'alg');
+    await expectEditorContains(page, 'jwt-encode-payload', 'sub');
   });
 
   test('should encode and generate a JWT token', async ({ page }) => {
     await page.getByRole('button', { name: 'Encode' }).click();
     await page.getByRole('button', { name: 'Sample' }).click();
     await page.getByRole('button', { name: 'Sign & Encode' }).click();
-    // Wait for encoded token
-    const encodedArea = page.locator('textarea').nth(2);
-    await expect(encodedArea).not.toHaveValue('');
-    await expect(encodedArea).toContainText('eyJ');
+    await expectEditorNotEmpty(page, 'jwt-encode-token');
+    await expectEditorContains(page, 'jwt-encode-token', 'eyJ');
   });
 
   test('should change algorithm selection', async ({ page }) => {

@@ -625,6 +625,8 @@ export default function TextDiffChecker() {
                 onChange={(val) => setOriginal(val)}
                 language="plaintext"
                 placeholder="Paste original version here..."
+                dataTestId="text-diff-original"
+                ariaLabel="Original Text"
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
@@ -665,6 +667,8 @@ export default function TextDiffChecker() {
                 onChange={(val) => setModified(val)}
                 language="plaintext"
                 placeholder="Paste modified version here..."
+                dataTestId="text-diff-modified"
+                ariaLabel="Modified Text"
               />
             </div>
           </div>

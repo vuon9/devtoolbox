@@ -39,6 +39,8 @@ export default function CodeEditor({
   readOnly = false,
   placeholder,
   label,
+  dataTestId,
+  ariaLabel,
   showLineNumbers = false,
   className = '',
   style = {},
@@ -52,6 +54,10 @@ export default function CodeEditor({
   const languageRef = useRef(language);
   const readOnlyRef = useRef(readOnly);
   const showLineNumbersRef = useRef(showLineNumbers);
+  const dataTestIdRef = useRef(dataTestId);
+  const ariaLabelRef = useRef(ariaLabel);
+  const placeholderRef = useRef(placeholder);
+  const labelRef = useRef(label);
 
   const { editorExtensions } = useTheme();
 
@@ -61,6 +67,10 @@ export default function CodeEditor({
     languageRef.current = language;
     readOnlyRef.current = readOnly;
     showLineNumbersRef.current = showLineNumbers;
+    dataTestIdRef.current = dataTestId;
+    ariaLabelRef.current = ariaLabel;
+    placeholderRef.current = placeholder;
+    labelRef.current = label;
   });
 
   // Destroy existing view on theme change, then re-init
@@ -81,6 +91,15 @@ export default function CodeEditor({
         const extensions = [
           ...editorExtensions,
           keymap.of(defaultKeymap),
+          EditorView.contentAttributes.of({
+            'aria-label':
+              ariaLabelRef.current ||
+              labelRef.current ||
+              placeholderRef.current ||
+              (readOnlyRef.current ? 'Read-only code output' : 'Code editor'),
+            ...(dataTestIdRef.current ? { 'data-testid': `${dataTestIdRef.current}-content` } : {}),
+            ...(readOnlyRef.current ? { 'aria-readonly': 'true' } : {}),
+          }),
           EditorView.updateListener.of((update) => {
             if (update.docChanged && onChangeRef.current)
               onChangeRef.current(update.state.doc.toString());
@@ -112,7 +131,7 @@ export default function CodeEditor({
     return () => {
       isCancelled = true;
     };
-  }, [highlight, editorExtensions]);
+  }, [highlight, editorExtensions, dataTestId, ariaLabel, label, placeholder]);
 
   useEffect(() => {
     return () => {
@@ -163,9 +182,11 @@ export default function CodeEditor({
 
   if (!highlight || loadError) {
     return (
-      <div className={className} style={containerStyle}>
+      <div className={className} style={containerStyle} data-testid={dataTestId}>
         {label && <div style={labelStyle}>{label}</div>}
         <textarea
+          data-testid={dataTestId ? `${dataTestId}-content` : undefined}
+          aria-label={ariaLabel || label || placeholder || 'Code editor'}
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           readOnly={readOnly}
@@ -190,7 +211,7 @@ export default function CodeEditor({
   }
 
   return (
-    <div className={className} style={containerStyle}>
+    <div className={className} style={containerStyle} data-testid={dataTestId}>
       {label && <div style={labelStyle}>{label}</div>}
       <div
         style={{ flex: 1, overflow: 'auto', position: 'relative', minHeight: 0 }}

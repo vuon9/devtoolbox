@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readEditorText, expectEditorNotEmpty, expectEditorText } from './helpers/editor';
 
 test.describe('Data Generator', () => {
   test.beforeEach(async ({ page }) => {
@@ -12,26 +13,29 @@ test.describe('Data Generator', () => {
     await expect(page.locator('input[placeholder="Field name"]')).toHaveCount(5);
     await expect(page.locator('input[placeholder="Field name"]').first()).toHaveValue('id');
 
-    const output = page.locator('textarea[readonly]');
-    await expect(output).toHaveValue('');
-    await expect(page.getByRole('button', { name: 'Copy to Clipboard' })).not.toBeVisible();
+    await expectEditorText(page, 'data-generator-output', '');
+    await expect(
+      page.getByRole('button', { name: 'Copy to Clipboard', exact: true })
+    ).not.toBeAttached();
   });
 
   test('generate button produces output', async ({ page }) => {
     await page.getByRole('button', { name: 'Generate' }).click();
 
-    const output = page.locator('textarea[readonly]');
-    await expect(output).not.toHaveValue('');
-    await expect(output).not.toHaveValue('Generated data will appear here...');
+    await expectEditorNotEmpty(page, 'data-generator-output');
+    await expectEditorText(
+      page,
+      'data-generator-output',
+      /^(?!Generated data will appear here\.\.\.)/
+    );
   });
 
   test('output is valid JSON when format is JSON', async ({ page }) => {
     await page.getByRole('button', { name: 'Generate' }).click();
 
-    const output = page.locator('textarea[readonly]');
-    await expect(output).not.toHaveValue('');
+    await expectEditorNotEmpty(page, 'data-generator-output');
 
-    const text = await output.inputValue();
+    const text = await readEditorText(page, 'data-generator-output');
     const parsed = JSON.parse(text);
     expect(Array.isArray(parsed)).toBe(true);
     expect(parsed.length).toBe(10);
@@ -43,10 +47,9 @@ test.describe('Data Generator', () => {
 
     await page.getByRole('button', { name: 'Generate' }).click();
 
-    const output = page.locator('textarea[readonly]');
-    await expect(output).not.toHaveValue('');
+    await expectEditorNotEmpty(page, 'data-generator-output');
 
-    const text = await output.inputValue();
+    const text = await readEditorText(page, 'data-generator-output');
     expect(text).toContain(',');
     expect(text).not.toContain('[');
   });
@@ -72,14 +75,14 @@ test.describe('Data Generator', () => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
     await page.getByRole('button', { name: 'Generate' }).click();
-    const output = page.locator('textarea[readonly]');
-    await expect(output).not.toHaveValue('');
+    await expectEditorNotEmpty(page, 'data-generator-output');
 
-    await expect(page.getByRole('button', { name: 'Copy to Clipboard' })).toBeVisible();
-    await page.getByRole('button', { name: 'Copy to Clipboard' }).click();
+    const copyButton = page.getByRole('button', { name: 'Copy to Clipboard', exact: true });
+    await expect(copyButton).toBeVisible();
+    await copyButton.click();
 
     const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-    const outputText = await output.inputValue();
+    const outputText = await readEditorText(page, 'data-generator-output');
     expect(clipboardText).toBe(outputText);
   });
 

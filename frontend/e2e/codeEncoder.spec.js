@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { fillEditor, expectEditorText, expectEditorNotEmpty } from './helpers/editor';
 
 test.describe('Code Encoder', () => {
   test.beforeEach(async ({ page }) => {
@@ -8,84 +9,60 @@ test.describe('Code Encoder', () => {
 
   test('loads with default method Base64 and Encode mode', async ({ page }) => {
     await expect(page.locator('select')).toHaveValue('Base64');
-    await expect(page.locator('button').filter({ hasText: 'Encode' })).toHaveCSS(
-      'background-color',
-      'rgb(39, 39, 42)'
+    await expect(page.locator('button').filter({ hasText: 'Encode' })).toHaveAttribute(
+      'style',
+      /background-color: var\(--border\)/
     );
   });
 
   test('encodes text to Base64', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello');
-    await expect(output).toHaveValue('aGVsbG8=');
+    await fillEditor(page, 'code-encoder-input', 'hello');
+    await expectEditorText(page, 'code-encoder-output', 'aGVsbG8=');
   });
 
   test('decodes Base64 to text', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('aGVsbG8gd29ybGQ=');
+    await fillEditor(page, 'code-encoder-input', 'aGVsbG8gd29ybGQ=');
     await page.locator('button').filter({ hasText: 'Decode' }).click();
-    await expect(output).toHaveValue('hello world');
+    await expectEditorText(page, 'code-encoder-output', 'hello world');
   });
 
   test('encodes text to Hex (Base16)', async ({ page }) => {
     await page.locator('select').selectOption('Base16 (Hex)');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello');
-    await expect(output).toHaveValue('68656c6c6f');
+    await fillEditor(page, 'code-encoder-input', 'hello');
+    await expectEditorText(page, 'code-encoder-output', '68656c6c6f');
   });
 
   test('encodes text to Binary', async ({ page }) => {
     await page.locator('select').selectOption('Binary');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('AB');
-    await expect(output).toHaveValue(/[01]+/);
+    await fillEditor(page, 'code-encoder-input', 'AB');
+    await expectEditorText(page, 'code-encoder-output', /[01]+/);
   });
 
   test('encodes text to ROT13', async ({ page }) => {
     await page.locator('select').selectOption('ROT13');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello');
-    await expect(output).toHaveValue('uryyb');
+    await fillEditor(page, 'code-encoder-input', 'hello');
+    await expectEditorText(page, 'code-encoder-output', 'uryyb');
   });
 
   test('escapes URL special characters', async ({ page }) => {
     await page.locator('select').selectOption('URL');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello world & more');
+    await fillEditor(page, 'code-encoder-input', 'hello world & more');
     await page.locator('button').filter({ hasText: 'Escape' }).first().click();
-    await expect(output).toHaveValue(/hello\+world/);
+    await expectEditorText(page, 'code-encoder-output', /hello(\+|%20)world/);
   });
 
   test('unescapes URL encoded text', async ({ page }) => {
     await page.locator('select').selectOption('URL');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('hello%20world');
+    await fillEditor(page, 'code-encoder-input', 'hello%20world');
     await page.locator('button').filter({ hasText: 'Unescape' }).first().click();
-    await expect(output).toHaveValue('hello world');
+    await expectEditorText(page, 'code-encoder-output', 'hello world');
   });
 
   test('escapes HTML entities', async ({ page }) => {
     await page.locator('select').selectOption('HTML/XML');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('<div>hello</div>');
+    await fillEditor(page, 'code-encoder-input', '<div>hello</div>');
     await page.locator('button').filter({ hasText: 'Escape' }).first().click();
-    await expect(output).toHaveValue(/&lt;/);
+    await expectEditorText(page, 'code-encoder-output', /&lt;/);
   });
 
   test('mode toggle labels change for escape methods', async ({ page }) => {
@@ -129,8 +106,7 @@ test.describe('Code Encoder', () => {
   test('copy button copies output to clipboard', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
-    const input = page.locator('textarea').first();
-    await input.fill('copy test');
+    await fillEditor(page, 'code-encoder-input', 'copy test');
 
     const copyButton = page.locator('button[title="Copy to clipboard"]').first();
     await copyButton.click();
@@ -140,31 +116,22 @@ test.describe('Code Encoder', () => {
   });
 
   test('shows error for invalid Base64 input', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('!!!invalid!!!');
+    await fillEditor(page, 'code-encoder-input', '!!!invalid!!!');
     await page.locator('button').filter({ hasText: 'Decode' }).click();
-    await expect(output).toHaveValue('');
+    await expectEditorText(page, 'code-encoder-output', '');
   });
 
   test('clears output when input is cleared', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
+    await fillEditor(page, 'code-encoder-input', 'test');
+    await expectEditorNotEmpty(page, 'code-encoder-output');
 
-    await input.fill('test');
-    await expect(output).not.toHaveValue('');
-
-    await input.fill('');
-    await expect(output).toHaveValue('');
+    await fillEditor(page, 'code-encoder-input', '');
+    await expectEditorText(page, 'code-encoder-output', '');
   });
 
   test('encodes text to Morse Code', async ({ page }) => {
     await page.locator('select').selectOption('Morse Code');
-    const input = page.locator('textarea').first();
-    const output = page.locator('textarea').nth(1);
-
-    await input.fill('SOS');
-    await expect(output).toHaveValue(/\.\.\./);
+    await fillEditor(page, 'code-encoder-input', 'SOS');
+    await expectEditorText(page, 'code-encoder-output', /\.\.\./);
   });
 });

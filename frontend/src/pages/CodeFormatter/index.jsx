@@ -169,6 +169,8 @@ function InputPane({ value, onChange, placeholder }) {
         </span>
       </div>
       <textarea
+        data-testid="code-formatter-input-content"
+        aria-label="Input"
         value={value}
         onChange={onChange}
         placeholder={placeholder}
@@ -224,7 +226,15 @@ function OutputPane({ content, language, error, filterComponent }) {
           marginBottom: '8px',
         }}
       >
-        {content && <HighlightedCode code={content} language={language} showLineNumbers />}
+        {content && (
+          <HighlightedCode
+            code={content}
+            language={language}
+            showLineNumbers
+            dataTestId="code-formatter-output"
+            ariaLabel="Formatted Output"
+          />
+        )}
       </div>
 
       {filterComponent}

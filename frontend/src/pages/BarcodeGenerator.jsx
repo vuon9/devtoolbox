@@ -304,6 +304,8 @@ export default function BarcodeGenerator() {
             variant="secondary"
             onClick={() => setIsVertical(!isVertical)}
             style={{ padding: '4px' }}
+            title="Toggle layout orientation"
+            aria-label="Toggle layout orientation"
           >
             <Columns
               style={{

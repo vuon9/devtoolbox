@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { fillEditor, readEditorText, expectEditorText } from './helpers/editor';
 
 test.describe('Text Utilities', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,15 +8,14 @@ test.describe('Text Utilities', () => {
   });
 
   test('loads with empty input and zero stats', async ({ page }) => {
-    await expect(page.locator('textarea').first()).toHaveValue('');
+    await expectEditorText(page, 'text-utilities-input', '');
     await expect(page.locator('text=Chars').locator('..').locator('span').nth(1)).toHaveText('0');
     await expect(page.locator('text=Words').locator('..').locator('span').nth(1)).toHaveText('0');
     await expect(page.locator('text=Lines').locator('..').locator('span').nth(1)).toHaveText('0');
   });
 
   test('updates stats when text is entered', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('Hello world');
+    await fillEditor(page, 'text-utilities-input', 'Hello world');
 
     await expect(page.locator('text=Chars').locator('..').locator('span').nth(1)).toHaveText('11');
     await expect(page.locator('text=Words').locator('..').locator('span').nth(1)).toHaveText('2');
@@ -23,31 +23,28 @@ test.describe('Text Utilities', () => {
   });
 
   test('sorts lines in ascending order', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('zebra\napple\nbanana');
+    await fillEditor(page, 'text-utilities-input', 'zebra\napple\nbanana');
 
     await page.getByRole('button', { name: 'Asc', exact: true }).click();
 
-    await expect(input).toHaveValue('apple\nbanana\nzebra');
+    await expectEditorText(page, 'text-utilities-input', 'apple\nbanana\nzebra');
   });
 
   test('sorts lines in descending order', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('apple\nzebra\nbanana');
+    await fillEditor(page, 'text-utilities-input', 'apple\nzebra\nbanana');
 
     await page.locator('button').filter({ hasText: 'Desc' }).click();
 
-    await expect(input).toHaveValue('zebra\nbanana\napple');
+    await expectEditorText(page, 'text-utilities-input', 'zebra\nbanana\napple');
   });
 
   test('removes duplicate lines', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('apple\napple\nbanana\napple\ncherry');
+    await fillEditor(page, 'text-utilities-input', 'apple\napple\nbanana\napple\ncherry');
 
     await page.locator('button').filter({ hasText: 'Dedupe' }).click();
     await page.waitForTimeout(300);
 
-    const value = await input.inputValue();
+    const value = await readEditorText(page, 'text-utilities-input');
     expect(value).toContain('apple');
     expect(value).toContain('banana');
     expect(value).toContain('cherry');
@@ -63,13 +60,12 @@ test.describe('Text Utilities', () => {
   });
 
   test('trims whitespace from lines', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('  apple  \n  banana  ');
+    await fillEditor(page, 'text-utilities-input', '  apple  \n  banana  ');
 
     await page.getByRole('button', { name: 'Trim' }).click();
     await page.waitForTimeout(300);
 
-    const value = await input.inputValue();
+    const value = await readEditorText(page, 'text-utilities-input');
     // Trim removes leading/trailing whitespace from lines
     expect(value).toContain('apple');
     expect(value).toContain('banana');
@@ -81,93 +77,84 @@ test.describe('Text Utilities', () => {
   });
 
   test('removes empty lines', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('apple\n\nbanana\n\n\ncherry');
+    await fillEditor(page, 'text-utilities-input', 'apple\n\nbanana\n\n\ncherry');
 
     await page.locator('button').filter({ hasText: 'Rm Empty' }).click();
     await page.waitForTimeout(300);
 
-    const value = await input.inputValue();
+    const value = await readEditorText(page, 'text-utilities-input');
     expect(value).not.toContain('\n\n');
   });
 
   test('converts to UPPERCASE', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('Hello World');
+    await fillEditor(page, 'text-utilities-input', 'Hello World');
 
     await page.locator('button').filter({ hasText: 'UPPER' }).click();
 
-    await expect(input).toHaveValue('HELLO WORLD');
+    await expectEditorText(page, 'text-utilities-input', 'HELLO WORLD');
   });
 
   test('converts to lowercase', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('Hello World');
+    await fillEditor(page, 'text-utilities-input', 'Hello World');
 
     await page.locator('button').filter({ hasText: 'lower' }).click();
 
-    await expect(input).toHaveValue('hello world');
+    await expectEditorText(page, 'text-utilities-input', 'hello world');
   });
 
   test('converts to camelCase', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('hello world');
+    await fillEditor(page, 'text-utilities-input', 'hello world');
 
     await page.locator('button').filter({ hasText: 'camelCase' }).click();
 
-    await expect(input).toHaveValue('helloWorld');
+    await expectEditorText(page, 'text-utilities-input', 'helloWorld');
   });
 
   test('converts to PascalCase', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('hello world');
+    await fillEditor(page, 'text-utilities-input', 'hello world');
 
     await page.locator('button').filter({ hasText: 'PascalCase' }).click();
 
-    await expect(input).toHaveValue('HelloWorld');
+    await expectEditorText(page, 'text-utilities-input', 'HelloWorld');
   });
 
   test('converts to snake_case', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('hello world');
+    await fillEditor(page, 'text-utilities-input', 'hello world');
 
     await page.getByRole('button', { name: 'snake_case' }).click();
     await page.waitForTimeout(300);
 
-    const value = await input.inputValue();
+    const value = await readEditorText(page, 'text-utilities-input');
     expect(value).toContain('hello');
     expect(value).toContain('world');
     expect(value).toContain('_');
   });
 
   test('converts to kebab-case', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('hello world');
+    await fillEditor(page, 'text-utilities-input', 'hello world');
 
     await page.getByRole('button', { name: 'kebab-case' }).click();
     await page.waitForTimeout(300);
 
-    const value = await input.inputValue();
+    const value = await readEditorText(page, 'text-utilities-input');
     expect(value).toContain('hello');
     expect(value).toContain('world');
     expect(value).toContain('-');
   });
 
   test('converts to Sentence case', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('hello world. second sentence.');
+    await fillEditor(page, 'text-utilities-input', 'hello world. second sentence.');
 
     await page.getByRole('button', { name: 'Sentence' }).click();
     await page.waitForTimeout(300);
 
-    const value = await input.inputValue();
+    const value = await readEditorText(page, 'text-utilities-input');
     // Sentence case capitalizes the first letter
     expect(value).toMatch(/^Hello/);
   });
 
   test('escapes string literal', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('line1\nline2\t"quoted"');
+    await fillEditor(page, 'text-utilities-input', 'line1\nline2\t"quoted"');
 
     // Find the escape section and click Run
     const escapeSection = page.locator('div').filter({ hasText: 'Escape / Unescape' }).first();
@@ -180,8 +167,7 @@ test.describe('Text Utilities', () => {
   });
 
   test('unescapes string literal', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('line1\\nline2');
+    await fillEditor(page, 'text-utilities-input', 'line1\\nline2');
 
     const escapeSection = page.locator('div').filter({ hasText: 'Escape / Unescape' }).first();
     await escapeSection.locator('select').selectOption('String Literal');
@@ -197,27 +183,25 @@ test.describe('Text Utilities', () => {
     const escapeButton = escapeSection.locator('button').filter({ hasText: 'Escape' }).first();
 
     await unescapeButton.click();
-    await expect(unescapeButton).toHaveCSS('background-color', 'rgb(39, 39, 42)');
+    await expect(unescapeButton).toHaveAttribute('style', /background-color: var\(--border\)/);
 
     await escapeButton.click();
-    await expect(escapeButton).toHaveCSS('background-color', 'rgb(39, 39, 42)');
+    await expect(escapeButton).toHaveAttribute('style', /background-color: var\(--border\)/);
   });
 
   test('reset button clears everything', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('some text to reset');
+    await fillEditor(page, 'text-utilities-input', 'some text to reset');
 
     await page.locator('button').filter({ hasText: 'Reset' }).click();
 
-    await expect(input).toHaveValue('');
+    await expectEditorText(page, 'text-utilities-input', '');
     await expect(page.locator('text=Chars').locator('..').locator('span').nth(1)).toHaveText('0');
   });
 
   test('copy button copies input to clipboard', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
-    const input = page.locator('textarea').first();
-    await input.fill('copy this text');
+    await fillEditor(page, 'text-utilities-input', 'copy this text');
 
     const copyButton = page.locator('button[title="Copy to clipboard"]').first();
     await copyButton.click();
@@ -227,8 +211,7 @@ test.describe('Text Utilities', () => {
   });
 
   test('counts multi-line text correctly', async ({ page }) => {
-    const input = page.locator('textarea').first();
-    await input.fill('Line one.\nLine two.\nLine three.');
+    await fillEditor(page, 'text-utilities-input', 'Line one.\nLine two.\nLine three.');
 
     await expect(page.locator('text=Lines').locator('..').locator('span').nth(1)).toHaveText('3');
     await expect(page.locator('text=Sentences').locator('..').locator('span').nth(1)).toHaveText(

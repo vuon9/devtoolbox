@@ -54,6 +54,7 @@ function ToolPane({
   error,
   highlightOn,
   language = 'plaintext',
+  dataTestId,
 }) {
   const handleCopy = () => {
     if (value) navigator.clipboard.writeText(value);
@@ -136,9 +137,17 @@ function ToolPane({
       </div>
       {readOnly ? (
         highlightOn ? (
-          <HighlightedCode code={value} language={language} copyable={false} />
+          <HighlightedCode
+            code={value}
+            language={language}
+            copyable={false}
+            dataTestId={dataTestId}
+            ariaLabel={label}
+          />
         ) : (
           <textarea
+            data-testid={dataTestId ? `${dataTestId}-content` : undefined}
+            aria-label={label}
             value={value}
             readOnly
             placeholder={placeholder}
@@ -165,6 +174,8 @@ function ToolPane({
           language={language}
           highlight={highlightOn}
           placeholder={placeholder}
+          dataTestId={dataTestId}
+          ariaLabel={label}
         />
       )}
     </div>
@@ -291,6 +302,7 @@ export default function CodeConverter() {
             indicator="Source"
             indicatorColor="green"
             highlightOn={highlightOn}
+            dataTestId="code-converter-input"
           />
           <ToolPane
             label="Output"
@@ -301,6 +313,7 @@ export default function CodeConverter() {
             indicatorColor="blue"
             error={!!error}
             highlightOn={highlightOn}
+            dataTestId="code-converter-output"
           />
         </ToolSplitPane>
       </div>
