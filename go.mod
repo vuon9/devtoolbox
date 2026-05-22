@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/boombuler/barcode v1.1.0
-	github.com/brianvoe/gofakeit/v7 v7.14.0
+	github.com/brianvoe/gofakeit/v7 v7.15.0
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/gin-contrib/cors v1.7.6
 	github.com/golang-jwt/jwt/v5 v5.3.1
@@ -62,8 +62,6 @@ require (
 	github.com/skeema/knownhosts v1.3.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
-	github.com/wailsapp/go-webview2 v1.0.18 // indirect
-	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/wailsapp/wails/webview2 v1.0.24 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
