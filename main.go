@@ -23,26 +23,6 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
-func init() {
-	// Register a custom event whose associated data type is string.
-	// This is not required, but the binding generator will pick up registered events
-	// and provide a strongly typed JS/TS API for them.
-	application.RegisterEvent[string]("time")
-
-	// Register event for command palette - emit empty string as data
-	application.RegisterEvent[string]("command-palette:open")
-	application.RegisterEvent[string]("window:toggle")
-	application.RegisterEvent[string]("app:quit")
-
-	// Register settings changed event
-	application.RegisterEvent[map[string]interface{}]("settings:changed")
-
-	// Register spotlight events
-	application.RegisterEvent[string]("spotlight:closed")
-	application.RegisterEvent[string]("spotlight:close")
-	application.RegisterEvent[string]("spotlight:command-selected") // Event triggered when user selects a command from spotlight - used for navigation from spotlight to main window
-}
-
 func main() {
 	serverOnly := flag.Bool("server-only", false, "Run in server-only mode (no GUI)")
 	port := flag.Int("port", 8081, "HTTP server port")
@@ -71,23 +51,6 @@ func main() {
 		})
 	})
 
-	// Create application with options
-	app := application.New(application.Options{
-		Name:        "DevToolbox",
-		Description: "Set of tools for daily development",
-		Services: []application.Service{
-			application.NewService(&GreetService{}),
-		},
-		Mac: application.MacOptions{
-			ApplicationShouldTerminateAfterLastWindowClosed: false,
-		},
-		Assets: application.AssetOptions{
-			// Handler:    ginEngine,
-			// Middleware: GinMiddleware(ginEngine),
-			Handler: application.AssetFileServerFS(assets),
-		},
-	})
-
 	// Initialize settings manager
 	var configDir string
 	if runtime.GOOS == "darwin" {
@@ -103,25 +66,42 @@ func main() {
 		log.Printf("Failed to load settings: %v", err)
 	}
 
-	// Register app services
-	app.RegisterService(application.NewService(service.NewJWTService(app)))
-	app.RegisterService(application.NewService(service.NewDateTimeService(app)))
-	app.RegisterService(application.NewService(service.NewEncrypterService(app)))
-	app.RegisterService(application.NewService(service.NewEncoderService(app)))
-	app.RegisterService(application.NewService(service.NewHashGeneratorService(app)))
-	app.RegisterService(application.NewService(service.NewCodeConverterService(app)))
-	app.RegisterService(application.NewService(service.NewTextUtilitiesService(app)))
-	app.RegisterService(application.NewService(service.NewBarcodeService(app)))
-	app.RegisterService(application.NewService(service.NewDataGeneratorService(app)))
-	app.RegisterService(application.NewService(service.NewCodeFormatterService(app)))
-	app.RegisterService(application.NewService(service.NewNumberConverterService(app)))
-	app.RegisterService(application.NewService(service.NewSettingsService(app, settingsManager)))
+	settingsService := service.NewSettingsService(nil, settingsManager)
+	spotlightService := service.NewSpotlightService(nil)
+	windowControls := service.NewWindowControls(nil)
 
-	// Create and register spotlight service
-	spotlightService := service.NewSpotlightService(app)
-	app.RegisterService(application.NewService(spotlightService))
+	// Create application with options
+	app := application.New(application.Options{
+		Name:        "DevToolbox",
+		Description: "Set of tools for daily development",
+		Services: []application.Service{
+			application.NewService(&GreetService{}),
+			application.NewService(service.NewJWTService(nil)),
+			application.NewService(service.NewDateTimeService(nil)),
+			application.NewService(service.NewEncrypterService(nil)),
+			application.NewService(service.NewEncoderService(nil)),
+			application.NewService(service.NewHashGeneratorService(nil)),
+			application.NewService(service.NewCodeConverterService(nil)),
+			application.NewService(service.NewTextUtilitiesService(nil)),
+			application.NewService(service.NewBarcodeService(nil)),
+			application.NewService(service.NewDataGeneratorService(nil)),
+			application.NewService(service.NewCodeFormatterService(nil)),
+			application.NewService(service.NewNumberConverterService(nil)),
+			application.NewService(settingsService),
+			application.NewService(spotlightService),
+			application.NewService(windowControls),
+		},
+		Mac: application.MacOptions{
+			ApplicationShouldTerminateAfterLastWindowClosed: false,
+		},
+		Assets: application.AssetOptions{
+			// Handler:    ginEngine,
+			// Middleware: GinMiddleware(ginEngine),
+			Handler: application.AssetFileServerFS(assets),
+		},
+	})
 
-	// WindowControls service must be registered after main window creation (see line 149)
+	settingsService.SetApp(app)
 
 	// Start HTTP server for browser support (background)
 	go func() {
@@ -129,7 +109,7 @@ func main() {
 	}()
 
 	// Create main window
-	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
+	mainWindow := app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
 		Name:   "main",
 		Title:  "DevToolbox",
 		Width:  1024,
@@ -166,13 +146,12 @@ func main() {
 		}
 	})
 
-	// Register WindowControls service after window creation
-	app.RegisterService(application.NewService(service.NewWindowControls(mainWindow)))
+	windowControls.SetWindow(mainWindow)
 
 	// Create spotlight window with special behaviors
 	// Note: MacWindowLevelFloating and ActivationPolicyAccessory may require
 	// platform-specific code. CollectionBehaviors provide most spotlight functionality.
-	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
+	spotlightWindow := app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
 		Title:            "Spotlight",
 		Width:            640,
 		Height:           384,
@@ -186,11 +165,6 @@ func main() {
 		// Prevent resizing
 		DisableResize: true,
 		Mac: application.MacWindow{
-			// Combine multiple behaviors using bitwise OR:
-			// - CanJoinAllSpaces: window appears on ALL Spaces (virtual desktops)
-			// - FullScreenAuxiliary: window can overlay fullscreen applications
-			CollectionBehavior: application.MacWindowCollectionBehaviorCanJoinAllSpaces |
-				application.MacWindowCollectionBehaviorFullScreenAuxiliary,
 			// Float above other windows
 			WindowLevel: application.MacWindowLevelFloating,
 			// Hidden title bar for clean look
@@ -213,7 +187,7 @@ func main() {
 	})
 
 	// Listen for spotlight navigation events
-	app.Event.On("spotlight:command-selected", func(event *application.CustomEvent) {
+	app.OnEvent("spotlight:command-selected", func(event *application.CustomEvent) {
 		log.Printf("[Spotlight] Received command-selected event with data: %#v", event.Data)
 
 		var path string
@@ -255,18 +229,18 @@ func main() {
 	})
 
 	// Close spotlight window
-	app.Event.On("spotlight:close", func(_ *application.CustomEvent) {
+	app.OnEvent("spotlight:close", func(_ *application.CustomEvent) {
 		log.Printf("[Spotlight] Spotlight close requested")
 		spotlightWindow.Hide()
 	})
 
 	// Proxy these events to the main window
-	app.Event.On("spotlight:theme:toggle", func(_ *application.CustomEvent) {
+	app.OnEvent("spotlight:theme:toggle", func(_ *application.CustomEvent) {
 		log.Printf("[Spotlight] Relaying theme:toggle to main window")
 		mainWindow.EmitEvent("theme:toggle", nil)
 	})
 
-	app.Event.On("window:toggle", func(_ *application.CustomEvent) {
+	app.OnEvent("window:toggle", func(_ *application.CustomEvent) {
 		log.Printf("[Spotlight] Window toggle requested")
 		if mainWindow.IsVisible() {
 			mainWindow.Hide()
@@ -276,13 +250,13 @@ func main() {
 		}
 	})
 
-	app.Event.On("app:quit", func(_ *application.CustomEvent) {
+	app.OnEvent("app:quit", func(_ *application.CustomEvent) {
 		log.Printf("[Spotlight] App quit requested via spotlight")
 		app.Quit()
 	})
 
 	// Setup system tray
-	systray := app.SystemTray.New()
+	systray := app.NewSystemTray()
 
 	// Set system tray icon
 	if runtime.GOOS == "darwin" {
@@ -321,8 +295,6 @@ func main() {
 		panic(err)
 	}
 }
-
-
 
 func GinMiddleware(ginEngine *gin.Engine) application.Middleware {
 	return func(next http.Handler) http.Handler {

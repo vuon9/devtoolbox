@@ -4,7 +4,6 @@
 
 - Go 1.25+
 - Bun 1.0+
-- Wails CLI: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
 
 ## Quick Build
 
@@ -13,11 +12,10 @@
 git clone https://github.com/vuon9/devtoolbox.git
 cd devtoolbox
 
-# Build
-wails build
-
-# Or run in development mode
-wails dev
+# Build for the current platform
+cd frontend && bun install && bun run build
+cd ..
+go build -o bin/DevToolbox .
 ```
 
 ## Development
@@ -30,24 +28,22 @@ cd frontend && bun dev
 go run .
 
 # Both (separate terminals)
-wails dev  # Terminal 1
-cd frontend && bun dev  # Terminal 2
+go run .                 # Terminal 1
+cd frontend && bun dev   # Terminal 2
 ```
 
 ## Output
 
-Built binaries are in `build/bin/`:
-- `devtoolbox` (Linux/macOS)
-- `devtoolbox.exe` (Windows)
+Built binaries and app bundles are in `bin/`:
+- `DevToolbox` (Linux/macOS binary)
+- `DevToolbox.exe` (Windows)
+- `DevToolbox.app` (macOS package)
+
+For signed and notarized macOS releases, see [MACOS_RELEASE.md](./MACOS_RELEASE.md).
 
 ## Troubleshooting
 
 **Frontend build fails:**
 ```bash
 cd frontend && bun install
-```
-
-**Wails not found:**
-```bash
-go install github.com/wailsapp/wails/v2/cmd/wails@latest
 ```

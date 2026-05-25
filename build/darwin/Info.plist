@@ -4,15 +4,15 @@
         <key>CFBundlePackageType</key>
             <string>APPL</string>
         <key>CFBundleName</key>
-            <string>My Product</string>
+            <string>DevToolbox</string>
         <key>CFBundleExecutable</key>
-            <string>devtoolbox</string>
+            <string>DevToolbox</string>
         <key>CFBundleIdentifier</key>
-            <string>com.example.devtoolbox</string>
+            <string>com.vuon9.devtoolbox</string>
         <key>CFBundleVersion</key>
             <string>0.1.0</string>
         <key>CFBundleGetInfoString</key>
-            <string>This is a comment</string>
+            <string>DevToolbox is a set of useful tools for daily development.</string>
         <key>CFBundleShortVersionString</key>
             <string>0.1.0</string>
         <key>CFBundleIconFile</key>
@@ -24,6 +24,6 @@
         <key>NSHighResolutionCapable</key>
             <string>true</string>
         <key>NSHumanReadableCopyright</key>
-            <string>© 2026, My Company</string>
+            <string>(c) 2026, Vuong</string>
     </dict>
 </plist>
