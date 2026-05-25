@@ -17,6 +17,7 @@ import BarcodeGenerator from './pages/BarcodeGenerator';
 import DataGenerator from './pages/DataGenerator';
 import CodeFormatter from './pages/CodeFormatter';
 import ColorConverter from './pages/ColorConverter';
+import UrlInspector from './pages/UrlInspector';
 
 const toolComponents = {
   'code-encrypter': CodeEncrypter,
@@ -30,6 +31,7 @@ const toolComponents = {
   'data-generator': DataGenerator,
   'code-formatter': CodeFormatter,
   'color-converter': ColorConverter,
+  'url-inspector': UrlInspector,
   regexp: RegExpTester,
   cron: CronJobParser,
   diff: TextDiffChecker,
