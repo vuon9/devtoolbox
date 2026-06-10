@@ -1,20 +1,26 @@
 # macOS Signed Release
 
 This project ships macOS releases as a signed, notarized, and stapled
-`DevToolbox-macos.dmg` from `.github/workflows/release.yml`.
+`DevToolbox-macos-universal.dmg` from `.github/workflows/release.yml`.
+
+The first signed release is intentionally macOS-only. Linux and Windows release
+artifacts are skipped until a later release pass.
 
 ## Required GitHub Secrets
 
 Configure these repository secrets before running a release:
 
-- `MACOS_CERTIFICATE`: base64 encoded Developer ID Application `.p12`
-- `MACOS_CERTIFICATE_PASSWORD`: password for the `.p12`
-- `MACOS_SIGN_IDENTITY`: full Developer ID Application identity name
-- `APPLE_ID`: Apple ID used for notarization
-- `APPLE_APP_SPECIFIC_PASSWORD`: app-specific password for the Apple ID
-- `APPLE_TEAM_ID`: Apple Developer Team ID
+- `APPLE_DEVELOPER_ID_APPLICATION_CERTIFICATE_P12_BASE64`: base64 encoded Developer ID Application `.p12`
+- `APPLE_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD`: password for the `.p12`
+- `APP_STORE_CONNECT_API_KEY_P8`: App Store Connect API private key content
+- `APP_STORE_CONNECT_API_KEY_ID`: App Store Connect API key ID
+- `APP_STORE_CONNECT_API_ISSUER_ID`: App Store Connect issuer ID
 
-The release workflow fails early on the macOS job if any of these secrets are
+Optional:
+
+- `MACOS_CODESIGN_IDENTITY`: full `Developer ID Application: ... (TEAMID)` identity name. If omitted, the reusable workflow finds the imported Developer ID Application identity for team `256XRVYZ9V`.
+
+The release workflow fails early if required signing or notarization secrets are
 missing. Unsigned macOS release artifacts are not uploaded by the release job.
 
 ## What the Workflow Does
@@ -25,22 +31,22 @@ On macOS runners, the release job:
 2. Imports the Developer ID Application certificate into a temporary keychain.
 3. Signs the app with hardened runtime and timestamping.
 4. Verifies the signature with `codesign --verify`.
-5. Submits the app to Apple notarization and waits for completion.
-6. Staples and validates the notarization ticket.
+5. Submits the app to Apple notarization through App Store Connect API keys.
+6. Staples and validates the app notarization ticket.
 7. Runs `spctl --assess --type execute`.
-8. Packages the stapled app into `DevToolbox-macos.dmg`.
-9. Verifies the DMG with `hdiutil verify`.
+8. Packages the stapled app into `DevToolbox-macos-universal.dmg`.
+9. Signs, notarizes, staples, and verifies the DMG.
 
-Mini owns certificate setup, notarization credentials, and final local Gatekeeper
-verification for the released artifact.
+Mini owns Apple Developer certificate export, repository secret setup, and final
+local Gatekeeper verification for the released artifact.
 
 ## Local macOS Verification
 
 After downloading the release DMG on macOS:
 
 ```bash
-hdiutil verify DevToolbox-macos.dmg
-hdiutil attach DevToolbox-macos.dmg
+hdiutil verify DevToolbox-macos-universal.dmg
+hdiutil attach DevToolbox-macos-universal.dmg
 spctl --assess --type execute --verbose=4 /Volumes/DevToolbox/DevToolbox.app
 codesign --verify --deep --strict --verbose=2 /Volumes/DevToolbox/DevToolbox.app
 open /Volumes/DevToolbox/DevToolbox.app
