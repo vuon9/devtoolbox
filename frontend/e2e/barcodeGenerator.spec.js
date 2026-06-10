@@ -24,20 +24,14 @@ test.describe('Barcode / QR Code Generator', () => {
     // Input should update to default
     const textarea = page.locator('textarea').first();
     await expect(textarea).toHaveValue('HELLO-2024');
-    // Preview should show image or placeholder
-    const barcodeImg = page.locator('img[alt="Barcode"]');
-    const placeholder = page.locator('div').filter({ hasText: /Enter content|Generating/i });
-    await expect(barcodeImg.or(placeholder)).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('img[alt="Barcode"]')).toBeVisible({ timeout: 10000 });
   });
 
   test('should switch to EAN-13 and generate barcode', async ({ page }) => {
     await page.getByRole('button', { name: 'EAN-13' }).click();
     const textarea = page.locator('textarea').first();
     await expect(textarea).toHaveValue('5901234123457');
-    // Preview should show image or placeholder
-    const barcodeImg = page.locator('img[alt="Barcode"]');
-    const placeholder = page.locator('div').filter({ hasText: /Enter content|Generating/i });
-    await expect(barcodeImg.or(placeholder)).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('img[alt="Barcode"]')).toBeVisible({ timeout: 10000 });
   });
 
   test('should update barcode when input changes', async ({ page }) => {

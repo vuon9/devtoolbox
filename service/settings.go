@@ -23,6 +23,11 @@ func NewSettingsService(app *application.App, manager *settings.Manager) *Settin
 	}
 }
 
+// SetApp connects the service to the Wails app after application creation.
+func (s *SettingsService) SetApp(app *application.App) {
+	s.app = app
+}
+
 // GetCloseMinimizesToTray returns the current setting
 func (s *SettingsService) GetCloseMinimizesToTray() bool {
 	return s.manager.GetCloseMinimizesToTray()
@@ -35,11 +40,7 @@ func (s *SettingsService) SetCloseMinimizesToTray(value bool) error {
 		return err
 	}
 
-	// Emit event to notify frontend that setting changed
-	s.app.Event.Emit("settings:changed", map[string]interface{}{
-		"setting": "closeMinimizesToTray",
-		"value":   value,
-	})
+	s.emitSettingsChanged("closeMinimizesToTray", value)
 
 	return nil
 }
@@ -53,11 +54,18 @@ func (s *SettingsService) ToggleCloseMinimizesToTray() (bool, error) {
 
 	value := s.manager.GetCloseMinimizesToTray()
 
-	// Emit event to notify frontend
-	s.app.Event.Emit("settings:changed", map[string]interface{}{
-		"setting": "closeMinimizesToTray",
-		"value":   value,
-	})
+	s.emitSettingsChanged("closeMinimizesToTray", value)
 
 	return value, nil
+}
+
+func (s *SettingsService) emitSettingsChanged(setting string, value bool) {
+	if s.app == nil {
+		return
+	}
+
+	s.app.Event.Emit("settings:changed", map[string]interface{}{
+		"setting": setting,
+		"value":   value,
+	})
 }
