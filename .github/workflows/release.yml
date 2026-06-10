@@ -235,7 +235,7 @@ jobs:
       # Create Release and upload assets (only on tags)
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: release/*
           draft: false
