@@ -6,15 +6,19 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 expect.extend(matchers);
 
 if (typeof window !== 'undefined' && !window.localStorage) {
-  const store = new Map();
+  const storage = new Map();
 
   Object.defineProperty(window, 'localStorage', {
     configurable: true,
     value: {
-      clear: () => store.clear(),
-      getItem: (key) => (store.has(String(key)) ? store.get(String(key)) : null),
-      removeItem: (key) => store.delete(String(key)),
-      setItem: (key, value) => store.set(String(key), String(value)),
+      clear: () => storage.clear(),
+      getItem: (key) => storage.get(String(key)) ?? null,
+      key: (index) => Array.from(storage.keys())[index] ?? null,
+      removeItem: (key) => storage.delete(String(key)),
+      setItem: (key, value) => storage.set(String(key), String(value)),
+      get length() {
+        return storage.size;
+      },
     },
   });
 }

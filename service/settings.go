@@ -64,7 +64,7 @@ func (s *SettingsService) emitSettingsChanged(setting string, value bool) {
 		return
 	}
 
-	s.app.EmitEvent("settings:changed", map[string]interface{}{
+	s.app.Event.Emit("settings:changed", map[string]interface{}{
 		"setting": setting,
 		"value":   value,
 	})

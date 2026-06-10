@@ -109,7 +109,7 @@ func main() {
 	}()
 
 	// Create main window
-	mainWindow := app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
+	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Name:   "main",
 		Title:  "DevToolbox",
 		Width:  1024,
@@ -151,7 +151,7 @@ func main() {
 	// Create spotlight window with special behaviors
 	// Note: MacWindowLevelFloating and ActivationPolicyAccessory may require
 	// platform-specific code. CollectionBehaviors provide most spotlight functionality.
-	spotlightWindow := app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
+	spotlightWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:            "Spotlight",
 		Width:            640,
 		Height:           384,
@@ -187,7 +187,7 @@ func main() {
 	})
 
 	// Listen for spotlight navigation events
-	app.OnEvent("spotlight:command-selected", func(event *application.CustomEvent) {
+	app.Event.On("spotlight:command-selected", func(event *application.CustomEvent) {
 		log.Printf("[Spotlight] Received command-selected event with data: %#v", event.Data)
 
 		var path string
@@ -229,18 +229,18 @@ func main() {
 	})
 
 	// Close spotlight window
-	app.OnEvent("spotlight:close", func(_ *application.CustomEvent) {
+	app.Event.On("spotlight:close", func(_ *application.CustomEvent) {
 		log.Printf("[Spotlight] Spotlight close requested")
 		spotlightWindow.Hide()
 	})
 
 	// Proxy these events to the main window
-	app.OnEvent("spotlight:theme:toggle", func(_ *application.CustomEvent) {
+	app.Event.On("spotlight:theme:toggle", func(_ *application.CustomEvent) {
 		log.Printf("[Spotlight] Relaying theme:toggle to main window")
 		mainWindow.EmitEvent("theme:toggle", nil)
 	})
 
-	app.OnEvent("window:toggle", func(_ *application.CustomEvent) {
+	app.Event.On("window:toggle", func(_ *application.CustomEvent) {
 		log.Printf("[Spotlight] Window toggle requested")
 		if mainWindow.IsVisible() {
 			mainWindow.Hide()
@@ -250,13 +250,13 @@ func main() {
 		}
 	})
 
-	app.OnEvent("app:quit", func(_ *application.CustomEvent) {
+	app.Event.On("app:quit", func(_ *application.CustomEvent) {
 		log.Printf("[Spotlight] App quit requested via spotlight")
 		app.Quit()
 	})
 
 	// Setup system tray
-	systray := app.NewSystemTray()
+	systray := app.SystemTray.New()
 
 	// Set system tray icon
 	if runtime.GOOS == "darwin" {
