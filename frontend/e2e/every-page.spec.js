@@ -13,6 +13,7 @@ const TOOLS = [
   { slug: 'data-generator', name: 'Data Generator' },
   { slug: 'code-formatter', name: 'Code Formatter' },
   { slug: 'color-converter', name: 'Color Converter' },
+  { slug: 'url-inspector', name: 'URL Inspector' },
   { slug: 'cron', name: 'Cron' },
   { slug: 'regexp', name: 'RegExp' },
   { slug: 'diff', name: 'Diff' },

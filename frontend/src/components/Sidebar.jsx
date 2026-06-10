@@ -26,6 +26,7 @@ import {
   Code2,
   Timer,
   FileCode,
+  Link,
 } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
 
@@ -50,6 +51,7 @@ const TOOL_ICONS = {
   'data-generator': LayoutGrid,
   'code-formatter': Code2,
   'color-converter': Palette,
+  'url-inspector': Link,
   cron: Timer,
   regexp: Regex,
   diff: FileDiff,
@@ -150,6 +152,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
     { id: 'data-generator', name: 'Data Generator', category: 'Generator' },
     { id: 'code-formatter', name: 'Code Formatter', category: 'Developer' },
     { id: 'color-converter', name: 'Color Converter', category: 'Developer' },
+    { id: 'url-inspector', name: 'URL Inspector', category: 'Developer' },
     { id: 'cron', name: 'Cron Job Parser', category: 'Developer' },
     { id: 'regexp', name: 'RegExp Tester', category: 'Developer' },
     { id: 'diff', name: 'Text Diff', category: 'Text' },
@@ -366,6 +369,7 @@ export function Sidebar({ isVisible, onOpenSettings }) {
                         'cron',
                         'code-formatter',
                         'color-converter',
+                        'url-inspector',
                         'number-converter',
                         'datetime-converter',
                       ].includes(tool.id)
