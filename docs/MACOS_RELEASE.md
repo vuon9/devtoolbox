@@ -6,9 +6,12 @@ This project ships macOS releases as a signed, notarized, and stapled
 The first signed release is intentionally macOS-only. Linux and Windows release
 artifacts are skipped until a later release pass.
 
-Release tags use the normal stable project SemVer format, for example `v0.10.0`.
-The packaging script embeds the tag version into the macOS app bundle as
-`CFBundleShortVersionString` and `CFBundleVersion`.
+Release tags use normal project SemVer. Stable releases use tags such as
+`v0.10.0`; prereleases use tags such as `v0.10.0-rc.1`. The packaging script
+embeds the stable base version into the macOS app bundle as
+`CFBundleShortVersionString` and `CFBundleVersion`, so a prerelease tag like
+`v0.10.0-rc.1` embeds `0.10.0` in the app bundle and marks the GitHub Release
+as a prerelease.
 
 ## Required GitHub Secrets
 

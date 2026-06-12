@@ -22,4 +22,5 @@ jobs:
       artifact-name: devtoolbox-macos-release-${{ github.run_id }}
       go-version-file: go.mod
       runner-label: macos-26
+      github-release-prerelease: ${{ contains(github.ref_name, '-') }}
     secrets: inherit
