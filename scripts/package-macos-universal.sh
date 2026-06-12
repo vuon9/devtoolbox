@@ -4,13 +4,22 @@ set -euo pipefail
 app_name="${APP_NAME:-DevToolbox}"
 bin_dir="${BIN_DIR:-bin}"
 app_version="${APP_VERSION:-}"
+tag_version=""
 
-if [[ -z "$app_version" && "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
-  app_version="${GITHUB_REF_NAME#v}"
+if [[ "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
+  tag_version="${GITHUB_REF_NAME#v}"
+  if [[ ! "$tag_version" =~ ^[0-9]+[.][0-9]+[.][0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+    echo "Release tag must be stable or prerelease SemVer with a leading v; got: ${GITHUB_REF_NAME:-}" >&2
+    exit 1
+  fi
+fi
+
+if [[ -z "$app_version" && -n "$tag_version" ]]; then
+  app_version="${tag_version%%-*}"
 fi
 
 if [[ -n "$app_version" && ! "$app_version" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
-  echo "APP_VERSION must be stable SemVer without a leading v; got: $app_version" >&2
+  echo "APP_VERSION must be stable SemVer without a leading v because Apple bundle versions do not include prerelease labels; got: $app_version" >&2
   exit 1
 fi
 
