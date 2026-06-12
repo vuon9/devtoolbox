@@ -188,8 +188,8 @@ go.mongodb.org/mongo-driver/v2 v2.5.0 h1:yXUhImUjjAInNcpTcAlPHiT7bIXhshCTL3jVBkF
 go.mongodb.org/mongo-driver/v2 v2.5.0/go.mod h1:yOI9kBsufol30iFsl1slpdq1I0eHPzybRWdyYUs8K/0=
 go.uber.org/mock v0.6.0 h1:hyF9dfmbgIX5EfOdasqLsWD6xqpNZlXblLB/Dbnwv3Y=
 go.uber.org/mock v0.6.0/go.mod h1:KiVJ4BqZJaMj4svdfmHM0AUx4NJYO8ZNpPnZn1Z+BBU=
-golang.design/x/hotkey v0.4.1 h1:zLP/2Pztl4WjyxURdW84GoZ5LUrr6hr69CzJFJ5U1go=
-golang.design/x/hotkey v0.4.1/go.mod h1:M8SGcwFYHnKRa83FpTFQoZvPO5vVT+kWPztFqTQKmXA=
+golang.design/x/hotkey v0.6.1 h1:mR3kp6L7eykJnEH7jvYQ9kc00LTq8edeWRFDsXfWp6Q=
+golang.design/x/hotkey v0.6.1/go.mod h1:+CUQy3N+t1b8HbhsDScVWWuUpXiRPNRIKugECCiW0Po=
 golang.design/x/mainthread v0.3.0 h1:UwFus0lcPodNpMOGoQMe87jSFwbSsEY//CA7yVmu4j8=
 golang.design/x/mainthread v0.3.0/go.mod h1:vYX7cF2b3pTJMGM/hc13NmN6kblKnf4/IyvHeu259L0=
 golang.org/x/arch v0.23.0 h1:lKF64A2jF6Zd8L0knGltUnegD62JMFBiCPBmQpToHhg=
