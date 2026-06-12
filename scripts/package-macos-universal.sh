@@ -3,6 +3,16 @@ set -euo pipefail
 
 app_name="${APP_NAME:-DevToolbox}"
 bin_dir="${BIN_DIR:-bin}"
+app_version="${APP_VERSION:-}"
+
+if [[ -z "$app_version" && "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
+  app_version="${GITHUB_REF_NAME#v}"
+fi
+
+if [[ -n "$app_version" && ! "$app_version" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+  echo "APP_VERSION must be stable SemVer without a leading v; got: $app_version" >&2
+  exit 1
+fi
 
 export GOOS=darwin
 export CGO_ENABLED=1
@@ -36,6 +46,10 @@ mkdir -p "$app_bundle/Contents/Resources"
 
 cp "$bin_dir/$app_name" "$app_bundle/Contents/MacOS/"
 cp build/darwin/Info.plist "$app_bundle/Contents/"
+if [[ -n "$app_version" ]]; then
+  /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $app_version" "$app_bundle/Contents/Info.plist"
+  /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $app_version" "$app_bundle/Contents/Info.plist"
+fi
 cp build/darwin/icons.icns "$app_bundle/Contents/Resources/"
 if [[ -f build/darwin/Assets.car ]]; then
   cp build/darwin/Assets.car "$app_bundle/Contents/Resources/"

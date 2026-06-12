@@ -3,7 +3,7 @@ name: macOS Release
 on:
   push:
     tags:
-      - "macos/devtoolbox/v*"
+      - "v*.*.*"
   workflow_dispatch:
 
 permissions:
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   release:
-    uses: vuon9/gh-workflows/.github/workflows/macos-desktop-release.yml@khoa/macos-desktop-release-workflow
+    uses: vuon9/gh-workflows/.github/workflows/wails-macos-release.yml@main
     with:
       app-name: DevToolbox
       bundle-id: com.vuon9.devtoolbox
