@@ -6,6 +6,10 @@ This project ships macOS releases as a signed, notarized, and stapled
 The first signed release is intentionally macOS-only. Linux and Windows release
 artifacts are skipped until a later release pass.
 
+Release tags use the normal stable project SemVer format, for example `v0.10.0`.
+The packaging script embeds the tag version into the macOS app bundle as
+`CFBundleShortVersionString` and `CFBundleVersion`.
+
 ## Required GitHub Secrets
 
 Configure these repository secrets before running a release:
@@ -28,14 +32,15 @@ missing. Unsigned macOS release artifacts are not uploaded by the release job.
 On macOS runners, the release job:
 
 1. Builds a universal `DevToolbox.app`.
-2. Imports the Developer ID Application certificate into a temporary keychain.
-3. Signs the app with hardened runtime and timestamping.
-4. Verifies the signature with `codesign --verify`.
-5. Submits the app to Apple notarization through App Store Connect API keys.
-6. Staples and validates the app notarization ticket.
-7. Runs `spctl --assess --type execute`.
-8. Packages the stapled app into `DevToolbox-macos-universal.dmg`.
-9. Signs, notarizes, staples, and verifies the DMG.
+2. Embeds the SemVer tag into the app bundle version fields.
+3. Imports the Developer ID Application certificate into a temporary keychain.
+4. Signs the app with hardened runtime and timestamping.
+5. Verifies the signature with `codesign --verify`.
+6. Submits the app to Apple notarization through App Store Connect API keys.
+7. Staples and validates the app notarization ticket.
+8. Runs `spctl --assess --type execute`.
+9. Packages the stapled app into `DevToolbox-macos-universal.dmg`.
+10. Signs, notarizes, staples, and verifies the DMG.
 
 Mini owns Apple Developer certificate export, repository secret setup, and final
 local Gatekeeper verification for the released artifact.
