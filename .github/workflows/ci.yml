@@ -27,12 +27,10 @@ jobs:
           go-version: "1.25.0"
           check-latest: true
 
-      - name: Cache APT packages
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: libgtk-4-dev libwebkitgtk-6.0-dev libvulkan-dev libgraphene-1.0-dev
-          version: 2.0
-          execute_install_scripts: false
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-4-dev libwebkitgtk-6.0-dev libvulkan-dev libgraphene-1.0-dev
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2.2.0
@@ -151,12 +149,10 @@ jobs:
           go-version: "1.25.0"
           check-latest: true
 
-      - name: Cache APT packages
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: libgtk-4-dev libwebkitgtk-6.0-dev libvulkan-dev libgraphene-1.0-dev
-          version: 2.0
-          execute_install_scripts: false
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-4-dev libwebkitgtk-6.0-dev libvulkan-dev libgraphene-1.0-dev
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2.2.0
