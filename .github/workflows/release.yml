@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   release:
-    uses: vuon9/gh-workflows/.github/workflows/wails-macos-release.yml@main
+    uses: vuon9/gh-workflows/.github/workflows/wails-macos-release.yml@wails-macos-release-workable
     with:
       app-name: DevToolbox
       bundle-id: com.vuon9.devtoolbox
