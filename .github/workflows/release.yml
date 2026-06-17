@@ -10,17 +10,58 @@ permissions:
   contents: write
 
 jobs:
+  build:
+    name: Build Wails App
+    runs-on: macos-26
+    timeout-minutes: 45
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Build app bundle
+        run: scripts/package-macos-universal.sh
+
+      - name: Validate app bundle metadata
+        run: |
+          test -d bin/DevToolbox.app
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleName' bin/DevToolbox.app/Contents/Info.plist)" = "DevToolbox"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' bin/DevToolbox.app/Contents/Info.plist)" = "com.vuon9.devtoolbox"
+
+      - name: Archive app bundle
+        run: tar -czf "$RUNNER_TEMP/macos-app.tar.gz" -C bin DevToolbox.app
+
+      - name: Upload app bundle artifact
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: devtoolbox-macos-app-${{ github.run_id }}
+          path: ${{ runner.temp }}/macos-app.tar.gz
+          retention-days: 1
+
   release:
-    uses: vuon9/gh-workflows/.github/workflows/wails-macos-release.yml@main
+    name: Sign, Package, and Notarize macOS App
+    needs: build
+    uses: vuon9/gh-workflows/.github/workflows/macos-release.yml@wails-macos-release-workable
     with:
       app-name: DevToolbox
-      bundle-id: com.vuon9.devtoolbox
       team-id: 256XRVYZ9V
-      package-command: scripts/package-macos-universal.sh
       app-path: bin/DevToolbox.app
+      app-artifact-name: devtoolbox-macos-app-${{ github.run_id }}
       dmg-name: DevToolbox-macos-universal.dmg
       artifact-name: devtoolbox-macos-release-${{ github.run_id }}
-      go-version-file: go.mod
       runner-label: macos-26
       github-release-prerelease: ${{ contains(github.ref_name, '-') }}
     secrets: inherit
