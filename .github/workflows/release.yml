@@ -54,7 +54,7 @@ jobs:
   release:
     name: Sign, Package, and Notarize macOS App
     needs: build
-    uses: vuon9/gh-workflows/.github/workflows/macos-release.yml@wails-macos-release-workable
+    uses: vuon9/gh-workflows/.github/workflows/macos-release.yml@main
     with:
       app-name: DevToolbox
       team-id: 256XRVYZ9V
