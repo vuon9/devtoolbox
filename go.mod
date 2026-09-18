@@ -15,7 +15,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/wailsapp/wails/v3 v3.0.0-beta.17
 	golang.design/x/hotkey v0.6.1
-	golang.org/x/crypto v0.56.0
+	golang.org/x/crypto v0.57.0
 	golang.org/x/net v0.58.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -58,8 +58,8 @@ require (
 	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.23 // indirect
-	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.41.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/text v0.42.0 // indirect
 )
 
 // replace github.com/wailsapp/wails/v2 v2.11.0 => /Users/vuong/.gvm/pkgsets/go1.24/global/pkg/mod
