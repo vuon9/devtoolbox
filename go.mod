@@ -16,7 +16,7 @@ require (
 	github.com/wailsapp/wails/v3 v3.2.0-nightly.20261102
 	golang.design/x/hotkey v0.6.4
 	golang.org/x/crypto v0.58.0
-	golang.org/x/net v0.61.0
+	golang.org/x/net v0.62.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
