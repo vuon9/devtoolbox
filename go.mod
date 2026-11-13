@@ -6,7 +6,7 @@ require (
 	github.com/boombuler/barcode v1.1.0
 	github.com/brianvoe/gofakeit/v7 v7.18.1
 	github.com/btcsuite/btcutil v1.0.2
-	github.com/gin-contrib/cors v1.7.10
+	github.com/gin-contrib/cors v1.7.11
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gomarkdown/markdown v0.0.0-20260417124207-7d523f7318df
 	github.com/itchyny/gojq v0.12.20
@@ -16,7 +16,7 @@ require (
 	github.com/wailsapp/wails/v3 v3.2.0-nightly.20261102
 	golang.design/x/hotkey v0.6.4
 	golang.org/x/crypto v0.58.0
-	golang.org/x/net v0.61.0
+	golang.org/x/net v0.62.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
